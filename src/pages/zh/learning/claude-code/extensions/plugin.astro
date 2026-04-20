@@ -1,0 +1,926 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Plugins：把 Skills、Subagents、Hooks、MCP 整包裝起來"
+  description="學會用 Plugin 把常用的 Skills、Subagents、Hooks、MCP 設定包成一個工具箱，換專案也能整包帶走。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-plugins">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 接上工具、學會新招，把重複工作自動化</h1>
+        <p class="detail-subtitle">
+          前面我們已經幫 Claude Code 建好基本規則，像是 CLAUDE.md、記憶整理、上下文管理。
+          接下來這一階段，重點不是再把更多東西塞進手冊，而是學會幫 Claude Code 加能力。
+          有些能力是讓它看得到外部工具，有些是讓它學會固定流程，有些是把大工作拆出去做，
+          還有一些是把重複動作直接自動化。這些能力各自有分工，不是同一種東西。
+        </p>
+      </header>
+
+      <!-- Section: Plugins 是什麼 -->
+      <h2 class="detail-heading">Plugins：把 Skills、Subagents、Hooks、MCP 整包裝起來</h2>
+      <p class="detail-paragraph">
+        你可以把 Plugin 想成一個「工具箱」。
+      </p>
+      <p class="detail-paragraph">
+        前面你已經分別學會怎麼做 Skill、Subagent、Hook、MCP，
+        但如果每次換專案都要重建一次，其實很麻煩。
+        這時候就可以把它們包成一個 Plugin。之後你只要把這個 Plugin 帶去別的專案，Claude Code 就能一起用到這些設定。
+      </p>
+
+      <h3 class="detail-subheading">示範</h3>
+      <p class="detail-paragraph">
+        我們來做一個叫做 <code>starter-toolbox</code> 的 Plugin。它裡面一次包四樣東西：
+      </p>
+      <ul class="usage-list">
+        <li><code>explain-code</code>：把程式碼講得比較白話。</li>
+        <li><code>code-reviewer</code>：幫你做程式碼審查。</li>
+        <li>自動格式化 Hook：Claude 改完檔案就跑 Prettier。</li>
+        <li><code>everything-test</code> MCP：拿來做最基本的 MCP 測試。</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這個設計的好處很直覺：同一個 Plugin，同時證明它真的能裝 Skill、Subagent、Hook、MCP。
+        Plugin 技能也會自動帶上命名空間，所以之後技能名稱會像 <code>/starter-toolbox:explain-code</code> 這樣，避免跟別的 plugin 撞名。
+      </p>
+
+      <!-- Main collapsible 1: 建立 Plugin 的範例步驟 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">建立 Plugin 的範例步驟</span>
+        </summary>
+        <div class="collapsible-body">
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 Plugin 的資料夾結構</h3>
+                <p class="step-desc">操作位置：VS Code 左側檔案總管</p>
+                <pre class="code-block"><code set:html={`test-plugin-bundle/
+└─ starter-toolbox/
+   ├─ .claude-plugin/
+   │  └─ plugin.json
+   ├─ skills/
+   │  └─ explain-code/
+   │     └─ SKILL.md
+   ├─ agents/
+   │  └─ code-reviewer.md
+   ├─ hooks/
+   │  └─ hooks.json
+   └─ .mcp.json`} /></pre>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 plugin.json</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">貼上：</p>
+                <pre class="code-block"><code set:html={`{
+  "name": "starter-toolbox",
+  "description": "把 explain-code、code-reviewer、auto-format、everything-test 打包在一起的示範 plugin",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}`} /></pre>
+                <p class="step-desc">
+                  <code>name</code> 很重要，因為它會變成之後 Skill 的命名空間。
+                  像這個例子裡，Skill 就會變成 <code>/starter-toolbox:explain-code</code>。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">把 Skill 放進 plugin</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">打開：<code>starter-toolbox/skills/explain-code/SKILL.md</code></p>
+                <p class="step-desc">貼上：</p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: 用新手聽得懂的方式解釋程式碼。適合在教學、導讀程式、介紹函式流程，或使用者問「這段程式碼在做什麼」時使用。
+---
+
+當你解釋程式碼時，請照這個順序回答：
+1. 先用一句話說明這段程式碼的用途。
+2. 再用簡單方式說明它的執行流程。
+3. 點出最重要的函式、變數或判斷條件。
+4. 如果有容易搞混的地方，主動提醒。
+5. 最後補一個「新手版總結」。
+
+回答時請遵守下面規則：
+- 用口語化的中文
+- 不要一開始就丟太多術語
+- 如果有術語，順手解釋一下
+- 優先說「它在幹嘛」，再說「它怎麼做到」
+- 如果程式碼不完整，要直接說你是根據目前看到的內容來判斷`} /></pre>
+                <p class="step-desc">
+                  Plugin 裡的 Skill 跟你平常做的 Skill 很像，只是現在它是包在 plugin 裡，
+                  所以之後會用 namespaced 指令來叫它。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">把 Subagent 放進 plugin</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">打開：<code>starter-toolbox/agents/code-reviewer.md</code></p>
+                <p class="step-desc">貼上：</p>
+                <pre class="code-block"><code set:html={`---
+name: code-reviewer
+description: 專門幫忙檢查程式碼改動，找 bug、邏輯問題、邊界情況和可讀性問題。適合在使用者要求 code review、檢查最近改動或找問題時使用。
+model: sonnet
+disallowedTools: Write, Edit
+---
+
+你是一個專門負責程式碼審查的 agent。
+
+你的任務是檢查使用者提供的程式碼、變更或檔案內容，找出最值得注意的問題，特別是：
+1. 可能的 bug
+2. 邏輯錯誤
+3. 邊界情況沒有處理好
+4. 可讀性差或太難維護的地方
+5. 重複邏輯
+6. 明顯的效能問題
+7. 安全性風險
+
+請遵守下面規則：
+- 先找真正重要的問題，不要把小風格問題排在前面
+- 如果你不確定，就直接說你不確定，不要硬猜
+- 說明問題時，要包含「問題在哪裡」、「為什麼是問題」、「建議怎麼改」
+- 優先用白話說明，不要堆太多術語
+- 除非使用者明確要求，否則不要直接修改程式碼`} /></pre>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">把 Hook 放進 plugin</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">打開：<code>starter-toolbox/hooks/hooks.json</code></p>
+                <p class="step-desc">貼上：</p>
+                <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write"
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+                <p class="step-desc">
+                  這裡就是把前面已經教過的「改完檔案就自動格式化」那套 hook，直接包進 plugin。
+                  Plugin hooks 用的事件、matcher、hook type，跟平常設定在 <code>.claude/settings.json</code> 的 hooks 是同一套規則。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">把 MCP 也包進 plugin</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">打開：<code>starter-toolbox/.mcp.json</code></p>
+
+                <!-- Nested collapsible: Windows -->
+                <details class="collapsible-nested">
+                  <summary class="collapsible-nested-trigger">
+                    <span class="collapsible-nested-icon"></span>
+                    <span class="collapsible-nested-title">Windows 使用者</span>
+                  </summary>
+                  <div class="collapsible-nested-body">
+                    <pre class="code-block"><code set:html={`{
+  "mcpServers": {
+    "everything-test": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-everything"]
+    }
+  }
+}`} /></pre>
+                  </div>
+                </details>
+
+                <!-- Nested collapsible: macOS / Linux -->
+                <details class="collapsible-nested">
+                  <summary class="collapsible-nested-trigger">
+                    <span class="collapsible-nested-icon"></span>
+                    <span class="collapsible-nested-title">macOS / Linux 使用者</span>
+                  </summary>
+                  <div class="collapsible-nested-body">
+                    <pre class="code-block"><code set:html={`{
+  "mcpServers": {
+    "everything-test": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"]
+    }
+  }
+}`} /></pre>
+                  </div>
+                </details>
+
+                <p class="step-desc">
+                  前面在 MCP 章節已經用過 <code>everything-test</code>，
+                  這裡只是把同一台測試用 MCP server 改成由 plugin 啟用。
+                  之後這些 MCP servers 會跟一般 MCP 工具一樣出現在 Claude Code 的工具清單裡。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">啟動 Claude Code，直接載入這個 plugin</h3>
+                <p class="step-desc">操作位置：VS Code 整合終端機</p>
+                <p class="step-desc">先確認你目前的路徑位置在 <code>test-plugin-bundle</code> 資料夾下，再輸入：</p>
+                <pre class="code-block code-block--command"><code>claude --plugin-dir ./starter-toolbox</code></pre>
+                <p class="step-desc">選擇「Yes, I trust this folder」。</p>
+                <p class="step-desc">
+                  它會直接載入你本地的 plugin，不用先安裝到 marketplace，也不用先走 <code>/plugin install</code>。
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Main collapsible 2: 實際測試 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">實際測試</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            下面這段我會故意拆成四個小測試。目的：可以一個一個確認 Skill 有沒有進來、Subagent 有沒有進來、Hook 有沒有進來、MCP 有沒有進來。
+          </p>
+          <p class="detail-paragraph">
+            操作位置：透過指令出現的 Claude Code 聊天框（按右鍵即可貼上）。
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">測試 Skill</h3>
+                <p class="step-desc">輸入：</p>
+                <pre class="code-block code-block--command"><code>/starter-toolbox:explain-code</code></pre>
+                <p class="step-desc">接著再貼這段程式碼：</p>
+                <pre class="code-block"><code set:html={`function sumPrices(items) {
+  let total = 0;
+  for (const item of items) {
+    total += item.price;
+  }
+  return total;
+}`} /></pre>
+                <p class="step-desc">
+                  如果成功，Claude Code 會用比較白話的方式解釋，並會照你剛才在 SKILL.md 裡寫的順序來。
+                  Plugin 裡的 skills 會用 <code>plugin-name:skill-name</code> 這種格式出現。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">測試 Subagent</h3>
+                <p class="step-desc">輸入：</p>
+                <pre class="code-block code-block--command"><code>/agents</code></pre>
+                <p class="step-desc">
+                  並按 Enter 鍵、選擇 Library，你應該要看得到 <code>starter-toolbox:code-reviewer</code> 出現在清單裡，
+                  請選擇它，再按 Run agent。
+                </p>
+                <p class="step-desc">接著再輸入：</p>
+                <pre class="code-block"><code set:html={`@"code-reviewer (agent)" 幫我檢查下面這段程式碼，列出最值得先修的問題：
+
+function divide(a, b) {
+  return a / b;
+}
+
+console.log(divide(10, 0));`} /></pre>
+                <p class="step-desc">
+                  如果成功，Claude Code 會用 code-reviewer 這個小幫手的風格回答，重點會偏向 bug、邏輯風險和邊界情況。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">測試 Hook</h3>
+                <p class="step-desc">先建立一個故意排版很亂、還沒格式化的檔案。</p>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第一步：建立測試檔</h4>
+                  <p class="step-desc">操作位置：VS Code 編輯器</p>
+                  <p class="step-desc">建立：<code>tmp-plugin-test/demo.js</code></p>
+                  <p class="step-desc">內容貼上：</p>
+                  <pre class="code-block"><code set:html={`const data={foo:"bar",items:[1,2,3]};function greet(name){console.log("Hello Plugin",name,data)}
+greet("world")`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第二步：請 Claude Code 只改一小段字</h4>
+                  <p class="step-desc">操作位置：Claude Code 聊天框</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code set:html={`請修改 tmp-plugin-test/demo.js：
+只把字串 "Hello Plugin" 改成 "Hello Plugin Works"。
+不要新增功能，不要重寫內容，但要主動整理格式。`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第三步：驗證格式化有沒有被觸發</h4>
+                  <p class="step-desc">操作位置：VS Code 整合終端機</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code>npx prettier --check demo.js</code></pre>
+                  <p class="step-desc">如果成功，你會看到兩件事：</p>
+                  <ul class="inline-list">
+                    <li>字串真的被改了。</li>
+                    <li>檔案格式也被整理好了。</li>
+                  </ul>
+                  <p class="step-desc">這就代表 plugin 裡的 Hook 有在工作。</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">測試 MCP</h3>
+                <p class="step-desc">輸入：</p>
+                <pre class="code-block code-block--command"><code>請先列出目前 everything-test 這台 MCP server 可用的工具名稱。</code></pre>
+                <p class="step-desc">
+                  如果 Claude 能列出工具，表示這台 plugin 內建的 MCP server 已經真的被載進來了。
+                </p>
+                <p class="step-desc">接著再輸入：</p>
+                <pre class="code-block code-block--command"><code>請使用 everything-test 做一個最簡單的 MCP 測試，並把結果回傳給我。</code></pre>
+                <p class="step-desc">
+                  如果 Claude 成功呼叫工具並回傳結果，就代表這個 Plugin 連 MCP 也包成功了。
+                  Plugin 啟用後，內建的 MCP servers 會像一般 MCP 一樣可用。
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- 小提醒 -->
+      <div class="note-card note-card--warning">
+        <p class="note-body">
+          <span class="note-icon" aria-hidden="true">⚠️</span>
+          <strong>小提醒：</strong>
+          如果你在修改 plugin 內容之後，Claude Code 還是抓到舊版本，先不要急著懷疑自己做錯。
+          建議改完之後跑一次 <code>/reload-plugins</code>，這樣比較容易讓 Skills、Agents、Hooks、plugin MCP servers 一起重載。
+        </p>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>Plugin</strong>：把 Skill、Subagent、Hook、MCP 整包在一起的「工具箱」。</li>
+          <li><strong>換專案也能帶走</strong>：一次設定好，下次換專案直接沿用，不必每次重建。</li>
+          <li><strong>命名空間</strong>：Plugin 內的 Skill 會變成 <code>/plugin-name:skill-name</code>，避免跟別的 plugin 撞名。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-plugins {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-subheading {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Usage list ── */
+  .usage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .usage-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .usage-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .usage-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline list (bulleted inside step or collapsible) ── */
+  .inline-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0 var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .inline-list li {
+    padding-left: var(--space-8);
+    position: relative;
+  }
+
+  .inline-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Collapsible sections (purple, top-level) ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Nested collapsible (orange) ── */
+  .collapsible-nested {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #f97316;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible-nested[open] {
+    border-top-color: #f97316;
+    border-right-color: #f97316;
+    border-bottom-color: #f97316;
+  }
+
+  .collapsible-nested-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-nested-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-nested-trigger:hover {
+    background-color: #fff7ed;
+  }
+
+  :root[data-theme='dark'] .collapsible-nested-trigger:hover {
+    background-color: rgba(249, 115, 22, 0.08);
+  }
+
+  .collapsible-nested-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-nested-icon::before,
+  .collapsible-nested-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #f97316;
+    border-radius: 1px;
+  }
+
+  .collapsible-nested-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-nested-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible-nested[open] .collapsible-nested-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-nested-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-nested-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Sub-option (inner card inside step) ── */
+  .sub-option {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .sub-option-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-card--warning {
+    border-left-color: #f59e0b;
+    background-color: #fffbeb;
+  }
+
+  :root[data-theme='dark'] .note-card--warning {
+    background-color: rgba(245, 158, 11, 0.08);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .note-icon {
+    display: inline-block;
+    margin-right: 0.35em;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .usage-list code,
+  .inline-list code,
+  .step-desc code,
+  .step-title code,
+  .note-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .collapsible-body,
+    .collapsible-nested-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .sub-option {
+      padding: var(--space-3);
+    }
+  }
+</style>

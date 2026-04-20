@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="學習導覽與地圖 — PyBullet"
+  description="PyBullet 是什麼？一個用 Python 操作的機器人模擬工具，適合入門機器人模擬、物理測試與控制設計。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container pb-guide">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">PyBullet 是什麼？</h1>
+        <p class="detail-subtitle">
+          你可以把它想成一個用 Python 操作的機器人模擬工具。它能在電腦裡建立一個虛擬世界，把地板、桌子、機器人、物品放進場景中，再按照物理規則讓它們移動、碰撞、抓取，或完成各種控制測試。它常被拿來做機器人模擬、物理測試、控制設計，也能用在強化學習和影像資料產生等應用。
+        </p>
+        <p class="detail-subtitle" style="margin-top: var(--space-3);">
+          PyBullet 很適合當作入門的第一站，原因很簡單：它相對容易上手，而且可以直接用 Python 撰寫與執行。對剛接觸模擬的人來說，不需要先理解太多複雜工具，就能很快看到成果。從最基本的模型載入，到輪式機器人控制，再到機械手臂、夾爪、影像擷取和資料紀錄，都可以一步一步往上延伸。
+        </p>
+      </header>
+
+      <!-- Section 1 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">它到底可以做什麼？</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        最基本的做法，是先建立模擬環境，設定重力、載入地板，再把機器人放進場景中。這些動作看起來簡單，卻是所有後續應用的起點。像是連接模擬器、設定重力、載入 URDF 模型、推進模擬、最後關閉連線，都是最常用的基本操作。
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        再往前一步，就能開始控制機器人。入門範例中，會先用 R2D2 這類比較容易理解的輪式機器人來練習，透過鍵盤控制左右輪速度，讓機器人前進、後退、左轉和右轉。這種方式很適合初學者，因為畫面直觀，控制結果也很清楚。
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        如果想做更完整的模擬，PyBullet 也能一路延伸到機械手臂控制。除了載入手臂模型之外，還可以處理關節、夾爪、末端位置、物件抓取、影像擷取、資料儲存，甚至加入搖桿互動。也就是說，它不只是把模型放進虛擬世界，而是能慢慢做成一套完整的模擬與控制流程。
+      </p>
+
+      <!-- Section 2 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">為什麼很多人會先從 PyBullet 開始？</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        一個很大的原因是，它的學習門檻相對親切。PyBullet 直接用 Python 來建立環境和執行程式，整體操作方式比較容易理解；而且它本身就有提供一些內建模型和資源，剛開始不一定要自己準備所有模型檔。常見的入門做法，是先跑內建範例，像是 Franka Emika Panda，先確認環境正常，再往下學控制。
+      </p>
+
+      <!-- Section 3 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">它適合哪些人？</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        如果是第一次接觸機器人模擬、想學 Python 控制模擬、想做輪式機器人或機械手臂，PyBullet 都很適合當作起點。就算不是機器人相關背景，只要願意動手跑程式，通常也能從它慢慢建立起基本概念。
+      </p>
+
+      <!-- Section 4 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">它只是拿來看 3D 畫面的工具嗎？</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        不是。雖然 PyBullet 可以開啟 GUI 視窗，直接看到模擬畫面，但它真正有價值的地方不只在「看」。物理計算、碰撞處理、關節控制這些核心工作，主要還是由 CPU 負責；GUI 模式則是把模擬結果用畫面呈現出來。除了有畫面的模式之外，也可以用沒有畫面的 DIRECT 模式來做大量模擬、資料生成或自動化測試。
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        這代表 PyBullet 不只是展示工具，而是一個可以拿來做控制、驗證、拍影像、存資料的實用平台。當模擬內容開始變多、需要大量執行時，這一點就特別重要。
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pb-guide {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+</style>

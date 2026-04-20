@@ -1,0 +1,797 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM — Introduction & Applications"
+  description="NotebookLM is a source-centered workspace for reading, organizing, transforming, and reusing the material you already have."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-intro">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">NotebookLM — Introduction & Applications</h1>
+        <p class="detail-subtitle">
+          A source-centered workspace for organizing and learning — designed to make the material
+          you already have easier to read, compare, and reuse.
+        </p>
+      </header>
+
+      <!-- Section 1: Opening -->
+      <h2 class="detail-heading">When there is more material, what we need is not search — it is organization</h2>
+      <p class="detail-paragraph">
+        Most of us now deal with a steady stream of information every day: course handouts,
+        research articles, slide decks, web pages, videos, audio recordings, or a long pile of
+        unsorted notes. The hard part is usually not that we cannot find the material — it is that
+        <strong>the material is right in front of us, but we are not sure where to start, how to
+        pick out the key points, or how to bring different sources together</strong>.
+      </p>
+      <p class="detail-paragraph">
+        NotebookLM has drawn attention precisely because it is well suited to this kind of
+        situation. It is a workspace that helps you read, organize, transform, and reuse the
+        material you already have. You gather your sources into one notebook, then use questions,
+        summaries, guided reading, study aids, or other output formats to gradually turn scattered
+        content into something more coherent.
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-card--muted">
+          <p class="compare-label">General AI chat tools</p>
+          <p class="compare-title">Ask a question, get an answer</p>
+          <p class="compare-desc">
+            Good at answering questions from scratch, but less suited to helping you make use of
+            material you already have.
+          </p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">NotebookLM</p>
+          <p class="compare-title">Make your existing material usable</p>
+          <p class="compare-desc">
+            Answers a different question: "I already have a lot of material — now what do I do
+            with it?"
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 2: What is it -->
+      <h2 class="detail-heading">What is NotebookLM?</h2>
+      <p class="detail-paragraph">
+        A useful way to think of NotebookLM is as a <strong>source-centered tool for organizing
+        and learning</strong>. Its strength is not in generating content from scratch, but in
+        making the material you already have easier to read, understand, compare, and reuse.
+      </p>
+      <p class="detail-paragraph">
+        It fits situations like these: a long handout, a set of articles on a related topic, a
+        deck of course slides, a video, a meeting recording, or an ongoing research project. Once
+        these sources are placed into the same notebook, you can work around them directly,
+        instead of starting from a blank page every time.
+      </p>
+      <p class="detail-paragraph">
+        Over time, a notebook becomes more than a pile of files — it turns into a
+        <strong>focused, contextual, and reusable working space for a topic</strong>.
+      </p>
+
+      <!-- Section 3: Three main uses -->
+      <h2 class="detail-heading">Three common ways to use it</h2>
+      <p class="detail-paragraph">
+        The most common uses of NotebookLM are usually not a single feature, but a shift in how
+        time-consuming material gets handled.
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">Quick orientation</h3>
+          <p class="feature-alias">Summary and structure first</p>
+          <p class="feature-desc">
+            When a source is long, reading a summary and sketching the structure first is
+            usually easier than reading straight through. A good entry point for an unfamiliar
+            topic.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">Cross-source organization</h3>
+          <p class="feature-alias">Compare and consolidate</p>
+          <p class="feature-desc">
+            Bring several sources on the same topic together, surface shared points, mark
+            differences, compare concepts, or reshape scattered content into a more coherent
+            form. Especially useful when the reading spans multiple sources.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">Format transformation</h3>
+          <p class="feature-alias">The same material, a different way in</p>
+          <p class="feature-desc">
+            The same set of sources does not always need to be read in the same way. Some prefer
+            a summary, some a guided audio walkthrough, some a quiz, some a visual map.
+            NotebookLM lets material take more than one shape.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 4: Data types -->
+      <h2 class="detail-heading">What kinds of sources can it handle?</h2>
+      <p class="detail-paragraph">
+        Much of NotebookLM's usefulness comes from the fact that it is not limited to a single
+        format. When we study, research, prepare lessons, or work on a project, we are usually
+        dealing with several kinds of sources at once. The value is not "it can read a single
+        document" — it is that <strong>different formats can live under the same topic and be
+        organized, compared, and used together</strong>.
+      </p>
+
+      <div class="source-grid">
+        <span class="source-chip">PDF</span>
+        <span class="source-chip">Web pages</span>
+        <span class="source-chip">Google Docs</span>
+        <span class="source-chip">Slide decks</span>
+        <span class="source-chip">YouTube videos</span>
+        <span class="source-chip">Audio files</span>
+        <span class="source-chip">Your own notes</span>
+      </div>
+
+      <p class="detail-paragraph">
+        In other words, NotebookLM is not primarily for a single article — it is better suited to
+        <strong>a set of related sources</strong>. Once topic-related material lives in the same
+        notebook, the organizing and the interaction that follow tend to go a lot more smoothly.
+      </p>
+
+      <!-- Section 5: Functions grouped -->
+      <h2 class="detail-heading">How to think about the main features</h2>
+      <p class="detail-paragraph">
+        Rather than a tool with just a chat window, NotebookLM is better understood as
+        <strong>a workspace with several entry points into the same material</strong>. Its
+        different features are all doing the same thing: helping you approach your sources from
+        different angles.
+      </p>
+
+      <ol class="loop-list">
+        <li class="loop-step">
+          <span class="loop-num">A</span>
+          <div class="loop-body">
+            <h3 class="loop-title">For quick understanding</h3>
+            <p class="loop-desc">
+              Automatic summaries, key-point extraction, topic walkthroughs — useful
+              <strong>when you are first approaching the material</strong>. Their value is in
+              shortening the time it takes to get a sense of the whole.
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">B</span>
+          <div class="loop-body">
+            <h3 class="loop-title">For interactive organization</h3>
+            <p class="loop-desc">
+              Q&A, comparisons, follow-up questions, saved notes — better used
+              <strong>once you are already familiar with the material</strong>. The point is no
+              longer to re-read the summary, but to shape your own understanding.
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">C</span>
+          <div class="loop-body">
+            <h3 class="loop-title">For format transformation</h3>
+            <p class="loop-desc">
+              Audio overviews, study cards, quizzes, mind maps, infographics, video walkthroughs,
+              or slide decks. Well suited to <strong>re-digesting, re-expressing, sharing, or
+              simply changing the way in</strong>.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <blockquote class="pullquote">
+        NotebookLM's real strength is not just "reading for you," but "giving you another way to
+        read the same thing again."
+      </blockquote>
+
+      <!-- Section 6: Who it's for -->
+      <h2 class="detail-heading">Who is it especially useful for?</h2>
+      <p class="detail-paragraph">
+        NotebookLM is often introduced in a learning setting, but it is not only for learners. It
+        is useful for <strong>anyone whose work involves reading, organizing, or restructuring
+        material</strong>.
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">Teachers & speakers</h3>
+          <p class="feature-alias">Prepare and adapt materials</p>
+          <p class="feature-desc">
+            Organize teaching material, design guided readings, prepare for class, consolidate
+            supplementary sources, or turn the same content into different formats for different
+            teaching contexts.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">Researchers & writers</h3>
+          <p class="feature-alias">Early-stage organization</p>
+          <p class="feature-desc">
+            A good fit for the early stage of handling large amounts of material. Before
+            conclusions fully take shape, seeing how the pieces connect matters more than rushing
+            to a judgment.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">General users</h3>
+          <p class="feature-alias">Long reads & unfamiliar topics</p>
+          <p class="feature-desc">
+            Work through long texts, take in unfamiliar topics, compare multiple sources, or
+            turn hard-to-approach material into a version that is easier to enter.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 7: Applications -->
+      <h2 class="detail-heading">Three common application scenarios</h2>
+
+      <div class="app-stack">
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">Scenario 1</span>
+            <h3 class="app-card__title">Teaching and learning</h3>
+          </div>
+          <p class="app-card__desc">
+            NotebookLM fits well in the role of an "organizing intermediary" — not a replacement
+            for teaching materials, but something that makes them easier to use. Handouts, slides,
+            supplementary articles, videos, and references can be gathered into a single notebook,
+            so pre-class orientation, in-class explanation, and post-class review all draw from
+            the same foundation.
+          </p>
+          <p class="app-card__note">
+            Good for three things in particular:
+            <strong>orienting first, organizing further, transforming the format</strong>.
+          </p>
+        </section>
+
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">Scenario 2</span>
+            <h3 class="app-card__title">Research and report preparation</h3>
+          </div>
+          <p class="app-card__desc">
+            The hardest part of research or a report is usually not the absence of material, but
+            that there is too much of it and the pieces do not line up right away. Gathering the
+            sources into one notebook often helps the connections between topics become visible
+            sooner. Start from a summary, move into more specific questions, and turn what is
+            worth keeping into notes of your own.
+          </p>
+          <p class="app-card__note">
+            Suited to the early stage of
+            <strong>understanding the material before forming a view</strong>.
+          </p>
+        </section>
+
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">Scenario 3</span>
+            <h3 class="app-card__title">Content creation and knowledge work</h3>
+          </div>
+          <p class="app-card__desc">
+            Most content work does not begin with writing — it begins with collecting material,
+            finding threads, drawing out themes, and picking out what matters. NotebookLM works
+            well as a midway station: gather the sources, settle on a main line, and then decide
+            what suits an article, a slide deck, a video outline, or an audio walkthrough. A more
+            stable flow than researching and drafting at the same time.
+          </p>
+          <p class="app-card__note">
+            A natural fit as the
+            <strong>topic-organizing layer</strong> in a personal knowledge workflow.
+          </p>
+        </section>
+      </div>
+
+      <!-- Section 8: How to start -->
+      <h2 class="detail-heading">How to start using it</h2>
+      <p class="detail-paragraph">
+        For a first encounter with NotebookLM, the best approach is usually not to try every
+        feature at once, but to <strong>start with a simple topic</strong>.
+      </p>
+
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">1</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Pick a clear topic</h4>
+            <p class="start-step__desc">A handout, a report topic, a cluster of articles, or a meeting that needs to be organized.</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">2</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Gather the related material into one notebook</h4>
+            <p class="start-step__desc">Keep only sources that are genuinely related. The clearer the topic, the smoother the experience tends to be.</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">3</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Read the overall summary first</h4>
+            <p class="start-step__desc">Build a sense of the whole before getting into specific details.</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">4</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Ask a few concrete questions</h4>
+            <p class="start-step__desc">For example: what are the key points, where do these sources differ, which concepts are worth understanding first?</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">5</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Then choose an output format to match the task</h4>
+            <p class="start-step__desc">Notes, study cards, mind maps, audio summaries — reach for them when there is a clear task, not just to try the feature.</p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section 9: Takeaway -->
+      <h2 class="detail-heading">If there is only one thing to remember</h2>
+
+      <div class="takeaway">
+        <p class="takeaway__lead">
+          NotebookLM is not simply a tool that answers questions — it is a tool that makes your
+          material <strong>easier to read, easier to organize, and easier to reuse</strong>.
+        </p>
+        <p class="takeaway__desc">
+          Its value is not only in saving time, but in giving a sense of direction to the work of
+          handling material. For anyone who reads, teaches, researches, organizes content, works
+          on projects, or takes in new topics, the help it offers is not to make the material
+          smaller, but to make it more usable.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-intro {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Compare cards */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-4);
+  }
+
+  .compare-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Source chips */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Function loop list */
+  .loop-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .loop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .loop-step:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  .loop-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .loop-body {
+    flex: 1;
+  }
+
+  .loop-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .loop-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.7;
+  }
+
+  /* Application stack */
+  .app-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .app-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .app-card:hover {
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+  }
+
+  .app-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .app-card__tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .app-card__title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .app-card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .app-card__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .app-card__note strong {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Start steps */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Takeaway */
+  .takeaway {
+    margin-top: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .takeaway__lead {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  .takeaway__lead strong {
+    color: var(--color-accent);
+  }
+
+  .takeaway__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid,
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .loop-step {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .loop-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .app-card {
+      padding: var(--space-6);
+    }
+
+    .takeaway {
+      padding: var(--space-6);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

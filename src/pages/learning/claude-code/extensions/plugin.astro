@@ -1,0 +1,927 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Plugins: Bundle Skills, Subagents, Hooks, and MCP Together"
+  description="Learn how to bundle your commonly-used Skills, Subagents, Hooks, and MCP servers into a single Plugin — your own portable toolbox you can carry between projects."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-plugins">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Connect Claude Code to Tools, Teach It New Tricks, and Automate Repetitive Work</h1>
+        <p class="detail-subtitle">
+          We've already set up the basics for Claude Code — CLAUDE.md, memory management, context handling.
+          The next stage isn't about stuffing more rules into the handbook. It's about giving Claude Code
+          new abilities. Some let it see external tools, some let it follow fixed workflows, some let it
+          farm out large tasks, and some automate repetitive actions. These abilities each have their own role.
+        </p>
+      </header>
+
+      <!-- Section: What is a Plugin -->
+      <h2 class="detail-heading">Plugins: Bundle Skills, Subagents, Hooks, and MCP Together</h2>
+      <p class="detail-paragraph">
+        You can think of a Plugin as a "toolbox."
+      </p>
+      <p class="detail-paragraph">
+        At this point you already know how to make Skills, Subagents, Hooks, and MCP servers separately.
+        But if you have to rebuild them every time you switch projects, it gets tedious fast.
+        That's where Plugins come in. You wrap everything into a single Plugin, and then all you have to do is
+        carry that Plugin to another project — Claude Code will pick up the whole set at once.
+      </p>
+
+      <h3 class="detail-subheading">Demo</h3>
+      <p class="detail-paragraph">
+        Let's build a Plugin called <code>starter-toolbox</code>. It bundles four things at once:
+      </p>
+      <ul class="usage-list">
+        <li><code>explain-code</code>: Explains code in plainer language.</li>
+        <li><code>code-reviewer</code>: Helps you review code.</li>
+        <li>Auto-format Hook: Runs Prettier right after Claude edits a file.</li>
+        <li><code>everything-test</code> MCP: A minimal MCP server for smoke testing.</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        The design of this demo is straightforward: a single Plugin that proves it really can carry a Skill, a Subagent, a Hook, and an MCP server all together.
+        Plugin skills also get a namespace automatically, so a skill will show up as <code>/starter-toolbox:explain-code</code>, which avoids collisions with other plugins.
+      </p>
+
+      <!-- Main collapsible 1: Example steps for building a Plugin -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">Example steps for building a Plugin</span>
+        </summary>
+        <div class="collapsible-body">
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">Create the Plugin folder structure</h3>
+                <p class="step-desc">Where: the VS Code Explorer sidebar</p>
+                <pre class="code-block"><code set:html={`test-plugin-bundle/
+└─ starter-toolbox/
+   ├─ .claude-plugin/
+   │  └─ plugin.json
+   ├─ skills/
+   │  └─ explain-code/
+   │     └─ SKILL.md
+   ├─ agents/
+   │  └─ code-reviewer.md
+   ├─ hooks/
+   │  └─ hooks.json
+   └─ .mcp.json`} /></pre>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">Create plugin.json</h3>
+                <p class="step-desc">Where: the VS Code editor</p>
+                <p class="step-desc">Paste in:</p>
+                <pre class="code-block"><code set:html={`{
+  "name": "starter-toolbox",
+  "description": "A demo plugin that bundles explain-code, code-reviewer, auto-format, and everything-test together",
+  "version": "1.0.0",
+  "author": {
+    "name": "Your Name"
+  }
+}`} /></pre>
+                <p class="step-desc">
+                  <code>name</code> matters — it becomes the namespace for any skills in the plugin.
+                  In this example, the skill will appear as <code>/starter-toolbox:explain-code</code>.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">Put a Skill into the plugin</h3>
+                <p class="step-desc">Where: the VS Code editor</p>
+                <p class="step-desc">Open: <code>starter-toolbox/skills/explain-code/SKILL.md</code></p>
+                <p class="step-desc">Paste in:</p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: Explain code in beginner-friendly language. Use it for teaching, walking through code, introducing how a function works, or whenever the user asks "what is this code doing?"
+---
+
+When you explain code, please answer in this order:
+1. Start with one sentence on what the code is for.
+2. Then describe, in plain language, how it runs.
+3. Point out the most important functions, variables, or conditions.
+4. If something is easy to mix up, flag it proactively.
+5. Finish with a short "beginner's summary."
+
+Follow these rules when answering:
+- Use conversational English.
+- Don't drop heavy jargon right at the start.
+- If you must use a term, explain it in passing.
+- Say "what it does" first, then "how it does it."
+- If the code is incomplete, say so — make clear you're reasoning from what you can see.`} /></pre>
+                <p class="step-desc">
+                  A Skill inside a Plugin is very similar to a regular Skill — the only difference is that it's
+                  wrapped in the plugin, so you'll invoke it via its namespaced command.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">Put a Subagent into the plugin</h3>
+                <p class="step-desc">Where: the VS Code editor</p>
+                <p class="step-desc">Open: <code>starter-toolbox/agents/code-reviewer.md</code></p>
+                <p class="step-desc">Paste in:</p>
+                <pre class="code-block"><code set:html={`---
+name: code-reviewer
+description: A dedicated agent for reviewing code changes — hunts for bugs, logic problems, edge cases, and readability issues. Use it when the user asks for a code review, wants recent changes checked, or is hunting for problems.
+model: sonnet
+disallowedTools: Write, Edit
+---
+
+You are an agent whose job is to review code.
+
+Your task is to inspect the code, changes, or file contents the user provides and surface the most worthwhile issues. Especially look for:
+1. Possible bugs
+2. Logic errors
+3. Edge cases that aren't handled
+4. Hard-to-read or hard-to-maintain code
+5. Duplicated logic
+6. Obvious performance issues
+7. Security risks
+
+Follow these rules:
+- Lead with what really matters — don't put minor style nits at the top.
+- If you're unsure, say so; don't guess.
+- When describing a problem, include "where it is," "why it's a problem," and "how to fix it."
+- Prefer plain language over piled-up jargon.
+- Don't edit the code directly unless the user explicitly asks you to.`} /></pre>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">Put a Hook into the plugin</h3>
+                <p class="step-desc">Where: the VS Code editor</p>
+                <p class="step-desc">Open: <code>starter-toolbox/hooks/hooks.json</code></p>
+                <p class="step-desc">Paste in:</p>
+                <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write"
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+                <p class="step-desc">
+                  This is just the "auto-format after each edit" hook you already saw earlier, now packaged into the plugin.
+                  Plugin hooks use the same events, matchers, and hook types as hooks configured in <code>.claude/settings.json</code>.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">Bundle an MCP server into the plugin</h3>
+                <p class="step-desc">Where: the VS Code editor</p>
+                <p class="step-desc">Open: <code>starter-toolbox/.mcp.json</code></p>
+
+                <!-- Nested collapsible: Windows -->
+                <details class="collapsible-nested">
+                  <summary class="collapsible-nested-trigger">
+                    <span class="collapsible-nested-icon"></span>
+                    <span class="collapsible-nested-title">Windows users</span>
+                  </summary>
+                  <div class="collapsible-nested-body">
+                    <pre class="code-block"><code set:html={`{
+  "mcpServers": {
+    "everything-test": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-everything"]
+    }
+  }
+}`} /></pre>
+                  </div>
+                </details>
+
+                <!-- Nested collapsible: macOS / Linux -->
+                <details class="collapsible-nested">
+                  <summary class="collapsible-nested-trigger">
+                    <span class="collapsible-nested-icon"></span>
+                    <span class="collapsible-nested-title">macOS / Linux users</span>
+                  </summary>
+                  <div class="collapsible-nested-body">
+                    <pre class="code-block"><code set:html={`{
+  "mcpServers": {
+    "everything-test": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"]
+    }
+  }
+}`} /></pre>
+                  </div>
+                </details>
+
+                <p class="step-desc">
+                  We already used <code>everything-test</code> in the MCP chapter —
+                  here we're taking that same smoke-test MCP server and letting the plugin launch it instead.
+                  Once loaded, these MCP servers show up in Claude Code's tool list just like any other MCP tool.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">Launch Claude Code and load the plugin directly</h3>
+                <p class="step-desc">Where: the VS Code integrated terminal</p>
+                <p class="step-desc">Make sure your current path is inside the <code>test-plugin-bundle</code> folder, then run:</p>
+                <pre class="code-block code-block--command"><code>claude --plugin-dir ./starter-toolbox</code></pre>
+                <p class="step-desc">Choose "Yes, I trust this folder."</p>
+                <p class="step-desc">
+                  This loads your local plugin directly — no need to publish it to a marketplace first, and no need to run <code>/plugin install</code>.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Main collapsible 2: Real-world test -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">Testing it for real</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            I'll split the test into four small pieces on purpose. The goal: you can verify, one by one, whether the Skill is really loaded, whether the Subagent is really loaded, whether the Hook is really loaded, and whether the MCP is really loaded.
+          </p>
+          <p class="detail-paragraph">
+            Where: the Claude Code chat box that opens after you run the command (right-click to paste).
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">Test the Skill</h3>
+                <p class="step-desc">Type:</p>
+                <pre class="code-block code-block--command"><code>/starter-toolbox:explain-code</code></pre>
+                <p class="step-desc">Then paste this snippet:</p>
+                <pre class="code-block"><code set:html={`function sumPrices(items) {
+  let total = 0;
+  for (const item of items) {
+    total += item.price;
+  }
+  return total;
+}`} /></pre>
+                <p class="step-desc">
+                  If it works, Claude Code will explain the code in plain language, following the order you wrote into SKILL.md.
+                  Skills inside a Plugin appear in the format <code>plugin-name:skill-name</code>.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">Test the Subagent</h3>
+                <p class="step-desc">Type:</p>
+                <pre class="code-block code-block--command"><code>/agents</code></pre>
+                <p class="step-desc">
+                  Press Enter, pick Library — you should see <code>starter-toolbox:code-reviewer</code> in the list.
+                  Select it, then click Run agent.
+                </p>
+                <p class="step-desc">Next, type:</p>
+                <pre class="code-block"><code set:html={`@"code-reviewer (agent)" Please review the code below and list the most important issues to fix first:
+
+function divide(a, b) {
+  return a / b;
+}
+
+console.log(divide(10, 0));`} /></pre>
+                <p class="step-desc">
+                  If it works, Claude Code will answer in the code-reviewer style — focused on bugs, logic risks, and edge cases.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">Test the Hook</h3>
+                <p class="step-desc">Start by creating a deliberately messy, unformatted file.</p>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">Step 1: Create the test file</h4>
+                  <p class="step-desc">Where: the VS Code editor</p>
+                  <p class="step-desc">Create: <code>tmp-plugin-test/demo.js</code></p>
+                  <p class="step-desc">Paste this content:</p>
+                  <pre class="code-block"><code set:html={`const data={foo:"bar",items:[1,2,3]};function greet(name){console.log("Hello Plugin",name,data)}
+greet("world")`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">Step 2: Ask Claude Code to change just one small string</h4>
+                  <p class="step-desc">Where: the Claude Code chat box</p>
+                  <p class="step-desc">Type:</p>
+                  <pre class="code-block code-block--command"><code set:html={`Please modify tmp-plugin-test/demo.js:
+Only change the string "Hello Plugin" to "Hello Plugin Works."
+Don't add new functionality, don't rewrite anything else — but do tidy up the formatting.`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">Step 3: Verify the formatter actually fired</h4>
+                  <p class="step-desc">Where: the VS Code integrated terminal</p>
+                  <p class="step-desc">Run:</p>
+                  <pre class="code-block code-block--command"><code>npx prettier --check demo.js</code></pre>
+                  <p class="step-desc">If it worked, two things will be true:</p>
+                  <ul class="inline-list">
+                    <li>The string really has been changed.</li>
+                    <li>The file is also properly formatted.</li>
+                  </ul>
+                  <p class="step-desc">That means the Hook inside the plugin is doing its job.</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">Test the MCP server</h3>
+                <p class="step-desc">Type:</p>
+                <pre class="code-block code-block--command"><code>First, list the tool names currently available on the everything-test MCP server.</code></pre>
+                <p class="step-desc">
+                  If Claude can list the tools, that means the MCP server bundled into the plugin really did get loaded.
+                </p>
+                <p class="step-desc">Next, type:</p>
+                <pre class="code-block code-block--command"><code>Please run the simplest possible MCP test using everything-test and return the result to me.</code></pre>
+                <p class="step-desc">
+                  If Claude successfully calls a tool and returns a result, the MCP server is packaged correctly into the Plugin.
+                  Once the Plugin is active, its bundled MCP servers behave like any other MCP tool.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Friendly reminder -->
+      <div class="note-card note-card--warning">
+        <p class="note-body">
+          <span class="note-icon" aria-hidden="true">⚠️</span>
+          <strong>Heads up:</strong>
+          If you edit the plugin's contents and Claude Code still seems to be using the old version, don't immediately assume you did something wrong.
+          After an edit, try running <code>/reload-plugins</code> — that makes it easier to reload Skills, Agents, Hooks, and plugin MCP servers together.
+        </p>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">Key takeaways from this page</p>
+        <ul class="summary-list">
+          <li><strong>Plugin</strong>: a "toolbox" that bundles Skills, Subagents, Hooks, and MCP servers together.</li>
+          <li><strong>Portable across projects</strong>: set it up once, and reuse it in the next project without rebuilding.</li>
+          <li><strong>Namespacing</strong>: Skills inside a Plugin become <code>/plugin-name:skill-name</code>, so they won't collide with other plugins.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-plugins {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-subheading {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Usage list ── */
+  .usage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .usage-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .usage-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .usage-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline list (bulleted inside step or collapsible) ── */
+  .inline-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0 var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .inline-list li {
+    padding-left: var(--space-8);
+    position: relative;
+  }
+
+  .inline-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Collapsible sections (purple, top-level) ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Nested collapsible (orange) ── */
+  .collapsible-nested {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #f97316;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible-nested[open] {
+    border-top-color: #f97316;
+    border-right-color: #f97316;
+    border-bottom-color: #f97316;
+  }
+
+  .collapsible-nested-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-nested-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-nested-trigger:hover {
+    background-color: #fff7ed;
+  }
+
+  :root[data-theme='dark'] .collapsible-nested-trigger:hover {
+    background-color: rgba(249, 115, 22, 0.08);
+  }
+
+  .collapsible-nested-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-nested-icon::before,
+  .collapsible-nested-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #f97316;
+    border-radius: 1px;
+  }
+
+  .collapsible-nested-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-nested-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible-nested[open] .collapsible-nested-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-nested-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-nested-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Sub-option (inner card inside step) ── */
+  .sub-option {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .sub-option-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-card--warning {
+    border-left-color: #f59e0b;
+    background-color: #fffbeb;
+  }
+
+  :root[data-theme='dark'] .note-card--warning {
+    background-color: rgba(245, 158, 11, 0.08);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .note-icon {
+    display: inline-block;
+    margin-right: 0.35em;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .usage-list code,
+  .inline-list code,
+  .step-desc code,
+  .step-title code,
+  .note-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .collapsible-body,
+    .collapsible-nested-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .sub-option {
+      padding: var(--space-3);
+    }
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import profilePhoto from '../../assets/profile-photo.jpg';
+---
+
+<BaseLayout title="2025 NCHU AI-Empowered Robotics in Smart Manufacturing Competition" lang="en">
+  <section class="section">
+    <div class="container news-detail">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+      <h1 class="news-detail-title">Mentored students advanced to the finals of the "2025 NCHU AI-Empowered Robotics in Smart Manufacturing Competition"</h1>
+      <p class="news-detail-date">2025/11/22</p>
+      <div class="news-detail-body">
+        <Image
+          src={profilePhoto}
+          alt="AI Competition 2025"
+          width={600}
+          class="news-detail-img"
+        />
+        <p class="news-detail-placeholder">Content coming soon.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .news-detail {
+    max-width: 48rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .news-detail-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+
+  .news-detail-date {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+  }
+
+  .news-detail-img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--space-6);
+  }
+
+  .news-detail-placeholder {
+    color: var(--color-text-secondary);
+  }
+</style>

@@ -1,0 +1,219 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../i18n/utils';
+import { Image } from 'astro:assets';
+import profilePhoto from '../../assets/profile-photo.jpg';
+
+const locale = 'zh';
+const i = t(locale);
+---
+
+<BaseLayout title={i.site.title} description={i.site.description} lang="zh">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <h1 class="hero-name">{i.home.hero.name}</h1>
+        <p class="hero-title">{i.home.hero.title}</p>
+        <p class="hero-title"><a class="hero-adjunct-link" href={i.home.hero.adjunct_url} target="_blank" rel="noopener noreferrer">{i.home.hero.adjunct}</a></p>
+        {i.home.hero.description && <p class="hero-description">{i.home.hero.description}</p>}
+      </div>
+      <div class="hero-photo">
+        <Image
+          src={profilePhoto}
+          alt="王詩婷"
+          width={280}
+          height={280}
+          class="photo"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Interests -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">{i.home.sections.research}</h2>
+      <div class="research-grid">
+        {i.research_interests.map((item) => (
+          <div class="card">
+            <h3 class="research-card-title">{item.title}</h3>
+            <p class="research-card-desc">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- News -->
+  <section class="section" style="background-color: var(--color-bg-secondary);">
+    <div class="container">
+      <h2 class="section-title">{i.home.sections.news}</h2>
+      <ul class="news-list">
+        <li class="news-item">
+          <span class="news-date">2025/11/22</span>
+          <span class="news-text">指導學生陳冠廷、吳貞昀、黃晟偉晉級「2025 中興大學 AI 賦能與機器人於智慧製造應用專題實作競賽」決賽</span>
+        </li>
+        <li class="news-item">
+          <span class="news-date">2025/11/08</span>
+          <span class="news-text">指導學生吳貞昀獲得 CACS 最佳報告獎</span>
+        </li>
+        <li class="news-item">
+          <span class="news-date">2025/11/06</span>
+          <span class="news-text">指導學生黃晟偉、陳冠廷、吳貞昀、史其恩獲得「114 年精密工程專題與論文獎」大專專題獎—銀獎</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    padding-block: var(--space-16) var(--space-12);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .hero-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+  }
+
+  .hero-content {
+    flex: 1;
+  }
+
+  .hero-greeting {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .hero-name {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+  }
+
+  .hero-title {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    font-weight: 500;
+    margin-bottom: var(--space-1);
+  }
+
+  .hero-adjunct-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+
+  .hero-adjunct-link:hover {
+    text-decoration: underline;
+  }
+
+  .hero-affiliation {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-description {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-8);
+    max-width: 36rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .hero-photo {
+    flex-shrink: 0;
+  }
+
+  .photo {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--color-border);
+  }
+
+  /* Research grid */
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .research-card-title {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-3);
+  }
+
+  .research-card-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* News */
+  .news-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .news-item {
+    display: flex;
+    gap: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .news-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .news-date {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+    min-width: 3.5rem;
+  }
+
+  .news-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .hero-inner {
+      flex-direction: column-reverse;
+      text-align: center;
+      gap: var(--space-8);
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero-description {
+      max-width: 100%;
+    }
+
+    .photo {
+      width: 200px;
+      height: 200px;
+    }
+  }
+</style>

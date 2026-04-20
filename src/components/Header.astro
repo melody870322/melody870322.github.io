@@ -1,0 +1,502 @@
+---
+import { t, getLocaleFromUrl, getSwitchedLocalePath, type Locale } from '../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const i = t(locale);
+const currentPath = Astro.url.pathname;
+
+const switchLocale: Locale = locale === 'en' ? 'zh' : 'en';
+const switchLabel = locale === 'en' ? '中文' : 'EN';
+const switchPath = getSwitchedLocalePath(currentPath, switchLocale);
+
+function navPath(path: string) {
+  if (locale === 'en') return path;
+  return `/zh${path === '/' ? '' : path}`;
+}
+
+type NavItem = {
+  label: string;
+  href: string;
+  children?: NavItem[];
+};
+
+const navItems: NavItem[] = [
+  { label: i.nav.home, href: navPath('/') },
+  {
+    label: i.nav.research_results,
+    href: navPath('/research'),
+    children: [
+      { label: i.nav.research_vla, href: navPath('/research/vla') },
+      { label: i.nav.research_perception, href: navPath('/research/perception') },
+      { label: i.nav.research_action, href: navPath('/research/action-recognition') },
+      { label: i.nav.research_handwriting, href: navPath('/research/handwriting') },
+    ],
+  },
+  { label: i.nav.publications, href: navPath('/publications') },
+  { label: i.nav.timeline, href: navPath('/timeline') },
+  {
+    label: i.nav.learning,
+    href: navPath('/learning'),
+    children: [
+      {
+        label: i.nav.ai_agent,
+        href: '#',
+        children: [
+          { label: i.nav.ai_agent_basics, href: navPath('/learning/ai-agent/basics') },
+        ],
+      },
+      {
+        label: 'NotebookLM',
+        href: '#',
+        children: [
+          { label: i.nav.nb_intro_apps, href: navPath('/learning/notebooklm/intro-apps') },
+          { label: i.nav.nb_principles, href: navPath('/learning/notebooklm/principles') },
+          {
+            label: i.nav.nb_tutorials,
+            href: '#',
+            children: [
+              { label: i.nav.nb_basics, href: navPath('/learning/notebooklm/tutorials/basics') },
+              { label: i.nav.nb_organize, href: navPath('/learning/notebooklm/tutorials/organize') },
+              { label: i.nav.nb_media, href: navPath('/learning/notebooklm/tutorials/media') },
+              { label: i.nav.nb_interactive, href: navPath('/learning/notebooklm/tutorials/interactive') },
+            ],
+          },
+        ],
+      },
+      {
+        label: 'Claude Code',
+        href: '#',
+        children: [
+          { label: i.nav.intro, href: navPath('/learning/claude-code/intro') },
+          {
+            label: i.nav.install,
+            href: '#',
+            children: [
+              { label: i.nav.install_cli_vscode, href: navPath('/learning/claude-code/install/cli-vscode') },
+              { label: i.nav.install_desktop, href: navPath('/learning/claude-code/install/desktop') },
+            ],
+          },
+          { label: i.nav.basics, href: navPath('/learning/claude-code/basics') },
+          { label: i.nav.prompting, href: navPath('/learning/claude-code/prompting') },
+          { label: i.nav.memory, href: navPath('/learning/claude-code/memory') },
+          {
+            label: i.nav.extensions,
+            href: '#',
+            children: [
+              { label: i.nav.ext_mcp, href: navPath('/learning/claude-code/extensions/mcp') },
+              { label: i.nav.ext_skills, href: navPath('/learning/claude-code/extensions/skills') },
+              { label: i.nav.ext_subagents, href: navPath('/learning/claude-code/extensions/subagents') },
+              { label: i.nav.ext_hooks, href: navPath('/learning/claude-code/extensions/hooks') },
+              { label: i.nav.ext_plugin, href: navPath('/learning/claude-code/extensions/plugin') },
+            ],
+          },
+        ],
+      },
+      {
+        label: i.nav.tensorrt,
+        href: '#',
+      },
+      {
+        label: i.nav.deep_learning,
+        href: '#',
+      },
+      {
+        label: i.nav.ros2,
+        href: '#',
+      },
+      {
+        label: i.nav.virtual_env,
+        href: '#',
+        children: [
+          {
+            label: i.nav.urdf,
+            href: '#',
+            children: [
+              { label: i.nav.urdf_overview, href: navPath('/learning/virtual-env/urdf/overview') },
+              { label: i.nav.urdf_structure, href: navPath('/learning/virtual-env/urdf/structure') },
+            ],
+          },
+          {
+            label: i.nav.pybullet,
+            href: '#',
+            children: [
+              { label: i.nav.pb_guide, href: navPath('/learning/virtual-env/pybullet/guide') },
+              { label: i.nav.pb_setup, href: navPath('/learning/virtual-env/pybullet/setup') },
+            ],
+          },
+          { label: i.nav.gazebo, href: '#' },
+        ],
+      },
+      {
+        label: i.nav.ubuntu,
+        href: '#',
+      },
+    ],
+  },
+  { label: i.nav.gallery, href: navPath('/gallery') },
+  { label: i.nav.contact, href: navPath('/contact') },
+];
+---
+
+<header class="header">
+  <nav class="header-nav container" aria-label="Main navigation">
+    <button
+      class="menu-toggle"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      data-menu-toggle
+    >
+      <span class="menu-icon"></span>
+    </button>
+
+    <div class="nav-menu" data-nav-menu>
+      <ul class="nav-list">
+        {navItems.map((item) => (
+          <li class:list={['nav-item', { 'has-dropdown': item.children }]}>
+            <a
+              class:list={['nav-link', { active: currentPath === item.href || currentPath === item.href + '/' }]}
+              href={item.href}
+            >
+              {item.label}
+            </a>
+            {item.children && (
+              <ul class="dropdown">
+                {item.children.map((child) => (
+                  <li class:list={['dropdown-item', { 'has-submenu': child.children }]}>
+                    <a
+                      class:list={['dropdown-link', { active: currentPath === child.href || currentPath === child.href + '/' }]}
+                      href={child.href}
+                    >
+                      {child.label}
+                    </a>
+                    {child.children && (
+                      <ul class="submenu">
+                        {child.children.map((grandchild) => (
+                          <li class:list={[{ 'has-deep-submenu': grandchild.children }]}>
+                            <a
+                              class:list={['dropdown-link', { active: currentPath === grandchild.href || currentPath === grandchild.href + '/' }]}
+                              href={grandchild.href}
+                            >
+                              {grandchild.label}
+                            </a>
+                            {grandchild.children && (
+                              <ul class="deep-submenu">
+                                {grandchild.children.map((great) => (
+                                  <li>
+                                    <a
+                                      class:list={['dropdown-link', { active: currentPath === great.href || currentPath === great.href + '/' }]}
+                                      href={great.href}
+                                    >
+                                      {great.label}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+      <a class="lang-switch" href={switchPath} aria-label={`Switch to ${switchLocale === 'en' ? 'English' : 'Chinese'}`}>
+        {switchLabel}
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const menu = document.querySelector('[data-nav-menu]');
+
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    menu?.classList.toggle('open');
+  });
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    height: var(--header-height);
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .header-logo {
+    color: var(--color-heading);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .header-logo:hover {
+    color: var(--color-accent);
+  }
+
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .nav-link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    transition: all var(--transition);
+    text-decoration: none;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .nav-item {
+    position: relative;
+  }
+
+  .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 10rem;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    padding: var(--space-2);
+    flex-direction: column;
+    gap: var(--space-1);
+    z-index: 200;
+  }
+
+  .nav-item.has-dropdown:hover .dropdown,
+  .nav-item.has-dropdown:focus-within .dropdown {
+    display: flex;
+  }
+
+  .dropdown-item {
+    position: relative;
+  }
+
+  .submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    min-width: 10rem;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    padding: var(--space-2);
+    flex-direction: column;
+    gap: var(--space-1);
+    z-index: 201;
+  }
+
+  .dropdown-item.has-submenu:hover .submenu,
+  .dropdown-item.has-submenu:focus-within .submenu {
+    display: flex;
+  }
+
+  /* 4th-level deep submenu */
+  .has-deep-submenu {
+    position: relative;
+  }
+
+  .deep-submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    min-width: 9rem;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    padding: var(--space-2);
+    flex-direction: column;
+    gap: var(--space-1);
+    z-index: 202;
+  }
+
+  .has-deep-submenu:hover .deep-submenu,
+  .has-deep-submenu:focus-within .deep-submenu {
+    display: flex;
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--transition);
+  }
+
+  .dropdown-link:hover,
+  .dropdown-link.active {
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    margin-left: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all var(--transition);
+  }
+
+  .lang-switch:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+  }
+
+  .menu-icon,
+  .menu-icon::before,
+  .menu-icon::after {
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    background-color: var(--color-text);
+    transition: all var(--transition);
+    position: relative;
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: '';
+    position: absolute;
+  }
+
+  .menu-icon::before { top: -6px; }
+  .menu-icon::after { top: 6px; }
+
+  @media (max-width: 900px) {
+    .menu-toggle {
+      display: flex;
+    }
+
+    .nav-menu {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background-color: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-4) var(--space-6);
+      box-shadow: 0 4px 12px var(--color-card-shadow);
+    }
+
+    .nav-menu.open {
+      display: flex;
+    }
+
+    .nav-list {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .nav-link {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .dropdown {
+      display: flex;
+      position: static;
+      border: none;
+      box-shadow: none;
+      padding: 0 0 0 var(--space-4);
+      background: transparent;
+    }
+
+    .nav-item.has-dropdown .dropdown {
+      display: flex;
+    }
+
+    .submenu {
+      display: flex;
+      position: static;
+      border: none;
+      box-shadow: none;
+      padding: 0 0 0 var(--space-4);
+      background: transparent;
+    }
+
+    .dropdown-item.has-submenu .submenu {
+      display: flex;
+    }
+
+    .deep-submenu {
+      display: flex;
+      position: static;
+      border: none;
+      box-shadow: none;
+      padding: 0 0 0 var(--space-4);
+      background: transparent;
+    }
+
+    .has-deep-submenu .deep-submenu {
+      display: flex;
+    }
+
+    .lang-switch {
+      margin-left: 0;
+      margin-top: var(--space-2);
+      justify-content: center;
+    }
+  }
+</style>

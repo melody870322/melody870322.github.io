@@ -1,0 +1,244 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { albums } from '../../data/gallery';
+import { t } from '../../i18n/utils';
+
+const locale = 'zh';
+const i = t(locale);
+---
+
+<BaseLayout title={i.nav.gallery} description="活動相簿" lang="zh">
+  <section class="section">
+    <div class="container">
+      <h1 class="page-title">{i.nav.gallery}</h1>
+      <div class="albums">
+        {albums.map((album) => (
+          <div class="album" data-album>
+            <div class="carousel">
+              <div class="carousel-viewport">
+                <div class="carousel-track" data-track>
+                  {album.photos.map((photo, idx) => (
+                    <div class="carousel-slide" data-slide data-index={idx}>
+                      <img
+                        src={`/gallery/${album.id}/${photo}`}
+                        alt={`${album.title} - ${idx + 1}`}
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button class="carousel-btn carousel-btn-prev" data-prev aria-label="上一張">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+              </button>
+              <button class="carousel-btn carousel-btn-next" data-next aria-label="下一張">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+              </button>
+              <div class="carousel-dots" data-dots>
+                {album.photos.map((_, idx) => (
+                  <button
+                    class:list={['carousel-dot', { active: idx === 0 }]}
+                    data-dot={idx}
+                    aria-label={`前往第 ${idx + 1} 張照片`}
+                  />
+                ))}
+              </div>
+            </div>
+            <p class="album-title">{album.title}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('[data-album]').forEach((albumEl) => {
+    const track = albumEl.querySelector('[data-track]') as HTMLElement;
+    const slides = albumEl.querySelectorAll('[data-slide]');
+    const dots = albumEl.querySelectorAll('[data-dot]');
+    const prevBtn = albumEl.querySelector('[data-prev]');
+    const nextBtn = albumEl.querySelector('[data-next]');
+    let current = 0;
+    const total = slides.length;
+
+    function goTo(index: number) {
+      if (index < 0) index = total - 1;
+      if (index >= total) index = 0;
+      current = index;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === current);
+      });
+    }
+
+    prevBtn?.addEventListener('click', () => goTo(current - 1));
+    nextBtn?.addEventListener('click', () => goTo(current + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const idx = Number((dot as HTMLElement).dataset.dot);
+        goTo(idx);
+      });
+    });
+
+    albumEl.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'ArrowLeft') goTo(current - 1);
+      if ((e as KeyboardEvent).key === 'ArrowRight') goTo(current + 1);
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const viewport = albumEl.querySelector('.carousel-viewport') as HTMLElement;
+
+    viewport?.addEventListener('touchstart', (e) => {
+      touchStartX = (e as TouchEvent).changedTouches[0].screenX;
+    }, { passive: true });
+
+    viewport?.addEventListener('touchend', (e) => {
+      touchEndX = (e as TouchEvent).changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) goTo(current + 1);
+        else goTo(current - 1);
+      }
+    }, { passive: true });
+  });
+</script>
+
+<style>
+  .page-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .albums {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .album {
+    width: 100%;
+  }
+
+  .carousel {
+    position: relative;
+    background-color: #1a1a1a;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  .carousel-viewport {
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s ease;
+  }
+
+  .carousel-slide {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 10;
+  }
+
+  .carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    z-index: 2;
+  }
+
+  .carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .carousel-btn-prev {
+    left: 0.75rem;
+  }
+
+  .carousel-btn-next {
+    right: 0.75rem;
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 2;
+  }
+
+  .carousel-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s;
+  }
+
+  .carousel-dot.active {
+    background-color: #fff;
+  }
+
+  .carousel-dot:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .album-title {
+    margin-top: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .carousel-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .carousel-btn-prev {
+      left: 0.5rem;
+    }
+
+    .carousel-btn-next {
+      right: 0.5rem;
+    }
+
+    .carousel-slide {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

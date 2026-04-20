@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Lite RSDNet — Lightweight Referring Dynamic and Potentially Dynamic Object Video Segmentation Network"
+  description="A lightweight multimodal segmentation model combining textual instructions and visual information, focusing on identifying and removing potentially dynamic and dynamic objects to strengthen scene understanding in dynamic environments and improve visual odometry localization stability in real-world settings."
+  lang="en"
+>
+  <section class="section">
+    <div class="container research-detail">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Lightweight Referring Dynamic and Potentially Dynamic Object Video Segmentation Network</h1>
+        <p class="detail-subtitle">
+          A lightweight multimodal segmentation model combining textual instructions and visual information to improve robot perception and localization in dynamic environments.
+        </p>
+      </header>
+
+      <!-- Overview -->
+      <h2 class="detail-heading">Overview</h2>
+      <p class="detail-paragraph">
+        This research proposes Lite RSDNet, a lightweight multimodal segmentation model that combines textual instructions and visual information. Its goal is to accurately identify and remove dynamic objects and potentially dynamic objects in dynamic environments, improving the robot's scene understanding in real-world settings. The study focuses on scenarios commonly encountered by autonomous mobile robots (AMR), such as a person moving a chair, carrying a box, or opening a door, enabling the system to recognize not only moving people but also objects that become dynamic due to human interaction.
+      </p>
+
+      <!-- Research Video -->
+      <h2 class="detail-heading">Research Video</h2>
+      <div class="video-wrapper">
+        <iframe
+          src="https://www.youtube.com/embed/dhEwrB8spy0"
+          title="Lite RSDNet — Research Video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- Core Technologies -->
+      <h2 class="detail-heading">Core Technologies</h2>
+      <ul class="tech-tags">
+        <li class="tech-tag">Referring Video Object Segmentation</li>
+        <li class="tech-tag">Multimodal Feature Fusion</li>
+        <li class="tech-tag">VO Integration</li>
+        <li class="tech-tag">Edge Deep Learning</li>
+      </ul>
+
+      <!-- Research Highlights -->
+      <h2 class="detail-heading">Research Highlights</h2>
+      <ul class="highlight-list">
+        <li class="highlight-item">
+          <strong>Lightweight multimodal architecture:</strong> Combines textual and visual information to simultaneously segment dynamic objects and potentially dynamic objects, balancing scene understanding with model efficiency.
+        </li>
+        <li class="highlight-item">
+          <strong>Efficiency and segmentation performance:</strong> The model has only 21.35M total parameters, 8.86M trainable parameters, and 76.83 GFLOPs, while demonstrating stable segmentation performance on A2D, JHMDB, and Ref-DAVIS2017 benchmarks.
+        </li>
+        <li class="highlight-item">
+          <strong>Improved localization stability in dynamic scenes:</strong> More precisely distinguishes dynamic/potentially dynamic objects to be removed from static background to be retained, reducing dynamic interference and improving VO localization in both indoor and outdoor environments.
+        </li>
+      </ul>
+
+      <!-- Related Publications -->
+      <h2 class="detail-heading">Related Publications</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          <strong>王詩婷</strong>、李聯旺、李宜勳，"自主移動機器人動態環境視覺里程計定位技術：一種基於深度學習 DDHAR 動作識別方法," in <em>National Symposium on System Science and Engineering (NSSSE)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>S.-T. Wang</strong>, I.-H. Li, and L.-W. Lee, "Enhancing Visual Odometry Localization in Dynamic Environments for Autonomous Mobile Robots through Edge DD-HAR: A Deep Learning-Based Action Recognition Approach," in <em>International Conference on Artificial Intelligence and Virtual Reality (AIVR)</em>, 2024.
+        </li>
+        <li class="pub-item">
+          <strong>S.-T. Wang</strong>, I.-H. Li, and L.-W. Lee, "Dynamic Object-Aware Visual Odometry Enhancement for Autonomous Mobile Robots using Edge DD-HAR," in <em>International Conference on System Science and Engineering (ICSSE)</em>, 2024.
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .research-detail {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Video embed (responsive 16:9) */
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Tech tags */
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+  }
+
+  .tech-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+  }
+
+  /* Highlights */
+  .highlight-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .highlight-item {
+    position: relative;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .highlight-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+
+  .highlight-item strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Publication list */
+  .pub-list {
+    list-style: disc;
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .pub-item {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .pub-item strong {
+    color: var(--color-heading);
+  }
+
+  .pub-item em {
+    color: var(--color-text-secondary);
+  }
+</style>

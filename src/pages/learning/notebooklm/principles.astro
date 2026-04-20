@@ -1,0 +1,783 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM — Principles & Usage Concepts"
+  description="The biggest difference between NotebookLM and a general chatbot is not that it chats better — it's that it reads your sources first, and answers based on them."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-principles">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Principles &amp; Usage Concepts</h1>
+        <p class="detail-subtitle">
+          NotebookLM is not a chatbot that claims to know everything. It is a learning tool that
+          reads the sources you provide first, and then helps you organize, explain, and cite them.
+        </p>
+      </header>
+
+      <!-- Section 1: Why it matters now -->
+      <h2 class="detail-heading">Why people are starting to use NotebookLM</h2>
+      <p class="detail-paragraph">
+        In recent years, more and more people have turned to AI to organize information, write
+        summaries, and answer questions. These tools are genuinely convenient, but they also have
+        one noticeable problem: they sometimes produce statements that sound reasonable but are not
+        necessarily correct. In teaching, reading comprehension, research, or any context that
+        depends on evidence, answers without grounding can easily mislead.
+      </p>
+      <p class="detail-paragraph">
+        NotebookLM has drawn attention because it does not rely purely on the model's own memory
+        to answer. Instead, it
+        <strong>reads the sources the user has provided first, and then organizes, explains,
+        and cites them</strong>. In that sense, it is closer to a study companion who has already
+        read your materials, notes, or documents, rather than a chatbot that answers any question
+        on the spot.
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-card--muted">
+          <p class="compare-label">General generative AI</p>
+          <p class="compare-title">Answers from its own memory</p>
+          <p class="compare-desc">
+            Fluent and fast, but not every sentence has a clear basis. It can take information it
+            half-remembers and stitch it into an answer that sounds complete.
+          </p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">NotebookLM</p>
+          <p class="compare-title">Reads first, then answers</p>
+          <p class="compare-desc">
+            The scope of its answers is more defined. It reads the sources you put in, answers
+            questions based on those sources, and attaches citations so you can check back.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 2: Core difference -->
+      <h2 class="detail-heading">The core difference: it reads your sources first</h2>
+      <p class="detail-paragraph">
+        The biggest difference between NotebookLM and a general chatbot is not that it chats
+        better — it's that <strong>the scope of its answers is clearer</strong>. You begin by
+        putting your own materials into a notebook — PDFs, websites, Google Docs, Google Slides,
+        YouTube videos, or audio — and NotebookLM reads them before it answers questions,
+        organizes content, or produces summaries.
+      </p>
+      <p class="detail-paragraph">
+        In other words, the emphasis is not on "what it already knows," but on
+        <strong>"how well it can make sense of the materials you hand it"</strong>.
+        That design suits any situation that involves reading and understanding, because you
+        can see fairly clearly which materials, documents, or sources the current discussion
+        is drawing from.
+      </p>
+
+      <!-- Section 3: How it works -->
+      <h2 class="detail-heading">How it works: four steps</h2>
+      <p class="detail-paragraph">
+        You can think of NotebookLM's behavior as a four-step process. It does not simply paste
+        the original text back at you — it walks through a full
+        <em>read → organize → answer</em> flow.
+      </p>
+
+      <ol class="loop-list">
+        <li class="loop-step">
+          <span class="loop-num">1</span>
+          <div class="loop-body">
+            <h3 class="loop-title">Add your sources</h3>
+            <p class="loop-desc">
+              You create a notebook and put in the materials you want to read or analyze.
+              These become the main basis for everything the notebook says afterwards.
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">2</span>
+          <div class="loop-body">
+            <h3 class="loop-title">Understand the whole first</h3>
+            <p class="loop-desc">
+              The system reads through the sources, pulls out the gist, and produces an initial
+              summary. The point of this step is to help you get into the material quickly,
+              rather than being buried in pages of raw text from the start.
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">3</span>
+          <div class="loop-body">
+            <h3 class="loop-title">Find what matters for your question</h3>
+            <p class="loop-desc">
+              When you ask a question, NotebookLM looks through the sources you've provided
+              and picks out the passages <strong>most relevant to that question</strong>,
+              instead of returning the entire document.
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">4</span>
+          <div class="loop-body">
+            <h3 class="loop-title">Organize it into a readable answer</h3>
+            <p class="loop-desc">
+              It turns what it found into a clearer explanation and <strong>attaches citations</strong>
+              so you can go back to the original. So it is not quite a search tool, and not a
+              free-form chatbot either — it sits somewhere in between.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section 4: RAG concept -->
+      <h2 class="detail-heading">The easiest way to understand it: RAG</h2>
+      <p class="detail-paragraph">
+        If you want a more structured way to describe NotebookLM, RAG is a good starting point.
+        RAG (Retrieval-Augmented Generation) can be understood simply as:
+        <strong>before answering, the model does not rely only on what it already remembers —
+        it first looks up relevant information in an external source, and then generates its
+        answer based on what it finds</strong>.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Applied to NotebookLM</p>
+        <p class="concept-card__body">
+          NotebookLM's "external source" is not the whole internet, nor some large public database.
+          It is <strong>the materials you have uploaded yourself</strong>.
+          So you can think of it as a source-grounded generation tool, well suited to reading,
+          teaching, and organizing materials: instead of answering off the top of its head,
+          it tries to come back to your text to answer.
+        </p>
+      </section>
+
+      <blockquote class="pullquote">
+        AI is not here to replace reading — it is here to support it. It is not meant to think
+        for you, but to help you find the places worth thinking about more quickly.
+      </blockquote>
+
+      <!-- Section 5: Why suits learning -->
+      <h2 class="detail-heading">Why it suits reading, teaching, and research</h2>
+      <p class="detail-paragraph">
+        NotebookLM is a good fit for learning contexts — not only because it can summarize
+        material, but because its overall design is close to what reading and understanding
+        actually feel like. When there is a lot of material and each piece is long, people
+        tend to get stuck in three places:
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">Stuck 01</p>
+          <h3 class="feature-title">Don't know where to start</h3>
+          <p class="feature-alias">Too much material to enter</p>
+          <p class="feature-desc">
+            NotebookLM can generate a summary and a reading guide first, helping you get a sense
+            of the whole before diving into the original text.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">Stuck 02</p>
+          <h3 class="feature-title">Can't see the main points</h3>
+          <p class="feature-alias">Read it, but the shape is unclear</p>
+          <p class="feature-desc">
+            Through Q&amp;A, topic organization, and cross-source comparison, it helps line up
+            the core ideas across different materials into a clearer structure.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">Stuck 03</p>
+          <h3 class="feature-title">Not sure the reading is right</h3>
+          <p class="feature-alias">Finished, but is the understanding correct?</p>
+          <p class="feature-desc">
+            Its answers come with citations so you can check the original. That tends to be more
+            valuable than "just getting an answer," because it supports the habit of
+            <strong>reading, understanding, and verifying</strong>.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 6: Long context -->
+      <h2 class="detail-heading">Why it can handle a lot of material at once</h2>
+      <p class="detail-paragraph">
+        NotebookLM is able to read long documents, combine multiple sources, and keep a
+        conversation going on the same topic. That has a lot to do with the
+        <strong>long-context ability</strong> of the underlying model.
+      </p>
+      <p class="detail-paragraph">
+        You can think of "long context" as being able to hold a lot of content in mind at once.
+        Tools that can only see a short passage at a time tend to struggle with a whole course
+        pack, a full research dossier, or a comparison across several articles. NotebookLM is
+        better at sustaining a longer line of discussion inside a single notebook, which makes
+        it more suitable for larger collections of documents. This is also what sets it apart
+        from one-off Q&amp;A tools: <strong>it is not just answering a single question, but
+        staying with you on the same body of material as you keep asking and organizing.</strong>
+      </p>
+
+      <!-- Section 7: Why it can still err -->
+      <h2 class="detail-heading">If it cites sources, why can it still be wrong?</h2>
+      <p class="detail-paragraph">
+        This is where first-time users most often misunderstand NotebookLM. It's tempting to
+        think: "If it answers based on my uploaded sources and shows citations, doesn't that
+        mean it won't be wrong?" The answer is: <strong>not quite</strong>.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">Why errors are still possible</p>
+        <p class="caution-card__body">
+          Even though NotebookLM answers based on your sources, it does not paste the original
+          text back mechanically. It goes through several steps:
+          <strong>find the relevant passages, understand them, and rewrite them into a
+          readable answer</strong>. As long as there are these steps, small drifts can happen.
+        </p>
+        <ul class="caution-card__list">
+          <li>The passage it picks may not be the most important one.</li>
+          <li>It may read the right content, but overstate it when summarizing.</li>
+          <li>A carefully hedged sentence may come out sounding more certain than the original.</li>
+        </ul>
+        <p class="caution-card__footer">
+          None of these are completely made up — but they can still cause subtle misunderstanding.
+          So NotebookLM's real value is not "guaranteed zero errors." It is
+          <strong>making it easier for you to verify</strong>. The citations exist so you can go
+          back to the original text, not so you can stop reading it.
+        </p>
+      </section>
+
+      <!-- Section 8: Correct mindset -->
+      <h2 class="detail-heading">The right mindset</h2>
+      <p class="detail-paragraph">
+        If you want a single sentence for how NotebookLM is best used, it would be:
+      </p>
+
+      <blockquote class="pullquote pullquote--primary">
+        Treat it as a reading assistant, not the final judge.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        It is well suited to helping you get to the main points, organize topics, shape good
+        questions, compare different sources, and turn hard-to-approach material into a form
+        that is easier to read. But when it comes to
+        <strong>formal reports, teaching content, important concepts, or research conclusions</strong>,
+        the safer habit is still to check the original text again. In other words, NotebookLM can
+        speed up understanding, but <strong>it should not replace verification</strong>.
+      </p>
+
+      <!-- Section 9: Advanced features -->
+      <h2 class="detail-heading">Advanced features exist to support understanding</h2>
+      <p class="detail-paragraph">
+        Beyond answering questions, NotebookLM can also turn your material into different forms:
+        summaries, notes, reading guides, audio, key-point roundups, or other study-support
+        formats. What matters about these features is not that they make the interface look
+        richer. It is that they let <strong>the same content be entered from different angles</strong>.
+      </p>
+      <p class="detail-paragraph">
+        Some people prefer to listen first and read later. Some prefer to see the summary before
+        returning to the original. Others only really absorb material through asking and
+        comparing. From a teaching or content-organization perspective, these features are
+        useful precisely because they give the same material several ways in — which helps for
+        audiences with different backgrounds, different levels, and different habits.
+      </p>
+
+      <!-- Section 10: Four takeaways -->
+      <h2 class="detail-heading">Four ideas worth taking away</h2>
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">1</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Its answers are grounded in your sources</h4>
+            <p class="start-step__desc">
+              NotebookLM answers primarily from the materials you provide, not by drawing freely
+              from the outside world.
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">2</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Helpful, but not error-proof</h4>
+            <p class="start-step__desc">
+              It is a good fit for reading, organizing, asking questions, and review — but that
+              does not mean it never gets anything wrong.
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">3</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Citations are for verification, not decoration</h4>
+            <p class="start-step__desc">
+              The citations matter because their purpose is not to decorate the answer, but to
+              help you get back to the original text and check.
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">4</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">It is not an answer machine</h4>
+            <p class="start-step__desc">
+              The best way to use it is not as an answer generator, but as a tool that helps you
+              understand the material with more guidance.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <p class="takeaway__lead">
+          NotebookLM is not a chatbot that claims to know everything. It is a learning tool that
+          <strong>reads the sources you give it first, and then helps you organize and explain them</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-principles {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Compare cards */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-4);
+  }
+
+  .compare-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Loop list (4 steps) */
+  .loop-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .loop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .loop-step:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  .loop-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .loop-body {
+    flex: 1;
+  }
+
+  .loop-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .loop-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Concept card (for RAG explanation) */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.7;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Feature grid (used for three bottlenecks) */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .caution-card__list {
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .caution-card__footer {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .caution-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Start steps (four takeaways) */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Final takeaway */
+  .takeaway {
+    margin-top: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .takeaway__lead {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .takeaway__lead strong {
+    color: var(--color-accent);
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid,
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .loop-step {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .loop-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .takeaway {
+      padding: var(--space-6);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

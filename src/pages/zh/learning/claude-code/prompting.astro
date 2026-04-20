@@ -1,0 +1,647 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="提示詞框架與任務拆解"
+  description="怎麼把事情交代清楚，讓 Claude Code 更容易一次做對——從 5 件事講清楚、任務大小分類，到可直接套用的 prompt 模板。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-prompting">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">怎麼把事情交代清楚，讓 Claude Code 更容易一次做對</h1>
+        <p class="detail-subtitle">
+          不是你不會問，而是很多任務本來就不能只靠一句「幫我做一下」。
+          Claude Code 雖然很強，能讀檔、改檔、跑指令、幫你整理專案，但它不是通靈。
+          你給得越清楚，它就越容易一次走在對的方向上；你講得越模糊，它就越可能做出一個「看起來有在幫忙，但不是你真正要的東西」。
+        </p>
+        <p class="detail-subtitle" style="margin-top: var(--space-3);">
+          這一頁要做的事很簡單：不是教你把提示詞（prompt）寫得很花，而是教你怎麼用比較省力、比較穩、也比較容易成功的方式，把任務交給 Claude Code。
+        </p>
+      </header>
+
+      <!-- Section 1: 為什麼同一句話效果差很多 -->
+      <h2 class="detail-heading">為什麼同一句話，效果會差很多？</h2>
+      <p class="detail-paragraph">
+        很多人會覺得：「我明明已經講得很清楚了啊。」但實際上，像下面這種說法，對 Claude Code 來說還是太大：
+      </p>
+
+      <ul class="check-list">
+        <li>幫我整理這個專案</li>
+        <li>幫我修這個 bug</li>
+        <li>幫我改漂亮一點</li>
+        <li>幫我做登入功能</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這幾句不是不能用，而是少了很多關鍵資訊。Claude Code 這時候通常還是會開始做事，但它得自己猜：你想改哪裡、不能碰哪裡、你要的是暫時解法還是完整重構、做完後要怎麼驗證。
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">你可以把這件事想成</p>
+        <p class="info-body">
+          Claude Code 很像一位做事很快的助理。你如果只說一句「幫我整理一下」，它不是不會整理，而是它得先自己猜你的整理標準是什麼。問題通常不是它沒做，而是它做的版本，跟你腦中的版本不一樣。
+        </p>
+      </div>
+
+      <!-- Section 2: 5 件事講清楚 -->
+      <h2 class="detail-heading">一個好用的起手式：先把 5 件事講清楚</h2>
+
+      <div class="five-points">
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">1</span>
+            <h3 class="point-title">你要它做什麼</h3>
+          </div>
+          <p class="point-desc">先說清楚這次的任務目標。不是只說「幫我看一下」，而是講出你真正想要的結果。</p>
+          <ul class="check-list check-list--compact">
+            <li>幫我找出登入失敗的原因</li>
+            <li>幫我把這段程式碼重構得比較好讀</li>
+            <li>幫我先讀懂這個專案，再整理目前的資料</li>
+            <li>幫我做一個最小可用版本的聯絡表單</li>
+          </ul>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">2</span>
+            <h3 class="point-title">它應該看哪些東西</h3>
+          </div>
+          <p class="point-desc">Claude Code 不是一定知道你要它從哪裡開始。所以第二件事，是告訴它：這次要看哪些檔案、資料夾、終端機輸出、錯誤訊息或畫面截圖。</p>
+          <ul class="check-list check-list--compact">
+            <li>請先閱讀 <code>@src/auth/login.js</code></li>
+            <li>先看 <code>@components</code> 資料夾</li>
+            <li>請讀 <code>@terminal:npm test</code> 的輸出</li>
+            <li>這是錯誤截圖，請先判斷是哪個區塊壞掉</li>
+          </ul>
+          <p class="point-note">也就是說，不要只交代任務，還要順手把它帶到正確的入口。</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">3</span>
+            <h3 class="point-title">哪些地方不能碰</h3>
+          </div>
+          <p class="point-desc">這一點很多人最容易忘。你想讓 Claude Code 幫忙，不代表你希望它整個專案都自由發揮。所以要把限制講清楚。</p>
+          <ul class="check-list check-list--compact">
+            <li>不要改 API 回傳格式</li>
+            <li>不要碰 <code>.env</code></li>
+            <li>先不要改資料庫 schema</li>
+            <li>請保留原本功能</li>
+            <li>只改這個元件，不要動其他頁面</li>
+            <li>先不要直接改檔，先列計畫</li>
+          </ul>
+          <p class="point-note">很多時候，Claude Code 出問題不是因為它太笨，而是因為你沒有先告訴它邊界在哪裡。</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">4</span>
+            <h3 class="point-title">你希望它怎麼交付</h3>
+          </div>
+          <p class="point-desc">同樣是完成任務，你可能要的是不同形式。</p>
+          <ul class="check-list check-list--compact">
+            <li>先用條列整理，不要直接改</li>
+            <li>直接提出修改方案並動手實作</li>
+            <li>先列步驟，再等我確認</li>
+            <li>幫我用新手也看得懂的方式解釋</li>
+            <li>最後請附上你改了哪些檔案</li>
+          </ul>
+          <p class="point-note">這一步的重點是：不要只講內容，也講一下你要它怎麼回你。</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">5</span>
+            <h3 class="point-title">什麼叫做完成</h3>
+          </div>
+          <p class="point-desc">很多 prompt 看起來已經很完整了，最後還是容易卡住，通常就是因為少了這一步。你要讓 Claude Code 知道：這次任務做到什麼程度，才算真的完成。</p>
+          <ul class="check-list check-list--compact">
+            <li>修好後請重新跑測試</li>
+            <li>請確認表單可以正常送出</li>
+            <li>請保留原本畫面不變</li>
+            <li>請讓手機版排版不要跑掉</li>
+            <li>做完後請告訴我還有哪些風險沒有處理</li>
+          </ul>
+          <p class="point-note">這一步很重要，因為它會直接影響 Claude Code 後面會不會自己驗證結果。</p>
+        </article>
+      </div>
+
+      <!-- Section 3: 不用一次寫很長 -->
+      <h2 class="detail-heading">寫 prompt 時，不一定要一次寫成很長一段</h2>
+      <p class="detail-paragraph">
+        很多人會誤會，以為好 prompt 就是很長、很完整、像在寫作文。其實不一定。重點不是字多，而是資訊有沒有放對位置。你甚至可以用很短的方式把任務講清楚，例如：
+      </p>
+
+      <div class="prompt-example">
+        <p>請先閱讀 <code>@src/cart</code>。</p>
+        <p>我要你找出為什麼購物車數量更新後總價沒有同步。</p>
+        <p>先不要直接改檔，先列出可能原因和你會檢查的檔案。</p>
+        <p>不要碰 API。</p>
+        <p>等我確認後再修。</p>
+      </div>
+
+      <p class="detail-paragraph">
+        這段不長，但已經有：<strong>任務目標、指定範圍、限制、交付方式、工作順序</strong>。這就夠用了。
+      </p>
+
+      <!-- Section 4: 任務大小 -->
+      <h2 class="detail-heading">任務越大，越不要一次叫它直接做完</h2>
+      <p class="detail-paragraph">
+        小任務可以直接做，大任務最好拆開做。這不是因為 Claude Code 做不到，而是因為拆開之後，你比較容易控制方向，也比較不容易一次改太多。你可以把任務拆成三種大小來理解。
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">小任務：直接做就好</summary>
+        <div class="collapsible-body">
+          <p>這類任務通常範圍小、風險低，也比較容易馬上驗證。</p>
+          <ul class="check-list check-list--compact">
+            <li>解釋一段程式碼</li>
+            <li>改一個按鈕文案</li>
+            <li>補一個小 bug</li>
+            <li>幫一段 CSS 整理結構</li>
+            <li>說明某個檔案在做什麼</li>
+          </ul>
+          <p>這種情況可以直接講：</p>
+          <div class="prompt-example">
+            <p>請閱讀 <code>@components/Navbar.tsx</code>，幫我解釋這支元件在做什麼，並指出哪裡最適合加上手機版選單。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">中型任務：先列步驟，再開始做</summary>
+        <div class="collapsible-body">
+          <p>這類任務通常會碰到不只一個檔案，或你已經知道它不是一句話能做完的。</p>
+          <ul class="check-list check-list--compact">
+            <li>重構一個功能模組</li>
+            <li>調整一段流程</li>
+            <li>整理資料夾結構</li>
+            <li>修一個會牽動多個元件的 bug</li>
+          </ul>
+          <p>這時候很適合先叫它列步驟：</p>
+          <div class="prompt-example">
+            <p>請先閱讀 <code>@src/profile</code> 和 <code>@components/profile</code>。</p>
+            <p>我要整理個人資料頁的結構，讓資料抓取、畫面呈現和表單邏輯分開。</p>
+            <p>先列出你建議的修改步驟和會動到的檔案，再等我確認後才開始改。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">大任務：先規劃，再分階段交付</summary>
+        <div class="collapsible-body">
+          <p>當你要做的是登入流程重整、資料流重構、整個模組搬家，或你自己也還沒想清楚時，不要一開始就叫它直接衝。比較穩的做法是：</p>
+          <ul class="check-list check-list--compact">
+            <li>先理解現況</li>
+            <li>先列計畫</li>
+            <li>先確認方向</li>
+            <li>再分階段實作</li>
+            <li>每一階段做完都先驗證</li>
+          </ul>
+          <p>例如：</p>
+          <div class="prompt-example">
+            <p>我要重整目前的登入流程。</p>
+            <p>請先閱讀 <code>@src/auth</code>、<code>@middleware</code> 和相關頁面。</p>
+            <p>先整理現在的登入、登出、session timeout 流程，並列出哪些檔案和邏輯會被影響。</p>
+            <p>先不要改檔。</p>
+            <p>我確認後，再分成「重現問題 → 補測試 → 修邏輯 → 驗證」四步來做。</p>
+          </div>
+          <p>這種拆法的好處是：你不是把一整包風險一次丟出去，而是讓 Claude Code 一段一段陪你走。</p>
+        </div>
+      </details>
+
+      <!-- Section 5: 先請它說怎麼做 -->
+      <h2 class="detail-heading">一個真的很好用的習慣：先請它說它要怎麼做</h2>
+      <p class="detail-paragraph">
+        很多時候，你不是一開始就需要答案，而是先需要方向。所以很推薦你在中型或大型任務前，先多加一句：
+      </p>
+
+      <div class="prompt-example">
+        <p>先告訴我你打算怎麼做，再開始動手。</p>
+      </div>
+
+      <p class="detail-paragraph">或者：</p>
+
+      <div class="prompt-example">
+        <p>先列出你會看的檔案、你判斷的原因，以及你準備怎麼驗證。</p>
+      </div>
+
+      <p class="detail-paragraph">
+        這句話的價值很高，因為它可以讓你在 Claude Code 真正動手前，就先看到它的思路有沒有偏掉。
+      </p>
+
+      <!-- Section 6: Prompt 模板 -->
+      <h2 class="detail-heading">你可以直接套用的 prompt 模板</h2>
+      <p class="detail-paragraph">
+        下面這幾種模板，都是可以直接改字來用的。
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">情境 1：讀懂一段程式碼</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>請閱讀 <code>@src/components/UserCard.tsx</code>。</p>
+            <p>用白話文告訴我這支元件在做什麼、吃哪些 props、最容易出問題的地方在哪裡。</p>
+            <p>先不要改檔。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">情境 2：修 bug</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>我遇到一個 bug：使用者重新整理頁面後，購物車數量會重設。</p>
+            <p>請先讀 <code>@src/cart</code> 和 <code>@terminal:npm test</code> 的輸出。</p>
+            <p>先找出第一個真正的錯誤來源，再修正。</p>
+            <p>請保留目前 API 與畫面不變。</p>
+            <p>修好後請重新跑測試，並告訴我你改了哪些檔案。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">情境 3：做新功能</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>我想加一個聯絡表單。</p>
+            <p>請先閱讀目前的頁面結構與共用表單元件。</p>
+            <p>先告訴我你會怎麼做、會改哪些檔案。</p>
+            <p>表單需要姓名、Email、訊息三個欄位，送出前要有基本驗證。</p>
+            <p>先做最小可用版本，不要一開始加太多進階功能。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">情境 4：重構</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>請閱讀 <code>@src/auth</code>。</p>
+            <p>我要把登入邏輯整理得比較清楚，但先不要改 API 格式，也不要改畫面。</p>
+            <p>先列出目前邏輯混在一起的地方、你建議拆成哪幾層、會影響哪些檔案。</p>
+            <p>等我確認後再開始改。</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">情境 5：整理專案</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>請先閱讀 <code>@src/pages</code> 和 <code>@src/components</code>。</p>
+            <p>幫我整理目前這個專案的主要頁面、共用元件、資料流與明顯的結構問題。</p>
+            <p>先用條列整理，不要直接改檔。</p>
+            <p>最後請告訴我哪三個地方最值得先處理。</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <h2 class="detail-heading">這一頁的重點</h2>
+      <ul class="summary-list">
+        <li>好的 prompt 不是寫得長，而是把重點講清楚。</li>
+        <li>最好先講清楚：任務目標、參考範圍、限制、交付方式、完成標準。</li>
+        <li>小任務可以直接做；中型任務先列步驟；大型任務先規劃再分階段做。</li>
+        <li>很多時候，先做對第一步，比一次把整件事做完更重要。</li>
+        <li>當你不知道怎麼開口時，先從「請先看哪裡、我要你做什麼、哪些不能碰」開始就夠了。</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-prompting {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .check-list--compact {
+    font-size: var(--text-sm);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+
+  .check-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info card */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  /* 5 points */
+  .five-points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .point-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .point-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .point-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .point-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .point-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin: 0;
+  }
+
+  .point-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .point-note {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .prompt-example p {
+    margin-bottom: var(--space-1);
+  }
+
+  .prompt-example p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Collapsible sections */
+  .collapsible {
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .collapsible:hover {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible[open] {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible-title {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    user-select: none;
+  }
+
+  .collapsible-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-title::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-text-secondary);
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible[open] > .collapsible-title::after {
+    transform: rotate(45deg);
+  }
+
+  .collapsible-body {
+    padding: 0 var(--space-6) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    border-top: 1px dashed var(--color-border);
+    padding-top: var(--space-4);
+  }
+
+  .collapsible-body p {
+    margin-bottom: var(--space-3);
+  }
+
+  .collapsible-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Summary list */
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-8);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.point-desc) code,
+  :global(.check-list) code,
+  :global(.prompt-example) code,
+  :global(.point-note) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .collapsible-body code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .point-card {
+      padding: var(--space-5);
+    }
+  }
+</style>

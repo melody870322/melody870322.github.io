@@ -1,0 +1,436 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM Interactive Learning"
+  description="Flashcards help you break knowledge into small pieces and build familiarity; Quizzes let you check whether you truly understand. Together they turn passive reading into active practice."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-interactive">
+      <a class="back-link" href="/">&larr; Back to home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Interactive Learning: Turning static material into something you can practice with</h1>
+        <p class="detail-subtitle">
+          After uploading sources to NotebookLM, it can do more than summarize your material — it can turn the
+          content into interactive tools you can actually practice with. For many people, the real challenge is not
+          <strong>"having read the material"</strong> but rather
+          <strong>"can I actually recall it, explain it, and apply it?"</strong>
+          The Flashcards and Quiz features that NotebookLM offers take what would otherwise be
+          passive reading and reshape it into a more hands-on way to review. Both tools generate content
+          based on the sources in your notebook, and both live inside the <strong>Studio panel</strong>.
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">Usage note</span>
+          Creating or deleting Flashcards and Quizzes requires <strong>edit access</strong> to the notebook.
+          Generation happens in the background, so it will not interrupt whatever else you are working on.
+        </p>
+      </header>
+
+      <!-- Section 1: Two tools overview -->
+      <h2 class="detail-heading">Two tools, two stages of learning</h2>
+      <p class="detail-paragraph">
+        Flashcards and Quizzes may look like two separate little tools, but they actually correspond to
+        two different stages in the learning process: first, break the knowledge into small pieces and
+        build familiarity; then, check whether you truly understand.
+      </p>
+
+      <div class="feature-grid feature-grid--two">
+        <article class="feature-card">
+          <p class="feature-index">Step one</p>
+          <h3 class="feature-title">Flashcards</h3>
+          <p class="feature-alias">Build familiarity, one card at a time</p>
+          <p class="feature-desc">
+            Break knowledge into small pieces and <strong>practice repeatedly</strong>
+            with question-and-answer cards — well suited to memorizing definitions,
+            key concepts, important dates, process steps,
+            or anything that needs a baseline level of familiarity first.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">Step two</p>
+          <h3 class="feature-title">Quiz</h3>
+          <p class="feature-alias">Check whether you actually know it</p>
+          <p class="feature-desc">
+            Turn source content into interactive questions you can answer,
+            moving you <strong>from reading into answering</strong> —
+            and revealing which parts seemed clear but are not yet solid.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Flashcards -->
+      <h2 class="detail-heading">Flashcards: Breaking key points into cards you can practice over and over</h2>
+      <p class="detail-paragraph">
+        Flashcards are a good fit for situations where you want to break knowledge into small pieces
+        and commit them to memory through repetition. NotebookLM will organize your uploaded sources
+        into a set of question-and-answer cards, letting you flip through them one at a time.
+        Unlike reading a summary, Flashcards nudge you to pause and decide for yourself whether you
+        actually know the answer before moving on.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">What you can adjust before generating</p>
+        <p class="concept-card__body">
+          Inside your notebook, select <strong>"Flashcards"</strong> from the Studio panel to start generating.
+          To tailor the content to your needs, you can adjust:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>Difficulty</strong> — Easy, Medium, or Hard.</li>
+          <li><strong>Prompt</strong> — tell NotebookLM what angle you would like the cards to take, such as introductory basics, a comprehensive review, or a focus on a particular use case.</li>
+          <li><strong>Number of cards</strong> — Fewer, Standard, or More.</li>
+        </ul>
+        <p class="concept-card__footer">
+          This means Flashcards are not just a fixed set of prompts — you can shape them to match your own review pace.
+        </p>
+      </section>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Progress tracking during practice</p>
+        <p class="concept-card__body">
+          Flashcards do more than just lay out cards for you. While practicing, you can mark each card as:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>"Got it"</strong> (green checkmark) — you have this one down.</li>
+          <li><strong>"Keep practicing"</strong> (red cross) — this one needs more work.</li>
+        </ul>
+        <p class="concept-card__footer">
+          The system remembers your progress, so even if you leave partway through,
+          you can pick up where you left off later.
+          After finishing a round, you can choose to go again — and not just redo every card;
+          you can also <strong>practice only the ones you did not get right</strong>.
+          This is convenient when you need to reinforce specific weak spots without starting over from scratch.
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        We usually think of Flashcards as <strong>the best first step for building familiarity</strong>.
+        They fit well after an initial reading and before a quiz — helping you commit scattered
+        key points to memory one card at a time. Whether you are preparing for an exam, internal training,
+        course review, certification prep, or even helping a new team member learn specialized terms,
+        this format is useful. It is not about testing how much you know all at once,
+        but about letting knowledge settle in gradually.
+      </p>
+
+      <!-- Section 3: Quiz -->
+      <h2 class="detail-heading">Quiz: Turning review into a real self-check</h2>
+      <p class="detail-paragraph">
+        If Flashcards are more like "remembering key points one card at a time," then a Quiz is more like
+        "formally checking whether you actually know it." NotebookLM's Quiz feature organizes source content
+        into interactive questions you can answer — not just skimming or flipping through,
+        but actually responding. This is especially helpful when you need to assess how well you understand
+        something, because a lot of material feels clear while reading but turns out to be shaky
+        once you are in answering mode.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Generation works much like Flashcards</p>
+        <p class="concept-card__body">
+          Select <strong>"Quiz"</strong> from the Studio panel, and you can also set difficulty and a prompt
+          to make the questions better match your level or purpose. The system generates in the background
+          as well, so you do not need to pause what you are doing.
+          This makes it easy to chat with your notebook to organize material first,
+          then go straight into a quiz in the same session.
+        </p>
+      </section>
+
+      <section class="concept-card">
+        <p class="concept-card__label">More than just "right or wrong"</p>
+        <p class="concept-card__body">
+          The Quiz provides a complete self-review cycle rather than popping up a full explanation
+          every time you get a question wrong. The support it offers during answering includes:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>Hint</strong> — when you are stuck, you can get a thinking prompt first.</li>
+          <li><strong>Explanation</strong> — look into why an answer was wrong.</li>
+          <li><strong>Results</strong> — after completing the full quiz, NotebookLM shows your results.</li>
+          <li><strong>Redo</strong> — you can choose to "Review from the start" or "Take it again."</li>
+        </ul>
+        <p class="concept-card__footer">
+          In short, what it provides is a <strong>"Hint, Explanation, Results, and Redo"</strong>
+          self-review cycle — a structured way to find your gaps.
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        We usually think of the Quiz as <strong>the second step, moving from memorization to verification</strong>.
+        Use Flashcards first to commit key points to memory, then use a Quiz to check whether you
+        truly have a handle on them. The two together tend to feel more engaging than simply reading
+        a summary or re-reading notes, and they make it easier to spot where you are getting stuck.
+      </p>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">Together, they turn review into a two-step process</h2>
+      <blockquote class="pullquote pullquote--primary">
+        Flashcards are well suited to breaking knowledge into small pieces and building familiarity;
+        Quizzes are well suited to checking whether you truly understand.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Viewed side by side, Flashcards and Quizzes correspond to two different stages.
+        Start with Flashcards to commit scattered key points to memory one at a time,
+        then move to a Quiz to confirm you actually have them down —
+        letting NotebookLM not only help you organize material, but also walk with you as you
+        <strong>turn that knowledge into something that is genuinely your own</strong>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-interactive {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (two tools overview) */
+  .feature-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--two {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .feature-grid--two {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

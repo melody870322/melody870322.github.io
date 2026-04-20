@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Learning Guide & Roadmap — PyBullet"
+  description="What is PyBullet? A Python-based robot simulation tool, ideal for getting started with robot simulation, physics testing, and control design."
+  lang="en"
+>
+  <section class="section">
+    <div class="container pb-guide">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">What is PyBullet?</h1>
+        <p class="detail-subtitle">
+          Think of it as a robot simulation tool you operate with Python. It can create a virtual world inside your computer — placing floors, tables, robots, and objects into a scene, then letting them move, collide, grasp, and perform all kinds of control tests according to physics rules. It's commonly used for robot simulation, physics testing, control design, and also for reinforcement learning and image data generation.
+        </p>
+        <p class="detail-subtitle" style="margin-top: var(--space-3);">
+          PyBullet is a great starting point, and the reason is simple: it's relatively easy to pick up, and you can write and run everything directly in Python. For newcomers to simulation, there's no need to understand many complex tools first — you can see results quickly. From basic model loading to wheeled robot control, and then to robotic arms, grippers, image capture, and data logging, you can build your skills step by step.
+        </p>
+      </header>
+
+      <!-- Section 1 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">What can it actually do?</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        The most basic approach is to first create a simulation environment, set gravity, load a ground plane, and then place a robot into the scene. These steps may seem simple, but they are the starting point for all subsequent applications. Connecting to the simulator, setting gravity, loading URDF models, stepping the simulation, and finally closing the connection are the most commonly used basic operations.
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        Going one step further, you can start controlling robots. In introductory examples, you would first practice with a wheeled robot like R2D2, which is easier to understand — controlling left and right wheel speeds via the keyboard to make the robot move forward, backward, turn left, and turn right. This approach is great for beginners because the visuals are intuitive and the control results are clear.
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        For more complete simulations, PyBullet can extend all the way to robotic arm control. Beyond loading arm models, you can also work with joints, grippers, end-effector positions, object grasping, image capture, data storage, and even joystick interaction. In other words, it's not just about placing models in a virtual world — you can gradually build a complete simulation and control pipeline.
+      </p>
+
+      <!-- Section 2 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">Why do many people start with PyBullet?</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        A major reason is that the learning curve is relatively gentle. PyBullet uses Python directly to set up environments and run programs, making the overall workflow easier to understand. It also comes with some built-in models and resources, so you don't necessarily need to prepare all model files yourself at the beginning. A common approach for beginners is to first run built-in examples, like the Franka Emika Panda, to verify that the environment works correctly before moving on to learning control.
+      </p>
+
+      <!-- Section 3 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">Who is it suitable for?</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        If you're encountering robot simulation for the first time, want to learn Python-based simulation control, or want to work with wheeled robots or robotic arms, PyBullet is a great starting point. Even without a robotics background, as long as you're willing to get hands-on with code, you can usually build up fundamental concepts gradually.
+      </p>
+
+      <!-- Section 4 -->
+      <h2 class="detail-heading" style="font-size: var(--text-xl); margin-top: var(--space-12); margin-bottom: var(--space-4); padding-bottom: var(--space-2);">Is it just a tool for viewing 3D visuals?</h2>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        No. While PyBullet can open a GUI window to display the simulation visually, its real value goes far beyond just "watching." Physics calculations, collision handling, and joint control — these core tasks are primarily handled by the CPU. The GUI mode simply renders the simulation results on screen. Besides the visual mode, you can also use the headless DIRECT mode for running large-scale simulations, data generation, or automated testing.
+      </p>
+      <p class="detail-paragraph" style="margin-bottom: var(--space-4); line-height: 1.9;">
+        This means PyBullet is not just a visualization tool, but a practical platform for control, verification, image capture, and data storage. This becomes especially important when simulations grow in complexity and need to be run at scale.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pb-guide {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+</style>

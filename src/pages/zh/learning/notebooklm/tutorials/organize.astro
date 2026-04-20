@@ -1,0 +1,577 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM 內容整理與理解"
+  description="從心智圖、報告到資料表，NotebookLM 的三個 Studio 工具可以把零散資料一步步整理成清楚的知識。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container nb-organize">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">內容整理與理解：讓 AI 幫你把資料變得更好懂、更好用</h1>
+        <p class="detail-subtitle">
+          把資料上傳到 NotebookLM 之後，它不只可以回答問題，還能進一步把零散內容整理成更容易吸收的形式。
+          打開筆記本後，除了左側的來源區和中間的對話區，右側的
+          <strong>Studio 面板</strong>就是整理成果最常出現的地方——像是心智圖、報告和資料表，都是從這裡生成與查看。
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">環境說明</span>
+          以下三種工具<strong>目前以電腦版網頁操作為主</strong>，NotebookLM 手機 app 目前還不支援生成或查看心智圖、報告和資料表。
+        </p>
+      </header>
+
+      <!-- Section 1: Three tools as one flow -->
+      <h2 class="detail-heading">三種工具，合成一套整理流程</h2>
+      <p class="detail-paragraph">
+        心智圖、報告、資料表看起來是三個彼此獨立的小工具，但實際使用時，它們剛好可以接成一套很實用的整理流程：
+        先看懂整體脈絡、再把內容整理成可閱讀的文件、最後把重點轉成可以比較和分類的表格。
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">步驟 01</p>
+          <h3 class="feature-title">心智圖</h3>
+          <p class="feature-alias">先看懂全貌</p>
+          <p class="feature-desc">
+            把大量資料攤開成分支圖，讓你先<strong>用「看圖」的方式建立整體理解</strong>，
+            再決定要往哪個方向追下去。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">步驟 02</p>
+          <h3 class="feature-title">報告</h3>
+          <p class="feature-alias">整理成可讀文件</p>
+          <p class="feature-desc">
+            把來源內容整理成一份<strong>可直接閱讀、分享、再加工</strong>的文字成果，
+            作為第一版整理稿。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">步驟 03</p>
+          <h3 class="feature-title">資料表</h3>
+          <p class="feature-alias">轉成可比較的結構</p>
+          <p class="feature-desc">
+            把大量零散的文字轉成<strong>可分類、可比較、可回看</strong>的表格，
+            讓共同點和差異點一眼就能看出來。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Mind Map -->
+      <h2 class="detail-heading">心智圖：先看懂全貌，再一路追到細節</h2>
+      <p class="detail-paragraph">
+        當你的來源很多，或內容本身比較複雜時，直接看一大段一大段文字，常常很難一下抓到重點。
+        這時候，NotebookLM 的心智圖就很有幫助。它會把你上傳的來源整理成一張分支圖，
+        把主要主題和相關想法用視覺化方式呈現出來，讓你先快速看懂
+        <strong>「這份資料大概在講什麼」</strong>，再慢慢往下看細節。
+      </p>
+
+      <p class="detail-paragraph">
+        官方把它定位成幫助使用者<strong>快速掌握大方向、探索新主題、看見概念之間的關聯，以及整理思路</strong>的工具。
+        它適合用在篇幅長、概念多、關係比較複雜的內容，例如研究資料、專題文獻、政策說明、
+        產業分析、培訓教材，或任何需要先抓整體架構的主題。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">怎麼打開心智圖</p>
+        <p class="concept-card__body">
+          打開筆記本，在右邊 Studio 面板點選<strong>「心智圖」</strong>，
+          NotebookLM 就會生成一張心智圖，之後可以隨時再打開來看。
+        </p>
+        <ul class="concept-card__list">
+          <li>可以<strong>放大、縮小、拖曳畫面</strong>，也能<strong>展開或收合各個分支</strong>，先看大架構再決定要不要往下挖。</li>
+          <li>對某個節點特別有興趣時，可以<strong>直接點選該節點</strong>，回到聊天區對那個主題繼續追問。</li>
+          <li>也可以直接下載心智圖，或分享整本筆記本，讓其他人一起查看同一張圖。</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        心智圖很像是幫你先把一堆資料攤開、分門別類，讓你不用從頭到尾硬讀一遍，
+        先用「看圖」的方式建立基本理解，再慢慢往細節走。
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <p class="caution-card__body">
+          心智圖是 AI 根據來源自動整理出來的結果，不代表每個分支都一定完全正確。
+          NotebookLM 官方也明確提醒，系統可能會出現不準確的地方——如果要把它用在
+          <strong>正式教材、報告內容或重要決策</strong>上，最好還是回到原始來源再核對一次。
+        </p>
+      </section>
+
+      <!-- Section 3: Reports -->
+      <h2 class="detail-heading">報告：把零散素材整理成能直接閱讀的內容</h2>
+      <p class="detail-paragraph">
+        如果說心智圖是在幫你先理出脈絡，那麼報告功能更像是把資料整理成一份
+        <strong>可以直接閱讀、直接分享、甚至直接再加工的文件</strong>。
+        NotebookLM 在 Studio 面板裡提供「報告」，你可以自行輸入需求，
+        也可以直接選擇幾種常見格式，不用每次都從空白開始想架構。
+      </p>
+
+      <p class="detail-paragraph">常見可選的報告格式包括：</p>
+      <div class="source-grid">
+        <span class="source-chip">簡介文件</span>
+        <span class="source-chip">研讀指南</span>
+        <span class="source-chip">網誌文章</span>
+        <span class="source-chip">系統建議的報告類型</span>
+        <span class="source-chip">自訂需求</span>
+      </div>
+
+      <p class="detail-paragraph">
+        當你手上有會議紀錄、課程講義、訪談內容、專案資料、產品說明，或多份互相關聯的來源時，
+        報告功能可以幫你先整理成一份比較成形的文字內容。你可以把它當成
+        <strong>「第一版整理稿」</strong>，再依照用途調整成教學講義、閱讀重點、
+        常見問答、工作摘要，或內部分享文件。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">把報告匯出成可繼續整理的檔案</p>
+        <p class="concept-card__body">
+          報告生成後，可以從旁邊的<strong>三點選單</strong>把內容匯出到不同地方：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>匯出到 Google Docs</strong>——整份報告內容會完整帶過去，方便繼續編輯。</li>
+          <li>
+            <strong>報告裡的資料表可以另外匯出到 Google Sheets</strong>——
+            每個資料表會各自放在不同分頁裡，讓你可以把結構化的內容拆出來繼續整理。
+          </li>
+        </ul>
+      </section>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <p class="caution-card__body">
+          匯出後，你在 Docs 或 Sheets 裡做的修改<strong>不會同步回原本的 NotebookLM 內容</strong>，
+          分享權限也不會自動沿用。所以如果要持續更新，建議把「哪一份才是最新版本」先講清楚。
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        如果你會需要不同語言版本的文字內容，也可以先到報告格式設定中，
+        點選右上角的<strong>鉛筆符號</strong>來「選擇語言」。
+        官方說明指出，NotebookLM 瀏覽器版目前支援 80 多種語言，會使用你設定的輸出語言來生成文字內容。
+        這對整理跨語言資料、製作雙語教學內容，或準備不同讀者版本時，會很方便。
+      </p>
+
+      <!-- Section 4: Data Tables -->
+      <h2 class="detail-heading">資料表：把雜亂文字整理成可比較、可分類的表格</h2>
+      <p class="detail-paragraph">
+        有些資料不是不重要，而是太散、太碎、太多，導致你很難一眼看出規律。
+        像是問卷回饋、訪談逐字稿、活動意見、客訴紀錄、產品比較、案例整理，
+        這類內容如果一直停留在段落文字的形式，閱讀起來會很吃力。
+        NotebookLM 的「資料表」就是拿來處理這種情況的——它可以把來源內容整理成表格，
+        幫你把零散資訊轉成<strong>比較容易分類、比對和回看</strong>的形式。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">兩種調整資料表的方式</p>
+        <p class="concept-card__body">
+          資料表功能位於 Studio 面板。官方目前明確支援兩種調整方式：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>選擇輸出語言</strong>——適合需要跨語言整理的情境。</li>
+          <li>
+            <strong>在提示框裡描述你要的表格長相</strong>——例如希望有哪些欄位、
+            每列要放什麼資訊，或想讓表格更聚焦在某一種比較方式。
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        這代表資料表不是只能「自動整理」，你也可以<strong>主動告訴它要用什麼角度來整理</strong>。
+        舉例來說：
+      </p>
+
+      <ul class="example-list">
+        <li>
+          <strong>整理活動心得</strong>：可以把它做成
+          <em>「反映問題 / 建議方向 / 提及頻率」</em>這類欄位。
+        </li>
+        <li>
+          <strong>整理多篇文章</strong>：可以用
+          <em>「主題 / 觀點 / 例子 / 適用情境」</em>的方式去比對。
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        原本看起來很亂的內容，一旦變成表格，往往就更容易抓出共同點、差異點和後續可以行動的方向。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">匯出後同時保留引用線索</p>
+        <p class="concept-card__body">
+          資料表也可以從旁邊的三點選單匯出到 Google Sheets。官方說明得很清楚：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>第一個分頁</strong>：表格內容。</li>
+          <li><strong>第二個分頁</strong>：相關的引用資料。</li>
+        </ul>
+        <p class="concept-card__footer">
+          這點很實用，因為資料表不只是把內容排整齊而已，
+          它同時也保留了<strong>回頭查證的線索</strong>——你不只得到一張表，
+          還能知道這些整理結果是從哪些來源整理出來的。
+        </p>
+      </section>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">三者搭配，剛好是一套整理流程</h2>
+      <blockquote class="pullquote pullquote--primary">
+        心智圖適合先建立全貌，幫你看懂資料之間的關係；
+        報告適合把內容整理成一份可讀、可分享的文字成果；
+        資料表則適合把大量資訊轉成可分類、可比較的結構。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這三者搭配起來，剛好就是把零散資料一步步整理成清楚知識的過程——
+        從看見整體、整理成文件，到收斂成可比較的結構，
+        讓 NotebookLM 不只回答問題，也能陪你把資料真的<strong>整理到好用的程度</strong>。
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-organize {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (three tools overview) */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Source chips (report formats) */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Example list (column schemas) */
+  .example-list {
+    margin: var(--space-4) 0 var(--space-6);
+    padding-left: var(--space-5);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .example-list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .example-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-list em {
+    font-style: normal;
+    padding: 2px var(--space-2);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+    color: var(--color-heading);
+    font-size: var(--text-sm);
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

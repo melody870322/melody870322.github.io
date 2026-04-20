@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="輕量型引用動態和潛在動態物件視訊分割網路"
+  description="提出 Lite RSDNet，結合文字指令與影像資訊的輕量化多模態分割模型，聚焦於潛在動態物體與動態物體的辨識與移除，以強化機器人在動態環境中的場景理解，並提升視覺里程計於真實場域中的定位穩定性。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container research-detail">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">輕量型引用動態和潛在動態物件視訊分割網路</h1>
+        <p class="detail-subtitle">
+          結合文字指令與影像資訊的輕量化多模態分割模型，聚焦於潛在動態物體與動態物體的辨識與移除，以強化機器人在動態環境中的場景理解，並提升視覺里程計於真實場域中的定位穩定性。
+        </p>
+      </header>
+
+      <!-- 研究概述 -->
+      <h2 class="detail-heading">研究概述</h2>
+      <p class="detail-paragraph">
+        本研究提出 Lite RSDNet，是一套結合文字指令與影像資訊的輕量化多模態分割模型，目標是在動態環境中準確辨識並移除動態物體與潛在動態物體，提升機器人在真實場域中的環境理解能力。研究特別聚焦於自主移動機器人（AMR）常見情境，例如人移動椅子、搬運箱子、開門等，讓系統不只辨識正在移動的人，也能理解因人類互動而變成動態的物體。
+      </p>
+
+      <!-- 研究影片 -->
+      <h2 class="detail-heading">研究影片</h2>
+      <div class="video-wrapper">
+        <iframe
+          src="https://www.youtube.com/embed/dhEwrB8spy0"
+          title="輕量型引用動態和潛在動態物件視訊分割網路 研究影片"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- 核心技術 -->
+      <h2 class="detail-heading">核心技術</h2>
+      <ul class="tech-tags">
+        <li class="tech-tag">引用視訊物件分割</li>
+        <li class="tech-tag">多模態特徵融合</li>
+        <li class="tech-tag">VO 整合應用</li>
+        <li class="tech-tag">邊緣深度學習</li>
+      </ul>
+
+      <!-- 研究亮點 -->
+      <h2 class="detail-heading">研究亮點</h2>
+      <ul class="highlight-list">
+        <li class="highlight-item">
+          <strong>輕量化多模態架構：</strong>結合文字與影像資訊，可同時分割動態物體與潛在動態物體，兼顧場景理解與模型輕量化。
+        </li>
+        <li class="highlight-item">
+          <strong>效率與分割表現兼具：</strong>模型僅 21.35M 總參數、8.86M 可訓練參數、76.83 GFLOPs，並在 A2D、JHMDB、Ref-DAVIS2017 上展現穩定分割表現。
+        </li>
+        <li class="highlight-item">
+          <strong>提升動態場景定位穩定性：</strong>能更精準區分需移除的動態／潛在動態物體與應保留的靜態背景，降低動態干擾並改善 VO 在室內外環境中的定位效果。
+        </li>
+      </ul>
+
+      <!-- 相關著作 -->
+      <h2 class="detail-heading">相關著作</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          <strong>王詩婷</strong>、李聯旺、李宜勳，"自主移動機器人動態環境視覺里程計定位技術：一種基於深度學習 DDHAR 動作識別方法," in <em>National Symposium on System Science and Engineering (NSSSE)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>S.-T. Wang</strong>, I.-H. Li, and L.-W. Lee, "Enhancing Visual Odometry Localization in Dynamic Environments for Autonomous Mobile Robots through Edge DD-HAR: A Deep Learning-Based Action Recognition Approach," in <em>International Conference on Artificial Intelligence and Virtual Reality (AIVR)</em>, 2024.
+        </li>
+        <li class="pub-item">
+          <strong>S.-T. Wang</strong>, I.-H. Li, and L.-W. Lee, "Dynamic Object-Aware Visual Odometry Enhancement for Autonomous Mobile Robots using Edge DD-HAR," in <em>International Conference on System Science and Engineering (ICSSE)</em>, 2024.
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .research-detail {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Video embed (responsive 16:9) */
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Tech tags */
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+  }
+
+  .tech-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+  }
+
+  /* Highlights */
+  .highlight-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .highlight-item {
+    position: relative;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .highlight-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+
+  .highlight-item strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* 著作列表 */
+  .pub-list {
+    list-style: disc;
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .pub-item {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .pub-item strong {
+    color: var(--color-heading);
+  }
+
+  .pub-item em {
+    color: var(--color-text-secondary);
+  }
+</style>

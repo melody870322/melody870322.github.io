@@ -1,0 +1,943 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Subagents: Dedicated Helpers for Claude Code"
+  description="Learn how to use /agents to create Subagents — dedicated helpers that Claude Code can delegate work to, keeping the main conversation's context clean."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-subagents">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Connect Claude Code to Tools, Teach It New Tricks, and Automate Repetitive Work</h1>
+        <p class="detail-subtitle">
+          We've already set up the basics for Claude Code — CLAUDE.md, memory management, context handling.
+          The next stage isn't about stuffing more rules into the handbook. It's about giving Claude Code
+          new abilities. Some let it see external tools, some let it follow fixed workflows, some let it
+          farm out large tasks, and some automate repetitive actions. These abilities each have their own role.
+        </p>
+      </header>
+
+      <!-- Section 1: What is a Subagent -->
+      <h2 class="detail-heading">Subagents: Dedicated Helpers for Claude Code</h2>
+      <p class="detail-paragraph">
+        Think of a Subagent as a sidekick version of Claude Code. It's not just a block of instructions — it's a helper with
+        its own context, its own tool permissions, and can even run on a specific model. When the main Claude Code hits a task
+        that fits, it can delegate the work to the subagent, then pull back a summary when it's done.
+      </p>
+      <p class="detail-paragraph">
+        The biggest advantage of this design is protecting the main conversation from getting flooded with details.
+        For example, if you ask Claude Code to read many files, run a wide search, or sort through a pile of data,
+        running all of that in the main conversation makes it heavy fast. A subagent handles the work on its own
+        and only reports back a summary. This gives you the benefit of context isolation.
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">How to manage Subagents?</p>
+        <p class="info-body">
+          In Claude Code, the recommended way to create and manage Subagents is with the <code>/agents</code> command.<br />
+          It opens an interactive interface where you can view available subagents, create new ones, edit tool access, delete custom subagents, or see which definitions are currently active.
+        </p>
+      </div>
+
+      <!-- Section 2: Three ways to use -->
+      <h2 class="detail-heading">Three Common Ways to Use a Subagent</h2>
+      <p class="detail-paragraph">
+        Say you want to create a new subagent, like <code>code-reviewer</code>. Once it's set up, you have three common ways to use it:
+      </p>
+      <ul class="usage-list">
+        <li>
+          <strong>Mention it in natural language</strong>: for example, "Please have code-reviewer look at my recent changes."
+        </li>
+        <li>
+          <strong>Use @ to name it explicitly</strong>: this guarantees that specific helper will handle the task.
+        </li>
+        <li>
+          <strong>Set the whole session to a specific agent style</strong>: this is more advanced — we won't cover it here.
+        </li>
+      </ul>
+
+      <!-- Main collapsible: Example steps -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">Example Steps for Using a Subagent</span>
+        </summary>
+        <div class="collapsible-body">
+
+          <p class="detail-paragraph" style="margin-bottom: var(--space-2);">
+            <strong>Creating code-reviewer</strong> (skip this section if you're using an existing subagent)
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">Open the /agents interface</h3>
+                <p class="step-desc">Open the Claude Code chat, type <code>/agents</code>, and select Agents.</p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">Select Continue in Terminal</h3>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">Trust the folder and create a new agent</h3>
+                <p class="step-desc">
+                  Press Enter on "Yes, I trust this folder" and then on "Create new agent".
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">Choose the subagent's scope</h3>
+                <p class="step-desc">
+                  You'll see two options: "Project (.claude/agents/)" and "Personal (~/.claude/agents/)".
+                  The former means this subagent is only available in this project; the latter means it's available across all projects.
+                  For this demo, we'll pick "Project (.claude/agents/)".
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">Select Manual configuration</h3>
+                <p class="step-desc">Press Enter on "Manual configuration".</p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Nested collapsible: Create a new subagent -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">6. Create a New Subagent</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">Where: /agents interface</p>
+              <p class="step-desc">
+                Create a new subagent in the interface. For the name, enter: <code>code-reviewer</code>
+              </p>
+
+              <p class="step-desc" style="margin-top: var(--space-4);">
+                Next, fill in the <strong>System prompt</strong> — this is the subagent's "internal working rules".
+                It tells the helper "who you are, how you work, and what to focus on in your responses." For example:
+              </p>
+              <pre class="code-block"><code set:html={`You are a subagent dedicated to code review.
+
+Your job is to inspect code, changes, or file contents the user provides, and find the most noteworthy issues, especially:
+
+1. Possible bugs
+2. Logic errors
+3. Unhandled edge cases
+4. Code that's hard to read or maintain
+5. Duplicated logic
+6. Obvious performance issues
+7. Security risks
+
+Follow these rules:
+- Surface truly important issues first; don't put minor style nits at the top
+- If you're unsure, say so — don't guess
+- When explaining an issue, include "where it is", "why it's a problem", and "how to fix it"
+- Keep responses well-organized; prefer bulleted lists
+- If you don't see any obvious issues, say so explicitly
+- Unless the user explicitly asks, do not modify the code — only review and suggest
+- Explain things in plain language; avoid piling on jargon`} /></pre>
+
+              <p class="step-desc" style="margin-top: var(--space-4);">
+                Then fill in the <strong>Description</strong> — this tells the main Claude "when to delegate work to this helper." For example:
+              </p>
+              <pre class="code-block"><code set:html={`Dedicated to reviewing code changes — finding bugs, readability issues, edge cases, performance issues, and security risks.
+Use when the user asks for a code review, wants recent changes checked, is hunting for bugs, or is evaluating code quality.`} /></pre>
+
+              <div class="note-card">
+                <p class="note-body">
+                  Claude mainly uses the <strong>description</strong> to decide whether to delegate, while the subagent itself has its own custom system prompt.
+                  If you want it to be invoked proactively more often, add phrasing like "use proactively" in the description.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <!-- Nested collapsible: Configure tools -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">7. Configure Which Tools Your Subagent Can Use</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">Where: /agents interface</p>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">All tools</h4>
+                <p class="step-desc">
+                  Give it every tool. If this option stays checked, the subagent inherits every tool currently available in the main conversation —
+                  including built-in tools and MCP tools. This is the most convenient option and grants the broadest permissions.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> feature-complete helpers — ones that don't just read code but also edit files, run commands, and use external tools.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Read-only tools</h4>
+                <p class="step-desc">
+                  Let it look, but not change anything. These tools are mainly for reading files, finding files, and searching content —
+                  helping Claude Code understand the project without modifying it directly.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> code review, investigating issues, exploring project structure, research-before-reporting tasks.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Edit tools</h4>
+                <p class="step-desc">
+                  Let it modify files. Claude Code has tools like Edit and Write that directly change files.
+                  Turn on Edit tools and the subagent isn't just looking — it can actually make changes.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> bug-fix helpers, automated refactoring, applying suggested edits directly.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Execution tools</h4>
+                <p class="step-desc">
+                  Let it run commands. Things like shell commands, starting services, running tests, and using git all fall in this category.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> test runners, build helpers, deployment checkers.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">MCP tools</h4>
+                <p class="step-desc">
+                  Let it use external tools you've connected. If your main conversation already has MCP servers attached,
+                  the subagent inherits those MCP tools by default. You can also restrict it to only specific tools.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> helpers that need to look up external data, agents working alongside third-party tools.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Other tools</h4>
+                <p class="step-desc">
+                  Auxiliary tools that don't fit the main categories — opening subagents, asking the user questions, managing tasks, switching to plan mode, working with worktrees, and so on.
+                </p>
+                <p class="step-desc"><strong>Good for:</strong> flow-control tasks.</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Show advanced options</h4>
+                <p class="step-desc">
+                  Opens finer-grained settings. This button usually lets you add further restrictions —
+                  going beyond the broad categories to fine-tune individual tools. If this is your first time, you can skip it.
+                </p>
+              </div>
+
+              <div class="note-card" style="margin-top: var(--space-4);">
+                <p class="note-body">
+                  The subagent we're building is <code>code-reviewer</code>, which is a review-type helper. It needs to look, search, and analyze —
+                  but shouldn't directly modify files. So the recommendation is: uncheck All tools, leave only <strong>Read-only tools</strong>, then press Continue.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <ol class="step-list" start="8">
+            <li class="step-item">
+              <span class="step-num">8</span>
+              <div class="step-body">
+                <h3 class="step-title">Select model</h3>
+                <p class="step-desc">
+                  Where: /agents interface<br />
+                  Sonnet is a solid default — it balances capability and speed well for analyzing code patterns. But pick based on your own needs.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">9</span>
+              <div class="step-body">
+                <h3 class="step-title">Choose a color</h3>
+                <p class="step-desc">
+                  Where: /agents interface<br />
+                  Pick whatever color you like. It's just a visual cue so you can tell which subagent is running in the interface.
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Nested collapsible: Configure memory -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">10. Configure Memory</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">Where: /agents interface</p>
+              <p class="step-desc">
+                Decide whether this subagent should have its own long-term memory, and where that memory should live.
+                If memory is on, the helper isn't just "one-and-done" — it gradually builds up notes on the rules it's observed,
+                common issues, code style, and project habits, so it can reuse them later.
+              </p>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">Project scope (.claude/agent-memory/) (Recommended)</h4>
+                <p class="step-desc">
+                  Stores the subagent's memory inside the current project. Good for cases where "this memory is only useful for this project."
+                  Things like the project's naming conventions, folder structure, common trouble spots, and code style —
+                  all a good fit for project scope.
+                </p>
+                <p class="step-desc step-desc--hint">
+                  Think of it as: this helper gradually learns "how we do things in this project."
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">None (no persistent memory)</h4>
+                <p class="step-desc">
+                  No long-term memory at all. The subagent is one-and-done every time — nothing it learns carries over.
+                </p>
+                <p class="step-desc step-desc--hint">
+                  Think of it as: this helper has short-term memory, but no long-term notebook.
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">User scope (~/.claude/agent-memory/)</h4>
+                <p class="step-desc">
+                  Stores memory in your personal Claude config folder, so it's available across all projects.
+                  Good if what the subagent learns is "not just for one project" — your personal coding style, the review standards you use,
+                  the debugging instincts you rely on. Those can live here.
+                </p>
+                <p class="step-desc step-desc--hint">
+                  Think of it as: this helper learns "how you work," not just one project's habits.
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">Local scope (.claude/agent-memory-local/)</h4>
+                <p class="step-desc">
+                  Memory stays in the current project and isn't meant to be shared. Similar to project scope,
+                  but project scope is "versioned and shareable with the team," while local scope is
+                  "private notes on my machine that I don't want in the repo."
+                </p>
+                <p class="step-desc step-desc--hint">
+                  Think of it as: this helper remembers project-specific things, but the notes are personal — not something you'd hand to the team.
+                </p>
+              </div>
+
+              <div class="note-card" style="margin-top: var(--space-4);">
+                <p class="note-body">
+                  Since we're just testing for now, choose <strong>None</strong>.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <ol class="step-list" start="11">
+            <li class="step-item">
+              <span class="step-num">11</span>
+              <div class="step-body">
+                <h3 class="step-title">Save</h3>
+                <p class="step-desc">
+                  Where: /agents interface<br />
+                  You'll land on a summary screen. Press <kbd>s</kbd> or <kbd>Enter</kbd> to save;
+                  press <kbd>e</kbd> to save and then open the file for editing. Once saved, the subagent is ready to use immediately.
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Usage section -->
+          <h3 class="subsection-title">How to Use code-reviewer After Creation</h3>
+
+          <div class="usage-card">
+            <h4 class="usage-card-title">1. Mention It in Natural Language</h4>
+            <p class="step-desc">
+              (No guarantee it'll actually delegate — Claude Code may decide it can handle the task itself.)
+            </p>
+            <p class="step-desc">Type something like this into the Claude Code chat:</p>
+            <pre class="code-block code-block--command"><code>Please have code-reviewer look at my recent code changes.</code></pre>
+            <p class="step-desc">
+              Claude Code uses the subagent's description to decide whether to delegate — automatic delegation mostly depends on how you wrote the description.
+            </p>
+          </div>
+
+          <div class="usage-card">
+            <h4 class="usage-card-title">2. Use @ to Name It Explicitly</h4>
+            <p class="step-desc">
+              In the Claude Code chat, type <code>@</code>, pick your subagent from the dropdown, and then fill in the task. For example:
+            </p>
+            <pre class="code-block code-block--command"><code>@"code-reviewer (agent)" check my recent changes and list the most important issues to fix first.</code></pre>
+          </div>
+
+          <div class="note-card" style="margin-top: var(--space-4);">
+            <p class="note-body">
+              <strong>Key takeaway:</strong> if the task involves reading a lot, running many searches, but you only want a summary at the end —
+              it's a perfect fit for a Subagent.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">Key Takeaways</p>
+        <ul class="summary-list">
+          <li><strong>Subagent</strong>: a sidekick version of Claude Code with its own context, tool permissions, and model settings.</li>
+          <li><strong>Context isolation</strong>: the subagent handles work on its own and only reports back a summary, keeping the main conversation clean.</li>
+          <li><strong>/agents</strong>: the interactive interface for creating and managing subagents.</li>
+          <li><strong>Tool permissions</strong>: fine-tune which tools each subagent can use — read-only, editing, execution, and so on.</li>
+          <li><strong>Memory settings</strong>: choose Project, User, Local scope, or no memory at all.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-subagents {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Usage list ── */
+  .usage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .usage-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .usage-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .usage-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Collapsible sections (purple, top-level) ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Nested collapsible (orange) ── */
+  .collapsible-nested {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #f97316;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible-nested[open] {
+    border-top-color: #f97316;
+    border-right-color: #f97316;
+    border-bottom-color: #f97316;
+  }
+
+  .collapsible-nested-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-nested-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-nested-trigger:hover {
+    background-color: #fff7ed;
+  }
+
+  :root[data-theme='dark'] .collapsible-nested-trigger:hover {
+    background-color: rgba(249, 115, 22, 0.08);
+  }
+
+  .collapsible-nested-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-nested-icon::before,
+  .collapsible-nested-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #f97316;
+    border-radius: 1px;
+  }
+
+  .collapsible-nested-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-nested-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible-nested[open] .collapsible-nested-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-nested-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-nested-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Info card ── */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Tool & Memory option cards ── */
+  .tool-option,
+  .memory-option {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .tool-option-title,
+  .memory-option-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #f97316;
+    margin-bottom: var(--space-2);
+  }
+
+  /* ── Usage cards ── */
+  .usage-card {
+    margin-bottom: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .usage-card-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Subsection title ── */
+  .subsection-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc--hint {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0 var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .usage-list code,
+  .step-desc code,
+  .note-body code,
+  .info-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* kbd */
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--color-heading);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 0 var(--color-border);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .collapsible-body,
+    .collapsible-nested-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

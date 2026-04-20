@@ -1,0 +1,64 @@
+---
+import { t, getLocaleFromUrl } from '../i18n/utils';
+
+const locale = getLocaleFromUrl(Astro.url);
+const i = t(locale);
+const year = new Date().getFullYear();
+const copyright = i.footer.copyright.replace('{year}', String(year));
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p class="footer-text">{copyright}</p>
+    <div class="footer-links">
+      <a href="https://orcid.org/0000-0003-3553-0936" target="_blank" rel="noopener noreferrer" aria-label="ORCID">
+        ORCID
+      </a>
+      <a href="mailto:melody870322@gmail.com" aria-label="Email">
+        Email
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    padding-block: var(--space-8);
+    margin-top: var(--space-16);
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .footer-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--space-6);
+  }
+
+  .footer-links a {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .footer-links a:hover {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 768px) {
+    .footer-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>

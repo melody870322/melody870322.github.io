@@ -1,0 +1,470 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="概述與基本觀念 — URDF 格式與模型描述"
+  description="認識 URDF 的基本概念：什麼是 URDF、它和 PyBullet／Gazebo 的關係、Link 與 Joint 的核心觀念，以及 URDF 能做與不能做的事。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container urdf-overview">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">帶你認識機器人的「數位藍圖」：URDF</h1>
+        <p class="detail-subtitle">
+          如果我們在腦海中設計好了一款機器人，接下來要怎麼把它「放進」電腦裡，讓它在虛擬世界中出現，甚至能拿來做模擬與測試呢？這時候，我們就會用到一個非常重要的工具——URDF。
+        </p>
+      </header>
+
+      <!-- Section: What is URDF -->
+      <h2 class="detail-heading">什麼是 URDF？</h2>
+      <p class="detail-paragraph">
+        全名是 Unified Robot Description Format，中文常翻成統一機器人描述格式。你可以把它想成機器人的數位說明書，也可以把它想成機器人的數位藍圖。
+      </p>
+      <p class="detail-paragraph">
+        這份「說明書」會告訴電腦兩件很重要的事：
+      </p>
+      <ul class="check-list">
+        <li>這台機器人長什麼樣子</li>
+        <li>它的各個零件是怎麼組合在一起的</li>
+      </ul>
+      <p class="detail-paragraph">
+        在 ROS 的世界裡，URDF 是很常見的模型描述方式。不過它不只出現在 ROS 裡，很多模擬器也會讀取 URDF 來載入機器人模型。所以先看懂 URDF，之後學 PyBullet 和 Gazebo 等虛擬環境也會順很多。
+      </p>
+      <p class="detail-paragraph">
+        為了讓電腦能看懂這份說明書，URDF 是用一種叫做 XML 的格式來編寫的。你可以先把它想成一層一層的「標籤」，把機器人的各個部分整理得清清楚楚。
+      </p>
+      <div class="callout-card">
+        <p class="callout-text">
+          不過這裡也要先記住一件事：<strong>URDF 的工作是描述機器人，不是直接控制機器人。</strong>它很擅長告訴電腦「這台機器人由哪些部分組成、長什麼樣、怎麼連接」，但如果真的要讓機器人在模擬器裡動起來，通常還要再搭配控制程式、模擬器或其他工具一起使用。
+        </p>
+      </div>
+
+      <!-- Section: Relationship with PyBullet / Gazebo -->
+      <h2 class="detail-heading">URDF 和 PyBullet／Gazebo 的關係</h2>
+      <p class="detail-paragraph">
+        可以把 URDF 想成「模型本身的說明書」，而 PyBullet 和 Gazebo 則比較像「讓這份模型真的進入虛擬世界運作的平台」。
+      </p>
+      <p class="detail-paragraph">
+        也就是說，URDF 負責描述：
+      </p>
+      <ul class="check-list">
+        <li>機器人的外型</li>
+        <li>零件怎麼連接</li>
+        <li>哪些地方可以轉動</li>
+        <li>碰撞和基本物理資訊</li>
+      </ul>
+      <p class="detail-paragraph">
+        而 PyBullet 和 Gazebo 則會把這些資料讀進去，放到模擬環境裡，讓我們進一步做控制、測試、碰撞模擬、影像擷取，或其他更完整的應用。
+      </p>
+      <p class="detail-paragraph">
+        所以它們不是互相取代的關係，而是彼此配合的關係。先看懂 URDF，後面不管是學 PyBullet 還是 Gazebo，都會比較容易理解模型到底是怎麼被放進模擬器裡的。
+      </p>
+
+      <!-- Section: What will we learn -->
+      <h2 class="detail-heading">我們會學到什麼？</h2>
+      <p class="detail-paragraph">
+        要把一台機器人慢慢在電腦裡建立出來，就像在拼樂高一樣，我們通常會經歷幾個很重要的階段：
+      </p>
+
+      <ol class="stage-list">
+        <li class="stage-item">
+          <span class="stage-num">1</span>
+          <div class="stage-body">
+            <h3 class="stage-title">幫機器人做個身體（建立視覺模型）</h3>
+            <p class="stage-desc">
+              一開始，我們會先從最基本的外觀開始。像是圓柱體、長方體這些簡單形狀，都可以拿來拼出機器人的外型。這一步的重點，是先做出一個「看得見」的機器人。
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">2</span>
+          <div class="stage-body">
+            <h3 class="stage-title">讓機器人有結構（建立可動模型）</h3>
+            <p class="stage-desc">
+              只有外型還不夠，因為那樣的模型通常只是靜態的，看得到，但還不能動。接下來就要幫它加上「關節」，讓電腦知道哪些部位是連在一起的、哪裡可以轉、哪裡可以移動。這樣模型才會有活動的結構。之後再搭配模擬器或控制程式，機器人才真的能動起來。
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">3</span>
+          <div class="stage-body">
+            <h3 class="stage-title">加入更接近真實的資訊（加上物理與碰撞屬性）</h3>
+            <p class="stage-desc">
+              如果想讓機器人在模擬器裡表現得更像真實世界中的物體，還需要補上更多資訊。像是重量、重心、碰撞外殼這些設定，都很重要。這些資料會提供給模擬器使用，幫助它更合理地計算碰撞、重力和平衡，而不是讓模型只有外觀看起來像真的。
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">4</span>
+          <div class="stage-body">
+            <h3 class="stage-title">把重複內容整理好（使用 Xacro 工具）</h3>
+            <p class="stage-desc">
+              當機器人越做越複雜，URDF 檔案也會越來越長。這時候，常常會搭配 Xacro 來整理內容。你可以把 Xacro 想成 URDF 的小幫手，它能幫忙整理重複的程式片段，讓整份檔案更乾淨、更好改，也比較不容易寫到眼花。
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">5</span>
+          <div class="stage-body">
+            <h3 class="stage-title">搭配其他工具一起使用</h3>
+            <p class="stage-desc">
+              寫好 URDF 之後，這份模型通常還會搭配其他工具一起使用。例如在 ROS 裡，可以配合相關工具去顯示機器人各個部位之間的關係，或是根據關節資料更新整體姿態。這樣一來，URDF 就不只是靜態檔案，而是能真正被放進系統裡使用的模型。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Link and Joint -->
+      <h2 class="detail-heading">先記住兩個最重要的字：Link 和 Joint</h2>
+      <p class="detail-paragraph">
+        如果剛開始覺得 URDF 有點陌生，也不用急。先記住兩個最核心的概念就夠了：
+      </p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h3 class="concept-label">Link</h3>
+          <p class="concept-desc">
+            你可以想成機器人的一個零件，像是底座、手臂、前臂、輪子，這些都可以算是一個 link。
+          </p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">Joint</h3>
+          <p class="concept-desc">
+            就是把這些零件接在一起的地方。它會告訴電腦兩個 link 之間是怎麼連接的，也會決定它們之間能不能轉、能不能動。
+          </p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        很多 URDF 內容，其實都是圍繞著這兩個核心在展開。只要先抓住這個概念，後面看到 visual、collision、inertial 這些內容時，就比較不會亂掉。這些內容會在後面做進一步說明。
+      </p>
+
+      <!-- Section: Can and Can't -->
+      <h2 class="detail-heading">URDF 能做什麼？不能做什麼？</h2>
+      <p class="detail-paragraph">
+        URDF 很重要，但它不是萬能的。
+      </p>
+
+      <div class="ability-grid">
+        <div class="ability-card ability-card--can">
+          <h3 class="ability-label">它很擅長做的事</h3>
+          <ul class="ability-list">
+            <li>描述機器人的外觀</li>
+            <li>表示機器人的零件結構</li>
+            <li>定義零件之間怎麼連接</li>
+            <li>提供碰撞和基本物理資訊</li>
+            <li>讓模擬器或其他工具能正確讀取模型</li>
+          </ul>
+        </div>
+        <div class="ability-card ability-card--cant">
+          <h3 class="ability-label">它不負責的事情</h3>
+          <ul class="ability-list">
+            <li>不會自己寫出控制邏輯</li>
+            <li>不會自己讓機器人動起來</li>
+            <li>不會自己完成物理模擬</li>
+            <li>不會單靠一份檔案就變成完整的機器人系統</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        URDF 負責把機器人的樣子和結構描述清楚；真正讓它動起來、算起來、跑起來，還要靠其他工具一起合作。
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-overview {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Stage list (numbered steps) */
+  .stage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .stage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .stage-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .stage-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .stage-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stage-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .stage-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Concept grid (Link & Joint) */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .concept-card {
+    padding: var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .concept-label {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+    letter-spacing: 0.02em;
+  }
+
+  .concept-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Ability grid (can / can't) */
+  .ability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .ability-card {
+    padding: var(--space-8);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .ability-card--can {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-accent);
+  }
+
+  .ability-card--cant {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .ability-label {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ability-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ability-list li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .ability-card--can .ability-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .ability-card--cant .ability-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .concept-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ability-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stage-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .stage-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .concept-card {
+      padding: var(--space-6);
+    }
+
+    .ability-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

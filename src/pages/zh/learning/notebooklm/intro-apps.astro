@@ -1,0 +1,764 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM 介紹與應用"
+  description="NotebookLM 是一個以資料為中心的整理與學習工具，能陪你閱讀、整理、轉換與再利用手邊的資料。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container nb-intro">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">NotebookLM 介紹與應用</h1>
+        <p class="detail-subtitle">
+          一個以資料為中心的整理與學習工具，幫你把已經擁有的資料，變得比較好讀、好整理，也比較好再利用。
+        </p>
+      </header>
+
+      <!-- Section 1: Opening -->
+      <h2 class="detail-heading">當資料越來越多，需要的不只是搜尋，而是整理</h2>
+      <p class="detail-paragraph">
+        現在很多人每天都在接觸大量資訊：課程講義、研究文章、簡報、網站內容、影片、錄音，
+        或是一整串還沒整理的筆記。真正讓人感到吃力的，往往不是找不到資料，而是
+        <strong>資料明明就在眼前，卻不知道該從哪裡開始看、怎麼抓重點、怎麼把不同來源放在一起整理</strong>。
+      </p>
+      <p class="detail-paragraph">
+        NotebookLM 之所以受到注意，就是因為它很適合處理這類情境。它是一個能陪你閱讀、整理、轉換與再利用資料的工作空間。
+        你可以把資料集中放在同一個 notebook 裡，再用提問、摘要、導讀、學習輔助或其他輸出形式，
+        慢慢把原本零散的內容變得更有條理。
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-card--muted">
+          <p class="compare-label">一般 AI 工具</p>
+          <p class="compare-title">問一個問題、拿到一段答案</p>
+          <p class="compare-desc">
+            擅長從零回答問題，但手上已有資料時，不一定能幫你把它們串起來使用。
+          </p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">NotebookLM</p>
+          <p class="compare-title">把已有的資料變得能用</p>
+          <p class="compare-desc">
+            適合回答另一種需求：「我手上已經有很多資料了，接下來我該怎麼把它們用起來？」
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 2: What is it -->
+      <h2 class="detail-heading">NotebookLM 是什麼？</h2>
+      <p class="detail-paragraph">
+        NotebookLM 可以先理解成一種<strong>以資料為中心的整理與學習工具</strong>。它的核心特色，
+        不在於替你從零生出內容，而在於幫你把已經擁有的資料變得更容易閱讀、理解、比較與再使用。
+      </p>
+      <p class="detail-paragraph">
+        它很適合用在這些情境：你有一份很長的講義、一組主題相近的文章、一套課程投影片、一段影片內容、
+        一場會議錄音，或者一份正在進行中的專題資料。當這些內容被放進同一個 notebook 之後，
+        你就可以圍繞這些資料展開互動，而不是每次都從空白開始。
+      </p>
+      <p class="detail-paragraph">
+        久而久之，一本 notebook 就不只是檔案堆放區，而會變成一個
+        <strong>有主題、有脈絡、可以持續使用的知識工作本</strong>。
+      </p>
+
+      <!-- Section 3: Three main uses -->
+      <h2 class="detail-heading">最常見的三種用途</h2>
+      <p class="detail-paragraph">
+        NotebookLM 最常見的用途，通常不是某一個單一功能，而是把原本很花時間的資料處理工作，變得比較順。
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">快速導讀</h3>
+          <p class="feature-alias">先看摘要、先抓架構</p>
+          <p class="feature-desc">
+            當一份資料很長、內容很多時，先看摘要、先抓架構，通常比一開始就從頭讀到尾更容易進入狀況。
+            適合當作接觸新主題的第一個入口。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">整理助手</h3>
+          <p class="feature-alias">跨資料比對與歸納</p>
+          <p class="feature-desc">
+            把同一主題的幾份來源放在一起，整理共通重點、標出差異、比較概念，
+            或把分散的內容重新歸納成比較有條理的形式。對需要跨資料閱讀的人特別有幫助。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">內容轉換</h3>
+          <p class="feature-alias">把同一份資料換成不同形式</p>
+          <p class="feature-desc">
+            同一批來源，有時不只需要一種讀法。有人想先看摘要，有人想先聽導讀，
+            有人需要測驗練習，有人想要圖像化整理。NotebookLM 能讓資料不只停留在原本的樣子。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 4: Data types -->
+      <h2 class="detail-heading">可以處理哪些類型的資料？</h2>
+      <p class="detail-paragraph">
+        NotebookLM 的好用，很大一部分來自它不只面對單一格式。多數人在學習、研究、備課、整理專案或做內容時，
+        本來就會同時接觸不同型態的來源。它的價值不只是「能讀一份文件」，而是能讓不同型態的內容
+        <strong>進到同一個主題底下，一起被整理、比對與使用</strong>。
+      </p>
+
+      <div class="source-grid">
+        <span class="source-chip">PDF 文件</span>
+        <span class="source-chip">網頁連結</span>
+        <span class="source-chip">Google 文件</span>
+        <span class="source-chip">課程簡報</span>
+        <span class="source-chip">YouTube 影片</span>
+        <span class="source-chip">音訊檔</span>
+        <span class="source-chip">自行補充的文字</span>
+      </div>
+
+      <p class="detail-paragraph">
+        換句話說，它不是只適合拿來看單篇文章，而是更適合拿來處理<strong>一組彼此有關聯的資料</strong>。
+        當你把主題相關的來源放在同一個 notebook 裡，後面的整理與互動通常會順很多。
+      </p>
+
+      <!-- Section 5: Functions grouped -->
+      <h2 class="detail-heading">主要功能，可以怎麼理解？</h2>
+      <p class="detail-paragraph">
+        與其把 NotebookLM 看成一個只有聊天視窗的工具，不如把它看成一個<strong>有多種入口的資料工作台</strong>。
+        它的不同功能，其實都在做同一件事：幫你用不同方式接近同一批資料。
+      </p>
+
+      <ol class="loop-list">
+        <li class="loop-step">
+          <span class="loop-num">A</span>
+          <div class="loop-body">
+            <h3 class="loop-title">快速理解類</h3>
+            <p class="loop-desc">
+              像是自動摘要、重點整理、主題導讀，適合<strong>剛開始接觸資料</strong>時使用。
+              這些功能的價值在於幫助你縮短進入內容的時間，先建立整體感。
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">B</span>
+          <div class="loop-body">
+            <h3 class="loop-title">互動整理類</h3>
+            <p class="loop-desc">
+              像是問答、比較、延伸提問、記事保存，適合用在<strong>已經開始熟悉內容之後</strong>。
+              這時重點不是再看一次摘要，而是進一步把想法整理出來，讓資料開始變成自己的理解。
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">C</span>
+          <div class="loop-body">
+            <h3 class="loop-title">形式轉換類</h3>
+            <p class="loop-desc">
+              例如把內容變成語音摘要、學習卡、測驗、心智圖、資訊圖表、影片導覽或簡報。
+              適合用在<strong>需要重複消化、重新表達、對外分享，或改變閱讀入口</strong>的情境。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <blockquote class="pullquote">
+        NotebookLM 的強項不只是「幫你讀」，而是「幫你換一種方式再讀一次」。
+      </blockquote>
+
+      <!-- Section 6: Who it's for -->
+      <h2 class="detail-heading">哪些人特別適合使用？</h2>
+      <p class="detail-paragraph">
+        雖然很多人會先從教學情境認識 NotebookLM，但其實它不只適合學習者，也很適合
+        <strong>任何需要閱讀、整理和重組資料的人</strong>。
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">教師 / 講者</h3>
+          <p class="feature-alias">整理教材、設計導讀</p>
+          <p class="feature-desc">
+            整理教材、設計導讀、做課前準備、統整補充資料，
+            或把同一份內容轉成不同形式，方便在不同教學情境中使用。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">研究者 / 寫作者</h3>
+          <p class="feature-alias">大量資料的前期整理</p>
+          <p class="feature-desc">
+            處理大量資料初步整理的階段。在還沒完全形成結論之前，
+            先把資料脈絡看清楚、把主題層次拉出來，通常比急著下判斷更重要。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">一般使用者</h3>
+          <p class="feature-alias">長文與陌生主題</p>
+          <p class="feature-desc">
+            整理長文、吸收陌生主題、比較多個來源，
+            或把本來很難進入的資料，先轉成比較容易理解的版本。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 7: Applications -->
+      <h2 class="detail-heading">三種常見的應用情境</h2>
+
+      <div class="app-stack">
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">情境一</span>
+            <h3 class="app-card__title">教學與學習</h3>
+          </div>
+          <p class="app-card__desc">
+            NotebookLM 很適合扮演「整理中介」的角色——不是取代教材，而是幫助教材更容易被使用。
+            把講義、投影片、補充文章、影片和參考資料放進同一個 notebook，
+            不管課前導讀、課堂說明或課後複習，都能從同一個資料基礎出發。
+          </p>
+          <p class="app-card__note">
+            很適合拿來做三件事：<strong>幫忙先導讀、幫忙再整理、幫忙換形式</strong>。
+          </p>
+        </section>
+
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">情境二</span>
+            <h3 class="app-card__title">研究與報告整理</h3>
+          </div>
+          <p class="app-card__desc">
+            研究或報告最麻煩的地方，通常不是完全沒有內容，而是內容太多、彼此之間又不一定能立刻對上。
+            先把來源集中在一個 notebook 裡，通常能幫助你比較快看出主題之間的關聯。
+            可以先從摘要進入，再慢慢問比較細的問題，最後把值得留下的內容整理成自己的記事。
+          </p>
+          <p class="app-card__note">
+            適合「<strong>先理解資料，再形成觀點</strong>」的前期階段。
+          </p>
+        </section>
+
+        <section class="app-card">
+          <div class="app-card__head">
+            <span class="app-card__tag">情境三</span>
+            <h3 class="app-card__title">內容製作與知識整理</h3>
+          </div>
+          <p class="app-card__desc">
+            很多內容工作並不是一開始就直接寫，而是先蒐集資料、找脈絡、拉主題、挑重點。
+            先把相關來源放進來，整理出主軸，再決定哪些內容適合做成文章、簡報、影片大綱或語音導讀。
+            這樣的流程，會比一邊查資料一邊硬寫來得更穩。
+          </p>
+          <p class="app-card__note">
+            也很適合當作個人知識管理中的「<strong>主題整理層</strong>」。
+          </p>
+        </section>
+      </div>
+
+      <!-- Section 8: How to start -->
+      <h2 class="detail-heading">實際使用，可以怎麼開始？</h2>
+      <p class="detail-paragraph">
+        如果是第一次接觸 NotebookLM，最適合的方式通常不是一開始就丟很多功能進來，
+        而是<strong>先用一個簡單主題開始</strong>。
+      </p>
+
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">1</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">選一個明確的主題</h4>
+            <p class="start-step__desc">例如一份講義、一個報告題目、一組研究文章，或一場需要整理的會議內容。</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">2</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">把相關資料放進同一本 notebook</h4>
+            <p class="start-step__desc">只放跟這個主題最相關的來源，主題夠清楚，整體體驗通常就會比較順。</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">3</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">先看整體摘要</h4>
+            <p class="start-step__desc">建立對內容的整體感，而不是一開始就鑽進細節。</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">4</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">問幾個實際的問題</h4>
+            <p class="start-step__desc">例如：重點是什麼？這幾份資料差在哪裡？哪些概念最值得先理解？</p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">5</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">再依任務選適合的輸出形式</h4>
+            <p class="start-step__desc">記事、學習卡、心智圖、語音摘要……在有清楚任務時才使用，而不是為了試功能而試功能。</p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section 9: Takeaway -->
+      <h2 class="detail-heading">如果只想記住一件事</h2>
+
+      <div class="takeaway">
+        <p class="takeaway__lead">
+          NotebookLM 不是單純幫你回答問題的工具，而是幫你把資料變得<strong>更好讀、更好整理、也更好再利用</strong>的工具。
+        </p>
+        <p class="takeaway__desc">
+          它的價值不只在於省時間，更在於讓資料處理這件事變得比較有方向。對需要閱讀、教學、研究、整理內容、做專案或吸收新主題的人來說，
+          這種工具特別有幫助，因為它不是把資料變少而已，而是把資料變得比較能用。
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-intro {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Compare cards */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-4);
+  }
+
+  .compare-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Source chips */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Function loop list (re-using existing pattern) */
+  .loop-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .loop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .loop-step:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  .loop-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .loop-body {
+    flex: 1;
+  }
+
+  .loop-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .loop-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.7;
+  }
+
+  /* Application stack */
+  .app-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .app-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .app-card:hover {
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+  }
+
+  .app-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .app-card__tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .app-card__title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .app-card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .app-card__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .app-card__note strong {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Start steps */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Takeaway */
+  .takeaway {
+    margin-top: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .takeaway__lead {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  .takeaway__lead strong {
+    color: var(--color-accent);
+  }
+
+  .takeaway__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid,
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .loop-step {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .loop-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .app-card {
+      padding: var(--space-6);
+    }
+
+    .takeaway {
+      padding: var(--space-6);
+    }
+  }
+</style>

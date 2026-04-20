@@ -1,0 +1,599 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM Content Organization & Understanding"
+  description="From Mind Maps to Reports to Tables — the three Studio tools in NotebookLM help turn scattered material into clearer knowledge, step by step."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-organize">
+      <a class="back-link" href="/">&larr; Back to home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Content Organization &amp; Understanding: Using AI to make your material easier to read and easier to use</h1>
+        <p class="detail-subtitle">
+          Once your sources are in NotebookLM, it can do more than just answer questions —
+          it can take scattered material and shape it into forms that are easier to absorb.
+          Inside a notebook, alongside the sources panel on the left and the chat area in the middle,
+          the <strong>Studio panel on the right</strong> is where most of the organized output shows up —
+          Mind Maps, Reports, and Tables are all generated and viewed here.
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">Platform note</span>
+          The three tools below <strong>are currently available through the desktop web version</strong>.
+          The NotebookLM mobile app does not yet support generating or viewing Mind Maps, Reports, or Tables.
+        </p>
+      </header>
+
+      <!-- Section 1: Three tools as one flow -->
+      <h2 class="detail-heading">Three tools that quietly form one workflow</h2>
+      <p class="detail-paragraph">
+        Mind Maps, Reports, and Tables look like three separate little tools, but in practice they line up
+        into a useful workflow: first understand the overall shape, then turn the content into something
+        you can actually read, and finally convert the key points into a structure you can compare and classify.
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">Step 01</p>
+          <h3 class="feature-title">Mind Map</h3>
+          <p class="feature-alias">See the whole picture first</p>
+          <p class="feature-desc">
+            Spreads a pile of material into a branching diagram, so you can
+            <strong>build a sense of the whole by looking at the shape</strong>
+            before deciding where to dig deeper.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">Step 02</p>
+          <h3 class="feature-title">Report</h3>
+          <p class="feature-alias">Turn it into a readable document</p>
+          <p class="feature-desc">
+            Shapes your sources into a piece of writing that is
+            <strong>ready to read, share, or polish further</strong> —
+            a first-pass draft you can refine from.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">Step 03</p>
+          <h3 class="feature-title">Table</h3>
+          <p class="feature-alias">Convert it into a structure</p>
+          <p class="feature-desc">
+            Turns a lot of scattered text into
+            <strong>a categorized, comparable, reviewable</strong> layout,
+            so similarities and differences become easier to see.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Mind Map -->
+      <h2 class="detail-heading">Mind Map: See the whole picture, then follow the branches</h2>
+      <p class="detail-paragraph">
+        When you have a lot of sources, or the content itself is complex, reading paragraph after paragraph
+        can make it hard to grasp the main points quickly. This is where NotebookLM's Mind Map tends to help.
+        It organizes your sources into a branching diagram that shows the main themes and related ideas visually,
+        so you can first get a sense of
+        <strong>"what is this material roughly about"</strong>
+        before slowly going into the details.
+      </p>
+
+      <p class="detail-paragraph">
+        Google positions it as a tool for
+        <strong>quickly grasping the big picture, exploring new topics, seeing connections between concepts, and organizing your thinking</strong>.
+        It is a good fit for content that is long, concept-dense, or full of interrelated pieces — things like research material,
+        subject-specific literature, policy documents, industry analyses, training material, or any topic where you want
+        to see the overall structure first.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">How to open a Mind Map</p>
+        <p class="concept-card__body">
+          Open a notebook, then in the Studio panel on the right click <strong>"Mind Map"</strong>.
+          NotebookLM will generate one in the panel, and you can reopen it later whenever you need.
+        </p>
+        <ul class="concept-card__list">
+          <li>You can <strong>zoom, pan, and drag</strong> the view, and <strong>expand or collapse branches</strong> — look at the overall shape first, then decide where to dig in.</li>
+          <li>If one node catches your attention, you can <strong>click the node directly</strong> to jump back to chat and keep asking about that topic.</li>
+          <li>You can also download the Mind Map itself or share the whole notebook so others can view the same diagram.</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        A Mind Map is a bit like spreading a stack of material out on a table and sorting it into groups,
+        so you don't have to read through everything front-to-back. You build a first layer of understanding
+        by looking, and then work your way into the details.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <p class="caution-card__body">
+          A Mind Map is AI-generated from your sources, which means not every branch is guaranteed to be correct.
+          NotebookLM also clearly notes that the system can produce inaccuracies — if you plan to use a Mind Map
+          for <strong>formal teaching material, a report, or an important decision</strong>,
+          it is still worth going back to the original source to double-check.
+        </p>
+      </section>
+
+      <!-- Section 3: Reports -->
+      <h2 class="detail-heading">Report: Turn scattered material into something you can read directly</h2>
+      <p class="detail-paragraph">
+        If Mind Maps help you map out the shape, Reports lean in a different direction — they shape your material
+        into a piece of writing that is
+        <strong>ready to read, share, or even polish further</strong>.
+        In the Studio panel, NotebookLM offers Reports: you can describe exactly what you need,
+        or pick from a few common formats so you don't have to start from a blank page every time.
+      </p>
+
+      <p class="detail-paragraph">Common report formats include:</p>
+      <div class="source-grid">
+        <span class="source-chip">Briefing doc</span>
+        <span class="source-chip">Study guide</span>
+        <span class="source-chip">Blog post</span>
+        <span class="source-chip">System-suggested formats</span>
+        <span class="source-chip">Custom prompt</span>
+      </div>
+
+      <p class="detail-paragraph">
+        When you have meeting notes, course handouts, interview transcripts, project material, product docs,
+        or several related sources sitting together, Reports can shape them into a more coherent first draft.
+        Think of it as a
+        <strong>"first-pass draft"</strong>
+        — you can then adapt it into teaching notes, reading highlights, an FAQ, a work summary, or an internal share.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Exporting a report so you can keep working on it</p>
+        <p class="concept-card__body">
+          Once a report is generated, the <strong>three-dot menu</strong> next to it lets you send it elsewhere:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>Export to Google Docs</strong> — the full report moves over, ready for further editing.</li>
+          <li>
+            <strong>Tables inside the report can also be exported to Google Sheets</strong> —
+            each table goes into its own tab, so you can pull the structured pieces out and keep organizing them separately.
+          </li>
+        </ul>
+      </section>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <p class="caution-card__body">
+          Once exported, changes you make in Docs or Sheets
+          <strong>do not sync back to NotebookLM</strong>,
+          and sharing permissions are not carried over automatically.
+          If the material will keep evolving, it helps to agree up front on which copy is the "source of truth."
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        If you need text content in different languages, you can go into the report format settings and click the
+        <strong>pencil icon in the top-right corner</strong> to "Select language."
+        Google notes that the NotebookLM browser version currently supports 80+ languages, and it will generate
+        text output in the language you pick. This is handy when you are organizing cross-language material,
+        preparing bilingual teaching content, or making versions for different readers.
+      </p>
+
+      <!-- Section 4: Data Tables -->
+      <h2 class="detail-heading">Table: Turn messy text into something you can compare and classify</h2>
+      <p class="detail-paragraph">
+        Some material is not unimportant — just scattered, fragmented, and too much to take in at a glance.
+        Survey feedback, interview transcripts, event comments, customer complaints, product comparisons,
+        case studies: when this kind of content stays in paragraph form, it is tiring to read.
+        NotebookLM's "Table" tool is designed for exactly this situation — it pulls source content into a table
+        so scattered information becomes
+        <strong>easier to categorize, compare, and revisit</strong>.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Two ways to shape a table</p>
+        <p class="concept-card__body">
+          The Table tool lives in the Studio panel. Google currently supports two ways to adjust it:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>Select the output language</strong> — helpful when you are organizing material across languages.</li>
+          <li>
+            <strong>Describe the table you want in the prompt box</strong> —
+            what columns you want, what each row should contain, or the angle you want the table to focus on.
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        In other words, a table is not just "let the system decide" — you can actively
+        <strong>tell it what angle to organize from</strong>.
+        For example:
+      </p>
+
+      <ul class="example-list">
+        <li>
+          <strong>Organizing event feedback</strong>: try columns like
+          <em>"Issues raised / Suggested directions / Frequency of mention"</em>.
+        </li>
+        <li>
+          <strong>Comparing several articles</strong>: try
+          <em>"Topic / Viewpoint / Example / When it applies"</em>.
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Content that looks messy in paragraph form often becomes much easier to read once it is in a table —
+        similarities, differences, and possible next actions tend to stand out more clearly.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Exports keep the citation trail</p>
+        <p class="concept-card__body">
+          Tables can also be exported to Google Sheets through the three-dot menu. Google's docs are explicit about how the sheet is laid out:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>First tab</strong>: the table content itself.</li>
+          <li><strong>Second tab</strong>: the related citations.</li>
+        </ul>
+        <p class="concept-card__footer">
+          This is useful because a table is not just tidier content — it also preserves
+          <strong>the trail back to the original source</strong>.
+          You do not just get the table; you also know which sources each row was built from.
+        </p>
+      </section>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">Three tools, one organizing flow</h2>
+      <blockquote class="pullquote pullquote--primary">
+        Mind Maps are well suited to building the whole picture and showing how pieces connect;
+        Reports are well suited to shaping material into readable, shareable writing;
+        Tables are well suited to turning large amounts of information into a structure you can categorize and compare.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Put together, the three tools quietly form the arc of turning scattered material into clearer knowledge —
+        from seeing the whole, to shaping it into a document, to settling it into a comparable structure.
+        It is how NotebookLM moves past answering questions and helps you actually
+        <strong>organize material to the point where it becomes useful</strong>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-organize {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (three tools overview) */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Source chips (report formats) */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Example list (column schemas) */
+  .example-list {
+    margin: var(--space-4) 0 var(--space-6);
+    padding-left: var(--space-5);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .example-list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .example-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-list em {
+    font-style: normal;
+    padding: 2px var(--space-2);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+    color: var(--color-heading);
+    font-size: var(--text-sm);
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+  }
+</style>
