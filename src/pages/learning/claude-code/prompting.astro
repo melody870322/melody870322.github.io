@@ -1,0 +1,665 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Prompt Frameworks & Task Decomposition"
+  description="How to communicate clearly so Claude Code gets it right the first time — from the 5 things to spell out, to task sizing, and ready-to-use prompt templates."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-prompting">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">How to Communicate Clearly So Claude Code Gets It Right the First Time</h1>
+        <p class="detail-subtitle">
+          It's not that you don't know how to ask — it's that many tasks simply can't be handled
+          with a single "just do it for me." Claude Code is powerful — it can read files, edit code,
+          run commands, and organize your project — but it's not a mind reader. The clearer you are,
+          the more likely it is to head in the right direction on the first try. The vaguer you are,
+          the more likely it is to produce something that "looks helpful, but isn't quite what you
+          actually wanted."
+        </p>
+        <p class="detail-subtitle" style="margin-top: var(--space-3);">
+          This page keeps it simple: it's not about writing fancy prompts — it's about learning a
+          more efficient, more reliable, and more successful way to hand tasks over to Claude Code.
+        </p>
+      </header>
+
+      <!-- Section 1: Why the same sentence can produce very different results -->
+      <h2 class="detail-heading">Why the Same Sentence Can Produce Very Different Results</h2>
+      <p class="detail-paragraph">
+        Many people think: "I already explained it perfectly clearly." But in practice, prompts like
+        these are still too broad for Claude Code:
+      </p>
+
+      <ul class="check-list">
+        <li>Help me tidy up this project</li>
+        <li>Help me fix this bug</li>
+        <li>Make it look nicer</li>
+        <li>Help me build a login feature</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        These aren't unusable — they're just missing a lot of key information. Claude Code will
+        typically still start working, but it has to guess on its own: where you want changes,
+        what's off-limits, whether you want a quick fix or a full refactor, and how to verify when
+        it's done.
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">Think of it this way</p>
+        <p class="info-body">
+          Claude Code is like a very fast assistant. If you just say "tidy things up a bit," it's
+          not that it can't tidy — it's that it has to guess your tidying standards first. The
+          problem usually isn't that it didn't do anything — it's that its version doesn't match
+          the version in your head.
+        </p>
+      </div>
+
+      <!-- Section 2: 5 things to spell out -->
+      <h2 class="detail-heading">A Great Starting Point: Spell Out These 5 Things</h2>
+
+      <div class="five-points">
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">1</span>
+            <h3 class="point-title">What you want it to do</h3>
+          </div>
+          <p class="point-desc">State the goal of this task clearly. Don't just say "take a look at this" — tell it the actual result you want.</p>
+          <ul class="check-list check-list--compact">
+            <li>Help me find out why login is failing</li>
+            <li>Refactor this code snippet so it's easier to read</li>
+            <li>Read through this project first, then organize the current data</li>
+            <li>Build me a minimal viable contact form</li>
+          </ul>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">2</span>
+            <h3 class="point-title">What it should look at</h3>
+          </div>
+          <p class="point-desc">Claude Code doesn't always know where you want it to start. So the second thing is to tell it: which files, folders, terminal output, error messages, or screenshots to look at.</p>
+          <ul class="check-list check-list--compact">
+            <li>Please read <code>@src/auth/login.js</code> first</li>
+            <li>Start with the <code>@components</code> folder</li>
+            <li>Read the output of <code>@terminal:npm test</code></li>
+            <li>Here's a screenshot of the error — figure out which section is broken</li>
+          </ul>
+          <p class="point-note">In other words, don't just hand over the task — also point it to the right entry point.</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">3</span>
+            <h3 class="point-title">What's off-limits</h3>
+          </div>
+          <p class="point-desc">This is the one most people forget. Just because you want Claude Code's help doesn't mean you want it to have free rein over the entire project. Be clear about constraints.</p>
+          <ul class="check-list check-list--compact">
+            <li>Don't change the API response format</li>
+            <li>Don't touch <code>.env</code></li>
+            <li>Don't modify the database schema yet</li>
+            <li>Keep the existing functionality intact</li>
+            <li>Only change this component — don't touch other pages</li>
+            <li>Don't edit files directly yet — make a plan first</li>
+          </ul>
+          <p class="point-note">Most of the time, Claude Code doesn't go wrong because it's dumb — it goes wrong because you didn't tell it where the boundaries are.</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">4</span>
+            <h3 class="point-title">How you want the output delivered</h3>
+          </div>
+          <p class="point-desc">Even for the same task, you might want the result in different forms.</p>
+          <ul class="check-list check-list--compact">
+            <li>Summarize in a bullet list first — don't edit directly</li>
+            <li>Propose the changes and go ahead and implement them</li>
+            <li>List the steps first, then wait for my confirmation</li>
+            <li>Explain it in a way a beginner could understand</li>
+            <li>At the end, list which files you changed</li>
+          </ul>
+          <p class="point-note">The point here: don't just describe the content — also tell it how you want the response structured.</p>
+        </article>
+
+        <article class="point-card">
+          <div class="point-head">
+            <span class="point-num">5</span>
+            <h3 class="point-title">What "done" looks like</h3>
+          </div>
+          <p class="point-desc">Many prompts that look complete still get stuck at the end, usually because this step is missing. Let Claude Code know: at what point is this task actually finished?</p>
+          <ul class="check-list check-list--compact">
+            <li>After the fix, re-run the tests</li>
+            <li>Confirm the form submits successfully</li>
+            <li>Keep the existing UI unchanged</li>
+            <li>Make sure mobile layout doesn't break</li>
+            <li>When you're done, tell me what risks remain unaddressed</li>
+          </ul>
+          <p class="point-note">This step matters because it directly affects whether Claude Code will verify its own results afterward.</p>
+        </article>
+      </div>
+
+      <!-- Section 3: You don't need to write a long prompt -->
+      <h2 class="detail-heading">Your Prompt Doesn't Have to Be Long</h2>
+      <p class="detail-paragraph">
+        Many people assume a good prompt has to be long, thorough, and essay-like. That's not
+        necessarily true. What matters isn't word count — it's whether the information is in the
+        right place. You can even state a task clearly in a very short prompt, for example:
+      </p>
+
+      <div class="prompt-example">
+        <p>Please read <code>@src/cart</code>.</p>
+        <p>I need you to find out why the total price doesn't sync after updating the cart quantity.</p>
+        <p>Don't edit files directly yet — list the possible causes and the files you'd check first.</p>
+        <p>Don't touch the API.</p>
+        <p>Wait for my confirmation before fixing.</p>
+      </div>
+
+      <p class="detail-paragraph">
+        That's short, but it already covers: <strong>task goal, scope, constraints, delivery format,
+        and work sequence</strong>. That's enough.
+      </p>
+
+      <!-- Section 4: Task sizing -->
+      <h2 class="detail-heading">The Bigger the Task, the Less You Should Ask It to Do All at Once</h2>
+      <p class="detail-paragraph">
+        Small tasks can be done directly; big tasks are better split up. This isn't because Claude
+        Code can't handle them — it's because splitting makes it easier for you to control the
+        direction and much harder to change too much at once. You can think of tasks in three sizes.
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Small tasks: just do it directly</summary>
+        <div class="collapsible-body">
+          <p>These tasks are typically small in scope, low-risk, and easy to verify right away.</p>
+          <ul class="check-list check-list--compact">
+            <li>Explain a piece of code</li>
+            <li>Change a button label</li>
+            <li>Fix a small bug</li>
+            <li>Tidy up the structure of a CSS block</li>
+            <li>Explain what a specific file does</li>
+          </ul>
+          <p>For these, you can just say it directly:</p>
+          <div class="prompt-example">
+            <p>Please read <code>@components/Navbar.tsx</code>, explain what this component does, and point out where a mobile menu would best fit.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Medium tasks: list the steps first, then start</summary>
+        <div class="collapsible-body">
+          <p>These tasks typically touch more than one file, or you already know they can't be done in a single prompt.</p>
+          <ul class="check-list check-list--compact">
+            <li>Refactor a feature module</li>
+            <li>Adjust a workflow</li>
+            <li>Restructure a folder layout</li>
+            <li>Fix a bug that spans multiple components</li>
+          </ul>
+          <p>This is a great time to ask it to list steps first:</p>
+          <div class="prompt-example">
+            <p>Please read <code>@src/profile</code> and <code>@components/profile</code>.</p>
+            <p>I want to restructure the profile page so that data fetching, display, and form logic are separated.</p>
+            <p>List your suggested steps and the files you'd touch, then wait for my confirmation before making changes.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Large tasks: plan first, then deliver in stages</summary>
+        <div class="collapsible-body">
+          <p>When the job involves overhauling a login flow, restructuring data flows, migrating an entire module, or you haven't fully figured out the direction yet — don't ask it to charge ahead from the start. A more stable approach:</p>
+          <ul class="check-list check-list--compact">
+            <li>Understand the current state first</li>
+            <li>Make a plan first</li>
+            <li>Confirm the direction first</li>
+            <li>Then implement in stages</li>
+            <li>Verify after each stage</li>
+          </ul>
+          <p>For example:</p>
+          <div class="prompt-example">
+            <p>I want to overhaul the current login flow.</p>
+            <p>Please read <code>@src/auth</code>, <code>@middleware</code>, and the related pages.</p>
+            <p>First, map out the current login, logout, and session timeout flows, and list which files and logic will be affected.</p>
+            <p>Don't edit files yet.</p>
+            <p>After I confirm, we'll work through it in four stages: reproduce the problem → add tests → fix the logic → verify.</p>
+          </div>
+          <p>The benefit of this approach: you're not throwing an entire bundle of risk out at once — you're letting Claude Code walk through it with you, one stage at a time.</p>
+        </div>
+      </details>
+
+      <!-- Section 5: Ask it to explain its plan first -->
+      <h2 class="detail-heading">A Really Useful Habit: Ask It to Explain Its Plan First</h2>
+      <p class="detail-paragraph">
+        Often, you don't need the answer right away — you need the direction first. So it's highly
+        recommended to add one line before medium or large tasks:
+      </p>
+
+      <div class="prompt-example">
+        <p>Tell me how you plan to approach this before you start.</p>
+      </div>
+
+      <p class="detail-paragraph">Or:</p>
+
+      <div class="prompt-example">
+        <p>List the files you'd check, your reasoning, and how you plan to verify the result.</p>
+      </div>
+
+      <p class="detail-paragraph">
+        This one line is extremely valuable — it lets you see whether Claude Code's thinking is
+        on track before it actually touches anything.
+      </p>
+
+      <!-- Section 6: Prompt templates -->
+      <h2 class="detail-heading">Ready-to-Use Prompt Templates</h2>
+      <p class="detail-paragraph">
+        The templates below can be adapted by simply swapping in your own details.
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Scenario 1: Understand a piece of code</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>Please read <code>@src/components/UserCard.tsx</code>.</p>
+            <p>Explain in plain language what this component does, what props it takes, and where it's most likely to break.</p>
+            <p>Don't edit any files.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Scenario 2: Fix a bug</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>I've hit a bug: the cart quantity resets after the user refreshes the page.</p>
+            <p>Please read <code>@src/cart</code> and the output of <code>@terminal:npm test</code>.</p>
+            <p>Find the first real source of the error, then fix it.</p>
+            <p>Keep the current API and UI unchanged.</p>
+            <p>After fixing, re-run the tests and tell me which files you changed.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Scenario 3: Build a new feature</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>I want to add a contact form.</p>
+            <p>Please read the current page structure and shared form components first.</p>
+            <p>Tell me how you'd approach it and which files you'd change.</p>
+            <p>The form needs name, email, and message fields, with basic validation before submit.</p>
+            <p>Build the minimal viable version first — don't add advanced features right away.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Scenario 4: Refactor</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>Please read <code>@src/auth</code>.</p>
+            <p>I want to clean up the login logic, but don't change the API format or the UI for now.</p>
+            <p>List where the logic is currently tangled, how you'd suggest splitting it into layers, and which files would be affected.</p>
+            <p>Wait for my confirmation before you start editing.</p>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Scenario 5: Audit a project</summary>
+        <div class="collapsible-body">
+          <div class="prompt-example">
+            <p>Please read <code>@src/pages</code> and <code>@src/components</code>.</p>
+            <p>Help me map out the main pages, shared components, data flow, and any obvious structural issues in this project.</p>
+            <p>Summarize in a bullet list — don't edit files directly.</p>
+            <p>At the end, tell me which three areas are most worth addressing first.</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <h2 class="detail-heading">Key Takeaways</h2>
+      <ul class="summary-list">
+        <li>A good prompt isn't long — it's clear about what matters.</li>
+        <li>Spell out: the task goal, reference scope, constraints, delivery format, and definition of done.</li>
+        <li>Small tasks can be done directly; medium tasks benefit from listing steps first; large tasks should be planned and delivered in stages.</li>
+        <li>Often, getting the first step right matters more than finishing everything at once.</li>
+        <li>When you're not sure how to start, begin with "look here first, I want you to do this, and don't touch these" — that's enough.</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-prompting {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .check-list--compact {
+    font-size: var(--text-sm);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+
+  .check-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info card */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  /* 5 points */
+  .five-points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .point-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .point-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .point-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .point-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .point-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin: 0;
+  }
+
+  .point-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .point-note {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .prompt-example p {
+    margin-bottom: var(--space-1);
+  }
+
+  .prompt-example p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Collapsible sections */
+  .collapsible {
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .collapsible:hover {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible[open] {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible-title {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    user-select: none;
+  }
+
+  .collapsible-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-title::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-text-secondary);
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible[open] > .collapsible-title::after {
+    transform: rotate(45deg);
+  }
+
+  .collapsible-body {
+    padding: 0 var(--space-6) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    border-top: 1px dashed var(--color-border);
+    padding-top: var(--space-4);
+  }
+
+  .collapsible-body p {
+    margin-bottom: var(--space-3);
+  }
+
+  .collapsible-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Summary list */
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-8);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.point-desc) code,
+  :global(.check-list) code,
+  :global(.prompt-example) code,
+  :global(.point-note) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .collapsible-body code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .point-card {
+      padding: var(--space-5);
+    }
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t } from '../i18n/utils';
+
+const locale = 'en';
+const i = t(locale);
+---
+
+<BaseLayout title={i.publications_page.title} description="Publications of Shih-Ting Wang" lang="en">
+  <section class="section">
+    <div class="container">
+      <!-- Journal Papers -->
+      <h2 class="section-heading first">{i.publications_page.journals}</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          L. -W. Lee, <strong>S. -T. Wang</strong>, and I. -H. Li, "An IoT enabled omnidirectional mobile system for home based rehabilitation of upper and lower limbs," <em>Internet of Things</em>, vol. 30, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>S. -T. Wang</strong>, I. -H. Li and W. -Y. Wang, "Implementation of A Pyramidal Manipulator for Handwritten Character Recognition and Writing Using CNN," <em>iRobotics Journal</em>, vol. 6, no. 1, 2023.
+        </li>
+        <li class="pub-item">
+          <strong>S. -T. Wang</strong>, I. -H. Li and W. -Y. Wang, "Human Action Recognition of Autonomous Mobile Robot Using Edge-AI," <em>IEEE Sensors Journal</em>, vol. 23, no. 2, pp. 1671-1682, Jan. 15, 2023, doi: 10.1109/JSEN.2022.3225158.
+        </li>
+      </ul>
+
+      <!-- Conference Papers -->
+      <h2 class="section-heading">{i.publications_page.conferences}</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          J. -Y. Wu, G. -T. Chen, C. -W Huang, <strong>S. -T. Wang</strong>, and I. -H. Li, "Virtual Training Framework for Multimodal Task-Oriented Robot Learning with Sim-to-Real Validation," in <em>International Automatic Control Conference (CACS)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>S. -T. Wang</strong>, I. -H. Li, and L. -W. Lee, "Enhancing Robotic Task Execution with Lite IDTN: A Multimodal Approach to Flexible Instruction Processing," in <em>International Conference on Advanced Machine Learning and Data Science (AMLDS)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>王詩婷</strong>、李聯旺、李宜勳，"自主移動機器人動態環境視覺里程計定位技術：一種基於深度學習 DDHAR 動作識別方法," in <em>National Symposium on System Science and Engineering (NSSSE)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>王詩婷</strong>、李聯旺、李宜勳，"利用 Lite IDTN 增強機器人任務執行：一種多模態的靈活指令處理方法," in <em>National Symposium on System Science and Engineering (NSSSE)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          Y. -S. Kao, <strong>S. -T. Wang</strong> and I. -H. Li, "Advanced Obstacle Avoidance in Walking Aids: Overcoming the Challenges of Low-Lying Obstacles with Deep Learning," in <em>IEEE International Conference on Recent Advances in Systems Science and Engineering (RASSE)</em>, Taichung, Taiwan, 2024, pp. 1-4.
+        </li>
+        <li class="pub-item">
+          <strong>S. -T. Wang</strong>, I. -H. Li, and L. -W. Lee, "Enhancing Visual Odometry Localization in Dynamic Environments for Autonomous Mobile Robots through Edge DD-HAR: A Deep Learning-Based Action Recognition Approach," in <em>International Conference on Artificial Intelligence and Virtual Reality (AIVR)</em>, 2024.
+        </li>
+        <li class="pub-item">
+          <strong>S. -T. Wang</strong>, I. -H. Li, and L. -W. Lee, "Dynamic Object-Aware Visual Odometry Enhancement for Autonomous Mobile Robots using Edge DD-HAR," in <em>International Conference on System Science and Engineering (ICSSE)</em>, 2024.
+        </li>
+        <li class="pub-item">
+          第二十九屆模糊理論及其應用研討會, 2021.
+        </li>
+        <li class="pub-item">
+          第二十七屆模糊理論及其應用研討會, 2019.
+        </li>
+      </ul>
+
+      <!-- Others -->
+      <h2 class="section-heading">{i.publications_page.others}</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          科技部大專學生研究計畫，"深度學習應用於並聯機械手臂的整合性開發－以手寫字體辨識及撰寫為例," 2019.
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-16);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-heading.first {
+    margin-top: 0;
+  }
+
+  .pub-list {
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    padding-left: var(--space-6);
+  }
+
+  .pub-item {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .pub-item strong {
+    color: var(--color-heading);
+  }
+
+  .pub-item em {
+    color: var(--color-text-secondary);
+  }
+</style>

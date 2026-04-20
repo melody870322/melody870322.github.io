@@ -1,0 +1,942 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Subagents：幫 Claude Code 準備專門的小幫手"
+  description="學會用 /agents 建立 Subagent，讓 Claude Code 把工作委派給專門的分身小幫手，保護主對話的上下文。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-subagents">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 接上工具、學會新招，把重複工作自動化</h1>
+        <p class="detail-subtitle">
+          前面我們已經幫 Claude Code 建好基本規則，像是 CLAUDE.md、記憶整理、上下文管理。
+          接下來這一階段，重點不是再把更多東西塞進手冊，而是學會幫 Claude Code 加能力。
+          有些能力是讓它看得到外部工具，有些是讓它學會固定流程，有些是把大工作拆出去做，
+          還有一些是把重複動作直接自動化。這些能力各自有分工，不是同一種東西。
+        </p>
+      </header>
+
+      <!-- Section 1: Subagent 是什麼 -->
+      <h2 class="detail-heading">Subagents：幫 Claude Code 準備幾個專門的小幫手</h2>
+      <p class="detail-paragraph">
+        Subagent 可以把它想成 Claude Code 的分身小幫手。它不是單純一段說明，而是一個有自己 context、
+        自己工具權限、甚至可以指定模型的小助手。當主 Claude Code 遇到適合的任務時，
+        可以把工作委派給它，等它做完後再把摘要帶回來。
+      </p>
+      <p class="detail-paragraph">
+        這種設計最大的好處，是保護主對話不要被大量細節塞滿。例如你叫 Claude Code 去看很多檔案、
+        做一輪大範圍搜尋、或整理一大堆資料，如果全部都在主對話裡跑，主對話很快就會變很重。
+        Subagent 的做法是：它自己去忙，最後只回報重點摘要。這具備上下文隔離優勢。
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">怎麼管理 Subagent？</p>
+        <p class="info-body">
+          在 Claude Code 裡，建立和管理 Subagent 的建議方式是用 <code>/agents</code> 命令。<br />
+          這個命令會打開互動式介面，讓你查看可用的 subagents、建立新的、編輯工具存取、刪除自訂 subagents，或看目前哪些定義正在生效。
+        </p>
+      </div>
+
+      <!-- Section 2: 三種用法 -->
+      <h2 class="detail-heading">建好 Subagent 後，三種常見用法</h2>
+      <p class="detail-paragraph">
+        假設要建立新的 subagent，例如 code-reviewer，建立好後，你有三種常見用法：
+      </p>
+      <ul class="usage-list">
+        <li>
+          <strong>自然語言提到它</strong>：例如「請 code-reviewer 幫我看看最近改動」。
+        </li>
+        <li>
+          <strong>用 @ 明確點名</strong>：這樣就能保證是那個小幫手執行。
+        </li>
+        <li>
+          <strong>把整個 session 設成某個 agent 風格</strong>：但這比較進階，暫且不討論。
+        </li>
+      </ul>
+
+      <!-- Main collapsible: 使用 Subagent 的範例步驟 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">使用 Subagent 的範例步驟</span>
+        </summary>
+        <div class="collapsible-body">
+
+          <p class="detail-paragraph" style="margin-bottom: var(--space-2);">
+            <strong>建立 code-reviewer</strong>（如果要使用已存在的 subagents，請跳過此步驟）
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">打開 /agents 介面</h3>
+                <p class="step-desc">打開 Claude Code 聊天框，輸入 <code>/agents</code>，並選擇 Agents。</p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">選擇 Continue in Terminal</h3>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">信任資料夾並建立新 agent</h3>
+                <p class="step-desc">
+                  依序對「Yes, I trust this folder」、「Create new agent」按 Enter 鍵。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">選擇 Subagent 的範圍</h3>
+                <p class="step-desc">
+                  此時有兩個選擇，分別為「Project (.claude/agents/)」、「Personal (~/.claude/agents/)」。
+                  選擇前者表示此 subagent 只能使用於此專案，選擇後者則表示此 subagent 可使用於每個專案。
+                  這裡以「Project (.claude/agents/)」作為示範。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">選擇 Manual configuration</h3>
+                <p class="step-desc">對「Manual configuration」按 Enter 鍵。</p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Nested collapsible: 建立一個新的 subagent -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">6. 建立一個新的 subagent</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">操作位置：/agents 介面</p>
+              <p class="step-desc">
+                在介面裡建立一個新的 subagent，名稱填：<code>code-reviewer</code>
+              </p>
+
+              <p class="step-desc" style="margin-top: var(--space-4);">
+                接著填 <strong>System prompt</strong>，也就是這個 subagent 的「內部工作規則」，
+                告訴這個小幫手「你是誰、你要怎麼做事、你回覆時重點放哪裡」，例如：
+              </p>
+              <pre class="code-block"><code set:html={`你是一個專門負責程式碼審查的 subagent。
+
+你的任務是檢查使用者提供的程式碼、變更或檔案內容，找出最值得注意的問題，特別是：
+
+1. 可能的 bug
+2. 邏輯錯誤
+3. 邊界情況沒有處理好
+4. 可讀性差或太難維護的地方
+5. 重複邏輯
+6. 明顯的效能問題
+7. 安全性風險
+
+請遵守下面規則：
+- 先找真正重要的問題，不要把小風格問題排在前面
+- 如果你不確定，就直接說你不確定，不要硬猜
+- 說明問題時，要包含「問題在哪裡」、「為什麼是問題」、「建議怎麼改」
+- 回覆請盡量條理清楚，優先用條列整理
+- 如果沒有明顯問題，也要明講「目前沒有看到明顯問題」
+- 除非使用者明確要求，否則不要直接修改程式碼，只要做審查和建議
+- 盡量用白話解釋，不要堆太多術語`} /></pre>
+
+              <p class="step-desc" style="margin-top: var(--space-4);">
+                再來填 <strong>Description</strong>，告訴主 Claude「什麼情況下應該把工作交給這個小幫手」，例如：
+              </p>
+              <pre class="code-block"><code set:html={`專門用來審查程式碼改動，找 bug、可讀性問題、邊界情況、效能問題和安全性風險。
+適合在使用者要求 code review、檢查最近改動、找問題或評估程式品質時使用。`} /></pre>
+
+              <div class="note-card">
+                <p class="note-body">
+                  Claude 主要是根據 <strong>description</strong> 來決定要不要委派，而 subagent 本身則有自己的 custom system prompt。
+                  如果你想讓它更容易主動被叫到，可以在描述裡加像「use proactively」這種意思。
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <!-- Nested collapsible: 設定工具 -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">7. 設定你的 subagent 可以用哪些工具</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">操作位置：/agents 介面</p>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">All tools</h4>
+                <p class="step-desc">
+                  全部工具都給它用。如果這個選項保持勾選，subagent 會繼承主對話目前可用的全部工具，
+                  包括內建工具，也包含 MCP 工具。這種做法最方便，權限也最大。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>功能很完整的小幫手、不只要看程式碼，還要改檔、跑指令、甚至用外部工具。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Read-only tools</h4>
+                <p class="step-desc">
+                  只給它看，不給它改。這類工具主要用來讀檔、找檔案、搜尋內容，幫 Claude Code 了解專案，不直接修改東西。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>code review、查問題、看專案結構、先研究再回報。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Edit tools</h4>
+                <p class="step-desc">
+                  允許它改檔案。Claude Code 的工具裡有像 Edit、Write 這類會直接修改檔案的工具，
+                  所以如果你把 Edit tools 打開，這個 subagent 就不只是看，它還能動手改。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>修 bug 的小幫手、自動重構、幫你直接套用修改建議。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Execution tools</h4>
+                <p class="step-desc">
+                  允許它執行指令。像跑 shell 指令、啟動服務、跑測試、用 git，都算這一類。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>test runner、build helper、deployment checker。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">MCP tools</h4>
+                <p class="step-desc">
+                  允許它用你接進來的外部工具。如果你的主對話本來就接了 MCP server，
+                  subagent 預設也可以繼承那些 MCP 工具；你也可以另外限制它只用某些工具。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>需要查外部資料的小幫手、需要跟第三方工具一起工作的 agent。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Other tools</h4>
+                <p class="step-desc">
+                  其他不屬於前面幾大類的輔助工具。像是開 subagent、問使用者問題、管理任務、切換 plan mode、工作樹之類。
+                </p>
+                <p class="step-desc"><strong>適合：</strong>做一些流程控制。</p>
+              </div>
+
+              <div class="tool-option">
+                <h4 class="tool-option-title">Show advanced options</h4>
+                <p class="step-desc">
+                  打開更細的設定。這個按鈕通常是給你做更進一步的限制，不只是勾大分類，而是再往下細調。
+                  如果你是第一次做，通常先不用碰這個。
+                </p>
+              </div>
+
+              <div class="note-card" style="margin-top: var(--space-4);">
+                <p class="note-body">
+                  目前我們建立的 subagent 是 code-reviewer，屬於審查型 subagent，能看、能查、能分析即可，不要直接改檔，
+                  因此建議的做法為：把 All tools 取消，只留 <strong>Read-only tools</strong>，最後按 Continue。
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <ol class="step-list" start="8">
+            <li class="step-item">
+              <span class="step-num">8</span>
+              <div class="step-body">
+                <h3 class="step-title">Select model</h3>
+                <p class="step-desc">
+                  操作位置：/agents 介面<br />
+                  建議選 Sonnet，因為它在分析程式碼模式時，能力和速度比較平衡。但視個人需求。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">9</span>
+              <div class="step-body">
+                <h3 class="step-title">Choose a color</h3>
+                <p class="step-desc">
+                  操作位置：/agents 介面<br />
+                  這裡隨便選你看得順眼的就好。顏色只是方便你在介面裡分辨是哪個 subagent 在跑。
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Nested collapsible: Configure memory -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">10. Configure memory</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <p class="step-desc">操作位置：/agents 介面</p>
+              <p class="step-desc">
+                這個 subagent 要不要有自己的長期記憶，以及這份記憶要放在哪裡。
+                如果你有開記憶，這個小幫手之後就不只是「這次幫你做完就忘記」，而是可以把它觀察到的規則、
+                常見問題、程式風格或專案習慣慢慢記下來，留到下次再用。
+              </p>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">Project scope (.claude/agent-memory/)（推薦）</h4>
+                <p class="step-desc">
+                  把這個 subagent 的記憶存在目前專案裡。它適合那種「這份記憶只對這個專案有用」的情況。
+                  比如說，這個專案的命名習慣、資料夾結構、哪些地方常出錯、程式碼風格長什麼樣，
+                  這些都很適合存在 project scope。
+                </p>
+                <p class="step-desc step-desc--hint">
+                  你可以把它想成：這個小幫手會慢慢學會「我們這個專案平常怎麼做事」。
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">None (no persistent memory)</h4>
+                <p class="step-desc">
+                  完全不開長期記憶。也就是說，這個 subagent 每次都是「這次做完就算了」，
+                  不會把學到的東西留到下次。
+                </p>
+                <p class="step-desc step-desc--hint">
+                  你可以把它想成：這個小幫手有短期記憶，但沒有長期筆記本。
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">User scope (~/.claude/agent-memory/)</h4>
+                <p class="step-desc">
+                  把記憶放在你個人的 Claude 設定資料夾裡，讓它跨專案都能用。
+                  如果這個 subagent 學到的是那種「不只這個專案會用到」的東西，就很適合用 user scope。
+                  像是你個人很常用的程式風格、你習慣的 review 標準、你常見的除錯思路，這些就可以存在這裡。
+                </p>
+                <p class="step-desc step-desc--hint">
+                  你可以把它想成：這個小幫手學到的是「你這個人平常怎麼做事」，不是只學某一個專案。
+                </p>
+              </div>
+
+              <div class="memory-option">
+                <h4 class="memory-option-title">Local scope (.claude/agent-memory-local/)</h4>
+                <p class="step-desc">
+                  記憶只放在目前專案，而且不打算跟別人分享。它跟 project scope 很像，
+                  差別在於：project scope 比較像是「可以一起帶進版本控制、分享給團隊」；
+                  local scope 則比較像「這是我自己這台電腦上的私人筆記，不想一起放進 repo」。
+                </p>
+                <p class="step-desc step-desc--hint">
+                  你可以把它想成：這個小幫手會記住這個專案的事，但這些筆記比較像你自己的，不會想一起交給團隊。
+                </p>
+              </div>
+
+              <div class="note-card" style="margin-top: var(--space-4);">
+                <p class="note-body">
+                  目前我們建立的 subagent 只是想先測試，因此選擇 <strong>None</strong>。
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <ol class="step-list" start="11">
+            <li class="step-item">
+              <span class="step-num">11</span>
+              <div class="step-body">
+                <h3 class="step-title">Save</h3>
+                <p class="step-desc">
+                  操作位置：/agents 介面<br />
+                  最後會進到摘要畫面。這時按 <kbd>s</kbd> 或 <kbd>Enter</kbd> 就會存檔；
+                  按 <kbd>e</kbd> 則是存檔後順便打開檔案編輯。存好之後，這個 subagent 就能立刻使用。
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- 使用方式 -->
+          <h3 class="subsection-title">建立 code-reviewer 後如何使用？</h3>
+
+          <div class="usage-card">
+            <h4 class="usage-card-title">1. 自然語言提到它</h4>
+            <p class="step-desc">
+              （但不保證一定會用，因為 Claude Code 可能認為自己就可以直接做了）
+            </p>
+            <p class="step-desc">在 Claude Code 聊天框輸入像這樣的句子：</p>
+            <pre class="code-block code-block--command"><code>請讓 code-reviewer 幫我看看最近的程式碼改動。</code></pre>
+            <p class="step-desc">
+              Claude Code 會根據 subagent 的描述決定要不要把任務委派給它，而自動委派主要看 subagent 的 description。
+            </p>
+          </div>
+
+          <div class="usage-card">
+            <h4 class="usage-card-title">2. 用 @ 明確點名它</h4>
+            <p class="step-desc">
+              在 Claude Code 聊天框先打 <code>@</code>，然後從跳出的清單裡選你的 subagent，再把任務補完整。例如：
+            </p>
+            <pre class="code-block code-block--command"><code>@"code-reviewer (agent)" 幫我檢查最近改動，列出最值得先修的問題。</code></pre>
+          </div>
+
+          <div class="note-card" style="margin-top: var(--space-4);">
+            <p class="note-body">
+              <strong>重點：</strong>如果這個工作會讀很多東西、做很多搜尋，但你最後只想拿到重點摘要，
+              那就很適合交給 Subagent。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>Subagent</strong>：Claude Code 的分身小幫手，有自己的 context、工具權限和模型設定。</li>
+          <li><strong>上下文隔離</strong>：Subagent 自己去忙，最後只回報重點摘要，保護主對話不被塞滿。</li>
+          <li><strong>/agents</strong>：建立和管理 Subagent 的互動式介面。</li>
+          <li><strong>工具權限</strong>：可以細調每個 subagent 能用哪些工具，例如只讀、可編輯、可執行等。</li>
+          <li><strong>記憶設定</strong>：可以選擇 Project、User、Local scope 或不開記憶。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-subagents {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Usage list ── */
+  .usage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .usage-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .usage-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .usage-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Collapsible sections (purple, top-level) ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Nested collapsible (orange) ── */
+  .collapsible-nested {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #f97316;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible-nested[open] {
+    border-top-color: #f97316;
+    border-right-color: #f97316;
+    border-bottom-color: #f97316;
+  }
+
+  .collapsible-nested-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-nested-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-nested-trigger:hover {
+    background-color: #fff7ed;
+  }
+
+  :root[data-theme='dark'] .collapsible-nested-trigger:hover {
+    background-color: rgba(249, 115, 22, 0.08);
+  }
+
+  .collapsible-nested-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-nested-icon::before,
+  .collapsible-nested-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #f97316;
+    border-radius: 1px;
+  }
+
+  .collapsible-nested-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-nested-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible-nested[open] .collapsible-nested-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-nested-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-nested-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Info card ── */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Tool & Memory option cards ── */
+  .tool-option,
+  .memory-option {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .tool-option-title,
+  .memory-option-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #f97316;
+    margin-bottom: var(--space-2);
+  }
+
+  /* ── Usage cards ── */
+  .usage-card {
+    margin-bottom: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .usage-card-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Subsection title ── */
+  .subsection-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc--hint {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0 var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .usage-list code,
+  .step-desc code,
+  .note-body code,
+  .info-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* kbd */
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--color-heading);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 0 var(--color-border);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .collapsible-body,
+    .collapsible-nested-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

@@ -1,0 +1,693 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Claude Desktop 安裝教學"
+  description="不用先碰終端機，也能把 Claude 裝到電腦裡——從下載、安裝、登入，到第一次開始使用的完整流程。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-desktop">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">不用先碰終端機，也能把 Claude 裝到電腦裡</h1>
+        <p class="detail-subtitle">
+          這一頁會帶你從下載、安裝、登入，一路做到第一次打開並開始使用。
+          官方目前提供 Claude Desktop 的 <strong>macOS</strong> 與 <strong>Windows</strong> 版本。
+        </p>
+      </header>
+
+      <!-- Section: Prerequisites -->
+      <h2 class="detail-heading">開始前，先準備兩樣東西</h2>
+
+      <div class="prep-grid">
+        <div class="prep-card">
+          <p class="prep-index">01</p>
+          <h3 class="prep-title">一個 Claude 帳號</h3>
+          <p class="prep-desc">
+            安裝完成後，第一次打開 Claude Desktop 會需要登入。
+            官方目前支援用 <strong>Google 帳號</strong>登入，也支援直接用 <strong>email</strong> 收安全登入連結。
+          </p>
+        </div>
+        <div class="prep-card">
+          <p class="prep-index">02</p>
+          <h3 class="prep-title">一個乾淨的工作資料夾</h3>
+          <p class="prep-desc">
+            先在電腦裡準備一個資料夾，之後要讓 Claude Code 幫你看檔案、改內容、整理專案時，就會比較順。
+            如果你是初學者，建議先從小一點、風險低一點的資料夾開始，不要一開始就拿最重要的正式專案來試。
+          </p>
+        </div>
+      </div>
+
+      <!-- Section: Version selection -->
+      <h2 class="detail-heading">先確認你要下載哪個版本</h2>
+      <p class="detail-paragraph">
+        官方下載頁目前有 macOS 和 Windows 版本，Windows 另外還有 arm64 版本可選。
+      </p>
+
+      <div class="version-grid">
+        <div class="version-card">
+          <span class="version-badge">Mac</span>
+          <p class="version-desc">直接選 <strong>macOS</strong></p>
+        </div>
+        <div class="version-card">
+          <span class="version-badge">Windows</span>
+          <p class="version-desc">一般常見的電腦，選 <strong>Windows</strong></p>
+        </div>
+        <div class="version-card">
+          <span class="version-badge">Windows ARM</span>
+          <p class="version-desc">ARM 架構裝置，選 <strong>Windows (arm64)</strong></p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        不確定自己是哪一種也沒關係，先看電腦的系統資訊再下載，通常會比硬猜安全。
+      </p>
+
+      <!-- Section: Install steps -->
+      <h2 class="detail-heading">安裝步驟</h2>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">打開官方下載頁</h3>
+            <p class="step-desc">
+              先到 Claude 的官方下載頁，再依作業系統去下載對應 Desktop 版本。
+            </p>
+            <ul class="check-list">
+              <li>Mac：選 macOS</li>
+              <li>Windows：選 Windows</li>
+              <li>Windows on ARM：選 Windows (arm64)</li>
+            </ul>
+            <p class="step-note">
+              <span class="step-note__icon">⚠️</span>
+              選錯版本，後面通常就會卡住，所以這一步不要急。
+            </p>
+          </div>
+        </li>
+
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">打開安裝檔，照畫面完成安裝</h3>
+            <p class="step-desc">
+              下載完成後，直接打開安裝檔，跟著畫面把 Claude Desktop 安裝好就可以了。
+            </p>
+            <ul class="check-list">
+              <li>Mac 通常可以在 <strong>Applications</strong> 找到 Claude</li>
+              <li>Windows 可以從<strong>開始選單</strong>找到 Claude</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">啟動 Claude Desktop</h3>
+            <p class="step-desc">
+              安裝好後，先把 Claude 打開。第一次進來時，最重要的事情只有一件：
+              <strong>登入你平常使用的 Claude 帳號</strong>。如果你本來就有 Claude 帳號，
+              直接用同一個帳號就好，不需要另外辦一個新的。
+            </p>
+            <p class="step-desc">目前最常見的登入方式有：</p>
+            <ul class="check-list">
+              <li>
+                <strong>Continue with Google</strong>——如果你平常就是用 Google 帳號登入 Claude，
+                直接選這個最快。系統會帶你走 Google 的登入流程，完成後就會回到 Claude Desktop。
+              </li>
+              <li>
+                <strong>Continue with email</strong>——如果你不想綁 Google，也可以直接輸入 email。
+                Claude 會寄一封安全登入信給你，你只要點裡面的登入連結就能進去。
+              </li>
+            </ul>
+            <p class="step-note">
+              <span class="step-note__icon">⚠️</span>
+              <strong>小提醒：</strong>如果你是在同一台電腦上收信、點連結，通常會最順；
+              如果你是在別台裝置上點那封信，系統可能會改成給你一組驗證碼，要你回原本那台電腦輸入。
+              這不是壞掉，是正常的驗證流程。
+            </p>
+          </div>
+        </li>
+
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="step-title">登入後，開始你的第一個 Claude Code 工作</h3>
+            <p class="step-desc">第一次使用時，建議先做這三件事：</p>
+            <ul class="check-list">
+              <li>
+                <strong>先從小任務開始</strong>——不要一進來就丟「幫我把整個網站重做」。
+                先讓它做一個小改動，像是改標題、整理一段文案、解釋一段程式碼，
+                這樣你比較容易看懂它的工作方式。
+              </li>
+              <li>
+                <strong>先用不重要的資料夾練手感</strong>——第一次接觸 Desktop 版，
+                建議先拿一個測試資料夾或小專案練習。熟悉之後，再帶進正式專案會安心很多。
+              </li>
+              <li>
+                <strong>先確認你登入的是正確帳號</strong>——如果你有不只一個 Claude 帳號，
+                或同一個 email 底下同時有個人帳號和 Team / Enterprise 帳號，
+                記得先確認目前啟用的是哪一個。官方支援在帳號之間切換。
+              </li>
+            </ul>
+
+            <p class="step-desc">第一次進來時，不用急著做大事。先找一個小任務試試看就好，例如：</p>
+            <ul class="check-list">
+              <li>請它先閱讀目前這個資料夾，告訴你它看到哪些檔案</li>
+              <li>請它解釋某個 HTML、CSS 或 JavaScript 檔案在做什麼</li>
+              <li>請它先不要改檔，只整理目前專案結構</li>
+            </ul>
+            <p class="step-desc">
+              這樣做的好處是，你可以先熟悉桌面版的操作感，再慢慢把任務加大。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: FAQ -->
+      <h2 class="detail-heading">Desktop 常見問題 FAQ</h2>
+      <p class="detail-paragraph">
+        下面整理了使用 Claude Desktop 時最常被問到的幾個問題，點擊可展開查看。
+      </p>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">Claude Desktop 跟網頁版有什麼不一樣？</summary>
+          <div class="faq-answer">
+            <p>
+              對做專案、看資料夾、接本機工具的人來說，桌面版通常會比單純開網頁更方便。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">我一定要會終端機，才能用 Claude Desktop 嗎？</summary>
+          <div class="faq-answer">
+            <p>
+              不用。Desktop app 是給偏好圖形介面的人使用的入口，
+              可以不用先做命令列安裝，就開始使用 Claude Code。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">我已經有 Claude 帳號了，Desktop 可以直接用同一個嗎？</summary>
+          <div class="faq-answer">
+            <p>
+              可以。只要用同一個 email 或同一個 Google 登入方式，
+              就能在不同裝置上使用同一個 Claude 帳號。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">我應該選 Google 登入，還是 email 登入？</summary>
+          <div class="faq-answer">
+            <p>
+              兩種都可以。如果你平常就是用 Google 登入 Claude，選 Continue with Google 會最直覺。
+              如果你不想綁 Google，直接輸入 email 也可以，系統會寄一封安全登入信給你。
+            </p>
+            <p>
+              最重要的不是哪種比較高級，而是你之後要一直用同一種方式、同一個帳號，
+              這樣比較不會登入到別的身份去。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">我明明收到 email 了，為什麼還是登不進去？</summary>
+          <div class="faq-answer">
+            <p>
+              這通常不是帳號壞掉，而是你「收信的裝置」和「原本發起登入的裝置」不是同一台。
+              官方說明是：
+            </p>
+            <p>
+              如果你在同一台裝置上請求登入、也在同一台裝置上點連結，通常會直接登入；
+              如果你改用另一台裝置點那封信，系統就可能改成給你一組驗證碼，
+              要你回原本那台裝置輸入。
+            </p>
+            <p>
+              所以最省事的做法是：<strong>在哪一台電腦上要登入，就在那一台電腦上完成整個流程。</strong>
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">Windows 用 Desktop 版，還需要另外裝 Git 嗎？</summary>
+          <div class="faq-answer">
+            <p>
+              如果你走的是 Claude Desktop 這條路，官方文件是把它定位成「不用先做命令列安裝」的圖形化入口。
+              需要先裝 Git 的，是某些 Windows 原生 CLI 安裝流程，不是 Desktop 的基本安裝步驟。
+            </p>
+            <p>
+              也就是說，想避開終端機和 Git 安裝的人，直接從 Desktop 開始會輕鬆很多。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">為什麼我打開 Desktop 後，看不到想用的 Claude Code 功能？</summary>
+          <div class="faq-answer">
+            <p>先檢查三件事：</p>
+            <ol>
+              <li>你是不是登入了正確的 Claude 帳號。</li>
+              <li>
+                你目前的帳號有沒有對應的 Claude Code 使用權限。
+                官方概覽頁提到，多數使用介面需要 Claude 訂閱或 Anthropic Console 帳號；
+                官方支援頁也另外說明，個人使用者可用 <strong>Pro</strong> 或 <strong>Max</strong> 方案連接 Claude Code。
+              </li>
+              <li>先重新啟動 App，再確認是不是版本太舊。</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">Claude Desktop 裡能不能接 MCP 或本機工具？</summary>
+          <div class="faq-answer">
+            <p>
+              可以。官方現在把這類東西做成 desktop extensions，可以在 Claude Desktop 的
+              <strong>Settings &rarr; Extensions</strong> 裡安裝。
+              這些本機型的 extensions 會在你的電腦上執行，
+              主要可用在 Claude Desktop 和 Claude Code，不是所有介面都會有。
+            </p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">Claude Desktop 會自己更新嗎？</summary>
+          <div class="faq-answer">
+            <p>
+              官方企業部署文件提到，Claude Desktop 在新版本發佈時會自動更新，除非被企業政策關掉。
+              對一般個人使用者來說，如果你發現介面怪怪的、功能跟教學對不上，
+              最先做的通常不是重灌，而是先完全關掉 App 再重開；
+              還是不行，再回官方下載頁重新安裝最新版。
+            </p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-desktop {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Prep cards */
+  .prep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .prep-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .prep-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .prep-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .prep-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .prep-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prep-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Version selection grid */
+  .version-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .version-card {
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+  }
+
+  .version-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .version-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .version-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Step list (numbered) */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .step-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list (✓ items) */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0 var(--space-3);
+  }
+
+  .check-list li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Step note (小提醒) */
+  .step-note {
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-text-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .step-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .step-note__icon {
+    margin-right: var(--space-1);
+  }
+
+  /* FAQ accordion */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .faq-item[open] {
+    border-color: var(--color-accent);
+  }
+
+  .faq-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    line-height: 1.6;
+    transition: background-color var(--transition);
+  }
+
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-summary::before {
+    content: '';
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: transform var(--transition);
+  }
+
+  .faq-item[open] > .faq-summary::before {
+    transform: rotate(180deg);
+  }
+
+  .faq-summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .faq-answer {
+    padding: 0 var(--space-6) var(--space-6);
+    padding-left: calc(var(--space-6) + 1.25rem + var(--space-3));
+  }
+
+  .faq-answer p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .faq-answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer p strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .faq-answer ol {
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .faq-answer ol:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer ol li {
+    margin-bottom: var(--space-2);
+  }
+
+  .faq-answer ol strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .prep-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .version-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .step-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .faq-summary {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .faq-answer {
+      padding: 0 var(--space-5) var(--space-5);
+      padding-left: calc(var(--space-5) + 1.25rem + var(--space-3));
+    }
+  }
+</style>

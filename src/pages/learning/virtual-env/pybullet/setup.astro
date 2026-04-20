@@ -1,0 +1,701 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Environment Setup & Testing — PyBullet"
+  description="Step-by-step PyBullet installation guide covering VS Code, Anaconda, pip, PyBullet setup, and common troubleshooting."
+  lang="en"
+>
+  <section class="section">
+    <div class="container pb-setup">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Setting Up Your Environment: PyBullet Installation & Testing</h1>
+        <p class="detail-subtitle">
+          Before you start using PyBullet, the most important thing is to get your environment installed and running successfully. Many people get stuck not because they can't code, but because the environment isn't set up properly.
+        </p>
+        <p class="detail-subtitle" style="margin-top: var(--space-3);">
+          The goal of this page is simple: make sure your computer can run PyBullet normally, and confirm that you can actually launch your first simulation.
+        </p>
+      </header>
+
+      <!-- Section: Tools -->
+      <h2 class="detail-heading">What tools do you need?</h2>
+      <p class="detail-paragraph">
+        You'll need a few common tools for this section. Just install them in order:
+      </p>
+
+      <ol class="tool-list">
+        <li class="tool-item">
+          <span class="tool-num">1</span>
+          <div class="tool-body">
+            <h3 class="tool-name">Visual Studio Code</h3>
+            <p class="tool-desc">Code editor for writing programs</p>
+          </div>
+        </li>
+        <li class="tool-item">
+          <span class="tool-num">2</span>
+          <div class="tool-body">
+            <h3 class="tool-name">Anaconda</h3>
+            <p class="tool-desc">Python environment manager (recommended)</p>
+          </div>
+        </li>
+        <li class="tool-item">
+          <span class="tool-num">3</span>
+          <div class="tool-body">
+            <h3 class="tool-name">pip</h3>
+            <p class="tool-desc">Python package installer</p>
+          </div>
+        </li>
+        <li class="tool-item">
+          <span class="tool-num">4</span>
+          <div class="tool-body">
+            <h3 class="tool-name">PyBullet</h3>
+            <p class="tool-desc">The main physics simulation tool</p>
+          </div>
+        </li>
+        <li class="tool-item">
+          <span class="tool-num">5</span>
+          <div class="tool-body">
+            <h3 class="tool-name">NumPy / Pillow / Pygame</h3>
+            <p class="tool-desc">For calculations, images, and joystick control</p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Install Steps -->
+      <h2 class="detail-heading">Installation Steps</h2>
+      <p class="detail-paragraph">
+        Follow these steps in order to set up your environment.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Install VS Code</h3>
+            <p class="step-desc">
+              VS Code is the tool for writing and running Python programs. Download it from the official website — choose the version for your operating system (Windows or Linux). Once installed, open it and you're ready to go.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Install Anaconda (Recommended)</h3>
+            <p class="step-desc">
+              Anaconda helps you manage different Python environments, preventing package conflicts. After installation, create a dedicated environment:
+            </p>
+            <pre class="code-block"><code>conda create --name pybullet_env
+conda activate pybullet_env</code></pre>
+            <p class="step-note">
+              It's not recommended to use the base environment directly — it tends to cause issues later on.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Install pip (If Needed)</h3>
+            <p class="step-desc">
+              Some environments may already have pip. If not, install it with:
+            </p>
+            <pre class="code-block"><code>conda install pip</code></pre>
+            <p class="step-note">
+              This step is usually only necessary for Windows users.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="step-title">Install PyBullet</h3>
+            <p class="step-desc">
+              This is the key step. Enter the following command in your terminal:
+            </p>
+            <pre class="code-block"><code>pip install pybullet</code></pre>
+            <p class="step-desc" style="margin-top: var(--space-3);">
+              Once installation is complete, you should be able to run simulations.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <h3 class="step-title">Install Additional Packages (Recommended)</h3>
+            <p class="step-desc">
+              These packages will be used later for image processing and joystick control:
+            </p>
+            <pre class="code-block"><code>pip install numpy pillow pygame</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Troubleshooting -->
+      <h2 class="detail-heading"><span class="warning-icon">&#9888;</span> Common Installation Issues</h2>
+      <p class="detail-paragraph">
+        You may occasionally encounter issues during installation. Here are the most common problems and their solutions.
+      </p>
+
+      <div class="faq-card">
+        <div class="faq-tag">Windows Issue</div>
+        <h3 class="faq-question">
+          PyBullet installation fails with a missing C++ compiler error?
+        </h3>
+        <figure class="faq-figure">
+          <img
+            src="/learning/virtual-env/Windows使用者安裝PyBullet時可能遇到的Error .png"
+            alt="Error encountered when installing PyBullet on Windows"
+            loading="lazy"
+          />
+          <figcaption class="faq-caption">Error encountered when installing PyBullet on Windows</figcaption>
+        </figure>
+        <p class="faq-desc">
+          This likely means your computer is missing C++ build tools. You'll need to download and install Microsoft C++ Build Tools from the Microsoft website.
+        </p>
+        <figure class="faq-figure">
+          <img
+            src="/learning/virtual-env/Microsoft C++ Build Tools 網頁.png"
+            alt="Microsoft C++ Build Tools webpage"
+            loading="lazy"
+          />
+          <figcaption class="faq-caption">Microsoft C++ Build Tools webpage</figcaption>
+        </figure>
+        <p class="faq-desc">
+          During installation, make sure to check:
+        </p>
+        <ul class="faq-checklist">
+          <li>C++ Desktop Development</li>
+          <li>Windows SDK (select the version matching your system)</li>
+        </ul>
+        <figure class="faq-figure">
+          <img
+            src="/learning/virtual-env/Microsoft C++ Build Tools 安裝選項.png"
+            alt="Microsoft C++ Build Tools installation options"
+            loading="lazy"
+          />
+          <figcaption class="faq-caption">Microsoft C++ Build Tools installation options</figcaption>
+        </figure>
+        <p class="faq-desc" style="margin-bottom: 0;">
+          Restart your computer after installation, then run
+          <code>pip install pybullet</code> again — it should succeed.
+        </p>
+      </div>
+
+      <div class="faq-card">
+        <div class="faq-tag">Package Issue</div>
+        <h3 class="faq-question">
+          Getting <code>numpy.core.multiarray failed to import</code> error?
+        </h3>
+        <p class="faq-desc">
+          This is usually a version issue. Updating NumPy should resolve it:
+        </p>
+        <pre class="code-block" style="margin: 0;"><code>pip install --upgrade numpy</code></pre>
+      </div>
+
+      <div class="faq-card">
+        <div class="faq-tag">Environment Issue</div>
+        <h3 class="faq-question">
+          VS Code can't find the environment?
+        </h3>
+        <p class="faq-desc">
+          In VS Code, do the following:
+        </p>
+        <ol class="faq-steps">
+          <li>
+            Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
+          </li>
+          <li>
+            Select <strong>Python: Select Interpreter</strong>
+          </li>
+          <li>
+            Choose the conda environment you just created (<code>pybullet_env</code>)
+          </li>
+        </ol>
+      </div>
+
+      <!-- Section: Verify -->
+      <h2 class="detail-heading">The Most Important Step: Verify Your Setup</h2>
+      <p class="detail-paragraph">
+        After installation, don't rush into writing new programs. First, run an example to confirm that everything is working properly.
+      </p>
+
+      <div class="verify-card">
+        <p class="verify-label">Enter this in your terminal:</p>
+        <pre class="code-block" style="margin: 0 0 var(--space-4);"><code>python -m pybullet_robots.panda.loadpanda</code></pre>
+        <p class="verify-desc">
+          If successful, you'll see a robotic arm simulation window. This means:
+        </p>
+        <ul class="verify-checklist">
+          <li>PyBullet has been installed successfully</li>
+          <li>Your environment is configured correctly</li>
+        </ul>
+        <p class="verify-desc">
+          This step is critical in the learning process — it helps you confirm whether any issues are environment-related.
+        </p>
+      </div>
+
+      <!-- Section: Reminders -->
+      <h2 class="detail-heading"><span class="warning-icon">&#9888;</span> Reminders (Really Important)</h2>
+      <p class="detail-paragraph">
+        When you're just starting out, the most common issues are:
+      </p>
+      <ul class="reminder-list">
+        <li>Wrong environment selected</li>
+        <li>Packages installed in the wrong location</li>
+        <li>VS Code not set to the correct interpreter</li>
+      </ul>
+      <p class="detail-paragraph">
+        These issues may seem minor, but they can completely prevent your programs from running. Make sure to confirm that the example runs successfully before moving on.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pb-setup {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Warning icon */
+  .warning-icon {
+    color: var(--color-accent);
+    margin-right: var(--space-2);
+    font-size: 1.1em;
+  }
+
+  /* Tool list (numbered like steps) */
+  .tool-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .tool-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-8) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .tool-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tool-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .tool-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tool-name {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .tool-desc {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* FAQ figure (screenshot) */
+  .faq-figure {
+    margin: var(--space-4) 0;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .faq-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+  }
+
+  .faq-caption {
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* Step list */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .step-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .step-note {
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .step-note strong {
+    color: var(--color-heading);
+  }
+
+  /* Code block */
+  .code-block {
+    display: block;
+    margin: var(--space-3) 0 0;
+    padding: var(--space-4);
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    padding: 0;
+  }
+
+  /* Keyboard key */
+  kbd {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+    vertical-align: middle;
+  }
+
+  /* Inline code */
+  .faq-card code,
+  .step-desc code,
+  .faq-question code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* FAQ card */
+  .faq-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .faq-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .faq-question {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .faq-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-steps {
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .faq-steps strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .faq-checklist {
+    list-style: disc;
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .faq-checklist li {
+    margin-bottom: var(--space-1);
+  }
+
+  /* Verify card */
+  .verify-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .verify-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .verify-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .verify-checklist {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0;
+  }
+
+  .verify-checklist li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .verify-checklist li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Reminder list */
+  .reminder-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .reminder-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .reminder-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .tool-item {
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .tool-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .step-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .faq-card {
+      padding: var(--space-6);
+    }
+
+    .verify-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,806 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Skills：把常用流程做成隨叫隨用的「招式」"
+  description="學會用 SKILL.md 把重複流程做成可重複使用的操作手冊，用 slash command 隨時呼叫。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-skills">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 接上工具、學會新招，把重複工作自動化</h1>
+        <p class="detail-subtitle">
+          前面我們已經幫 Claude Code 建好基本規則，像是 CLAUDE.md、記憶整理、上下文管理。
+          接下來這一階段，重點不是再把更多東西塞進手冊，而是學會幫 Claude Code 加能力。
+          有些能力是讓它看得到外部工具，有些是讓它學會固定流程，有些是把大工作拆出去做，
+          還有一些是把重複動作直接自動化。這些能力各自有分工，不是同一種東西。
+        </p>
+      </header>
+
+      <!-- Section 1: Skills 是什麼 -->
+      <h2 class="detail-heading">Skills：把常用流程做成一個隨叫隨用的「招式」</h2>
+      <p class="detail-paragraph">
+        Skill 比較像是幫 Claude Code 準備一份可重複使用的操作手冊。當你有一套流程會一直重複做，
+        例如「部署前檢查清單」、「幫我用固定格式寫 release note」、「把程式碼解釋成新手聽得懂的版本」，
+        這些就很適合做成 Skill。
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">SKILL.md 跟 CLAUDE.md 的差別</p>
+        <p class="info-body">
+          CLAUDE.md 是每次都會載入；SKILL.md 是用到時才載入。<br />
+          所以如果一段內容不是每次都需要，而是「有時候才會用到」，放 Skill 會比較省上下文，也比較乾淨。
+        </p>
+      </div>
+
+      <!-- Section 2: 個人 vs 專案 -->
+      <h2 class="detail-heading">先決定：你要做「個人 Skill」還是「專案 Skill」</h2>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <p class="compare-label">個人 Skill</p>
+          <p class="compare-path">~/.claude/skills/&lt;skill-folder&gt;/SKILL.md</p>
+          <p class="compare-desc">所有專案都能用，稱為 personal skills。</p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">專案 Skill</p>
+          <p class="compare-path">.claude/skills/&lt;skill-folder&gt;/SKILL.md</p>
+          <p class="compare-desc">只在目前這個專案生效。</p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">接下來以專案 Skill 為例。</p>
+
+      <!-- Section 3: 建立 Skill 的範例步驟 (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">建立 Skill 的範例步驟</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            用途：當貼一段程式碼進來時，Claude Code 會用比較好懂的方式解釋，
+            像是先講用途、再講流程、再講重點變數，最後補上常見誤解。
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">打開你的專案</h3>
+                <p class="step-desc">先用 VS Code 打開你的專案資料夾。</p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 Skill 的資料夾</h3>
+                <p class="step-desc">在 VS Code 左側檔案總管，建立這個資料夾路徑：</p>
+                <pre class="code-block"><code>.claude/skills/explain-code/</code></pre>
+                <div class="tip-card">
+                  <p class="tip-title">也就是</p>
+                  <ul class="tip-list">
+                    <li>在專案根目錄建立 <code>.claude</code> 資料夾</li>
+                    <li>在 <code>.claude</code> 裡建立 <code>skills</code> 資料夾</li>
+                    <li>在 <code>skills</code> 裡建立 <code>explain-code</code> 資料夾</li>
+                  </ul>
+                </div>
+                <p class="step-desc">
+                  標準結構就是「一個 Skill 一個資料夾，裡面至少有一個 <code>SKILL.md</code>」。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 SKILL.md</h3>
+                <p class="step-desc">
+                  在資料夾裡建立 <code>.claude/skills/explain-code/SKILL.md</code>，
+                  然後把下面這份內容完整貼進去：
+                </p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: 用新手看得懂的方式解釋程式碼。適合在教學、導讀程式、介紹函式流程，
+  或使用者問「這段程式碼在做什麼」時使用。
+---
+
+當你解釋程式碼時，請照這個順序回答：
+
+1. 先用一句話說明這段程式碼的用途。
+2. 再用條列方式說明它的執行流程。
+3. 點出最重要的函式、變數或判斷條件。
+4. 如果有容易搞混的地方，主動提醒。
+5. 最後補一個「新手版總結」。
+
+回答時請遵守下面規則：
+
+- 用口語化的中文
+- 不要一開始就丟太多術語
+- 如果有術語，順手解釋一下
+- 優先說「它在幹嘛」，再說「它怎麼做到」
+- 如果程式碼不完整，要直接說你是根據目前看到的內容來判斷
+- 如果適合，可以加一個很簡單的小例子幫助理解
+
+如果使用者有貼程式碼，先根據程式碼回答。
+如果使用者沒有貼程式碼，就先請他提供檔案、函式或程式片段。`} /></pre>
+                <div class="note-card">
+                  <p class="note-body">
+                    SKILL.md 包含兩部分：前面是 <strong>YAML frontmatter</strong>，用來告訴 Claude Code 這個 Skill 叫什麼、什麼時候該用；
+                    後面是 <strong>Markdown 內容</strong>，就是這個 Skill 真正的操作說明。
+                    <code>name</code> 會變成你之後可用的 <code>/slash-command</code>，在此範例為「<code>/explain-code</code>」，
+                    <code>description</code> 則幫助 Claude Code 判斷什麼時候要自動載入它。
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">把 SKILL.md 存檔</h3>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">開一個新的 Claude Code 對話</h3>
+                <p class="step-desc">
+                  我建議你新開一個對話再測。因為這樣比較容易確認現在載入的是最新的 Skill 內容。
+                  Skill 本身是可以被手動呼叫，也可以在相關時自動載入的。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">直接測試 slash command</h3>
+                <p class="step-desc">在 Claude Code 聊天框先輸入：</p>
+                <pre class="code-block code-block--command"><code>/explain-code</code></pre>
+                <p class="step-desc">然後再貼一小段程式碼，例如：</p>
+                <pre class="code-block"><code set:html={`function sumPrices(items) {
+  let total = 0;
+  for (const item of items) {
+    total += item.price;
+  }
+  return total;
+}`} /></pre>
+                <p class="step-desc">
+                  如果設定正常，Claude Code 會照你在 Skill 裡寫的方式解釋。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">再測一次「自動載入」</h3>
+                <p class="step-desc">你也可以不用 slash command，直接輸入：</p>
+                <pre class="code-block code-block--command"><code>請用新手看得懂的方式解釋這段程式碼</code></pre>
+                <p class="step-desc">然後貼上程式碼。</p>
+                <p class="step-desc">
+                  如果你的 <code>description</code> 寫得夠清楚，Claude Code 可能會自己判斷這個需求很像
+                  <code>explain-code</code>，然後自動載入它。
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Section 4: 常見問題 (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">最常遇到的問題與解法</span>
+        </summary>
+        <div class="collapsible-body">
+          <div class="faq-list">
+            <article class="faq-card">
+              <h3 class="faq-q">我建好了資料夾，但 slash command（例如 /explain-code）不能用</h3>
+              <p class="faq-a">
+                最常見的原因有兩個：一個是檔名不是 <code>SKILL.md</code>，另一個是 frontmatter 格式有問題。
+                每個 Skill 都需要一個 <code>SKILL.md</code>，而且要有 frontmatter 和 Markdown 內容兩部分。
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">你可以先檢查這三件事</p>
+                <ul class="faq-solution-list">
+                  <li>路徑是不是 <code>.claude/skills/explain-code/SKILL.md</code></li>
+                  <li>檔名是不是完全叫 <code>SKILL.md</code></li>
+                  <li>最上面有沒有用 <code>---</code> 包住 frontmatter</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="faq-card">
+              <h3 class="faq-q">資料夾叫 explain-code，是不是 slash command 一定也是這個名字？</h3>
+              <p class="faq-a">
+                不一定。重點是 <code>name</code> 欄位會變成 slash command。
+                所以真正最該看的，是 frontmatter 裡的 <code>name</code>。
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">也就是說，這樣才是關鍵</p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: ...
+---`} /></pre>
+              </div>
+            </article>
+
+            <article class="faq-card">
+              <h3 class="faq-q">Skill 可以放參考檔案嗎？</h3>
+              <p class="faq-a">
+                可以。Skills 可以在 <code>SKILL.md</code> 旁邊放支援檔案，讓 Claude Code 在需要時一起用。
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">例如你可以做成這樣</p>
+                <pre class="code-block"><code set:html={`.claude/skills/explain-code/
+├── SKILL.md
+└── examples.md`} /></pre>
+                <p class="note-body" style="margin-top: var(--space-3);">
+                  這樣之後就可以把一些固定範例放進去。
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>SKILL.md</strong>：用到時才載入的操作手冊，比 CLAUDE.md 更省上下文。</li>
+          <li><strong>frontmatter</strong>：<code>name</code> 決定 slash command 名稱，<code>description</code> 幫助自動載入。</li>
+          <li><strong>個人 vs 專案</strong>：個人 Skill 放 <code>~/.claude/skills/</code>，專案 Skill 放 <code>.claude/skills/</code>。</li>
+          <li><strong>標準結構</strong>：一個 Skill 一個資料夾，裡面至少有一個 <code>SKILL.md</code>。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-skills {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Collapsible sections ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Info card ── */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Compare grid ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .compare-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-path {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-all;
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Tip card ── */
+  .tip-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .tip-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .tip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .tip-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .tip-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0 var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── FAQ cards ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .faq-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .faq-q {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .faq-a {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-solution {
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .faq-solution-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .faq-solution-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .faq-solution-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .faq-solution-list li::before {
+    content: '\203A';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .tip-list code,
+  .step-desc code,
+  .note-body code,
+  .faq-a code,
+  .faq-solution-list code,
+  .faq-q code,
+  .info-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* kbd */
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--color-heading);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 0 var(--color-border);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .compare-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .collapsible-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

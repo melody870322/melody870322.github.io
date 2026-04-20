@@ -1,0 +1,1024 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Hooks：讓某些事自動發生，不必每次靠你提醒"
+  description="學會用 Hooks 在 Claude Code 生命週期的特定時機自動執行指令，例如桌面通知、自動格式化等。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-hooks">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 接上工具、學會新招，把重複工作自動化</h1>
+        <p class="detail-subtitle">
+          前面我們已經幫 Claude Code 建好基本規則，像是 CLAUDE.md、記憶整理、上下文管理。
+          接下來這一階段，重點不是再把更多東西塞進手冊，而是學會幫 Claude Code 加能力。
+          有些能力是讓它看得到外部工具，有些是讓它學會固定流程，有些是把大工作拆出去做，
+          還有一些是把重複動作直接自動化。這些能力各自有分工，不是同一種東西。
+        </p>
+      </header>
+
+      <!-- Section 1: Hooks 是什麼 -->
+      <h2 class="detail-heading">Hooks：讓某些事自動發生，而不是每次都靠你提醒</h2>
+      <p class="detail-paragraph">
+        Hooks 是在 Claude Code 生命週期某些時機點，自動執行的 shell 指令、HTTP 端點，或 LLM 提示。
+        它的重點在於「這件事一定要發生」，而不是讓模型自己決定要不要做。
+      </p>
+
+      <p class="detail-paragraph">所以 Hooks 很適合處理以下需求：</p>
+      <ul class="usage-list">
+        <li>每次 Claude Code 在等你回應時跳出桌面通知。</li>
+        <li>每次 Claude Code 改完檔案就自動格式化。</li>
+      </ul>
+
+      <!-- Main collapsible 1: 先做一次共同準備 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">先做一次共同準備</span>
+        </summary>
+        <div class="collapsible-body">
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">決定你要把 hook 放在哪裡</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">你可以選下面其中一個位置：</p>
+                <ul class="inline-list">
+                  <li><code>~/.claude/settings.json</code>：所有專案都生效。</li>
+                  <li><code>.claude/settings.json</code>：只有目前專案生效，適合團隊共享。</li>
+                  <li><code>.claude/settings.local.json</code>：只有目前專案生效，而且通常不想交給 git。</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">如果檔案還不存在，就先建立</h3>
+                <p class="step-desc">操作位置：VS Code 左側檔案總管 + 編輯器</p>
+                <p class="step-desc">
+                  如果你要做專案版 hook，最常見的做法是建立：<code>.claude/settings.json</code>
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">設定完之後用 /hooks 檢查</h3>
+                <p class="step-desc">操作位置：Claude Code 聊天框</p>
+                <p class="step-desc">
+                  設定寫好之後，在 Claude Code 聊天框輸入 <code>/hooks</code>，
+                  並依序選擇「Hooks」、「Continue in Terminal」。
+                </p>
+                <p class="step-desc">
+                  你會看到哪些 hook 事件有設定成功。
+                  （如果你是按照步驟做的話，應該會顯示 <code>0 hooks configured</code>）
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Main collapsible 2: 範例 1 - 桌面通知 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">範例 1：當 Claude 需要你回應時，跳出桌面通知</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            這個 hook 很適合那種「Claude Code 在跑事情，你先去做別的事」的情境。
+            官方範例用的是 <code>Notification</code> 事件，當 Claude Code 在等你輸入、
+            或在等你批准某個操作時，就會觸發通知。
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">打開設定檔</h3>
+                <p class="step-desc">
+                  操作位置：VS Code 編輯器<br />
+                  打開 <code>.claude/settings.json</code>。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">貼上通知 hook</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">
+                  以下都是官方 hooks guide 直接給的通知範例。<code>Notification</code> 事件會在 Claude Code
+                  需要你注意時觸發；<code>matcher</code> 留空代表這個事件每次發生都會跑。
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Nested collapsible: Windows -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">Windows 使用者</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -Command \\"[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')\\""
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+            </div>
+          </details>
+
+          <!-- Nested collapsible: Linux -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">Linux 使用者</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude Code' 'Claude Code needs your attention'"
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+            </div>
+          </details>
+
+          <!-- Nested collapsible: macOS -->
+          <details class="collapsible-nested">
+            <summary class="collapsible-nested-trigger">
+              <span class="collapsible-nested-icon"></span>
+              <span class="collapsible-nested-title">macOS 使用者</span>
+            </summary>
+            <div class="collapsible-nested-body">
+              <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \\"Claude Code needs your attention\\" with title \\"Claude Code\\"'"
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+            </div>
+          </details>
+
+          <ol class="step-list" start="3">
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">存檔並實際測試</h3>
+                <p class="step-desc">操作位置：Claude Code 聊天框</p>
+                <p class="step-desc">輸入：</p>
+                <pre class="code-block code-block--command"><code>/hooks</code></pre>
+                <p class="step-desc">
+                  並選擇「Hooks」，如果你有看到 <code>Notification</code> 事件底下出現一個 hook，就代表載進去了。
+                </p>
+                <p class="step-desc">你可以故意請 Claude Code 做一個可能會需要你批准的動作，輸入：</p>
+                <pre class="code-block code-block--command"><code>請幫我修改 README.md，最上面加上一行：這是一個 hooks 通知測試。</code></pre>
+                <p class="step-desc">
+                  然後切到別的視窗，如果設定成功，當 Claude Code 需要你操作時，就會跳通知。
+                </p>
+                <figure class="figure">
+                  <img
+                    class="figure-img"
+                    src="/learning/claude-code/通知.jpg"
+                    alt="Claude Code 桌面通知跳出的畫面"
+                    loading="lazy"
+                  />
+                </figure>
+              </div>
+            </li>
+          </ol>
+
+          <div class="note-card note-card--warning">
+            <p class="note-body">
+              <span class="note-icon" aria-hidden="true">⚠️</span>
+              <strong>注意：</strong>在 VS Code 執行會失敗，以上成功是基於在 Windows PowerShell 執行。如下步驟
+            </p>
+          </div>
+
+          <ol class="step-list sub-step-list">
+            <li class="step-item">
+              <span class="step-num step-num--sub">1</span>
+              <div class="step-body">
+                <h3 class="step-title">對專案資料夾按右鍵選擇「在終端中開啟」。</h3>
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num step-num--sub">2</span>
+              <div class="step-body">
+                <h3 class="step-title">輸入 <code>Claude</code>，並按 Enter 鍵。</h3>
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num step-num--sub">3</span>
+              <div class="step-body">
+                <h3 class="step-title">按右鍵貼上：</h3>
+                <pre class="code-block code-block--command"><code>請幫我修改 README.md，最上面加上一行：這是一個 hooks 通知測試。</code></pre>
+              </div>
+            </li>
+            <li class="step-item">
+              <span class="step-num step-num--sub">4</span>
+              <div class="step-body">
+                <h3 class="step-title">縮小 Windows PowerShell 視窗</h3>
+                <p class="step-desc">
+                  等待或做其他事情都可以，到時候會跳出通知，回到 Windows PowerShell 視窗你會看到有需要批准的選項。
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="note-card">
+            <p class="note-body">
+              如果你在 PowerShell 中執行 Claude Code 時能正常收到通知，但在 VS Code extension 裡收不到，
+              不是你做錯，而是 VS Code extension 目前對 <code>Notification</code> hook 的支援有已知問題，
+              大家都遇到相同問題，是個待解決的 bug！
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Main collapsible 3: 範例 2 - 自動格式化 -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">範例 2：每次 Claude Code 改完檔案，就自動格式化</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            這個 hook 很適合寫程式時用。只要 Claude Code 用 Edit 或 Write 改了檔案，就自動跑 Prettier，把格式整理好。
+            它用的是 <code>PostToolUse</code> 事件，搭配 <code>Edit|Write</code> 這個 matcher。
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">先確認你有 Prettier</h3>
+                <p class="step-desc">操作位置：VS Code 整合終端機</p>
+                <p class="step-desc">安裝指令：</p>
+                <pre class="code-block code-block--command"><code>npm install --save-dev --save-exact prettier</code></pre>
+                <p class="step-desc">驗證安裝成功：</p>
+                <pre class="code-block code-block--command"><code>npx prettier --help</code></pre>
+                <p class="step-desc">如果能正常顯示說明，就代表至少 Prettier CLI 能被叫起來。</p>
+                <p class="step-desc">但如果你看到類似下圖的錯誤訊息，代表 PowerShell 擋住了 npx：</p>
+                <figure class="figure">
+                  <img
+                    class="figure-img"
+                    src="/learning/claude-code/npx error.jpg"
+                    alt="PowerShell 執行 npx 時出現的執行原則錯誤訊息"
+                    loading="lazy"
+                  />
+                </figure>
+
+                <div class="note-card note-card--warning">
+                  <p class="note-body">
+                    <span class="note-icon" aria-hidden="true">⚠️</span>
+                    <strong>注意：</strong>錯誤原因可能是 PowerShell 把 <code>npx.ps1</code> 擋掉了。
+                    PowerShell 官方文件說，Windows 上的執行原則會決定腳本可不可以執行。
+                  </p>
+                </div>
+
+                <p class="step-desc"><strong>解決方法</strong>（操作位置：VS Code 整合終端機）：</p>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">方法 1：只適用「目前這個 PowerShell 視窗」</h4>
+                  <pre class="code-block code-block--command"><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">方法 2：適用「目前使用者」</h4>
+                  <pre class="code-block code-block--command"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+                  <p class="step-desc">
+                    這樣會影響你這個 Windows 帳號之後開的 PowerShell，但不會改整台電腦
+                    （<code>CurrentUser</code> 只影響目前使用者）。
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">安裝 jq</h3>
+                <p class="step-desc">操作位置：VS Code 整合終端機</p>
+                <p class="step-desc">安裝指令：</p>
+                <pre class="code-block code-block--command"><code>winget install jqlang.jq</code></pre>
+                <p class="step-desc">重新載入系統與使用者 PATH：</p>
+                <pre class="code-block code-block--command"><code>$env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User')</code></pre>
+                <p class="step-desc">驗證安裝成功：</p>
+                <pre class="code-block code-block--command"><code>jq --version</code></pre>
+                <p class="step-desc">
+                  這個 hook 會從 hook 傳進來的 JSON 裡，用 <code>jq</code> 解析 JSON，把被修改的檔案路徑抓出來。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">把 hook 加進設定檔</h3>
+                <p class="step-desc">操作位置：VS Code 編輯器</p>
+                <p class="step-desc">在你的 hooks 設定裡加上：</p>
+                <pre class="code-block"><code set:html={`{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs npx prettier --write"
+          }
+        ]
+      }
+    ]
+  }
+}`} /></pre>
+                <p class="step-desc"><strong>這段的意思：</strong></p>
+                <ul class="inline-list">
+                  <li><code>PostToolUse</code>：工具成功跑完之後才觸發。</li>
+                  <li><code>matcher: "Edit|Write"</code>：只在 Claude 改檔時才跑。</li>
+                  <li><code>jq -r '.tool_input.file_path'</code>：把剛剛被改的檔案路徑抓出來。</li>
+                  <li><code>xargs npx prettier --write</code>：把這個檔案交給 Prettier 格式化。</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">存檔後檢查</h3>
+                <p class="step-desc">操作位置：Claude Code 聊天框</p>
+                <p class="step-desc">
+                  輸入 <code>/hooks</code> 並選擇「Hooks」來確認裡面有看到你設定的
+                  <code>PostToolUse / Edit|Write</code> 那條。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">實際測試</h3>
+                <p class="step-desc">操作位置：VS Code 終端機</p>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第一步：建立一個故意沒格式化的測試檔</h4>
+                  <p class="step-desc">如果你是 macOS / Linux / WSL / Git Bash，輸入：</p>
+                  <pre class="code-block"><code set:html={`mkdir -p tmp-hook-test
+cat > tmp-hook-test/hook-test.js <<'EOF'
+const data={foo:"bar",items:[1,2,3]};function greet(name){console.log("Hello Hook",name,data)}
+greet("world")
+EOF`} /></pre>
+                  <p class="step-desc">如果你是 Windows，輸入：</p>
+                  <pre class="code-block"><code set:html={`New-Item -ItemType Directory -Force tmp-hook-test | Out-Null
+@'
+const data={foo:"bar",items:[1,2,3]};function greet(name){console.log("Hello Hook",name,data)}
+greet("world")
+'@ | Set-Content tmp-hook-test/hook-test.js`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第二步：先確認這個檔案目前是「未格式化」</h4>
+                  <p class="step-desc">操作位置：VS Code 終端機</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code>npx prettier --check tmp-hook-test/hook-test.js</code></pre>
+                  <p class="step-desc">正常情況下，這一步終端機應該會出現類似：</p>
+                  <pre class="code-block"><code set:html={`Checking formatting...
+[warn] tmp-hook-test/hook-test.js
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.`} /></pre>
+                  <p class="step-desc">這代表這個檔案目前還沒被格式化。</p>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第三步：請 Claude 只做一個很小的修改，讓 hook 有機會觸發</h4>
+                  <p class="step-desc">操作位置：Claude Code 聊天框</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code set:html={`請修改 tmp-hook-test/hook-test.js：
+只把字串 "Hello Hook" 改成 "Hello Hook Works"。
+不要新增功能，不要重寫內容，但要主動整理格式。`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第四步：看檔案內容有沒有被自動整理</h4>
+                  <p class="step-desc">操作位置：VS Code 終端機</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code>cat tmp-hook-test/hook-test.js</code></pre>
+                  <p class="step-desc">你應該會看到它不再是一整行，而是變成類似這種有格式的內容：</p>
+                  <pre class="code-block"><code set:html={`const data = { foo: "bar", items: [1, 2, 3] };
+function greet(name) {
+  console.log("Hello Hook Works", name, data);
+}
+greet("world");`} /></pre>
+                </div>
+
+                <div class="sub-option">
+                  <h4 class="sub-option-title">第五步：再用 Prettier 檢查一次</h4>
+                  <p class="step-desc">操作位置：VS Code 終端機</p>
+                  <p class="step-desc">輸入：</p>
+                  <pre class="code-block code-block--command"><code>npx prettier --check tmp-hook-test/hook-test.js</code></pre>
+                  <p class="step-desc">如果 hook 有成功執行，終端機通常會出現：</p>
+                  <pre class="code-block"><code set:html={`Checking formatting...
+All matched files use Prettier code style!`} /></pre>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>Hooks</strong>：在 Claude Code 生命週期的時機點，自動執行指令的機制。</li>
+          <li><strong>重點是「一定會發生」</strong>：不像其他能力是由模型自己決定要不要做。</li>
+          <li><strong>設定檔位置</strong>：依需求選擇 <code>~/.claude/settings.json</code>、專案版或 local 版。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-hooks {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Usage list ── */
+  .usage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .usage-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .usage-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .usage-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline list (bulleted inside step or collapsible) ── */
+  .inline-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0 var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .inline-list li {
+    padding-left: var(--space-8);
+    position: relative;
+  }
+
+  .inline-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Collapsible sections (purple, top-level) ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Nested collapsible (orange) ── */
+  .collapsible-nested {
+    margin: var(--space-4) 0;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #f97316;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible-nested[open] {
+    border-top-color: #f97316;
+    border-right-color: #f97316;
+    border-bottom-color: #f97316;
+  }
+
+  .collapsible-nested-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-nested-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-nested-trigger:hover {
+    background-color: #fff7ed;
+  }
+
+  :root[data-theme='dark'] .collapsible-nested-trigger:hover {
+    background-color: rgba(249, 115, 22, 0.08);
+  }
+
+  .collapsible-nested-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-nested-icon::before,
+  .collapsible-nested-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #f97316;
+    border-radius: 1px;
+  }
+
+  .collapsible-nested-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-nested-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible-nested[open] .collapsible-nested-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-nested-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-nested-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-num--sub {
+    width: 1.6rem;
+    height: 1.6rem;
+    background-color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+  }
+
+  .sub-step-list {
+    margin-top: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc--hint {
+    font-style: italic;
+    color: var(--color-text-secondary);
+  }
+
+  /* ── Sub-option (inner card inside step) ── */
+  .sub-option {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .sub-option-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-card--warning {
+    border-left-color: #f59e0b;
+    background-color: #fffbeb;
+  }
+
+  :root[data-theme='dark'] .note-card--warning {
+    background-color: rgba(245, 158, 11, 0.08);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .note-icon {
+    display: inline-block;
+    margin-right: 0.35em;
+  }
+
+  /* ── Figure (inline image) ── */
+  .figure {
+    margin: var(--space-4) 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  .figure-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .usage-list code,
+  .inline-list code,
+  .step-desc code,
+  .step-title code,
+  .note-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .collapsible-body,
+    .collapsible-nested-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .sub-option {
+      padding: var(--space-3);
+    }
+  }
+</style>

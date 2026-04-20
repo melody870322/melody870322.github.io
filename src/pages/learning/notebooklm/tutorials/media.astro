@@ -1,0 +1,753 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM Multimedia & Visualization"
+  description="From Audio Overviews and Video Overviews to Slides and Infographics, NotebookLM can reshape the same material into audio, video, visual, and shareable formats."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-media">
+      <a class="back-link" href="/">&larr; Back to home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Multimedia &amp; Visualization: Turning material into something you can listen to, watch, and share</h1>
+        <p class="detail-subtitle">
+          Once your sources are in NotebookLM, organizing the material does not have to stay in chat form.
+          On top of text summaries, NotebookLM can also turn content into
+          <strong>audio, video, slides, and visual imagery</strong> —
+          giving you different ways to re-understand the same material. Most of this output is
+          generated and managed inside the <strong>Studio panel</strong> on the right of your notebook.
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">Platform note</span>
+          Mobile support for these features <strong>is not fully uniform</strong>; some tools may be limited or look slightly different from the web UI.
+          Also, <strong>Slides and Infographics are currently marked by Google as available only to users 18 and older</strong>.
+        </p>
+      </header>
+
+      <!-- Section 1: Four tools overview -->
+      <h2 class="detail-heading">Four output formats, four kinds of situations</h2>
+      <p class="detail-paragraph">
+        The four tools each suit a different situation: when you don't have time to sit and read, use audio;
+        when you want the content to be easier to see, use video; when you need to present or share the result,
+        use slides; when you want to grasp the gist in one glance, use a single image.
+      </p>
+
+      <div class="feature-grid feature-grid--four">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">Audio Overview</h3>
+          <p class="feature-alias">A version you can listen to</p>
+          <p class="feature-desc">
+            Turns your sources into <strong>an audio track</strong> — good for commutes,
+            pre-meeting warm-ups, or building a first sense of the material before reading.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">Video Overview</h3>
+          <p class="feature-alias">An easier-to-follow explainer</p>
+          <p class="feature-desc">
+            Turns the main points into <strong>an AI-narrated video</strong>, adding visuals and voiceover
+            on top of the text — useful for concept intros, topic overviews, and pre-class prep.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">Slide Deck</h3>
+          <p class="feature-alias">A presentable, editable deck</p>
+          <p class="feature-desc">
+            Generates <strong>a first-pass deck</strong> from your sources — helpful for topic overviews,
+            internal briefings, event recaps, teaching notes, and case walkthroughs.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">04</p>
+          <h3 class="feature-title">Infographic</h3>
+          <p class="feature-alias">The gist in one image</p>
+          <p class="feature-desc">
+            Shapes the main ideas, data, or relationships into <strong>a single-page visual</strong>,
+            so readers can grasp the main points or see how things connect at a glance.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Audio Overviews -->
+      <h2 class="detail-heading">Audio Overview: Turning text into a version you can listen to</h2>
+      <p class="detail-paragraph">
+        Audio Overviews are a good fit for the <strong>"absorb the material quickly first"</strong> situation.
+        NotebookLM generates an audio segment based on your uploaded sources to walk you through the main points.
+        The default format is "Deep Dive" — two AI hosts unpacking the topic in conversation;
+        if you want something faster, "Brief" has a single speaker cover the main points in about two minutes.
+      </p>
+
+      <p class="detail-paragraph">Available formats:</p>
+      <div class="source-grid">
+        <span class="source-chip">Deep Dive (two-host conversation)</span>
+        <span class="source-chip">Brief (single speaker, ~2 min)</span>
+        <span class="source-chip">Critique (constructive feedback)</span>
+        <span class="source-chip">Debate (multiple angles)</span>
+      </div>
+
+      <section class="concept-card">
+        <p class="concept-card__label">What you can adjust before generating</p>
+        <p class="concept-card__body">
+          In a notebook, pick <strong>"Audio Overview"</strong> in the Studio panel — generation starts in the background,
+          and you can keep working in NotebookLM meanwhile (checking citations, searching the sources, asking more questions).
+          Before generating you can set:
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>Format</strong> (Deep Dive / Brief / Critique / Debate)</li>
+          <li><strong>Output language</strong></li>
+          <li><strong>A prompt</strong> to tell it what to focus on</li>
+          <li><strong>Length</strong> (Short / Default / Long)</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        Audio Overviews are most useful when you <strong>don't have time to sit down and read</strong> —
+        listening through the key points on a commute, a quick warm-up before a meeting,
+        or building a first sense of the material before you actually read it.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>Both the voice and the content are AI-generated</strong> — so there may be inaccuracies,
+            slightly unnatural speech, or the occasional audio stutter.
+          </li>
+          <li>
+            <strong>Interactive mode is currently English-only</strong> — you can download and share Audio Overviews,
+            but people who open your shared link cannot keep talking to the hosts the way you could in your own interactive session.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 3: Video Overviews -->
+      <h2 class="detail-heading">Video Overview: Shaping the main points into an easier-to-watch explainer</h2>
+      <p class="detail-paragraph">
+        If Audio Overviews are about <strong>"understanding by listening,"</strong> Video Overviews lean more toward
+        <strong>"understanding by watching."</strong>
+        NotebookLM turns the sources in your notebook into an AI-narrated video, adding visuals and voiceover
+        on top of what would otherwise be text. This kind of video is a good fit for concept explanations,
+        topic overviews, pre-class prep, warm-ups, or situations where you want to get a sense of direction quickly.
+      </p>
+
+      <p class="detail-paragraph">Available video formats:</p>
+      <div class="source-grid">
+        <span class="source-chip">Explainer (full walkthrough)</span>
+        <span class="source-chip">Brief (short highlights)</span>
+        <span class="source-chip">Cinematic (Ultra only, 18+, English)</span>
+      </div>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Beyond format, you can also fine-tune</p>
+        <ul class="concept-card__list">
+          <li><strong>Narration language</strong> — Google supports 80+ languages, so you can produce a first-pass in different languages.</li>
+          <li><strong>Visual style</strong> — decide the overall look of the video.</li>
+          <li><strong>A prompt</strong> — tell it which topics or sources to focus on.</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        A Video Overview is not just text moved onto a screen — it is meant to be a version that is
+        <strong>easier to watch and follow</strong>. For people who would rather not work through long reading,
+        or when you want to turn material into something easier to share, a video tends to be more inviting than a plain summary.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>Generation takes patience</strong> — Google notes that video generation can sometimes take
+            <strong>30 minutes or more</strong>.
+          </li>
+          <li>
+            <strong>Audio and visuals are both AI-generated</strong> — there may be content errors or audio artifacts.
+            Think of it as a tool that helps you produce a first visual draft, not something that will fully auto-produce a polished teaching video.
+          </li>
+          <li>
+            Once generated, you can download the video file directly or share it so others can watch.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Slides -->
+      <h2 class="detail-heading">Slides: Organizing material into a presentable, editable deck</h2>
+      <p class="detail-paragraph">
+        The Slides tool fits the stage where
+        <strong>"the organized result needs to be presented, shared, or shown."</strong>
+        NotebookLM can generate a deck from your sources so you don't have to start from a blank canvas.
+        It is well suited to pulling scattered material from several sources into a structured sequence of slides —
+        for topic overviews, internal briefings, event recaps, teaching notes, or case walkthroughs.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Two main directions to choose from</p>
+        <ul class="concept-card__list">
+          <li>
+            <strong>Detailed briefing</strong> — a thorough, information-rich version, suited to reading or sending.
+          </li>
+          <li>
+            <strong>Presentation slides</strong> — leaner and more visual, suited to accompanying a spoken talk.
+          </li>
+        </ul>
+        <p class="concept-card__footer">
+          You can also set the output language, length, or add a prompt telling it about your audience, style, and priorities.
+          NotebookLM lets you play the deck directly inside the interface, so you can see the overall flow and pacing.
+        </p>
+      </section>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>Currently available to users 18 and older</strong> — the mobile version is usable,
+            but may look different from the web version.
+          </li>
+          <li>
+            <strong>You can't add or delete slides yet</strong> — revisions can edit existing slides,
+            but the number of slides is fixed.
+          </li>
+          <li>
+            <strong>Revisions do not re-consult the sources</strong> — follow-up tweaks behave more like editing an existing deck,
+            not like regenerating a full pass from the original material.
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        It helps to think of Slides as
+        <strong>"a tool that gives you a structured first draft of a deck,"</strong>
+        not an AI layout tool that will never change content. For anything formal, it is still worth checking
+        whether the content is accurate and whether the order makes sense.
+        When you're done, NotebookLM lets you export the deck as
+        <strong>PDF or PowerPoint (.pptx)</strong>,
+        so further edits, on-stage playback, or separate sharing are all easy to do.
+      </p>
+
+      <!-- Section 5: Infographic -->
+      <h2 class="detail-heading">Infographic: Condensing the main points into a single readable image</h2>
+      <p class="detail-paragraph">
+        Infographics are a good fit for situations where you want to
+        <strong>"understand the main points quickly."</strong>
+        NotebookLM pulls the key ideas, numbers, or relationships out of your sources and shapes them into
+        a single-page visual — helping you grasp the main points, see connections across the material,
+        or present hard-to-enter content in a more direct form.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">There are quite a few things you can adjust</p>
+        <ul class="concept-card__list">
+          <li><strong>Output language</strong></li>
+          <li><strong>Detail level</strong> — Concise / Standard / Detailed (beta).</li>
+          <li><strong>Orientation</strong> — Landscape / Portrait / Square.</li>
+          <li>
+            <strong>Visual style</strong> — let the system decide automatically, or steer it toward hand-drawn, playful, professional, and so on.
+          </li>
+          <li>
+            <strong>A prompt</strong> — ask it to emphasize certain points, use a particular color palette,
+            or center on specific numbers.
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        An infographic is useful as
+        <strong>"a single image that invites the reader into the topic."</strong>
+        It is a good fit for concept organization, process explanations, highlighting key figures,
+        or acting as a visual waypoint in a longer piece of writing. Long blocks of text do not always stick in memory,
+        but a well-organized image often does. When you're done, NotebookLM lets you download infographics as
+        <strong>PNG</strong>, and you can share them directly or via the whole notebook.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <p class="caution-card__body">
+          Like the other generated outputs, infographics are not guaranteed to be entirely correct.
+          Google notes that these images can contain
+          <strong>visual or factual inaccuracies</strong>,
+          so it's sensible to treat them as an efficient first visual pass, not as a substitute for human review.
+          If you spot typos, odd wording, or characters that don't render naturally, the safest move is usually to
+          <strong>adjust the prompt and regenerate</strong>, then decide whether any hand touch-ups are still needed.
+        </p>
+      </section>
+
+      <!-- Canva workaround -->
+      <h3 class="detail-subheading">Touching up text: Post-processing in Canva</h3>
+      <p class="detail-paragraph">
+        If only a small amount of text needs tweaking, you can import the downloaded PNG into Canva for post-processing.
+        Canva supports PNG uploads; once uploaded, you can try <strong>Grab Text</strong> first —
+        it extracts the text in the image into an editable layer so you can modify it directly.
+        Canva positions this tool explicitly as a way to fix text in images,
+        including correcting typos, updating wording, and adjusting font, size, and color.
+      </p>
+
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">A</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Try Grab Text first (a Canva Pro feature)</h4>
+            <p class="start-step__desc">
+              After uploading the PNG, use Grab Text to extract the text into an editable layer.
+              You can then fix typos, update wording, or adjust font, size, and color directly.
+              This works best when the characters are clean and easy to recognize.
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">B</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">When recognition isn't reliable, go manual</h4>
+            <p class="start-step__desc">
+              Use <strong>Magic Eraser</strong> to clear the incorrect text, or cover the original text with a same-colored block,
+              then add a new text box and re-type the correct text.
+              This is more hands-on, but for infographics with small text, busy backgrounds, or unusual typography,
+              it tends to be easier to control.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ Another reminder</p>
+        <p class="caution-card__body">
+          This is <strong>external post-processing in Canva</strong>, not part of NotebookLM's own infographic revision flow.
+          The edited file and the original notebook are not linked.
+        </p>
+      </section>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">Four outputs, four ways into the same material</h2>
+      <blockquote class="pullquote pullquote--primary">
+        Listen to it, watch it, present it, or see it in one glance — the same material can have four different entry points.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Audio Overviews, Video Overviews, Slides, and Infographics are not meant to replace your own understanding of the material.
+        They help you reshape the same source into forms that are
+        <strong>easier to absorb and easier to share</strong>.
+        NotebookLM already makes it clear that this output is AI-generated and may contain mistakes,
+        so the more reasonable way to use them is as
+        <strong>an efficient first pass</strong> —
+        and then go back to the original sources to verify, adjust, or touch up with other tools when needed.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-media {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-subheading {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (four tools overview, 2x2) */
+  .feature-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--four {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .caution-card__numbered {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    counter-reset: caution;
+    list-style: none;
+  }
+
+  .caution-card__numbered li {
+    position: relative;
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    counter-increment: caution;
+  }
+
+  .caution-card__numbered li::before {
+    content: counter(caution);
+    position: absolute;
+    left: -1.25rem;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: var(--color-text-secondary);
+    color: var(--color-bg);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .caution-card__numbered strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Source chips */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Start steps */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .feature-grid--four {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

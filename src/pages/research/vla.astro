@@ -1,0 +1,307 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Multimodal Intelligent Collaborative Robot"
+  description="Proposes SC-TinyVLA, using speech as the human-robot interaction interface, combining speech recognition, semantic understanding, visual perception, and action generation for intuitive collaborative robot control with continual learning."
+  lang="en"
+>
+  <section class="section">
+    <div class="container research-detail">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Multimodal Intelligent Collaborative Robot</h1>
+        <span class="status-badge">Ongoing</span>
+        <p class="detail-subtitle">
+          Using speech as the human-robot interaction interface, combining speech recognition, semantic understanding, visual perception, and action generation for intuitive collaborative robot control with continual learning.
+        </p>
+      </header>
+
+      <!-- Overview -->
+      <h2 class="detail-heading">Overview</h2>
+      <p class="detail-paragraph">
+        This research proposes SC-TinyVLA (Speech-Guided Vision-Language-Action), using speech as the human-robot interaction interface to enable users to directly control collaborative robots for task execution. The system integrates speech recognition, semantic understanding, visual perception, and action generation, parsing spoken instructions into executable sub-tasks and generating continuous motion trajectories to improve the intuitiveness and flexibility of collaborative robot operation. Furthermore, this research introduces a continual learning mechanism, allowing the robot to retain existing capabilities while learning new tasks, moving toward a more general-purpose, extensible, and real-time human-collaborative intelligent robot system.
+      </p>
+
+      <!-- Research Videos -->
+      <h2 class="detail-heading">Research Videos</h2>
+      <div class="video-grid">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/nqBpncJ1CdU"
+            title="Multimodal Intelligent Collaborative Robot — Research Video 1"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/dTz-dM_4VZY"
+            title="Multimodal Intelligent Collaborative Robot — Research Video 2"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- Core Technologies -->
+      <h2 class="detail-heading">Core Technologies</h2>
+      <ul class="tech-tags">
+        <li class="tech-tag">Vision-Language-Action Models</li>
+        <li class="tech-tag">PyBullet</li>
+        <li class="tech-tag">Sim-to-Real</li>
+        <li class="tech-tag">Continual Learning</li>
+        <li class="tech-tag">Robotic Arm Integration</li>
+      </ul>
+
+      <!-- Research Highlights -->
+      <h2 class="detail-heading">Research Highlights</h2>
+      <ul class="highlight-list">
+        <li class="highlight-item">
+          <strong>Sim-to-Real validation capability:</strong> The system has been verified on both simulated environments and a real collaborative robot for toy train assembly and storage cabinet assembly tasks, preliminarily demonstrating the feasibility of transferring from virtual data to physical robot operation.
+        </li>
+        <li class="highlight-item">
+          <strong>Real-time interruption and task switching:</strong> Unlike fixed-trajectory execution approaches, this research also emphasizes real-time controllability during task execution, allowing humans to issue stop, switch, or resume commands mid-process to enhance collaboration flexibility.
+        </li>
+      </ul>
+
+      <!-- Related Publications -->
+      <h2 class="detail-heading">Related Publications</h2>
+      <ul class="pub-list">
+        <li class="pub-item">
+          J.-Y. Wu, G.-T. Chen, C.-W Huang, <strong>S.-T. Wang</strong>, and I.-H. Li, "Virtual Training Framework for Multimodal Task-Oriented Robot Learning with Sim-to-Real Validation," in <em>International Automatic Control Conference (CACS)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>S.-T. Wang</strong>, I.-H. Li, and L.-W. Lee, "Enhancing Robotic Task Execution with Lite IDTN: A Multimodal Approach to Flexible Instruction Processing," in <em>International Conference on Advanced Machine Learning and Data Science (AMLDS)</em>, 2025.
+        </li>
+        <li class="pub-item">
+          <strong>王詩婷</strong>、李聯旺、李宜勳，"利用 Lite IDTN 增強機器人任務執行：一種多模態的靈活指令處理方法," in <em>National Symposium on System Science and Engineering (NSSSE)</em>, 2025.
+        </li>
+      </ul>
+
+      <!-- Related Timeline -->
+      <h2 class="detail-heading">Related Timeline</h2>
+      <ul class="timeline-list">
+        <li class="timeline-item">
+          <span class="timeline-date">2025/11/22</span>
+          <span class="timeline-text">Mentored students Chen Guan-Ting, Wu Zhen-Yun, and Huang Cheng-Wei advanced to the finals of the "2025 NCHU AI-Empowered Robotics in Smart Manufacturing Competition"</span>
+        </li>
+        <li class="timeline-item">
+          <span class="timeline-date">2025/11/08</span>
+          <span class="timeline-text">Mentored student Wu Zhen-Yun won the CACS Best Presentation Award</span>
+        </li>
+        <li class="timeline-item">
+          <span class="timeline-date">2025/11/06</span>
+          <span class="timeline-text">Mentored students Huang Cheng-Wei, Chen Guan-Ting, Wu Zhen-Yun, and Shi Qi-En won the Silver Award at the "114th Precision Engineering Project and Paper Award"</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .research-detail {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: #fef3c7;
+    color: #92400e;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--space-3);
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Video grid for multiple videos */
+  .video-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  /* Video embed (responsive 16:9) */
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Tech tags */
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+  }
+
+  .tech-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    border-radius: var(--border-radius);
+  }
+
+  /* Highlights */
+  .highlight-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .highlight-item {
+    position: relative;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .highlight-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+  }
+
+  .highlight-item strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Publication list */
+  .pub-list {
+    list-style: disc;
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .pub-item {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .pub-item strong {
+    color: var(--color-heading);
+  }
+
+  .pub-item em {
+    color: var(--color-text-secondary);
+  }
+
+  /* Related Timeline */
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    list-style: none;
+    padding: 0;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .timeline-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .timeline-date {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+    min-width: 6rem;
+  }
+
+  .timeline-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+</style>

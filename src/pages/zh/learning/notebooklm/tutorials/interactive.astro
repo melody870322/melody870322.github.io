@@ -1,0 +1,418 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM 學習互動功能"
+  description="學習卡幫你把知識拆小、反覆記熟；測驗則幫你正式檢查自己到底會不會。兩者搭配，讓複習變得更有參與感。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container nb-interactive">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">學習互動功能：把靜態資料變成可以練習的學習工具</h1>
+        <p class="detail-subtitle">
+          把資料上傳到 NotebookLM 之後，它不只是幫你整理重點，還能進一步把內容
+          轉成可以實際練習的互動工具。對很多人來說，真正困難的不是「看過資料」，
+          而是<strong>「有沒有真的記住、能不能說得出來、會不會用」</strong>。
+          NotebookLM 提供的學習卡和測驗，就是把原本偏靜態的閱讀內容，
+          轉成更有參與感的複習方式。這兩項功能都會根據你筆記本中的來源生成，
+          並且都位在右側的 <strong>Studio 面板</strong>。
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">操作說明</span>
+          若要建立或刪除學習卡與測驗，使用者需要擁有該筆記本的<strong>編輯權限</strong>；
+          另外，生成時系統會在背景完成產出，不會打斷你手上的其他操作。
+        </p>
+      </header>
+
+      <!-- Section 1: Two tools overview -->
+      <h2 class="detail-heading">兩種工具，對應兩個學習階段</h2>
+      <p class="detail-paragraph">
+        學習卡和測驗看起來像是兩個獨立的小工具，但實際上它們剛好對應兩個不同的學習階段：
+        先把知識拆小、建立熟悉感，再進一步檢查自己是否真的理解。
+      </p>
+
+      <div class="feature-grid feature-grid--two">
+        <article class="feature-card">
+          <p class="feature-index">第一步</p>
+          <h3 class="feature-title">學習卡</h3>
+          <p class="feature-alias">先把重點一張一張記起來</p>
+          <p class="feature-desc">
+            把知識切小，用問答式卡片<strong>反覆練習</strong>，
+            適合記憶名詞解釋、重要概念、關鍵日期、流程步驟，
+            或任何需要先建立基本熟悉度的內容。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">第二步</p>
+          <h3 class="feature-title">測驗</h3>
+          <p class="feature-alias">正式檢查自己到底會不會</p>
+          <p class="feature-desc">
+            把來源內容整理成可作答的互動題目，讓你<strong>從閱讀進入答題</strong>，
+            發現哪些地方看似懂了，其實還不夠穩。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Flashcards -->
+      <h2 class="detail-heading">學習卡：把重點拆成一張一張可反覆練習的記憶卡</h2>
+      <p class="detail-paragraph">
+        學習卡很適合用在「先把知識切小，再反覆記熟」的情境裡。NotebookLM 會根據你上傳的來源，
+        自動整理出一組問答式卡片，讓你用一張一張翻看的方式練習重點。
+        和直接看摘要不太一樣，學習卡的好處在於它會逼你先停下來想一下，再決定自己是不是真的會。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">生成前可調整的項目</p>
+        <p class="concept-card__body">
+          進入筆記本後，在 Studio 面板選擇<strong>「學習卡」</strong>就能開始生成。
+          如果你想讓內容更貼近需求，可以調整以下選項：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>設定難度</strong>——簡單、中等、困難。</li>
+          <li><strong>輸入提示詞</strong>——告訴 NotebookLM 你希望它用什麼角度出卡，例如偏基礎入門、重點總複習，或聚焦某種特定用途。</li>
+          <li><strong>調整卡片數量</strong>——較少、標準、較多。</li>
+        </ul>
+        <p class="concept-card__footer">
+          這讓學習卡不只是固定的一套題目，而是可以依照你的複習節奏去調整。
+        </p>
+      </section>
+
+      <section class="concept-card">
+        <p class="concept-card__label">練習時的進度追蹤</p>
+        <p class="concept-card__body">
+          學習卡不只是把卡片做出來而已。你在練習時，可以把每張卡標記成：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>「學會了」</strong>（綠色勾勾）——代表這張你已經掌握。</li>
+          <li><strong>「請繼續挑戰」</strong>（紅色叉叉）——代表這張還需要再練。</li>
+        </ul>
+        <p class="concept-card__footer">
+          系統會記住你的進度，就算中途離開，之後再回來也能接著練。
+          做完一輪之後，還能選擇再練一次——不只可以重做全部卡片，
+          也可以<strong>只練剛剛沒記熟的那些卡</strong>。
+          這對於需要反覆加強某些弱點的人來說很方便，不用每次都從頭全部重來。
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        通常我們會把學習卡定位成<strong>「最適合用來建立熟悉度的第一步」</strong>。
+        它很適合放在正式閱讀之後、測驗之前，先幫自己把零散重點一張一張記起來。
+        對於準備考試、內部培訓、課程複習、證照準備，甚至是新進人員熟悉專有名詞，
+        這種形式都很有用。它不是要一次測出你多厲害，而是先讓你把知識慢慢記熟。
+      </p>
+
+      <!-- Section 3: Quiz -->
+      <h2 class="detail-heading">測驗：把複習變成一次真正的自我檢查</h2>
+      <p class="detail-paragraph">
+        如果學習卡比較像是「一張一張記重點」，那測驗更像是「正式檢查自己到底會不會」。
+        NotebookLM 的「測驗」會把來源內容整理成可作答的互動題目，讓你不是只停留在看過、翻過，
+        而是要真的做答。這對需要檢視理解程度的人特別有幫助，因為很多內容在閱讀時看起來好像懂了，
+        但一旦進入答題狀態，才會發現哪些地方其實還不夠穩。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">生成方式和學習卡很接近</p>
+        <p class="concept-card__body">
+          你一樣是在 Studio 面板選擇<strong>「測驗」</strong>，也可以設定難度與提示詞，
+          讓題目更符合你的程度或用途。完成後，系統同樣也支援在背景生成，不需要停下目前的操作。
+          這樣的設計很適合在同一份筆記本裡，先用聊天整理資料，再直接接著做測驗。
+        </p>
+      </section>
+
+      <section class="concept-card">
+        <p class="concept-card__label">不只是「答對或答錯」</p>
+        <p class="concept-card__body">
+          測驗功能提供的是一套完整的自我檢核流程，而不是每答錯一題就即時跳出完整解析。
+          作答過程中的輔助包括：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>提示</strong>——當你一時沒有頭緒時，可以先拿到一些思考提示。</li>
+          <li><strong>說明</strong>——進一步查看答錯的原因。</li>
+          <li><strong>結果</strong>——做完整份測驗後，NotebookLM 會顯示你的結果。</li>
+          <li><strong>重做</strong>——可以選擇「重頭檢查」或「再測一次」。</li>
+        </ul>
+        <p class="concept-card__footer">
+          總而言之，它提供的會是<strong>「提示、說明、結果與重做」</strong>這種完整的自我檢核流程。
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        通常我們會把測驗功能定位成<strong>「從記憶走向驗收的第二步」</strong>。
+        前面先用學習卡把重點記熟，後面再用測驗檢查自己是不是真的掌握住。
+        兩者搭配起來，會比單純看摘要或反覆讀筆記更有參與感，也更容易發現自己卡住的地方。
+      </p>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">兩者搭配，讓複習變成有步驟的過程</h2>
+      <blockquote class="pullquote pullquote--primary">
+        學習卡適合先把知識拆小、建立熟悉感；測驗則適合進一步檢查自己是否真的理解。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        如果把這兩項功能放在一起看，學習卡和測驗其實剛好對應兩個不同階段。
+        先用學習卡把零散重點一張一張記起來，再用測驗確認自己是否真的掌握住——
+        讓 NotebookLM 不只幫你整理資料，也能陪你把知識<strong>真正內化成自己的東西</strong>。
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-interactive {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (two tools overview) */
+  .feature-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--two {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .feature-grid--two {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+  }
+</style>

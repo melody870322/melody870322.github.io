@@ -1,0 +1,758 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM 運作原理與使用觀念"
+  description="NotebookLM 和一般聊天機器人最大的差別，不是它比較會聊天，而是它會先讀你的資料、再根據這些資料回答你。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container nb-principles">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">運作原理與使用觀念</h1>
+        <p class="detail-subtitle">
+          它不是一個什麼都懂的聊天機器人，而是一個會先讀你給它的資料，再陪你整理、說明與引用的學習工具。
+        </p>
+      </header>
+
+      <!-- Section 1: Why it matters now -->
+      <h2 class="detail-heading">為什麼現在很多人開始用 NotebookLM？</h2>
+      <p class="detail-paragraph">
+        近年來，越來越多人用 AI 來整理資料、寫摘要、回答問題。這些工具確實很方便，
+        但也有一個明顯的問題：它們有時會說出看起來很合理、其實不一定正確的內容。
+        尤其是在教學、閱讀理解、研究整理，或是需要根據資料做判斷的情境裡，
+        如果資訊沒有根據，就很容易讓人誤解。
+      </p>
+      <p class="detail-paragraph">
+        NotebookLM 之所以受到重視，就是因為它不是單純靠模型自己的記憶來回答，
+        而是<strong>會先根據使用者提供的資料，再進行整理、說明與引用</strong>。
+        也就是說，它比較像一位「先看過你的教材、筆記或文件，再陪你討論」的學習助理，
+        而不是一位什麼都直接回答的聊天機器人。
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-card--muted">
+          <p class="compare-label">一般生成式 AI</p>
+          <p class="compare-title">靠自己的記憶回答</p>
+          <p class="compare-desc">
+            講話流暢、回答快速，但不一定每一段內容都有明確根據。
+            有時候會把記得不夠準的資訊，組合成看起來很完整的回答。
+          </p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">NotebookLM</p>
+          <p class="compare-title">先讀資料，再回答</p>
+          <p class="compare-desc">
+            回答範圍比較清楚。它先讀過你放進去的來源，
+            再根據這些來源回答問題、整理內容、產生摘要，並附上引用讓你能回查。
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 2: Core difference -->
+      <h2 class="detail-heading">它的核心差別：先看你的資料，再回答你</h2>
+      <p class="detail-paragraph">
+        NotebookLM 和一般聊天機器人最大的不同，不是它比較會聊天，而是<strong>它的回答範圍比較清楚</strong>。
+        使用時，你會先把自己的資料放進一個 notebook——可能是 PDF、網站、Google 文件、
+        Google 簡報、YouTube 影片或音訊內容——NotebookLM 會先讀過這些來源，
+        再根據這些來源來回答問題、整理內容、產生摘要。
+      </p>
+      <p class="detail-paragraph">
+        換句話說，它的重點不是「它本來知道什麼」，
+        而是<strong>「它能不能根據你交給它的資料，把內容整理得更清楚」</strong>。
+        這樣的設計很適合用在各種需要閱讀與理解的情境，因為使用者比較能掌握：
+        目前討論的內容，到底是從哪些教材、哪幾份文件或哪一些來源來的。
+      </p>
+
+      <!-- Section 3: How it works -->
+      <h2 class="detail-heading">它是怎麼運作的？四個步驟</h2>
+      <p class="detail-paragraph">
+        你可以把 NotebookLM 的運作想成四個步驟。它並不是把原文機械式地貼給你，
+        而是走完一個完整的「閱讀 → 整理 → 回答」流程。
+      </p>
+
+      <ol class="loop-list">
+        <li class="loop-step">
+          <span class="loop-num">1</span>
+          <div class="loop-body">
+            <h3 class="loop-title">先放入資料</h3>
+            <p class="loop-desc">
+              你先建立一個 notebook，把想閱讀或分析的來源放進去。
+              這些資料會成為這本 notebook 之後所有回答的主要依據。
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">2</span>
+          <div class="loop-body">
+            <h3 class="loop-title">先理解整體內容</h3>
+            <p class="loop-desc">
+              系統會先讀過這些來源，幫你抓出大意，並生成初步摘要。
+              這一步的目的，是讓你能快速進入內容，而不是一開始就被大量原文淹沒。
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">3</span>
+          <div class="loop-body">
+            <h3 class="loop-title">根據問題找重點</h3>
+            <p class="loop-desc">
+              當你提出問題時，NotebookLM 會從你提供的來源裡，
+              找出和這個問題<strong>最相關的段落</strong>，而不是整份文件都丟回來。
+            </p>
+          </div>
+        </li>
+        <li class="loop-step">
+          <span class="loop-num">4</span>
+          <div class="loop-body">
+            <h3 class="loop-title">整理成容易理解的回答</h3>
+            <p class="loop-desc">
+              它會把找到的內容整理成比較好懂的說明，並<strong>附上引用</strong>，
+              讓你可以回去看原文。所以它不是單純的搜尋工具，也不是完全自由發揮的聊天機器人，
+              而是介於兩者之間。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section 4: RAG concept -->
+      <h2 class="detail-heading">用「RAG」的概念來理解，會最容易懂</h2>
+      <p class="detail-paragraph">
+        如果想用一個比較有系統的觀念來介紹 NotebookLM，那麼 RAG 會是很好的切入點。
+        RAG（Retrieval-Augmented Generation）可以簡單理解成：
+        <strong>模型在回答問題前，不是只靠自己本來記得的內容，而是會先去外部資料裡找資料，再根據找到的內容來生成回答</strong>。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">套用到 NotebookLM</p>
+        <p class="concept-card__body">
+          NotebookLM 的「外部資料」不是整個網路，也不是某個大型公開資料庫，
+          而是<strong>使用者自己上傳的那些來源</strong>。
+          所以你可以把它理解成一種很適合閱讀、教學與資料整理情境的資料導向式生成工具：
+          它不是脫離文本去回答，而是盡量回到文本來回答。
+        </p>
+      </section>
+
+      <blockquote class="pullquote">
+        AI 不是取代閱讀，而是幫助閱讀；不是直接替你思考，而是幫你更快找到值得思考的地方。
+      </blockquote>
+
+      <!-- Section 5: Why suits learning -->
+      <h2 class="detail-heading">為什麼特別適合閱讀、教學與研究？</h2>
+      <p class="detail-paragraph">
+        NotebookLM 很適合學習情境，原因不只是它可以整理資料，
+        而是它的整體設計本來就很貼近「閱讀與理解」這件事。
+        當資料很多、篇幅很長時，人們常常會卡在三個地方：
+      </p>
+
+      <div class="feature-grid feature-grid--three">
+        <article class="feature-card">
+          <p class="feature-index">卡點 01</p>
+          <h3 class="feature-title">不知道從哪裡開始看</h3>
+          <p class="feature-alias">資料量太大，難以進入</p>
+          <p class="feature-desc">
+            NotebookLM 能先生成摘要與導讀，幫助你建立整體感，
+            不用一開始就被大量原文淹沒。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">卡點 02</p>
+          <h3 class="feature-title">不知道重點在哪</h3>
+          <p class="feature-alias">內容看過但抓不到骨架</p>
+          <p class="feature-desc">
+            可以透過提問、主題整理與跨資料比較，
+            幫助你把不同來源的核心觀點對齊、整理成比較清楚的層次。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">卡點 03</p>
+          <h3 class="feature-title">不確定理解有沒有偏掉</h3>
+          <p class="feature-alias">讀完了，但不知道對不對</p>
+          <p class="feature-desc">
+            它的回答會附上引用，讓你能回到原文查核。
+            這比「直接得到答案」更有價值，因為它能幫你練習
+            <strong>閱讀、理解和查核</strong>的能力。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 6: Long context -->
+      <h2 class="detail-heading">為什麼能一次處理很多資料？</h2>
+      <p class="detail-paragraph">
+        NotebookLM 能讀長文件、整合多份來源，並在同一個主題下持續對話，
+        這和它背後模型的<strong>長上下文能力</strong>有關。
+      </p>
+      <p class="detail-paragraph">
+        你可以把「長上下文」想成一種「一次能記住很多內容」的能力。
+        一般工具如果一次只能看到很短的內容，就很難處理整包教材、整份研究資料，
+        或是多篇文章的綜合比較。NotebookLM 比較擅長在同一個 notebook 裡維持較長的討論脈絡，
+        所以更適合處理大型文件集合。這也是它和一般單輪問答工具很不一樣的地方：
+        <strong>它不是只回答一個問題，而是能在同一份資料基礎上，陪你一路往下問、一路往下整理</strong>。
+      </p>
+
+      <!-- Section 7: Why it can still err -->
+      <h2 class="detail-heading">既然它會引用，為什麼還是可能出錯？</h2>
+      <p class="detail-paragraph">
+        這是很多人第一次接觸 NotebookLM 時最容易誤會的地方。
+        很多人會想：「既然它是根據我上傳的資料回答、還有引用，那是不是就完全不會錯？」
+        答案是：<strong>不是</strong>。
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">為什麼還是可能出錯</p>
+        <p class="caution-card__body">
+          NotebookLM 雖然是根據你的來源回答，但它不是把原文機械式地貼出來，
+          而是會經過幾個步驟：<strong>先找資料、再理解內容、再整理成一句比較好懂的回答</strong>。
+          只要有這些步驟，就還是可能出現誤差。
+        </p>
+        <ul class="caution-card__list">
+          <li>抓到的段落不一定是最關鍵的那一段。</li>
+          <li>讀到的是正確內容，但整理時講得太滿。</li>
+          <li>原本比較保留的語氣，被說得太肯定。</li>
+        </ul>
+        <p class="caution-card__footer">
+          這些都不是完全脫離資料亂講，但仍然可能造成理解上的偏差。所以 NotebookLM 的真正價值，
+          不在於「保證零錯誤」，而在於<strong>讓你比較容易查核</strong>。
+          引用的目的是幫助你回到原文，而不是讓你從此不用看原文。
+        </p>
+      </section>
+
+      <!-- Section 8: Correct mindset -->
+      <h2 class="detail-heading">正確的使用心態</h2>
+      <p class="detail-paragraph">
+        如果要用一句話說明 NotebookLM 最適合的用法，那就是：
+      </p>
+
+      <blockquote class="pullquote pullquote--primary">
+        把它當成閱讀助理，而不是最終裁判。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        它很適合幫你快速掌握重點、整理主題、設計提問方向、比較不同資料之間的差異，
+        也很適合把一份本來很難進入的資料，先轉成比較容易理解的形式。
+        但如果涉及<strong>正式報告、教學內容、重要概念或研究結論</strong>，
+        最好的做法仍然是回到原文再確認一次。
+        也就是說，NotebookLM 可以幫你加快理解，但<strong>不該取代查核</strong>。
+      </p>
+
+      <!-- Section 9: Advanced features -->
+      <h2 class="detail-heading">進階功能，是為了幫助理解，而不是增加花樣</h2>
+      <p class="detail-paragraph">
+        NotebookLM 不只可以回答問題，也能把資料轉成不同形式，
+        例如摘要、筆記、導讀、音訊內容、重點整理或其他學習輔助形式。
+        這些功能真正重要的地方，不是讓畫面看起來更豐富，
+        而是讓<strong>同一份內容可以用不同方式進入</strong>。
+      </p>
+      <p class="detail-paragraph">
+        有人比較適合先聽、再讀；有人比較適合先看摘要、再回頭看原文；
+        有人則需要透過提問和比較，才會真正理解。
+        從教學或內容整理的角度來看，這些功能很有用，因為它們等於是把同一份材料轉成多種入口。
+        對不同背景、不同程度、不同使用習慣的人來說，這種彈性很有幫助。
+      </p>
+
+      <!-- Section 10: Four takeaways -->
+      <h2 class="detail-heading">理解 NotebookLM，真正要建立的四個觀念</h2>
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">1</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">它以你提供的資料為主</h4>
+            <p class="start-step__desc">
+              NotebookLM 的回答是以使用者提供的資料為主，而不是隨意從外部世界自由發揮。
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">2</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">有幫助，但不代表永不出錯</h4>
+            <p class="start-step__desc">
+              它很適合幫助閱讀、整理、提問與複習，但這不代表它永遠不會出錯。
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">3</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">引用不是裝飾，是為了查核</h4>
+            <p class="start-step__desc">
+              它的引用之所以重要，是因為引用的目的不是裝飾，而是幫助你回去比對原文。
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">4</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">它不是答案產生器</h4>
+            <p class="start-step__desc">
+              最好的使用方式不是把它當成答案產生器，而是把它當成一個能陪你理解資料的工具。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <p class="takeaway__lead">
+          NotebookLM 不是一個什麼都懂的聊天機器人，而是一個
+          <strong>會先讀你給它的資料，再幫你整理與說明</strong>的學習工具。
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-principles {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Compare cards */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-4);
+  }
+
+  .compare-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Loop list (4 steps) */
+  .loop-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .loop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .loop-step:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  .loop-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .loop-body {
+    flex: 1;
+  }
+
+  .loop-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .loop-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Concept card (for RAG explanation) */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.7;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Feature grid (used for three bottlenecks) */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card (for "why it can still err") */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .caution-card__list {
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .caution-card__footer {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--color-border);
+  }
+
+  .caution-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Start steps (four takeaways) */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Final takeaway */
+  .takeaway {
+    margin-top: var(--space-6);
+    padding: var(--space-8);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .takeaway__lead {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .takeaway__lead strong {
+    color: var(--color-accent);
+  }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .feature-grid--three {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid,
+    .feature-grid,
+    .feature-grid--three {
+      grid-template-columns: 1fr;
+    }
+
+    .loop-step {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .loop-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .takeaway {
+      padding: var(--space-6);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

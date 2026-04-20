@@ -1,0 +1,1001 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="MCP：讓 Claude Code 接上外部工具"
+  description="從基礎安裝到進階 Notion 整合——學會用 MCP 把 Claude Code 接上資料庫、設計工具、文件工具，甚至其他 API。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-mcp">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 接上工具、學會新招，把重複工作自動化</h1>
+        <p class="detail-subtitle">
+          前面我們已經幫 Claude Code 建好基本規則，像是 CLAUDE.md、記憶整理、上下文管理。
+          接下來這一階段，重點不是再把更多東西塞進手冊，而是學會幫 Claude Code 加能力。
+          有些能力是讓它看得到外部工具，有些是讓它學會固定流程，有些是把大工作拆出去做，
+          還有一些是把重複動作直接自動化。這些能力各自有分工，不是同一種東西。
+        </p>
+      </header>
+
+      <!-- Section 1: MCP 是什麼 -->
+      <h2 class="detail-heading">MCP：讓 Claude Code 接上外部工具</h2>
+      <p class="detail-paragraph">
+        MCP 可以把 Claude Code 跟外部服務接起來，像是資料庫、設計工具、文件工具、
+        監控工具，甚至其他 API。裝好之後，Claude Code 就不只是「看你貼給它的內容」，
+        而是真的能直接去讀那些系統的資料，或使用那些工具做事。
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">白話理解</p>
+        <p class="info-body">
+          MCP 就像一條 USB 傳輸線。Claude Code 是電腦，外部服務是周邊設備。
+          接上之後，Claude Code 就能直接操作那些設備。
+        </p>
+      </div>
+
+      <!-- Section 2: 常用指令 -->
+      <h2 class="detail-heading">常用指令</h2>
+      <p class="detail-paragraph">
+        以下三個指令在 VS Code 整合終端機裡執行：
+      </p>
+
+      <div class="cmd-list">
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">1</span>
+            <div>
+              <h3 class="cmd-title">claude mcp add &lt;參數&gt;</h3>
+              <p class="cmd-alias">新增一台 MCP server</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">2</span>
+            <div>
+              <h3 class="cmd-title">claude mcp get &lt;server-name&gt;</h3>
+              <p class="cmd-alias">檢查某一台 MCP server 的狀態</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">3</span>
+            <div>
+              <h3 class="cmd-title">claude mcp list</h3>
+              <p class="cmd-alias">查看目前所有 MCP 的清單</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Section 3: 基礎安裝教學 (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">MCP 基礎安裝與測試教學</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            如果你是用 VS Code，而且又是在 Windows，最穩的做法是直接用 <strong>project scope</strong>。
+          </p>
+
+          <div class="tip-card">
+            <p class="tip-title">為什麼推薦 Project Scope？</p>
+            <ul class="tip-list">
+              <li>project scope 會把 MCP 設定寫到專案根目錄的 <code>.mcp.json</code>，容易檢查。</li>
+              <li>官方文件明確寫了：project-scoped MCP servers 存在 <code>.mcp.json</code>，
+                user 和 local scope 則是存在 <code>~/.claude.json</code> 裡。
+                在 Windows 上，VS Code extension 讀專案路徑時可能用小寫 <code>c:/...</code>，
+                但 CLI 寫進 <code>~/.claude.json</code> 時是大寫 <code>C:/...</code>，
+                導致 extension 找不到那段設定而失敗。</li>
+            </ul>
+          </div>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">用 VS Code 打開一個資料夾</h3>
+                <p class="step-desc">
+                  先開一個新的資料夾，像是 <code>test-basic-mcp</code>，這就是這次測試的專案根目錄。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">先確認環境正常</h3>
+                <p class="step-desc">
+                  很多本機 MCP server 都是靠 Node.js 啟動的，所以先確認能用。在 VS Code 整合終端機輸入：
+                </p>
+                <pre class="code-block"><code>claude --version
+node --version</code></pre>
+                <p class="step-desc">如果兩個都有正常顯示版本號，就可以繼續。</p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 .mcp.json</h3>
+                <p class="step-desc">
+                  在專案根目錄建立 <code>.mcp.json</code>，貼入以下內容：
+                </p>
+                <pre class="code-block"><code set:html={`{
+  "mcpServers": {
+    "everything-test": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-everything"]
+    }
+  }
+}`} /></pre>
+                <div class="note-card">
+                  <p class="note-body">
+                    <strong>everything-test</strong> 是你幫這台 MCP server 取的名字。
+                    在 Windows 上，用 npx 啟動本機 MCP server 時，官方文件建議用 <code>cmd /c</code> 包起來。
+                    <strong>stdio</strong> 代表 Claude Code 會直接啟動這個本機程序，透過標準輸入輸出和它溝通，
+                    這是 MCP 的標準本機 transport 之一。
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">建立 .claude/settings.local.json</h3>
+                <p class="step-desc">
+                  在專案根目錄建立 <code>.claude/settings.local.json</code>，貼入以下內容：
+                </p>
+                <pre class="code-block"><code set:html={`{
+  "enabledMcpjsonServers": ["everything-test"]
+}`} /></pre>
+                <p class="step-desc">
+                  這一步很重要。因為 project scope 的 MCP server 需要被批准，
+                  <code>enabledMcpjsonServers</code> 就是用來批准 <code>.mcp.json</code> 裡特定的 server。
+                </p>
+                <div class="note-card">
+                  <p class="note-body">
+                    如果你想偷懶，也可以改用：<code set:html={`{ "enableAllProjectMcpServers": true }`} />，
+                    自動批准這個專案裡 <code>.mcp.json</code> 的所有 MCP servers。
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">重新載入 VS Code 視窗</h3>
+                <p class="step-desc">
+                  按 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>，輸入
+                  <code>Developer: Reload Window</code>，按 Enter。
+                  讓 VS Code extension 重新讀到你剛新增的設定檔。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">先做「看工具」測試</h3>
+                <p class="step-desc">在 Claude Code 聊天框輸入：</p>
+                <pre class="code-block code-block--command"><code>請先列出目前 everything-test 這台 MCP server 可用的工具名稱，不要猜，直接用實際可用的工具回覆。</code></pre>
+                <p class="step-desc">
+                  如果 Claude Code 能列出工具，代表這台 MCP server 已經真的被載進來了。
+                </p>
+                <img class="step-screenshot" src="/learning/claude-code/先做「看工具」測試.jpg" alt="Claude Code 列出 everything-test MCP server 的 15 個可用工具" />
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">再做「真正呼叫工具」測試</h3>
+                <p class="step-desc">在 Claude Code 聊天框輸入：</p>
+                <pre class="code-block code-block--command"><code>請使用 everything-test 做一個最簡單的 MCP 測試，並把結果回傳給我。</code></pre>
+                <p class="step-desc">
+                  如果 Claude Code 成功呼叫工具並回傳結果，代表你的 MCP 已經接好了。
+                </p>
+                <img class="step-screenshot" src="/learning/claude-code/再做「真正呼叫工具」測試.jpg" alt="Claude Code 成功呼叫 everything-test 的 echo 工具並回傳結果" />
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Section 4: 進階教學 Notion (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">MCP 進階教學測試：把 Claude Code 接到 Notion</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            如果前面的 everything-test 是在學「MCP 怎麼接」，這一段則是在學「MCP 接好之後，
+            平常到底能拿來幹嘛」。選擇 Notion 作為示範，是因為它本來就常被拿來放筆記、
+            專案規劃、待辦、會議記錄。接好之後，Claude Code 就不只是看你貼進來的內容，
+            而是真的能幫你去 Notion 找頁面、整理內容、幫你寫草稿，甚至更新頁面。
+          </p>
+
+          <div class="compare-grid">
+            <div class="compare-card">
+              <p class="compare-label">前一段：基礎教學</p>
+              <p class="compare-title">本機 stdio server</p>
+              <p class="compare-desc">測試 MCP 機制是否能正常運作。</p>
+            </div>
+            <div class="compare-card compare-card--accent">
+              <p class="compare-label">這一段：進階教學</p>
+              <p class="compare-title">遠端 HTTP server</p>
+              <p class="compare-desc">官方 Notion MCP 端點，用 OAuth 登入授權。</p>
+            </div>
+          </div>
+
+          <div class="tip-card">
+            <p class="tip-title">開始前先確認</p>
+            <ul class="tip-list">
+              <li>一個 Notion 帳號，並能打開頁面</li>
+              <li>Claude Code 可以正常使用</li>
+              <li>建議先開一個新的測試資料夾，例如 <code>test-notion-mcp</code></li>
+              <li>確認 <code>claude --version</code> 和 <code>node --version</code></li>
+            </ul>
+          </div>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">把 Notion MCP 加進目前專案</h3>
+                <p class="step-desc">在 VS Code 整合終端機輸入：</p>
+                <pre class="code-block"><code>claude mcp add --transport http notion --scope project https://mcp.notion.com/mcp</code></pre>
+                <div class="note-card">
+                  <p class="note-body">
+                    這條指令同時做了三件事：
+                    <strong>--transport http</strong> 表示接的是遠端 HTTP MCP server；
+                    <strong>notion</strong> 是你幫這台 MCP server 取的名字；
+                    <strong>--scope project</strong> 表示設定會寫進 <code>.mcp.json</code>。
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">確認 .mcp.json 已出現</h3>
+                <p class="step-desc">
+                  打開 VS Code 左側檔案總管，確認專案根目錄已經出現 <code>.mcp.json</code>。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">重新載入 VS Code 視窗</h3>
+                <p class="step-desc">
+                  按 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>，輸入
+                  <code>Developer: Reload Window</code>，按 Enter。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">在 Claude Code 裡完成授權</h3>
+                <p class="step-desc">
+                  在 Claude Code 聊天框輸入 <code>/mcp</code>，選擇 MCP servers，
+                  找到 notion 這台 server，照畫面提示完成 OAuth 登入。
+                </p>
+                <img class="step-screenshot" src="/learning/claude-code/授權成功.jpg" alt="Notion MCP server 授權成功畫面，顯示 Connected 狀態" />
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">先做「看工具」測試</h3>
+                <p class="step-desc">在 Claude Code 聊天框輸入：</p>
+                <pre class="code-block code-block--command"><code>請先列出目前 notion 這台 MCP server 可用的工具名稱。</code></pre>
+                <p class="step-desc">
+                  先不要急著做事，先看 Claude 有沒有真的看到工具。
+                  如果能列出一串 Notion 相關工具，代表這台 MCP server 已經真的被載進來了。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">再做「讀資料」測試</h3>
+                <p class="step-desc">先從讀資料開始，比較穩。在 Claude Code 聊天框輸入：</p>
+                <pre class="code-block code-block--command"><code>請幫我查看我 Notion 裡最近可以存取的頁面，列出標題給我。</code></pre>
+                <p class="step-desc">
+                  如果成功，Claude 會真的去 Notion 抓資料，而不是叫你自己貼內容。
+                  前面「列工具」只能證明它看得到工具；這一步才是真的證明 Claude 能用 Notion MCP
+                  去碰你的 Notion 工作區。
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">實際測試：建立新頁面</h3>
+                <p class="step-desc">讀取成功後，做最有感的測試：</p>
+                <pre class="code-block code-block--command"><code>請在我的 Notion 建立一個新頁面，標題叫做「MCP 測試筆記」。
+內容請寫：
+1. 這是 Claude Code 透過 Notion MCP 建立的頁面
+2. 這次測試的目的是確認 MCP 連線正常
+3. 如果你看到這一頁，代表授權與工具呼叫都成功了</code></pre>
+                <p class="step-desc">
+                  如果成功，Notion 裡就會真的多出一頁新筆記。
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Section 5: 常見問題 (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">最常遇到的問題與解法</span>
+        </summary>
+        <div class="collapsible-body">
+          <div class="faq-list">
+            <article class="faq-card">
+              <h3 class="faq-q">claude mcp list 顯示 No MCP servers configured，但 claude mcp get everything-test 顯示 Connected</h3>
+              <p class="faq-a">
+                這不一定代表你的 MCP 沒接好。
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">解法</p>
+                <ul class="faq-solution-list">
+                  <li>先相信 <code>claude mcp get everything-test</code> 的結果</li>
+                  <li>直接去聊天框做真實測試</li>
+                  <li>不要只靠 <code>list</code> 來判斷成敗</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="faq-card">
+              <h3 class="faq-q">Claude Code 說 server 已安裝，但工具沒有出現在可用工具裡</h3>
+              <p class="faq-a">
+                可能原因：<code>.mcp.json</code> 有了，但這個 session 還沒重新載入；
+                project MCP 還沒被批准；你還在沿用舊對話。
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">解法</p>
+                <ul class="faq-solution-list">
+                  <li>確認 <code>.claude/settings.local.json</code> 裡有正確的批准設定</li>
+                  <li>重新載入 VS Code 視窗（<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → Developer: Reload Window）</li>
+                  <li>開一個新對話</li>
+                  <li>先問 Claude：「請列出 everything-test 可用的工具名稱」</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>MCP</strong>：讓 Claude Code 接上外部服務的橋樑，裝好就能直接操作外部工具。</li>
+          <li><strong>stdio</strong>：本機 MCP server 的標準連接方式，適合測試和開發工具。</li>
+          <li><strong>HTTP + OAuth</strong>：遠端雲端服務的連接方式，像是 Notion、Gmail 等。</li>
+          <li><strong>project scope</strong>：在 Windows + VS Code 環境下最穩的 MCP 設定方式。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-mcp {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Collapsible sections ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Info card ── */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Command cards ── */
+  .cmd-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .cmd-card {
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .cmd-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .cmd-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .cmd-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .cmd-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .cmd-alias {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-screenshot {
+    display: block;
+    width: 100%;
+    margin-top: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Tip card ── */
+  .tip-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .tip-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .tip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .tip-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .tip-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0 var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Compare grid ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .compare-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* ── FAQ cards ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .faq-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .faq-q {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .faq-a {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-solution {
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .faq-solution-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .faq-solution-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .faq-solution-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .faq-solution-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .tip-list code,
+  .step-desc code,
+  .note-body code,
+  .faq-a code,
+  .faq-solution-list code,
+  .faq-q code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* kbd */
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--color-heading);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 0 var(--color-border);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .compare-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .collapsible-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

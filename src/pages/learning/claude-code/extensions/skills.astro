@@ -1,0 +1,808 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Skills: Turn Repeated Workflows into Reusable Moves"
+  description="Learn how to use SKILL.md to turn repeated workflows into reusable playbooks that Claude Code can invoke via slash commands."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-skills">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Connect Claude Code to Tools, Teach It New Tricks, and Automate Repetitive Work</h1>
+        <p class="detail-subtitle">
+          We've already set up the basics for Claude Code — CLAUDE.md, memory management, context handling.
+          The next stage isn't about stuffing more rules into the handbook. It's about giving Claude Code
+          new abilities. Some let it see external tools, some let it follow fixed workflows, some let it
+          farm out large tasks, and some automate repetitive actions. These abilities each have their own role.
+        </p>
+      </header>
+
+      <!-- Section 1: What are Skills -->
+      <h2 class="detail-heading">Skills: Turn Repeated Workflows into Reusable "Moves"</h2>
+      <p class="detail-paragraph">
+        A Skill is like preparing a reusable playbook for Claude Code. When you have a workflow you keep
+        repeating — like "pre-deploy checklist," "write release notes in a fixed format," or "explain code
+        in a beginner-friendly way" — those are perfect candidates for a Skill.
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">How SKILL.md differs from CLAUDE.md</p>
+        <p class="info-body">
+          CLAUDE.md is loaded every time; SKILL.md is loaded only when needed.<br />
+          So if something isn't needed every session but only "sometimes," putting it in a Skill saves context and keeps things cleaner.
+        </p>
+      </div>
+
+      <!-- Section 2: Personal vs Project -->
+      <h2 class="detail-heading">First Decide: Personal Skill or Project Skill?</h2>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <p class="compare-label">Personal Skill</p>
+          <p class="compare-path">~/.claude/skills/&lt;skill-folder&gt;/SKILL.md</p>
+          <p class="compare-desc">Available across all your projects (personal skills).</p>
+        </div>
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">Project Skill</p>
+          <p class="compare-path">.claude/skills/&lt;skill-folder&gt;/SKILL.md</p>
+          <p class="compare-desc">Only works in the current project.</p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">The following example uses a project Skill.</p>
+
+      <!-- Section 3: Tutorial (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">Step-by-Step: Create a Skill</span>
+        </summary>
+        <div class="collapsible-body">
+          <p class="detail-paragraph">
+            Goal: When someone pastes a piece of code, Claude Code will explain it in a beginner-friendly way —
+            first the purpose, then the flow, then key variables, and finally common misconceptions.
+          </p>
+
+          <ol class="step-list">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <div class="step-body">
+                <h3 class="step-title">Open your project</h3>
+                <p class="step-desc">Open your project folder in VS Code.</p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <div class="step-body">
+                <h3 class="step-title">Create the Skill folder</h3>
+                <p class="step-desc">In VS Code's file explorer, create this folder path:</p>
+                <pre class="code-block"><code>.claude/skills/explain-code/</code></pre>
+                <div class="tip-card">
+                  <p class="tip-title">That means</p>
+                  <ul class="tip-list">
+                    <li>Create a <code>.claude</code> folder in the project root</li>
+                    <li>Create a <code>skills</code> folder inside <code>.claude</code></li>
+                    <li>Create an <code>explain-code</code> folder inside <code>skills</code></li>
+                  </ul>
+                </div>
+                <p class="step-desc">
+                  The standard structure is "one Skill per folder, with at least one <code>SKILL.md</code> inside."
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <div class="step-body">
+                <h3 class="step-title">Create SKILL.md</h3>
+                <p class="step-desc">
+                  Create <code>.claude/skills/explain-code/SKILL.md</code> and paste the following content:
+                </p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: Explain code in a beginner-friendly way. Use this when teaching,
+  walking through code, introducing function flows, or when a user asks
+  "what does this code do."
+---
+
+When explaining code, follow this order:
+
+1. Start with a one-sentence summary of what the code does.
+2. List the execution flow step by step.
+3. Highlight the most important functions, variables, or conditions.
+4. If there's anything easy to confuse, proactively point it out.
+5. End with a "beginner summary."
+
+Rules:
+- Use plain, conversational language
+- Don't start with too much jargon
+- If jargon is needed, explain it briefly
+- First say "what it does," then "how it does it"
+- If the code is incomplete, say so
+- If appropriate, add a simple example to aid understanding
+
+If the user pasted code, answer based on the code.
+If no code was provided, ask them to share a file, function, or snippet.`} /></pre>
+                <div class="note-card">
+                  <p class="note-body">
+                    SKILL.md has two parts: the <strong>YAML frontmatter</strong> tells Claude Code
+                    what this Skill is called and when to use it; the <strong>Markdown content</strong>
+                    is the actual playbook. The <code>name</code> becomes your <code>/slash-command</code>
+                    (in this example, <code>/explain-code</code>), and <code>description</code> helps
+                    Claude Code decide when to auto-load it.
+                  </p>
+                </div>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <div class="step-body">
+                <h3 class="step-title">Save SKILL.md</h3>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <div class="step-body">
+                <h3 class="step-title">Start a new Claude Code conversation</h3>
+                <p class="step-desc">
+                  I recommend starting a fresh conversation to test. This makes it easier to confirm
+                  the latest Skill content is loaded. Skills can be invoked manually or auto-loaded
+                  when relevant.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">6</span>
+              <div class="step-body">
+                <h3 class="step-title">Test the slash command</h3>
+                <p class="step-desc">In the Claude Code chat, type:</p>
+                <pre class="code-block code-block--command"><code>/explain-code</code></pre>
+                <p class="step-desc">Then paste a short code snippet, for example:</p>
+                <pre class="code-block"><code set:html={`function sumPrices(items) {
+  let total = 0;
+  for (const item of items) {
+    total += item.price;
+  }
+  return total;
+}`} /></pre>
+                <p class="step-desc">
+                  If everything is set up correctly, Claude Code will explain the code following your Skill's format.
+                </p>
+              </div>
+            </li>
+
+            <li class="step-item">
+              <span class="step-num">7</span>
+              <div class="step-body">
+                <h3 class="step-title">Test auto-loading</h3>
+                <p class="step-desc">You can also skip the slash command and just type:</p>
+                <pre class="code-block code-block--command"><code>Please explain this code in a beginner-friendly way</code></pre>
+                <p class="step-desc">Then paste the code.</p>
+                <p class="step-desc">
+                  If your <code>description</code> is clear enough, Claude Code may automatically
+                  recognize the request matches <code>explain-code</code> and load it on its own.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Section 4: Common Issues (collapsible) -->
+      <details class="collapsible">
+        <summary class="collapsible-trigger">
+          <span class="collapsible-icon"></span>
+          <span class="collapsible-title">Common Issues &amp; Solutions</span>
+        </summary>
+        <div class="collapsible-body">
+          <div class="faq-list">
+            <article class="faq-card">
+              <h3 class="faq-q">I created the folder, but the slash command (e.g. /explain-code) doesn't work</h3>
+              <p class="faq-a">
+                The two most common causes: the file isn't named <code>SKILL.md</code>, or the frontmatter
+                format is wrong. Every Skill needs a <code>SKILL.md</code> with both frontmatter and
+                Markdown content.
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">Check these three things</p>
+                <ul class="faq-solution-list">
+                  <li>Is the path <code>.claude/skills/explain-code/SKILL.md</code>?</li>
+                  <li>Is the filename exactly <code>SKILL.md</code>?</li>
+                  <li>Does the top have <code>---</code> wrapping the frontmatter?</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="faq-card">
+              <h3 class="faq-q">The folder is called explain-code — does the slash command have to be the same name?</h3>
+              <p class="faq-a">
+                Not necessarily. The <code>name</code> field in frontmatter becomes the slash command.
+                So what really matters is the <code>name</code> in the frontmatter.
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">This is what matters</p>
+                <pre class="code-block"><code set:html={`---
+name: explain-code
+description: ...
+---`} /></pre>
+              </div>
+            </article>
+
+            <article class="faq-card">
+              <h3 class="faq-q">Can a Skill include reference files?</h3>
+              <p class="faq-a">
+                Yes. Skills can have supporting files alongside <code>SKILL.md</code> for Claude Code to use when needed.
+              </p>
+              <div class="faq-solution">
+                <p class="faq-solution-label">For example</p>
+                <pre class="code-block"><code set:html={`.claude/skills/explain-code/
+├── SKILL.md
+└── examples.md`} /></pre>
+                <p class="note-body" style="margin-top: var(--space-3);">
+                  You can put fixed examples or templates in there for future use.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
+
+      <!-- Summary -->
+      <div class="summary-card">
+        <p class="summary-title">Key Takeaways</p>
+        <ul class="summary-list">
+          <li><strong>SKILL.md</strong> — a playbook loaded only when needed, saving context compared to CLAUDE.md.</li>
+          <li><strong>Frontmatter</strong> — <code>name</code> sets the slash command, <code>description</code> enables auto-loading.</li>
+          <li><strong>Personal vs Project</strong> — personal Skills go in <code>~/.claude/skills/</code>, project Skills in <code>.claude/skills/</code>.</li>
+          <li><strong>Standard structure</strong> — one Skill per folder, with at least one <code>SKILL.md</code> inside.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-skills {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Collapsible sections ── */
+  .collapsible {
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .collapsible[open] {
+    border-top-color: #8b5cf6;
+    border-right-color: #8b5cf6;
+    border-bottom-color: #8b5cf6;
+  }
+
+  .collapsible-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color var(--transition);
+  }
+
+  .collapsible-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-trigger:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .collapsible-icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-icon::before,
+  .collapsible-icon::after {
+    content: '';
+    position: absolute;
+    background-color: #8b5cf6;
+    border-radius: 1px;
+  }
+
+  .collapsible-icon::before {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transform: translateY(-50%);
+  }
+
+  .collapsible-icon::after {
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .collapsible[open] .collapsible-icon::after {
+    opacity: 0;
+  }
+
+  .collapsible-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .collapsible-body {
+    padding: var(--space-6);
+  }
+
+  /* ── Info card ── */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* ── Compare grid ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .compare-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-path {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-all;
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* ── Step list (tutorial steps) ── */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Code blocks ── */
+  .code-block {
+    margin: var(--space-3) 0 var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* ── Tip card ── */
+  .tip-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .tip-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .tip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .tip-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .tip-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Note card (inline hint) ── */
+  .note-card {
+    margin: var(--space-3) 0 var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .note-body {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .note-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── FAQ cards ── */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .faq-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .faq-q {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .faq-a {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-solution {
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-bg);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .faq-solution-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .faq-solution-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .faq-solution-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .faq-solution-list li::before {
+    content: '\203A';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ── Summary card ── */
+  .summary-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* ── Inline code ── */
+  .detail-paragraph code,
+  .tip-list code,
+  .step-desc code,
+  .note-body code,
+  .faq-a code,
+  .faq-solution-list code,
+  .faq-q code,
+  .info-body code,
+  .summary-list code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* kbd */
+  kbd {
+    display: inline-block;
+    padding: 0.1em 0.45em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--color-heading);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 0 var(--color-border);
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 720px) {
+    .compare-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .collapsible-body {
+      padding: var(--space-4);
+    }
+
+    .code-block {
+      padding: var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .step-item {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  }
+</style>

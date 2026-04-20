@@ -1,0 +1,742 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Install Claude Code First, Then Connect VS Code to Get Started"
+  description="A step-by-step guide to installing, launching, and signing in to Claude Code on Mac and Windows, with fixes for the most common beginner issues."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-install">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Install Claude Code First, Then Connect VS Code to Get Started</h1>
+        <p class="detail-subtitle">
+          From what to prepare beforehand, to installing on Mac or Windows, signing in to your
+          account, and fixing the most common hiccups — this guide walks you through getting
+          Claude Code up and running, step by step.
+        </p>
+      </header>
+
+      <!-- Overview Diagram -->
+      <h2 class="detail-heading">Quick Overview</h2>
+      <p class="detail-paragraph">
+        The diagram below summarizes the five main stages of the whole process, from preparing
+        your environment to starting your first project — so you can get a sense of the big
+        picture before diving in.
+      </p>
+      <figure class="overview-figure">
+        <img
+          src="/learning/claude-code/install-en.png"
+          alt="Overview diagram of the Claude Code installation and setup flow"
+          loading="lazy"
+        />
+      </figure>
+
+      <!-- Section: Prerequisites -->
+      <h2 class="detail-heading">Before You Start: Two Things to Prepare</h2>
+      <p class="detail-paragraph">
+        Before installing Claude Code, please make sure you have the following two things ready:
+      </p>
+
+      <div class="prep-grid">
+        <div class="prep-card">
+          <p class="prep-index">01</p>
+          <h3 class="prep-title">A project folder</h3>
+          <p class="prep-desc">
+            Create an empty folder on your computer. This will be the workspace where the AI
+            helps you write code and manage files. It is a good idea to put it somewhere easy to
+            find, such as your Desktop or Documents folder.
+          </p>
+        </div>
+        <div class="prep-card">
+          <p class="prep-index">02</p>
+          <h3 class="prep-title">A paid account</h3>
+          <p class="prep-desc">
+            Claude Code currently requires a
+            <strong>Claude Pro</strong> subscription (US$20 per month) or the more advanced
+            <strong>Max</strong> plan. Please sign up and complete the payment on the Claude
+            website first.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section: Mac Install -->
+      <h2 class="detail-heading">Installing on Mac</h2>
+      <p class="detail-paragraph">
+        <span class="platform-badge platform-badge--mac">macOS</span>
+        Installation on a Mac is very simple — all you need is the built-in Terminal app.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Open the Terminal</h3>
+            <p class="step-desc">
+              Press <kbd>⌘</kbd> + <kbd>Space</kbd> to bring up Spotlight, type
+              "Terminal", and press Enter. A window with a black-on-white (or white-on-black)
+              background will appear.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Paste the install command</h3>
+            <p class="step-desc">
+              Copy the command below and paste it into the Terminal window you just opened:
+            </p>
+            <pre class="code-block"><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Press Enter</h3>
+            <p class="step-desc">
+              Your computer will install Claude Code automatically — just wait for it to finish.
+              If any prompt shows up along the way, simply follow the on-screen instructions.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Windows Install -->
+      <h2 class="detail-heading">Installing on Windows</h2>
+      <p class="detail-paragraph">
+        <span class="platform-badge platform-badge--win">Windows</span>
+        Windows installation takes one extra step, so please follow the order carefully.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Install "Git" first (very important!)</h3>
+            <p class="step-desc">
+              On Windows, Claude Code requires Git to be installed before it can run.
+              Search Google for "<strong>Git for Windows</strong>" and download the installer.
+              During installation, you can simply keep clicking "Next" all the way through.
+            </p>
+            <p class="step-note">
+              Quick tip: if you see an option called "<strong>Add to PATH</strong>" during
+              installation, make sure it is checked. After the installation finishes, please
+              close all windows first.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Open "PowerShell"</h3>
+            <p class="step-desc">
+              Click the Windows Start button in the lower-left corner of the screen, type
+              "PowerShell", and open it. A command window with a blue or black background will
+              appear.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Paste the install command</h3>
+            <p class="step-desc">
+              Copy the command below, paste it into the PowerShell window, and press Enter:
+            </p>
+            <pre class="code-block"><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="step-title">Close and "reopen" PowerShell</h3>
+            <p class="step-desc">
+              After the installer finishes, be sure to close the PowerShell window and open a
+              brand new one. This step is needed so your computer can recognize the newly
+              installed tool.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Launch & Login -->
+      <h2 class="detail-heading">Launching and Signing In</h2>
+      <p class="detail-paragraph">
+        Once the installation steps above are done, you are ready to launch Claude Code for the
+        first time.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Call the AI assistant</h3>
+            <p class="step-desc">
+              In the Terminal (or PowerShell) window, type the following command and press Enter:
+            </p>
+            <pre class="code-block"><code>claude</code></pre>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Authorize in the browser</h3>
+            <p class="step-desc">
+              The first time you launch it, a browser window will open automatically. Check that
+              the Claude account shown is yours, then click the
+              "<strong>Approve</strong>" button.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">All done!</h3>
+            <p class="step-desc">
+              Close the browser page and go back to the command window. You will see that Claude
+              Code has started and is greeting you. It may ask whether you want to trust this
+              folder — choose yes, and you can start chatting.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Troubleshooting -->
+      <h2 class="detail-heading">Beginner Troubleshooting</h2>
+      <p class="detail-paragraph">
+        Small hiccups sometimes come up during installation, especially on Windows. Here are the
+        most common issues and how to fix them:
+      </p>
+
+      <div class="faq-card">
+        <div class="faq-tag">Common Windows pitfall</div>
+        <h3 class="faq-question">
+          After typing <code>claude</code>, you see a red error saying "The term 'claude' is not
+          recognized as the name of a cmdlet…"
+        </h3>
+        <p class="faq-desc">
+          This means your computer cannot "find" the file you just installed. Try the following
+          steps:
+        </p>
+        <ol class="faq-steps">
+          <li>
+            <strong>Close PowerShell and reopen it.</strong>
+            The most common cause is simply forgetting to reopen PowerShell after installing.
+            Try this first.
+          </li>
+          <li>
+            <strong>If reopening does not help, add the environment variable manually.</strong>
+            In PowerShell, type the following command and press Enter:
+            <pre class="code-block code-block--small"><code>$env:PATH += ";$env:USERPROFILE\.local\bin"</code></pre>
+            Then <strong>once again</strong> close PowerShell and open a new window, and type
+            <code>claude</code>. In most cases, this will solve the issue cleanly.
+          </li>
+        </ol>
+      </div>
+
+      <!-- Section: Optional VS Code GUI -->
+      <h2 class="detail-heading">
+        <span class="optional-badge">Optional</span>
+        Give Claude Code a Friendly Graphical Interface
+      </h2>
+      <p class="detail-paragraph">
+        Once you have finished the terminal installation above, your computer already has the
+        "smart brain" of Claude Code. The steps below show you how to install a free program
+        called <strong>Visual Studio Code</strong> (VS Code for short), which gives that brain
+        a nice, easy-to-use "control panel". With it, you no longer need to stare at a
+        black-and-white terminal window — you can click buttons with your mouse to approve
+        tasks and clearly see which files the AI has changed.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Download and install VS Code</h3>
+            <p class="step-desc">Set up your very own digital workbench.</p>
+            <ol class="substep-list">
+              <li>
+                Open your browser and search for
+                "<strong>VS Code</strong>" (or Visual Studio Code).
+              </li>
+              <li>
+                On the official website, the page automatically detects whether you are on a
+                Mac or a Windows PC — click the "<strong>Download</strong>" button.
+              </li>
+              <li>
+                Once the download is complete, run the installer. Installation is as simple as
+                any other program — just keep clicking "Next" until it finishes, then open
+                VS Code.
+              </li>
+            </ol>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Prepare a dedicated "work room" (folder)</h3>
+            <p class="step-desc">
+              The AI assistant needs a clear scope to work in — that scope is a folder.
+            </p>
+            <ol class="substep-list">
+              <li>
+                On your desktop, right-click and
+                <strong>create a new empty folder</strong>. This will be your future project
+                folder.
+              </li>
+              <li>Open the VS Code program you just installed.</li>
+              <li>
+                Drag the empty folder you just created directly into the VS Code window, or
+                choose "<strong>Open Folder</strong>" from the top-left menu to open it.
+              </li>
+            </ol>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Install the Claude Code extension in VS Code</h3>
+            <p class="step-desc">Now let's add the dedicated Claude panel to VS Code.</p>
+            <ol class="substep-list">
+              <li>
+                Look at the vertical strip of icons on the far left of the VS Code window —
+                find and click the one that looks like <strong>four small squares</strong>
+                (this is the Extensions view).
+              </li>
+              <li>
+                In the search box at the top, type the keyword
+                "<strong>Claude Code</strong>".
+              </li>
+              <li>
+                Find the extension published by <strong>Anthropic</strong> and click the
+                "<strong>Install</strong>" button next to it.
+              </li>
+            </ol>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <h3 class="step-title">Launch the assistant and start using it</h3>
+            <p class="step-desc">
+              After the extension is installed, a dedicated Claude icon will appear in the
+              left sidebar of VS Code.
+            </p>
+            <ol class="substep-list">
+              <li>
+                Click the Claude icon to open the graphical chat panel. You can also press
+                <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (Mac) or
+                <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (Windows) and type
+                "Claude Code" to open it.
+              </li>
+              <li>
+                Because this is your first time using the interface, you will be guided
+                through a browser authorization step. Just follow the on-screen instructions
+                and click "<strong>Approve</strong>" in the browser window that pops up to
+                complete the setup.
+              </li>
+              <li>
+                Back in VS Code, you will see the familiar chat box. From here on, you can
+                describe what you want in plain language and let the AI write code for you.
+              </li>
+            </ol>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-install {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Overview figure */
+  .overview-figure {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .overview-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+  }
+
+  /* Prep cards */
+  .prep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .prep-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .prep-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .prep-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .prep-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .prep-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prep-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Platform badge */
+  .platform-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-right: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .platform-badge--mac {
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+  }
+
+  .platform-badge--win {
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+  }
+
+  /* Step list (numbered) */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .step-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .step-note {
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .step-note strong {
+    color: var(--color-heading);
+  }
+
+  /* Code block */
+  .code-block {
+    display: block;
+    margin: var(--space-3) 0 0;
+    padding: var(--space-4);
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    padding: 0;
+  }
+
+  .code-block--small {
+    font-size: var(--text-xs);
+  }
+
+  /* Keyboard key */
+  kbd {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+    vertical-align: middle;
+  }
+
+  /* Inline code */
+  :global(.faq-card) code,
+  :global(.step-desc) code,
+  :global(.faq-question) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* FAQ / troubleshooting card */
+  .faq-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .faq-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .faq-question {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .faq-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .faq-steps {
+    padding-left: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .faq-steps strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Optional badge in heading */
+  .optional-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-right: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background-color: var(--color-accent);
+    color: #fff;
+    border-radius: var(--border-radius);
+    vertical-align: middle;
+  }
+
+  /* Sub-steps (a, b, c) inside a step */
+  .substep-list {
+    list-style: lower-alpha;
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .substep-list li {
+    margin-bottom: var(--space-2);
+    padding-left: var(--space-1);
+  }
+
+  .substep-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .substep-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .prep-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .step-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .faq-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

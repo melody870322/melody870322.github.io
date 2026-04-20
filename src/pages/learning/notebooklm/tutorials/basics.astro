@@ -1,0 +1,755 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+
+const figBase = '/learning/notebooklm';
+---
+
+<BaseLayout
+  title="NotebookLM — Getting Started"
+  description="From creating a notebook, organizing sources, and asking questions, to saving notes — a walkthrough for first-time NotebookLM users."
+  lang="en"
+>
+  <section class="section">
+    <div class="container nb-basics">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Getting Started: From creating a notebook to organizing key points</h1>
+        <p class="detail-subtitle">
+          NotebookLM turns the materials you already have into a conversational knowledge space.
+          Drop in PDFs, webpages, YouTube transcripts, Google Docs, or audio files, and then use
+          chat to ask for the main points, compare sources, or produce summaries — with inline
+          citations so you can trace answers back to the original text.
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">Platform note</span>
+          The walkthrough below is based on the <strong>desktop interface</strong>,
+          as the mobile app still has some limitations around source import and notes.
+        </p>
+      </header>
+
+      <!-- Section 1: Pricing -->
+      <h2 class="detail-heading">Pricing tiers</h2>
+      <p class="detail-paragraph">
+        NotebookLM comes in four tiers: <strong>Standard, Plus, Pro, and Ultra</strong>.
+        Standard is the free tier that any personal Google account can use directly.
+        If you have Google AI Plus, Google AI Pro, Google AI Ultra, or a qualifying
+        Workspace / Workspace for Education license, you may receive higher usage limits.
+      </p>
+      <p class="detail-paragraph">
+        For first-time users, Standard is enough to start with. It is usually only once you
+        begin working on a sizable project, a research case, or team collaboration that an
+        upgrade starts to make a clear difference.
+      </p>
+
+      <div class="plan-table-wrapper">
+        <table class="plan-table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Standard<span class="plan-table__sub">Free</span></th>
+              <th scope="col">Plus</th>
+              <th scope="col">Pro</th>
+              <th scope="col">Ultra</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Notebooks</th>
+              <td>100</td>
+              <td>200</td>
+              <td>500</td>
+              <td>500</td>
+            </tr>
+            <tr>
+              <th scope="row">Sources per notebook</th>
+              <td>50</td>
+              <td>100</td>
+              <td>300</td>
+              <td>600</td>
+            </tr>
+            <tr>
+              <th scope="row">Chat queries / day</th>
+              <td>50</td>
+              <td>200</td>
+              <td>500</td>
+              <td>5,000</td>
+            </tr>
+            <tr>
+              <th scope="row">Audio Overviews</th>
+              <td>3</td>
+              <td>6</td>
+              <td>20</td>
+              <td>200</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph plan-note">
+        Standard also includes 3 Video Overviews per day, plus 10 per day each for Reports,
+        Flashcards, and Quizzes. Daily limits reset every 24 hours and monthly limits every
+        30 days. <strong>Custom chat and analytics</strong> are available to everyone, but
+        <strong>advanced sharing</strong> is a paid feature.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">Which plan should you look at?</p>
+        <p class="concept-card__body">
+          For personal use, check the <strong>Google AI plans</strong>. For an organization
+          account, see whether your school or company <strong>already has a license</strong>.
+          If it is a managed account, an administrator will also need to enable NotebookLM
+          access before you can use it.
+        </p>
+      </section>
+
+      <!-- Section 2: Create a notebook -->
+      <h2 class="detail-heading">Creating a notebook</h2>
+      <p class="detail-paragraph">
+        Using NotebookLM is a bit like opening a separate folder for each topic.
+        Open NotebookLM, click <strong>"Create new notebook"</strong> (Figure 1),
+        and then add sources directly in the dialog that appears (center of Figure 2).
+        This step matters, because NotebookLM is not designed for you to dump everything into
+        one big pool. The idea is to
+        <strong>split different topics into different notebooks</strong>, so that later questions
+        and organization don't interfere with each other.
+      </p>
+
+      <figure class="figure">
+        <img src={`${figBase}/建立新的筆記本.png`} alt="NotebookLM home page, showing the 'Create new notebook' button" loading="lazy" />
+        <figcaption>Figure 1. Creating a new notebook</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img src={`${figBase}/新增來源.png`} alt="Add-source dialog, with the notebook name field highlighted in the top-left" loading="lazy" />
+        <figcaption>Figure 2. Adding sources (the notebook-name field is in the top-left)</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        In practice, it helps to name the notebook by <strong>topic</strong> from the start,
+        rather than using something generic. Instead of just "Midterm," try
+        "Marketing Management midterm — key points," "Thesis interview transcripts," or
+        "Career talk notes" — names that make the purpose obvious at a glance.
+        As your notebooks grow in number, this tends to save a lot of searching and keeps
+        unrelated material from getting mixed up. The rename field sits in the top-left
+        of Figure 2.
+      </p>
+
+      <!-- Section 3: Add and organize sources -->
+      <h2 class="detail-heading">Adding and organizing sources</h2>
+      <p class="detail-paragraph">
+        The core idea in NotebookLM is simple: <strong>good sources come before good answers</strong>.
+        Officially, a "source" is defined as a static copy imported into the app, which
+        NotebookLM then uses as the basis for answering questions and organizing material.
+        In other words, the better the quality of what you put in, the steadier its output
+        tends to be.
+      </p>
+
+      <p class="detail-paragraph">The supported source types are fairly broad:</p>
+      <div class="source-grid">
+        <span class="source-chip">PDF</span>
+        <span class="source-chip">Google Docs</span>
+        <span class="source-chip">Google Slides</span>
+        <span class="source-chip">Google Sheets</span>
+        <span class="source-chip">Web URL</span>
+        <span class="source-chip">Public YouTube videos</span>
+        <span class="source-chip">Audio files</span>
+        <span class="source-chip">Pasted text</span>
+        <span class="source-chip">Images</span>
+        <span class="source-chip">docx / txt / md / csv / pptx / ePub</span>
+        <span class="source-chip">Selected Gemini Chats</span>
+      </div>
+
+      <p class="detail-paragraph">
+        Each source can hold up to <strong>500,000 words</strong>; for local uploads, the file
+        size limit is <strong>200 MB</strong>. Standard allows up to 50 sources per notebook,
+        with higher limits at paid tiers.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">Three common misconceptions about source import</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>Web import only captures text</strong> — it does not pull in images,
+            embedded videos, or sub-pages, and paywalled content is not supported.
+          </li>
+          <li>
+            <strong>YouTube import brings in the caption transcript, not the video itself</strong>
+            — so the video must be public and have captions; videos with no spoken content won't work.
+          </li>
+          <li>
+            <strong>Most sources are static copies</strong> — Google Docs can be manually re-synced
+            in NotebookLM after the original updates, but for many other source types, editing
+            the original does not flow back automatically.
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        When organizing sources, it helps <strong>not to pour everything in at once</strong>.
+        A better habit is to keep only the materials that are genuinely relevant to the topic
+        and reasonably trustworthy, and then rename each source clearly — for example,
+        "Lecture handout, Ch. 3," "Interview transcript A," or "Official product page."
+        This way, when you ask questions later, it's easier to pinpoint which source an
+        answer is drawing from.
+      </p>
+
+      <p class="detail-paragraph">
+        One small technique worth knowing: once a notebook contains a lot of material,
+        you can <strong>check only a few sources</strong> in the source panel on the left
+        (see the arrow in Figure 3) before asking a question.
+        You can select sources individually to scope the conversation — especially useful
+        when organizing different versions of a document, or comparing two sources side by side.
+      </p>
+
+      <figure class="figure">
+        <img src={`${figBase}/選擇來源.png`} alt="Left-side source panel, where you can check specific sources to scope the conversation" loading="lazy" />
+        <figcaption>Figure 3. Selecting sources (the chat only answers from the checked ones)</figcaption>
+      </figure>
+
+      <!-- Section 4: Chat and citations -->
+      <h2 class="detail-heading">Chat Q&amp;A and citations</h2>
+      <p class="detail-paragraph">
+        Once the sources are in place, the useful part begins. NotebookLM lets you ask
+        questions in chat form, and its answers are grounded in the material inside your
+        notebook — <strong>not the kind of answer that goes on at length with no clear origin</strong>.
+        Answers come with clear inline citations, so you can check whether the content is reliable.
+      </p>
+
+      <p class="detail-paragraph">
+        Viewing a citation is straightforward. When a citation marker appears in the answer,
+        hover over it to preview the full cited text; click it directly, and NotebookLM jumps
+        to the corresponding place in the original source, letting you check the surrounding
+        context. This is part of why NotebookLM suits key-point roundups, source comparison,
+        and teaching-material preparation — you not only get an answer, you can verify it
+        on the spot.
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">The more specific your question, the better the answer</p>
+        <p class="concept-card__body">
+          When a notebook holds many sources, the clearer the question, the more likely
+          NotebookLM is to pick up the passages that actually matter.
+        </p>
+        <ul class="concept-card__list">
+          <li>
+            <span class="prompt-bad">"Summarize this"</span>
+            → try
+            <span class="prompt-good">"Pull out three key points from Chapter 2 related to user behavior"</span>
+          </li>
+          <li>
+            <span class="prompt-bad">"What's the difference?"</span>
+            → try
+            <span class="prompt-good">"Compare how Interview A and Interview B discuss the same issue"</span>
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        NotebookLM is a good fit for "organizing from sources," but only if the sources
+        themselves are clear and clean. It is not a magic tool —
+        <strong>messy sources usually lead to messy answers</strong>.
+      </p>
+
+      <!-- Section 5: Notes -->
+      <h2 class="detail-heading">Saving notes</h2>
+      <p class="detail-paragraph">
+        First-time users often treat the chat window as a one-off Q&amp;A area, but the
+        <strong>Notes feature is well worth using</strong>. There are two basic ways to do it:
+      </p>
+
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">A</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Add a note yourself</h4>
+            <p class="start-step__desc">
+              Type your thoughts or organized notes directly into a new note — good for
+              personal takeaways, to-dos, observations, or memos.
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">B</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">Save a chat response</h4>
+            <p class="start-step__desc">
+              When you get a particularly useful answer, press <strong>"Save to notes"</strong>
+              at the bottom-left of the response, and it lands in the notes panel on the right.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        The value of this feature is that you don't have to scroll back through the chat
+        history each time. Important passages, finalized outlines, and phrasing you've already
+        verified can all be saved as notes, then refined at your own pace. Each notebook can
+        hold up to <strong>1,000 notes</strong>, which is enough room for long-running
+        organization.
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ A quick note</p>
+        <p class="caution-card__body">
+          Notes <strong>saved from chat responses cannot be edited once created</strong>.
+          If you'd rather keep an editable version, it's better to use "Add a note yourself"
+          and write it in manually.
+        </p>
+      </section>
+
+      <p class="detail-paragraph">
+        Beyond memos, NotebookLM's notes can go further. You can
+        <strong>turn a single note into a source</strong>, or
+        <strong>convert all notes into sources at once</strong>.
+        This means you can first use chat to draft a set of key points, then feed them back
+        in as new sources — grounding later questions on a more condensed, more focused base.
+        This works well for teaching outlines, project organization, reading notes, and
+        personal knowledge bases.
+      </p>
+
+      <blockquote class="pullquote pullquote--primary">
+        When you see something good, don't just read it and move on — save it as a note.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Chat history keeps scrolling, but a saved note stays in the notebook.
+        You can refine it, reorganize it, or later turn it into a new source.
+        That is how NotebookLM shifts from being a Q&amp;A tool into
+        <strong>a working surface where content actually accumulates</strong>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-basics {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .plan-note {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-4);
+  }
+
+  /* Plan comparison table */
+  .plan-table-wrapper {
+    margin: var(--space-6) 0 var(--space-4);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .plan-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    min-width: 36rem;
+  }
+
+  .plan-table thead th {
+    padding: var(--space-4) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .plan-table thead th:first-child {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .plan-table__sub {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-accent);
+    margin-top: 2px;
+  }
+
+  .plan-table tbody tr:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .plan-table tbody th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text);
+    background-color: var(--color-bg-secondary);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  .plan-table tbody td {
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .prompt-bad,
+  .prompt-good {
+    display: inline-block;
+    padding: 2px var(--space-2);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+  }
+
+  .prompt-bad {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    text-decoration: line-through;
+  }
+
+  .prompt-good {
+    background-color: var(--color-bg);
+    color: var(--color-heading);
+    border: 1px solid var(--color-accent);
+    font-weight: 500;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .caution-card__numbered {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    counter-reset: caution;
+    list-style: none;
+  }
+
+  .caution-card__numbered li {
+    position: relative;
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    counter-increment: caution;
+  }
+
+  .caution-card__numbered li::before {
+    content: counter(caution);
+    position: absolute;
+    left: -1.25rem;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: var(--color-text-secondary);
+    color: var(--color-bg);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .caution-card__numbered strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Source chips */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Figure with screenshot */
+  .figure {
+    margin: var(--space-6) 0;
+    padding: var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: calc(var(--border-radius) - 2px);
+  }
+
+  .figure figcaption {
+    margin-top: var(--space-3);
+    padding-bottom: var(--space-1);
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.7;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Start steps */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .plan-table thead th,
+    .plan-table tbody th,
+    .plan-table tbody td {
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

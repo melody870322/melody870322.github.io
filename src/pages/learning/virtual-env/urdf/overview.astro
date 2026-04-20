@@ -1,0 +1,470 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Overview & Basic Concepts — URDF Format & Model Description"
+  description="Learn the basic concepts of URDF: what it is, its relationship with PyBullet and Gazebo, the core concepts of Link and Joint, and what URDF can and cannot do."
+  lang="en"
+>
+  <section class="section">
+    <div class="container urdf-overview">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Understanding Your Robot's "Digital Blueprint": URDF</h1>
+        <p class="detail-subtitle">
+          If you've designed a robot in your mind, how do you actually put it "into" a computer, make it appear in a virtual world, and even use it for simulation and testing? That's where a very important tool comes in — URDF.
+        </p>
+      </header>
+
+      <!-- Section: What is URDF -->
+      <h2 class="detail-heading">What is URDF?</h2>
+      <p class="detail-paragraph">
+        The full name is Unified Robot Description Format. You can think of it as a digital manual for a robot, or as a robot's digital blueprint.
+      </p>
+      <p class="detail-paragraph">
+        This "manual" tells the computer two very important things:
+      </p>
+      <ul class="check-list">
+        <li>What the robot looks like</li>
+        <li>How its various parts are assembled together</li>
+      </ul>
+      <p class="detail-paragraph">
+        In the world of ROS, URDF is a very common way to describe models. But it doesn't only appear in ROS — many simulators also read URDF to load robot models. So understanding URDF first will make learning virtual environments like PyBullet and Gazebo much smoother.
+      </p>
+      <p class="detail-paragraph">
+        To make this manual readable by computers, URDF is written in a format called XML. You can think of it as layer upon layer of "tags" that organize the robot's various parts clearly and neatly.
+      </p>
+      <div class="callout-card">
+        <p class="callout-text">
+          One important thing to remember: <strong>URDF's job is to describe the robot, not to directly control it.</strong> It's great at telling the computer "what parts make up this robot, what they look like, and how they're connected." But to actually make the robot move in a simulator, you typically need to combine it with control programs, simulators, or other tools.
+        </p>
+      </div>
+
+      <!-- Section: Relationship with PyBullet / Gazebo -->
+      <h2 class="detail-heading">URDF's Relationship with PyBullet / Gazebo</h2>
+      <p class="detail-paragraph">
+        Think of URDF as "the manual for the model itself," while PyBullet and Gazebo are more like "platforms that bring this model into a virtual world."
+      </p>
+      <p class="detail-paragraph">
+        In other words, URDF is responsible for describing:
+      </p>
+      <ul class="check-list">
+        <li>The robot's appearance</li>
+        <li>How parts are connected</li>
+        <li>Which parts can rotate</li>
+        <li>Collision and basic physics information</li>
+      </ul>
+      <p class="detail-paragraph">
+        PyBullet and Gazebo then read this data, place it into a simulation environment, and allow us to do control, testing, collision simulation, image capture, or other more complete applications.
+      </p>
+      <p class="detail-paragraph">
+        So they don't replace each other — they work together. Understanding URDF first will make it much easier to grasp how models are loaded into simulators, whether you're learning PyBullet or Gazebo.
+      </p>
+
+      <!-- Section: What will we learn -->
+      <h2 class="detail-heading">What Will We Learn?</h2>
+      <p class="detail-paragraph">
+        Building a robot inside a computer step by step is like assembling LEGO — we typically go through several important stages:
+      </p>
+
+      <ol class="stage-list">
+        <li class="stage-item">
+          <span class="stage-num">1</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Give the Robot a Body (Building a Visual Model)</h3>
+            <p class="stage-desc">
+              We start with the most basic appearance. Simple shapes like cylinders and boxes can be used to assemble the robot's form. The key point of this step is to first create a robot that you can "see."
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">2</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Give the Robot Structure (Building a Movable Model)</h3>
+            <p class="stage-desc">
+              Appearance alone isn't enough, because such a model is usually just static — visible but unable to move. Next, we need to add "joints" so the computer knows which parts are connected, where things can rotate, and where they can move. This gives the model an articulated structure. Combined with a simulator or control program, the robot can then actually move.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">3</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Add Realistic Information (Physics & Collision Properties)</h3>
+            <p class="stage-desc">
+              To make the robot behave more like a real-world object in the simulator, we need to add more information. Settings like weight, center of mass, and collision shells are all important. This data is used by the simulator to calculate collisions, gravity, and balance more realistically, rather than just making the model look real on the outside.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">4</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Organize Repetitive Content (Using Xacro)</h3>
+            <p class="stage-desc">
+              As robots become more complex, URDF files grow longer and longer. That's when Xacro is often used to tidy things up. Think of Xacro as URDF's helper — it can organize repetitive code snippets, making the file cleaner, easier to modify, and less likely to cause confusion.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">5</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Use with Other Tools</h3>
+            <p class="stage-desc">
+              After writing a URDF, the model is typically used alongside other tools. For example, in ROS, you can use related tools to visualize the relationships between different parts of the robot, or update the overall posture based on joint data. This way, URDF becomes more than just a static file — it's a model that can truly be integrated into a working system.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section: Link and Joint -->
+      <h2 class="detail-heading">Remember Two Key Words: Link and Joint</h2>
+      <p class="detail-paragraph">
+        If URDF feels a bit unfamiliar at first, don't worry. Just remember two core concepts to start:
+      </p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <h3 class="concept-label">Link</h3>
+          <p class="concept-desc">
+            Think of it as one part of the robot — the base, an arm, a forearm, a wheel — these can all be considered a link.
+          </p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">Joint</h3>
+          <p class="concept-desc">
+            This is where parts connect. It tells the computer how two links are joined together, and determines whether they can rotate or move relative to each other.
+          </p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        Much of URDF content actually revolves around these two core elements. As long as you grasp this concept first, you'll be less confused when you later encounter terms like visual, collision, and inertial. These topics will be explained in more detail later.
+      </p>
+
+      <!-- Section: Can and Can't -->
+      <h2 class="detail-heading">What Can URDF Do? What Can't It Do?</h2>
+      <p class="detail-paragraph">
+        URDF is important, but it's not omnipotent.
+      </p>
+
+      <div class="ability-grid">
+        <div class="ability-card ability-card--can">
+          <h3 class="ability-label">What it's good at</h3>
+          <ul class="ability-list">
+            <li>Describing the robot's appearance</li>
+            <li>Representing the robot's part structure</li>
+            <li>Defining how parts connect</li>
+            <li>Providing collision and basic physics information</li>
+            <li>Enabling simulators and tools to correctly read the model</li>
+          </ul>
+        </div>
+        <div class="ability-card ability-card--cant">
+          <h3 class="ability-label">What it doesn't handle</h3>
+          <ul class="ability-list">
+            <li>Won't write control logic by itself</li>
+            <li>Won't make the robot move on its own</li>
+            <li>Won't complete physics simulation by itself</li>
+            <li>Won't become a complete robot system from a single file</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        URDF is responsible for clearly describing the robot's appearance and structure. Actually making it move, compute, and run requires cooperation with other tools.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-overview {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Stage list (numbered steps) */
+  .stage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .stage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .stage-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .stage-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .stage-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stage-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .stage-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Concept grid (Link & Joint) */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .concept-card {
+    padding: var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .concept-label {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+    letter-spacing: 0.02em;
+  }
+
+  .concept-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Ability grid (can / can't) */
+  .ability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .ability-card {
+    padding: var(--space-8);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .ability-card--can {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-accent);
+  }
+
+  .ability-card--cant {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .ability-label {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ability-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ability-list li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .ability-card--can .ability-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .ability-card--cant .ability-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .concept-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ability-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stage-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .stage-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .concept-card {
+      padding: var(--space-6);
+    }
+
+    .ability-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,1018 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Claude Code Basic Operations & Workflow"
+  description="From basic chat and giving the right context, to permission modes, planning big tasks, rewinding mistakes, and reporting errors well — a friendly walkthrough of using Claude Code inside VS Code."
+  lang="en"
+>
+  <section class="section">
+    <div class="container cc-basics">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Claude Code Basic Operations &amp; Workflow</h1>
+        <p class="detail-subtitle">
+          Compared to a plain text terminal, using Claude Code inside VS Code gives you a lot more
+          intuitive buttons and mouse-based controls — making it very approachable for beginners.
+          Just think of it as a friendly AI teaching assistant sitting next to you, looking at the
+          same screen.
+        </p>
+      </header>
+
+      <!-- Section 1: Basic chat & model switching -->
+      <h2 class="detail-heading">Basic Chat and Model Switching</h2>
+      <p class="detail-paragraph">
+        Inside VS Code, Claude Code lives in its own dedicated side panel. You don't need to
+        memorize any complex commands — just type your request in plain language, the same way
+        you would talk to ChatGPT or Gemini.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Start chatting</h3>
+            <p class="step-desc">
+              Click the Claude icon in the VS Code side panel and you will see an input box at the
+              bottom. Type your request in plain language. To insert a new line, press
+              <kbd>Shift</kbd>+<kbd>Enter</kbd>; press <kbd>Enter</kbd> to send the message.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Manage your conversations</h3>
+            <p class="step-desc">
+              Click <strong>+ New session</strong> at the top to start a fresh conversation at any
+              time. Below it you will see your previous chat history. You can also rename old
+              conversations to make them easier to find later.
+            </p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Switch models</h3>
+            <p class="step-desc">
+              Type <code>/switch model</code> in the input box (just typing <code>/</code> will
+              already bring up a menu) to switch between different AI "brains". For very complex
+              reasoning tasks, you can switch to the most capable <strong>Opus</strong> model.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Section 2: Giving the right context -->
+      <h2 class="detail-heading">How to Give Claude Code the Right Context</h2>
+      <p class="detail-paragraph">
+        For the AI to be genuinely helpful, the most important thing is to make sure it is looking
+        at the right thing. Inside VS Code, you have three main ways to hand over content:
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-symbol">@</p>
+          <h3 class="method-title">Use @ to point to a file or folder</h3>
+          <p class="method-desc">
+            Type <code>@</code> in the chat box followed by a file name, and Claude Code will pull
+            that file into the conversation as a reference. This works best when you already know
+            exactly which file or folder you want it to look at.
+          </p>
+          <ul class="method-examples">
+            <li>Please check the form structure in <code>@index.html</code></li>
+            <li>Read <code>@src/app.js</code> and tell me what this script does</li>
+            <li>Based on the <code>@components</code> folder, list the components I have</li>
+          </ul>
+        </article>
+
+        <article class="method-card">
+          <p class="method-symbol">+</p>
+          <h3 class="method-title">Use the + button to attach a file</h3>
+          <p class="method-desc">
+            If you prefer using the mouse, click the <strong>+</strong> button at the bottom-left of
+            the chat box to attach a file. Think of it this way: <code>@</code> names a file
+            directly inside your question, while <code>+</code> attaches a file for Claude Code to
+            reference.
+          </p>
+          <ul class="method-examples">
+            <li>Click <strong>+</strong> → choose <code>styles.css</code></li>
+            <li>Type: please tidy up this CSS so the buttons and headings stay consistent</li>
+            <li>Great for beginners — no need to remember file path syntax</li>
+          </ul>
+        </article>
+
+        <article class="method-card">
+          <p class="method-symbol">▥</p>
+          <h3 class="method-title">Highlight the code you want to discuss</h3>
+          <p class="method-desc">
+            If you only want to deal with a small snippet, you don't need to hand over the whole
+            file. Just highlight the relevant lines in the editor and ask your question directly.
+          </p>
+          <ul class="method-examples">
+            <li>Explain what this piece of code is doing</li>
+            <li>Rewrite this snippet so it is easier to read</li>
+            <li>Refactor this block but keep the original behavior</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="info-card">
+        <p class="info-title">A simple way to remember</p>
+        <ul class="info-list">
+          <li><strong>@</strong> — I am pointing at a specific file for you to look at</li>
+          <li><strong>+</strong> — I am attaching a file for you to look at</li>
+          <li><strong>Highlight</strong> — I only want you to look at the part I have selected</li>
+        </ul>
+      </div>
+
+      <p class="detail-paragraph">
+        When you need to be more precise, you can also point to specific line numbers. For example,
+        <code>@app.js#10-25</code> tells Claude Code "look only at lines 10–25 of this file." This
+        is especially useful for narrowing down a discussion, avoiding noise from unrelated code,
+        or pointing out an exact range during a teaching demo.
+      </p>
+
+      <!-- Section 3: Permission modes -->
+      <h2 class="detail-heading">Understand Permission Modes — Don't Auto-Approve Everything</h2>
+      <p class="detail-paragraph">
+        One of the first things many people find unusual about Claude Code is that it keeps popping
+        up to ask "do you want to allow this?"
+      </p>
+      <p class="detail-paragraph">
+        This isn't there to be annoying — it's there to protect your project. Claude Code's
+        permission design is intentionally conservative: by default, it won't just go ahead and do
+        everything on its own. Read-only actions like reading files and searching tend to go
+        smoothly, but as soon as it needs to edit a file, run a command, or do anything more
+        sensitive, it checks your current permission mode and rules to decide whether to ask first.
+        You can also use <code>/permissions</code> to view and manage your current allow, ask, and
+        deny rules.
+      </p>
+      <p class="detail-paragraph">
+        Think of it this way: Claude Code isn't incapable of acting on its own — it's just handing
+        you the steering wheel first. When you feel safe, it moves forward; when you feel a step
+        needs care, it pauses and waits for your confirmation.
+      </p>
+
+      <h3 class="detail-subheading">For most people, start by learning these three</h3>
+      <p class="detail-paragraph">
+        Claude Code officially supports several permission modes, including default, acceptEdits,
+        plan, auto, dontAsk, and bypassPermissions. But if you're just getting started, you really
+        only need to understand the three you'll encounter most often: <strong>Ask before
+        edits</strong>, <strong>Edit automatically</strong>, and <strong>Plan mode</strong>. In
+        VS Code, you'll typically see them under these names.
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">1. Ask before edits — the safest, and best for getting started</summary>
+        <div class="collapsible-body">
+          <p>This is the most conservative and reassuring approach.</p>
+          <p>Before Claude Code actually modifies a file or performs certain actions, it shows you the diff or operation first — for example, showing you "original vs suggested change" before editing. You can accept, reject, or add a comment asking it to take a different approach.</p>
+          <p>The benefit of this mode isn't that it's slower — it's that you build intuition more easily. You'll learn how Claude Code thinks, how it edits, and where it tends to over-modify.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">2. Edit automatically — skip the small confirmations, but it's not full autopilot</summary>
+        <div class="collapsible-body">
+          <p>Once you start feeling that clicking "allow" on every single edit breaks your flow, you can consider turning on auto-accept edits.</p>
+          <p>This mode doesn't mean "it can do anything." It means: creating and modifying files within your working directory, plus some common filesystem commands, no longer require a prompt every time. The officially listed auto-approved commands include things like <code>mkdir</code>, <code>touch</code>, <code>rm</code>, <code>rmdir</code>, <code>mv</code>, <code>cp</code>, and <code>sed</code> — but this only applies within your working directory or additionalDirectories. Anything outside that scope, touching protected paths, or other Bash commands will still prompt you.</p>
+          <p>Think of it as: speeding up the very common, low-friction actions, while still leaving the truly consequential decisions to you. If you just need Claude Code to create a few files, edit some content, and tidy up folders, this mode will feel much smoother. But if you're working on something important, doing a major migration, or bulk-deleting files, staying conservative is still the safer bet.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">3. Plan Mode — research first, make a plan, don't touch anything yet</summary>
+        <div class="collapsible-body">
+          <p>If what you need to do involves multi-file changes, workflow refactoring, data flow migration, or you're still figuring out the direction yourself, you usually don't want Claude Code to start editing right away. That's when Plan Mode is most useful.</p>
+          <p>The idea behind Plan Mode is simple: look first, think first, organize the steps — but don't change anything yet.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">4. Other modes — just know the names for now</summary>
+        <div class="collapsible-body">
+          <p>There are also auto, dontAsk, and bypassPermissions — a few more advanced modes.</p>
+          <p>Auto mode uses additional safety checks to help decide which actions can proceed automatically, but it's officially labeled as a research preview and isn't available on all plans, models, or environments.</p>
+          <p>Bypass permissions essentially skips all prompts. The official VS Code docs explicitly warn: this mode is only suitable for use inside an offline, secure sandbox — not as an everyday default. As for dontAsk, it's more like a strict lockdown mode: "if it's not on the allowlist, don't do it at all."</p>
+          <p>So for most people, there's really no need to learn every mode at once. Just get comfortable with <strong>Ask before edits → Edit automatically → Plan Mode</strong>, and your experience will already feel very different.</p>
+        </div>
+      </details>
+
+      <!-- Section 3b: Preventing accidental deletion -->
+      <h2 class="detail-heading">Prevent Accidental Deletion — Draw Boundaries First</h2>
+      <p class="detail-paragraph">
+        The things that actually go wrong usually aren't Claude Code going completely rogue — they're
+        "you gave it too wide a scope, your instructions were too vague, or you turned on automation
+        too early."
+      </p>
+      <p class="detail-paragraph">
+        So the most important first step to preventing accidental deletion isn't memorizing a bunch
+        of settings — it's drawing clear working boundaries. Claude Code can only write to the folder
+        you launched it from and its subfolders. That means the folder you choose to start working in
+        is itself a decision about how far it can reach. While it can read some content outside the
+        working directory, its write boundary is restricted.
+      </p>
+      <p class="detail-paragraph">
+        This leads to a very practical approach: the first time you practice, don't start from a
+        large, important folder. Begin with a small project, a test folder, or just the specific
+        subfolder you actually want to change today. That's much safer — because you're not just
+        choosing a folder, you're drawing a boundary for how far Claude Code can go.
+      </p>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">If you don't want it touched, say so upfront</summary>
+        <div class="collapsible-body">
+          <p>Some files, even if they're in the project, don't mean you want Claude Code to read or edit them. Files like <code>.env</code>, credentials, keys, and certain secrets folders should be excluded from the start. The official configuration docs explicitly recommend using <code>permissions.deny</code> to block sensitive files. The rule evaluation order is deny → ask → allow — meaning if a deny rule matches first, it gets blocked immediately.</p>
+          <p>You can start with a basic protection like this:</p>
+          <pre class="code-block" style="padding-left: 2rem;"><code set:html={`{\n  "permissions": {\n    "deny": [\n      "Read(./.env)",\n      "Read(./.env.*)",\n      "Read(./secrets/**)",\n      "Read(./config/credentials.json)"\n    ]\n  }\n}`} /></pre>
+          <p>The idea is simple: don't wait until Claude Code has already read something to say "don't look at that" — lock the doors that shouldn't be opened in the first place.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">When asking it to delete, move, or rename — always be specific about scope</summary>
+        <div class="collapsible-body">
+          <p>Most "accidental deletions" don't happen because the model suddenly goes haywire — they happen because the instruction itself was too vague.</p>
+          <p>A phrase like "help me tidy up this project" is very broad from Claude Code's perspective. If you also happen to have auto-accept edits on, it might actually start moving files and deleting things it considers redundant. A more stable way to phrase it would be something like:</p>
+          <div class="info-card" style="margin: var(--space-4) 0;">
+            <p style="margin: 0; font-size: var(--text-sm); line-height: 1.8;">Only tidy up the <code>src/components</code> folder. Don't touch <code>.env</code>, deployment configs, or <code>package-lock.json</code>. List the files you plan to delete, move, or rename first, and wait for my confirmation before proceeding.</p>
+          </div>
+          <p>The benefit of phrasing it this way isn't that it's more verbose — it's that you've made both the "allowed scope" and the "off-limits areas" explicit, so Claude Code is much less likely to overshoot.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">Before big changes, use Plan Mode to preview first</summary>
+        <div class="collapsible-body">
+          <p>If you're about to do large-scale cleanup — batch renaming, restructuring folders, moving components, deleting old files — it's strongly recommended to switch to Plan Mode first. Plan Mode is designed for exactly this: "analyze first, propose a plan, get your confirmation" — not jump straight into editing. You can review the deletion list, the migration steps, and the dependency impact it lays out, then decide whether to let it continue.</p>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary class="collapsible-title">After changes, review the diff immediately — don't wait until the end</summary>
+        <div class="collapsible-body">
+          <p>The spirit of auto-accept edits isn't "don't look at all" — it's replacing "approve every single step along the way" with "review the diff together after a round." The official description of acceptEdits is quite direct: this mode is designed for checking in the editor or via git diff after the fact, not confirming every edit mid-stream.</p>
+        </div>
+      </details>
+
+      <!-- Section 4: Plan first -->
+      <h2 class="detail-heading">For Big Features, Plan Before You Build</h2>
+      <p class="detail-paragraph">
+        When you are working on a new feature, multi-file changes, a workflow refactor, or you
+        aren't yet sure of the direction, don't ask Claude Code to start writing right away. In the
+        bottom-right corner of the chat box, switch to <strong>Plan Mode</strong>. Claude Code will
+        first explore your project in read-only mode and put together a list of steps; it will only
+        start making changes after you approve.
+      </p>
+      <p class="detail-paragraph">
+        VS Code will also open this plan as a markdown document so you can leave comments, add
+        constraints, or adjust the direction before letting it move forward.
+      </p>
+
+      <div class="scenario-grid">
+        <div class="scenario-card scenario-card--good">
+          <p class="scenario-tag scenario-tag--good">✓ Worth planning first</p>
+          <ul class="scenario-list">
+            <li>Reworking the login flow</li>
+            <li>Migrating data flow</li>
+            <li>Refactoring an old module</li>
+            <li>Tasks that touch many parts of the code</li>
+          </ul>
+        </div>
+        <div class="scenario-card scenario-card--skip">
+          <p class="scenario-tag scenario-tag--skip">— Usually no need to plan</p>
+          <ul class="scenario-list">
+            <li>Tweaking text or copy</li>
+            <li>Adding a log line</li>
+            <li>Fixing a one or two-line bug</li>
+            <li>Small, contained edits</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Section 5: Rewind -->
+      <h2 class="detail-heading">Use "Rewind" to Recover — Don't Be Afraid of Mistakes</h2>
+      <p class="detail-paragraph">
+        When you write code with an AI, the most important thing isn't getting everything right the
+        first time — it's knowing how to safely back out when something goes wrong. Inside VS Code,
+        Claude Code automatically records every editing step, so when it changes too much, drifts
+        off direction, or you suddenly want to try a different approach, you don't need to panic.
+        Just use the rewind feature.
+      </p>
+      <p class="detail-paragraph">
+        Hover over any chat message to reveal the rewind button. Clicking it gives you three
+        options:
+      </p>
+
+      <div class="rewind-list">
+        <article class="rewind-card">
+          <div class="rewind-head">
+            <span class="rewind-num">1</span>
+            <div>
+              <h3 class="rewind-title">Fork conversation from here</h3>
+              <p class="rewind-alias">Keep your current code, branch off into a parallel chat</p>
+            </div>
+          </div>
+          <p class="rewind-desc">
+            Starting from this message, open up a new conversation branch — but keep all the code
+            changes you have made so far. Claude Code does not roll back any files; it just opens a
+            new path forward from this point in time.
+          </p>
+          <p class="rewind-example">
+            <strong>Example:</strong> Claude Code has finished updating your login page, but you
+            suddenly want to try a different form-validation approach. Choose
+            "Fork conversation from here" to keep your current code while starting a new chat
+            branch from this point.
+          </p>
+        </article>
+
+        <article class="rewind-card">
+          <div class="rewind-head">
+            <span class="rewind-num">2</span>
+            <div>
+              <h3 class="rewind-title">Rewind code to here</h3>
+              <p class="rewind-alias">Keep the chat, roll the code back</p>
+            </div>
+          </div>
+          <p class="rewind-desc">
+            Rewind your file changes back to this moment, but keep the full chat history. Your
+            conversation isn't deleted — you can still see everything that was discussed
+            afterwards. Only the code reverts to the state it was in when you chose this point.
+          </p>
+          <p class="rewind-example">
+            <strong>Example:</strong> You and Claude Code have been working through a tricky
+            debugging session, and it ended up modifying several files. After testing, you realize
+            things are broken. Choose "Rewind code to here" to roll the code back to a more stable
+            version while keeping the discussion thread for reference.
+          </p>
+        </article>
+
+        <article class="rewind-card">
+          <div class="rewind-head">
+            <span class="rewind-num">3</span>
+            <div>
+              <h3 class="rewind-title">Fork conversation and rewind code</h3>
+              <p class="rewind-alias">A fresh parallel branch — chat and code both roll back</p>
+            </div>
+          </div>
+          <p class="rewind-desc">
+            Open a new conversation branch <em>and</em> roll the code back to this point at the
+            same time. It does both jobs together: it doesn't pollute your current chat thread, and
+            it also restores the code to the state you specified.
+          </p>
+          <p class="rewind-example">
+            <strong>Example:</strong> Claude Code has done several rounds of refactoring in a row,
+            but you feel the whole direction is off — you don't just want to roll back the code,
+            you also don't want to keep the later conversation threads. Choose "Fork conversation
+            and rewind code" to start fresh from an earlier point.
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 6: Compact -->
+      <h2 class="detail-heading">When the Conversation Gets Long, Help Claude Code Slim Down</h2>
+      <p class="detail-paragraph">
+        Claude Code does not have unlimited memory. Its <em>context window</em> holds the chat
+        history, the files it has read, command output, CLAUDE.md, skills, and so on. The longer
+        you chat and the more files it has seen, the heavier the whole conversation becomes.
+      </p>
+      <p class="detail-paragraph">
+        At the bottom of the VS Code chat box, you can see how much context is currently being
+        used. Claude Code will also automatically compress content when it approaches the limit.
+        You can also type <code>/compact</code> manually, and tell it what to keep during the
+        compression. If you are about to switch to a completely different task, the cleanest
+        approach is usually not to keep going in the same chat — start a new conversation, or use
+        <code>/clear</code> to wipe the current one. For rules that "should always be followed",
+        don't repeat them in the chat over and over; put them into <strong>CLAUDE.md</strong>
+        instead.
+      </p>
+
+      <div class="example-card">
+        <p class="example-title">Examples</p>
+        <ul class="example-list">
+          <li><code>/compact keep only the API changes from this session, the test commands, and the bug we are still working on</code></li>
+          <li><code>/clear</code></li>
+          <li>Please add "always run typecheck after finishing" as a rule in our project's CLAUDE.md</li>
+        </ul>
+      </div>
+
+      <!-- Section 7: Errors -->
+      <h2 class="detail-heading">When You Hit an Error, Don't Just Say "Fix It"</h2>
+      <p class="detail-paragraph">
+        The thing that trips up beginners most often isn't that bugs are too hard — it's that they
+        give Claude Code too little information. Instead of just saying "this is broken", a much
+        more effective approach is to hand over the full picture together:
+        <strong>the error message, how to reproduce it, which file might be involved, and how
+        you'd like the fix to be verified</strong>.
+      </p>
+      <p class="detail-paragraph">
+        Claude Code performs noticeably better when it can verify its own work, so tests, error
+        output, expected screens, and screenshots are all very helpful. Inside VS Code, you can
+        also use <code>@terminal:name</code> to hand over a terminal's output directly — no need
+        to copy and paste it yourself every time. UI issues are especially well-suited to dropping
+        in a screenshot or dragging an image into the chat.
+      </p>
+
+      <div class="example-card">
+        <p class="example-title">Example prompts</p>
+        <ul class="example-list">
+          <li>Running <code>npm test</code> gives me this error. Please find the root cause first, then fix it, and finally re-run the tests to confirm they pass.</li>
+          <li>Please read the output of <code>@terminal:npm test</code> and tell me what the first real error actually is.</li>
+          <li>Here is a screenshot of the error. Please figure out which section is broken, and tell me which files you plan to change.</li>
+          <li>Users report that login fails after session timeout. Please first write a failing test that reproduces it, then fix it.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-basics {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-subheading {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-4);
+  }
+
+  /* Collapsible sections */
+  .collapsible {
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .collapsible:hover {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible[open] {
+    border-color: var(--color-accent);
+  }
+
+  .collapsible-title {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    user-select: none;
+  }
+
+  .collapsible-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-title::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-text-secondary);
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible[open] > .collapsible-title::after {
+    transform: rotate(45deg);
+  }
+
+  .collapsible-body {
+    padding: 0 var(--space-6) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    border-top: 1px dashed var(--color-border);
+    padding-top: var(--space-4);
+  }
+
+  .collapsible-body p {
+    margin-bottom: var(--space-3);
+  }
+
+  .collapsible-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .collapsible-body code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-5) var(--space-6) var(--space-5) var(--space-12);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-text);
+    font-size: inherit;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Step list */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .step-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .step-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Method cards (@ / + / highlight) */
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .method-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .method-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .method-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--border-radius);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+  }
+
+  .method-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.4;
+  }
+
+  .method-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .method-examples {
+    list-style: none;
+    padding: var(--space-3) 0 0;
+    margin: 0;
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .method-examples li {
+    padding-left: var(--space-3);
+    position: relative;
+  }
+
+  .method-examples li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info card */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .info-list strong {
+    display: inline-block;
+    min-width: 5.5rem;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Scenario cards */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .scenario-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .scenario-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .scenario-tag--good {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .scenario-tag--skip {
+    background-color: var(--color-bg);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  .scenario-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .scenario-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .scenario-list li::before {
+    content: '·';
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Rewind cards */
+  .rewind-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .rewind-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .rewind-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .rewind-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .rewind-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .rewind-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .rewind-alias {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .rewind-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .rewind-example {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .rewind-example strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Example card */
+  .example-card {
+    margin: var(--space-4) 0 var(--space-8);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .example-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-3);
+  }
+
+  .example-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .example-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .example-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.step-desc) code,
+  :global(.method-desc) code,
+  :global(.method-examples) code,
+  :global(.example-list) code,
+  :global(.rewind-desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Keyboard key */
+  kbd {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+    vertical-align: middle;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .method-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .scenario-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .step-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .rewind-card {
+      padding: var(--space-5);
+    }
+  }
+</style>

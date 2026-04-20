@@ -1,0 +1,736 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="NotebookLM 多媒體與視覺化輸出"
+  description="從語音摘要、影片摘要、簡報到資訊圖表，NotebookLM 可以把同一份資料轉成可聽、可看、可分享的多種形式。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container nb-media">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">多媒體與視覺化輸出：把資料變成可聽、可看、可分享的內容</h1>
+        <p class="detail-subtitle">
+          把來源放進 NotebookLM 之後，整理資料不一定只能靠對話問答。除了文字摘要，
+          它還能把內容轉成<strong>音訊、影片、投影片和視覺圖像</strong>，
+          幫你用不同形式重新理解同一批資料。這些成果大多會在筆記本右側的
+          <strong>工作室（Studio）面板</strong>生成與管理。
+        </p>
+        <p class="platform-note">
+          <span class="platform-note__label">環境說明</span>
+          以下功能<strong>手機版支援情況不完全相同</strong>，部分功能可能有限制，或和網頁版介面略有差異；另外，
+          <strong>簡報和資訊圖表目前官方明確標註為 18 歲以上使用者才能使用</strong>。
+        </p>
+      </header>
+
+      <!-- Section 1: Four tools overview -->
+      <h2 class="detail-heading">四種輸出形式，對應不同使用情境</h2>
+      <p class="detail-paragraph">
+        這四個工具各自對應一種使用情境：沒有空坐下來看時用「聽的」、想要更容易看懂時用「看的」、
+        要拿去分享展示時用「投影片」、想一眼抓到重點時用「一張圖」。
+      </p>
+
+      <div class="feature-grid feature-grid--four">
+        <article class="feature-card">
+          <p class="feature-index">01</p>
+          <h3 class="feature-title">語音摘要</h3>
+          <p class="feature-alias">可以用聽的整理版本</p>
+          <p class="feature-desc">
+            把來源整理成<strong>一段音訊</strong>，適合通勤、會前暖身、
+            正式閱讀前先建立基本概念。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">02</p>
+          <h3 class="feature-title">影片摘要</h3>
+          <p class="feature-alias">更容易理解的解說影片</p>
+          <p class="feature-desc">
+            把重點轉成一支<strong>AI 解說影片</strong>，多一層畫面和旁白，
+            適合概念說明、主題導讀或課前預習。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">03</p>
+          <h3 class="feature-title">簡報</h3>
+          <p class="feature-alias">可展示、可再加工的投影片</p>
+          <p class="feature-desc">
+            根據來源生成一份<strong>投影片初稿</strong>，
+            適合主題導讀、內部簡報、活動報告、教學分享、案例說明。
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <p class="feature-index">04</p>
+          <h3 class="feature-title">資訊圖表</h3>
+          <p class="feature-alias">一眼看懂的視覺整理</p>
+          <p class="feature-desc">
+            把主要概念、數據或關係整理成<strong>一張單頁圖像</strong>，
+            幫你更快理解重點或看見資料之間的關聯。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section 2: Audio Overviews -->
+      <h2 class="detail-heading">語音摘要：把文字內容變成可以用聽的整理版本</h2>
+      <p class="detail-paragraph">
+        語音摘要很適合放在<strong>「把資料先快速吸收一遍」</strong>這個情境裡。
+        NotebookLM 會根據你上傳的來源，自動生成一段音訊內容，幫你整理重點。
+        預設格式是「深入探索」，也就是兩位 AI 主持人用對話方式拆解主題；
+        如果你想聽得更快，也可以改成「摘要」，由單一講者在兩分鐘內快速帶過重點。
+      </p>
+
+      <p class="detail-paragraph">目前可選的格式：</p>
+      <div class="source-grid">
+        <span class="source-chip">深入探索（雙主持人對話）</span>
+        <span class="source-chip">摘要（單人兩分鐘）</span>
+        <span class="source-chip">評論（建設性回饋）</span>
+        <span class="source-chip">辯論（不同角度討論）</span>
+      </div>
+
+      <section class="concept-card">
+        <p class="concept-card__label">生成前可調整的項目</p>
+        <p class="concept-card__body">
+          進入筆記本後，在 Studio 面板選擇<strong>「語音摘要」</strong>，系統會在背景開始生成，
+          期間你仍然可以繼續在 NotebookLM 裡操作，像是查看引用、查找原文或繼續問問題。
+          生成前能調整的選項包括：
+        </p>
+        <ul class="concept-card__list">
+          <li><strong>選擇格式</strong>（深入探索 / 摘要 / 評論 / 辯論）</li>
+          <li><strong>選擇輸出語言</strong></li>
+          <li><strong>輸入提示詞</strong>，指定聚焦重點</li>
+          <li><strong>調整長度</strong>（短 / 預設 / 長）</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        語音摘要最適合拿來處理<strong>「沒有空坐下來慢慢看」</strong>的情況，
+        例如在通勤時先聽一遍資料重點、在會前快速暖身，或在正式閱讀前先建立基本概念。
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>聲音和內容都是 AI 生成</strong>——可能會出現內容不準、說話不夠自然，
+            或偶爾有音訊卡頓的情況。
+          </li>
+          <li>
+            <strong>互動模式目前只有英文支援</strong>——雖然可以下載和分享語音摘要，
+            但其他人即使拿到分享連結，也不能跟你原本那段互動式音訊一樣繼續和主持人對話。
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 3: Video Overviews -->
+      <h2 class="detail-heading">影片摘要：把重點整理成更容易理解的解說影片</h2>
+      <p class="detail-paragraph">
+        如果語音摘要是<strong>「聽懂」</strong>，那影片摘要更像是<strong>「看懂」</strong>。
+        NotebookLM 會把你筆記本裡的來源轉成一支 AI 解說影片，讓原本偏文字型的內容，
+        多一層畫面和旁白的輔助。這類影片特別適合用在概念說明、主題導讀、課前預習、
+        內容暖身，或需要先快速抓方向的場景。
+      </p>
+
+      <p class="detail-paragraph">目前可選的影片格式：</p>
+      <div class="source-grid">
+        <span class="source-chip">說明影片（完整解說）</span>
+        <span class="source-chip">摘要（短版重點）</span>
+        <span class="source-chip">Cinematic（僅 Ultra、18+、英文）</span>
+      </div>
+
+      <section class="concept-card">
+        <p class="concept-card__label">除了格式還能微調</p>
+        <ul class="concept-card__list">
+          <li><strong>旁白語言</strong>——官方支援 80 多種語言，多語需求可以直接先做出第一版。</li>
+          <li><strong>視覺風格</strong>——選擇整體畫面走向。</li>
+          <li><strong>提示詞</strong>——指定影片應該聚焦哪些主題或來源。</li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        影片摘要不是單純把文字搬上畫面，而是幫你做一版<strong>「更容易被看懂」</strong>的內容版本。
+        對於本來就不喜歡長篇閱讀的人，或想把資料轉成更容易分享的形式時，
+        這會比單純摘要更有吸引力。
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>需要耐心等待</strong>——官方明確寫到，影片生成有時可能要等到
+            <strong>30 分鐘以上</strong>。
+          </li>
+          <li>
+            <strong>聲音和畫面都是 AI 生成</strong>——可能會有內容誤差或音訊瑕疵。
+            建議把它定位成「幫你先產出視覺化初稿」的工具，而不是能全自動做出完美教學影片。
+          </li>
+          <li>
+            生成後如果覺得合用，可以直接下載影片檔，或透過分享功能提供給其他人觀看。
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Slides -->
+      <h2 class="detail-heading">簡報：把資料整理成可展示、可再加工的投影片</h2>
+      <p class="detail-paragraph">
+        簡報功能適合放在<strong>「整理成果要拿去講、拿去分享、或拿去展示」</strong>這個階段。
+        NotebookLM 可以根據來源生成一份投影片，讓你不用從空白頁開始排版。
+        很適合把原本分散在多份來源裡的內容，快速整理成一套有順序的投影片——
+        例如主題導讀、內部簡報、活動報告、教學分享、案例說明。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">兩種主要方向可選</p>
+        <ul class="concept-card__list">
+          <li>
+            <strong>詳細簡報</strong>——資訊完整，適合閱讀或寄送的版本。
+          </li>
+          <li>
+            <strong>簡報投影片</strong>——偏向簡潔、視覺化，適合搭配口頭說明的版本。
+          </li>
+        </ul>
+        <p class="concept-card__footer">
+          你也可以再指定輸出語言、長度，或輸入提示詞，告訴它你的受眾、風格和重點。
+          NotebookLM 也支援在介面內直接播放投影片，方便你先看完整體流程和節奏。
+        </p>
+      </section>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <ul class="caution-card__numbered">
+          <li>
+            <strong>僅 18 歲以上使用者可使用</strong>——手機版雖可用，但可能和網頁版有差異。
+          </li>
+          <li>
+            <strong>目前無法新增或刪除投影片</strong>——雖然支援用修訂功能修改投影片，
+            但不能自行增減張數。
+          </li>
+          <li>
+            <strong>修訂時系統不會重新參考來源內容</strong>——後續微調比較像是在改現成投影片，
+            而不是重新根據原始資料再做一次完整整理。
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        簡報功能可以定位成<strong>「能先幫你做出一版有結構的投影片」</strong>，
+        而不是完全不會改內容的 AI 排版工具。如果需要正式發表，還是應該再檢查一次內容是否準確、
+        順序是否合理。完成後，NotebookLM 支援把簡報下載成 <strong>PDF 或 PowerPoint（.pptx）</strong>，
+        所以後續要進一步修改、上台播放或另行分享都很方便。
+      </p>
+
+      <!-- Section 5: Infographic -->
+      <h2 class="detail-heading">資訊圖表：把重點濃縮成一張一眼看懂的圖</h2>
+      <p class="detail-paragraph">
+        資訊圖表最適合用在<strong>「想快速看懂重點」</strong>的場景。
+        NotebookLM 會把來源中的主要概念、數據或關係，整理成一張單頁的視覺化圖像，
+        幫你更快理解重點、看見資料之間的關聯，或把原本不容易入口的內容，
+        用更直觀的形式呈現出來。
+      </p>
+
+      <section class="concept-card">
+        <p class="concept-card__label">可調整的項目很完整</p>
+        <ul class="concept-card__list">
+          <li><strong>輸出語言</strong></li>
+          <li><strong>細節程度</strong>——精簡 / 標準 / 詳細（beta）。</li>
+          <li><strong>版面方向</strong>——橫向 / 直向 / 正方形。</li>
+          <li>
+            <strong>視覺風格</strong>——可由系統自動判斷，或由你指定成偏手繪、可愛、專業等不同類型。
+          </li>
+          <li>
+            <strong>提示詞</strong>——要求它強調某些重點、使用特定色調，
+            或把焦點放在某幾個核心數字。
+          </li>
+        </ul>
+      </section>
+
+      <p class="detail-paragraph">
+        資訊圖表可以被定位成<strong>「一張圖帶讀者先進入主題」</strong>。
+        它很適合做概念整理、流程說明、關鍵數據整理，或當成文章中的視覺中繼站。
+        對讀者來說，一長段說明文字不一定容易記住，但一張整理得好的圖，常常更容易留下印象。
+        完成後，NotebookLM 支援把資訊圖表下載成 <strong>PNG</strong>，
+        也能透過分享或分享整本筆記本的方式，讓其他人一起查看。
+      </p>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 小提醒</p>
+        <p class="caution-card__body">
+          和其他生成內容一樣，資訊圖表也不是保證百分之百正確。官方已明確提醒，
+          這些圖像可能出現<strong>視覺或事實上的不準確</strong>，
+          比較好的做法是把它當成高效率的第一版視覺整理，而不是完全取代人工檢查。
+          若發現圖中出現錯字、怪異用詞，或某些文字顯示不自然，最穩妥的做法通常是
+          <strong>先調整提示詞後重新生成一版</strong>，再決定是否進一步手動修整。
+        </p>
+      </section>
+
+      <!-- Canva workaround -->
+      <h3 class="detail-subheading">中文字微調：用 Canva 做後製</h3>
+      <p class="detail-paragraph">
+        如果只是少量文字需要微調，也可以把下載後的 PNG 匯入 Canva 做後製。
+        Canva 支援上傳 PNG 圖片；上傳後，可以先試著使用 <strong>Grab Text</strong>，
+        把圖片中的文字拉成可編輯圖層後直接修改。Canva 官方也明確把這個工具定位成
+        可用來修正圖片上的文字內容，像是改錯字、更新文字、調整字型、字級和顏色。
+      </p>
+
+      <ol class="start-steps">
+        <li class="start-step">
+          <span class="start-step__num">A</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">優先試 Grab Text（Canva Pro 功能）</h4>
+            <p class="start-step__desc">
+              上傳 PNG 後，使用 Grab Text 把文字抽成可編輯圖層，直接修改錯字、更新用詞、
+              或調整字型、字級和顏色。適合辨識得準、字樣清楚的情境。
+            </p>
+          </div>
+        </li>
+        <li class="start-step">
+          <span class="start-step__num">B</span>
+          <div class="start-step__body">
+            <h4 class="start-step__title">辨識不準時改用手動方式</h4>
+            <p class="start-step__desc">
+              先用 <strong>Magic Eraser</strong> 清掉錯誤文字，或用同色塊把原字蓋掉，
+              再另外新增文字方塊，把正確的文字重新打上去。
+              對於字太小、背景太複雜、或原字樣式太特殊的資訊圖表，通常反而更好控制。
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <section class="caution-card">
+        <p class="caution-card__label">⚠️ 再次提醒</p>
+        <p class="caution-card__body">
+          這屬於 <strong>Canva 的外部後製</strong>，不是 NotebookLM 內建的資訊圖表修訂流程。
+          修改後的圖檔和原本筆記本之間不會互通。
+        </p>
+      </section>
+
+      <!-- Closing -->
+      <h2 class="detail-heading">四種輸出，幫資料找到不同出口</h2>
+      <blockquote class="pullquote pullquote--primary">
+        聽的、看的、展示的、一眼看懂的——同一份資料，可以有四種不同的入口。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        語音摘要、影片摘要、簡報、資訊圖表這四個工具，並不是要取代你對資料的理解，
+        而是幫你把同一份材料變成<strong>更容易吸收、更容易分享</strong>的形式。
+        NotebookLM 已經清楚提醒這些內容都由 AI 生成，可能會有誤差；
+        所以比較合理的用法，是把它當成<strong>有效率的第一版</strong>，
+        需要時再回到原始來源確認、調整，或用其他工具做後製。
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nb-media {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .platform-note {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .platform-note__label {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-2);
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .platform-note strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-subheading {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Feature grid (four tools overview, 2x2) */
+  .feature-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .feature-grid--four {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    position: relative;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: all var(--transition);
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    transform: translateY(-2px);
+  }
+
+  .feature-index {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .feature-alias {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .feature-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept card */
+  .concept-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .concept-card__list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .concept-card__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .concept-card__footer strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Caution card */
+  .caution-card {
+    margin: var(--space-6) 0 var(--space-4);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .caution-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+  }
+
+  .caution-card__body {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .caution-card__body strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .caution-card__numbered {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    counter-reset: caution;
+    list-style: none;
+  }
+
+  .caution-card__numbered li {
+    position: relative;
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    counter-increment: caution;
+  }
+
+  .caution-card__numbered li::before {
+    content: counter(caution);
+    position: absolute;
+    left: -1.25rem;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: var(--color-text-secondary);
+    color: var(--color-bg);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .caution-card__numbered strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Source chips */
+  .source-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .source-chip {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  /* Pullquote */
+  .pullquote {
+    margin: var(--space-8) 0;
+    padding: var(--space-6) var(--space-8);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .pullquote--primary {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    border-left-width: 4px;
+  }
+
+  /* Start steps */
+  .start-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .start-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .start-step__num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    background-color: var(--color-bg);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .start-step__body {
+    flex: 1;
+    padding-top: var(--space-1);
+  }
+
+  .start-step__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .start-step__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .feature-grid--four {
+      grid-template-columns: 1fr;
+    }
+
+    .concept-card,
+    .caution-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pullquote {
+      padding: var(--space-5) var(--space-6);
+      font-size: var(--text-base);
+    }
+
+    .pullquote--primary {
+      font-size: var(--text-lg);
+    }
+
+    .start-step {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+    }
+  }
+</style>

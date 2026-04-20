@@ -1,0 +1,836 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Claude Code 記憶設定與上下文管理"
+  description="從 CLAUDE.md 工作手冊、auto memory 工作筆記，到 /compact、/clear、/context 清理腦袋——讓 Claude Code 把該長期記住的規則放到對的地方。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container cc-memory">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 Claude Code 越用越懂你</h1>
+        <p class="detail-subtitle">
+          很多人剛開始用 Claude Code 都會有一個感覺：「明明昨天才講過，今天怎麼又要重新說一次？」
+          這其實不是它在亂忘，而是每一次新對話，都是從新的 context window 開始。
+          這一頁要幫你學會把該長期記住的規則，放到對的地方。
+        </p>
+      </header>
+
+      <!-- Section 1: 兩種長期記憶 -->
+      <h2 class="detail-heading">Claude Code 的兩種長期記憶</h2>
+      <p class="detail-paragraph">
+        Claude Code 並不是完全沒有長期記憶，它主要靠兩種方式，把重要資訊帶到下一次工作。
+        這兩種方式的角色不太一樣，理解它們的差別，才能知道該把什麼寫在哪。
+      </p>
+
+      <div class="compare-grid">
+        <div class="compare-card compare-card--accent">
+          <p class="compare-label">你主動寫給它看的</p>
+          <p class="compare-title">CLAUDE.md</p>
+          <p class="compare-desc">
+            放在專案裡的「工作手冊」，每次開啟新的工作階段，Claude Code 會先讀這份檔案，
+            再開始幫你做事。適合放「這個專案平常就是這樣做」的規則。
+          </p>
+        </div>
+        <div class="compare-card">
+          <p class="compare-label">Claude Code 自己累積的</p>
+          <p class="compare-title">auto memory</p>
+          <p class="compare-desc">
+            Claude Code 一邊工作，一邊幫自己整理出的工作筆記。它會把你常提醒它的事、
+            反覆出現的模式、除錯心得慢慢記下來，讓之後的新工作階段比較快上手。
+          </p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        簡單說：<strong>CLAUDE.md 是你主動規定的長期規則；auto memory 是 Claude Code 在工作中慢慢學到的偏好和模式。</strong>
+      </p>
+
+      <!-- Section 2: CLAUDE.md -->
+      <h2 class="detail-heading">CLAUDE.md — Claude Code 的新進員工手冊</h2>
+      <p class="detail-paragraph">
+        你可以把 CLAUDE.md 想成是 Claude Code 的新進員工手冊。官方建議把這裡用來放
+        <strong>建置與測試指令、程式碼風格、工作流程規則、架構決策、命名慣例</strong>
+        這類「每次都適用」的內容。專案層級的 CLAUDE.md 可以放在
+        <code>./CLAUDE.md</code> 或 <code>./.claude/CLAUDE.md</code>。
+      </p>
+
+      <div class="tip-card">
+        <p class="tip-title">最快的起手式</p>
+        <p class="tip-body">
+          在 VS Code 裡，不用自己從零開始寫。直接在 Claude Code 對話框輸入
+          <code>/init</code>，Claude Code 會先掃描你的專案，幫你產生一份起始版
+          CLAUDE.md，裡面通常會先整理出它看得出來的建置指令、測試方式和專案慣例。
+          若你的專案本來就有 CLAUDE.md，<code>/init</code> 不會直接蓋掉，
+          而是改成提出補強建議。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你可以這樣理解：CLAUDE.md 放的是「這個專案平常就是這樣做」的規則。例如：
+      </p>
+
+      <pre class="code-block"><code># Project Overview
+這是一個公司內部報價系統的前端專案。
+
+# Commands
+- 開發請使用：npm run dev
+- 測試請使用：npm test
+
+# Development Rules
+- 元件一律用 function component
+- 樣式優先使用 Tailwind
+- 修改 API 邏輯後，先跑 npm test 再交付</code></pre>
+
+      <p class="detail-paragraph">
+        這種內容就很適合放進 CLAUDE.md，因為它們不是單次任務，
+        而是每次做這個專案都可能用得到的規則。
+      </p>
+
+      <!-- Section 3: 不要把手冊寫成作文 -->
+      <h2 class="detail-heading">不要把手冊寫成作文，短一點反而更有用</h2>
+      <p class="detail-paragraph">
+        很多新手會以為：「既然 Claude Code 會讀，那我就把所有東西都塞進去。」
+        但 Claude Code 剛好相反——CLAUDE.md 不是越長越好，而是要
+        <strong>短、清楚、好掃描</strong>。官方建議每份 CLAUDE.md 盡量控制在
+        200 行以內；最好用 markdown 標題和條列，把規則分組。因為 CLAUDE.md
+        會在每次工作階段一開始就載入，太長不只會吃掉上下文，也會讓重要規則反而被淹沒。
+      </p>
+
+      <div class="info-card">
+        <p class="info-title">最簡單的判斷方式</p>
+        <p class="info-body">
+          如果拿掉這一行，不會讓 Claude Code 比較容易做錯，那就不要寫。
+        </p>
+      </div>
+
+      <div class="scenario-grid">
+        <div class="scenario-card scenario-card--skip">
+          <p class="scenario-tag scenario-tag--skip">— 不夠好的寫法</p>
+          <ul class="scenario-list">
+            <li>請寫出乾淨的程式碼</li>
+            <li>請保持專案結構一致</li>
+            <li>修改後記得測試</li>
+          </ul>
+          <p class="scenario-note">太抽象，Claude Code 照著做也不知道怎麼做才對。</p>
+        </div>
+        <div class="scenario-card scenario-card--good">
+          <p class="scenario-tag scenario-tag--good">✓ 比較好的寫法</p>
+          <ul class="scenario-list">
+            <li>使用 2 spaces 縮排</li>
+            <li>API handler 放在 <code>src/api/handlers/</code></li>
+            <li>提交前先執行 <code>npm test</code></li>
+          </ul>
+          <p class="scenario-note">具體、可驗證，Claude Code 比較容易照做。</p>
+        </div>
+      </div>
+
+      <!-- Section 4: auto memory -->
+      <h2 class="detail-heading">auto memory — Claude Code 自己累積的工作筆記</h2>
+      <p class="detail-paragraph">
+        除了你手動寫的 CLAUDE.md，Claude Code 還有另一套記憶系統，叫做
+        <strong>auto memory</strong>。它會把你常提醒它的事、專案裡反覆出現的模式、
+        某些除錯心得，慢慢記錄下來，讓之後的新工作階段比較快上手。
+      </p>
+
+      <div class="path-card">
+        <p class="path-label">存在哪裡？</p>
+        <p class="path-body">
+          auto memory <strong>不是</strong>你自己在專案根目錄手動建立一個
+          <code>MEMORY.md</code>，而是 Claude Code 會自動存到：
+        </p>
+        <pre class="path-code"><code>~/.claude/projects/&lt;project&gt;/memory/</code></pre>
+        <p class="path-body">
+          裡面可能會出現像 <code>debugging.md</code>、<code>api-conventions.md</code>
+          這種主題筆記。<code>MEMORY.md</code> 的<strong>前 200 行或前 25KB</strong>
+          會在每次新對話開始時載入，其餘比較細的筆記，Claude Code 需要時才會再去讀。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        所以你可以這樣分工：
+      </p>
+
+      <div class="split-grid">
+        <div class="split-card">
+          <p class="split-head">CLAUDE.md 適合放</p>
+          <ul class="split-list">
+            <li>這個專案用 pnpm</li>
+            <li>修改 API 前要先補測試</li>
+            <li>元件命名用 PascalCase</li>
+          </ul>
+        </div>
+        <div class="split-card split-card--soft">
+          <p class="split-head">auto memory 會慢慢記住</p>
+          <ul class="split-list">
+            <li>這個專案最常出錯的是登入逾時</li>
+            <li>你很在意不要亂改檔名</li>
+            <li>遇到某個錯誤時，之前是用哪種方法修好的</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        如果你想編輯 CLAUDE.md、管理 auto memory，以及查看記憶項目，可以輸入：
+      </p>
+
+      <pre class="code-block code-block--command"><code>/memory</code></pre>
+
+      <div class="warning-card">
+        <p class="warning-title">⚠ 注意</p>
+        <p class="warning-body">
+          auto memory 是<strong>你這台機器本地的記憶</strong>，不是自動跟團隊同步。
+          也就是說，團隊共用規則還是應該寫進專案裡的 CLAUDE.md，
+          不要期待 auto memory 幫你記。
+        </p>
+      </div>
+
+      <!-- Section 5: 清腦袋 -->
+      <h2 class="detail-heading">對話太長時，要主動幫 Claude Code「清腦袋」</h2>
+      <p class="detail-paragraph">
+        Claude Code 雖然會記住你這次對話裡讀過的檔案、命令輸出、聊天內容、CLAUDE.md
+        和 auto memory，但這些東西都會一起占用 context window。聊得越久、看的檔案越多，
+        Claude Code 的注意力就越容易被不重要的舊資訊分散。當你發現這段對話已經聊很久、
+        訊息很多、看過很多檔案時，就可以主動清理：
+      </p>
+
+      <div class="cmd-list">
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">1</span>
+            <div>
+              <h3 class="cmd-title">/compact</h3>
+              <p class="cmd-alias">把長對話壓縮成比較短的重點</p>
+            </div>
+          </div>
+          <p class="cmd-desc">
+            適合你還想繼續同一個任務，只是怕上下文越來越亂。
+            你還可以順便告訴 Claude Code，這次壓縮後要保留什麼重點。
+          </p>
+          <div class="cmd-example">
+            <p class="cmd-example-label">範例</p>
+            <code>/compact 只保留登入流程、API 規格、目前待修的 bug</code>
+          </div>
+        </article>
+
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">2</span>
+            <div>
+              <h3 class="cmd-title">/clear</h3>
+              <p class="cmd-alias">把這串對話清空，重新開始</p>
+            </div>
+          </div>
+          <p class="cmd-desc">
+            適合你要做的是完全不相干的新任務。例如你剛剛都在修登入，
+            下一秒卻想叫 Claude Code 幫你改公司首頁，這時就不要硬接在同一串後面，
+            直接清掉或開新對話會比較乾淨。
+          </p>
+          <div class="cmd-example">
+            <p class="cmd-example-label">範例</p>
+            <code>/clear</code>
+          </div>
+        </article>
+
+        <article class="cmd-card">
+          <div class="cmd-head">
+            <span class="cmd-num">3</span>
+            <div>
+              <h3 class="cmd-title">/context</h3>
+              <p class="cmd-alias">檢查現在到底是什麼在吃空間</p>
+            </div>
+          </div>
+          <p class="cmd-desc">
+            如果你覺得這段對話變笨了、開始答非所問，但又不確定是不是上下文太滿，
+            可以先用 <code>/context</code> 看看目前有哪些內容占了空間。
+          </p>
+          <div class="cmd-example">
+            <p class="cmd-example-label">範例</p>
+            <code>/context</code>
+          </div>
+        </article>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-title">這一頁的重點</p>
+        <ul class="summary-list">
+          <li><strong>CLAUDE.md</strong>：每次都適用的規則，寫短、寫具體，200 行內。</li>
+          <li><strong>auto memory</strong>：Claude Code 工作中慢慢學到的偏好，本地筆記不跟團隊同步。</li>
+          <li><strong>/compact、/clear、/context</strong>：對話變重時，主動幫它清腦袋。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cc-memory {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Give paragraphs a bit more breathing room when they follow a card */
+  .tip-card + .detail-paragraph,
+  .path-card + .detail-paragraph,
+  .split-grid + .detail-paragraph {
+    margin-top: var(--space-6);
+  }
+
+  /* Compare cards (CLAUDE.md vs auto memory) */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .compare-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .compare-card--accent {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .compare-card--accent .compare-label {
+    color: var(--color-accent);
+  }
+
+  .compare-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .compare-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Tip card (for /init) */
+  .tip-card {
+    margin: var(--space-5) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .tip-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .tip-body {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  /* Info card (judgment rule) */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border-left: 4px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+  }
+
+  .info-title {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .info-body {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-block code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .code-block--command {
+    padding: var(--space-4) var(--space-6);
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Scenario cards (good vs bad) */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .scenario-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scenario-tag {
+    display: inline-block;
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+  }
+
+  .scenario-tag--good {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .scenario-tag--skip {
+    background-color: var(--color-bg);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  .scenario-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .scenario-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .scenario-list li::before {
+    content: '·';
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .scenario-note {
+    margin: 0;
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--color-border);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Path card */
+  .path-card {
+    margin: var(--space-5) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .path-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-3);
+  }
+
+  .path-body {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .path-body:last-child {
+    margin-bottom: 0;
+  }
+
+  .path-code {
+    margin: var(--space-2) 0 var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    overflow-x: auto;
+  }
+
+  .path-code code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  /* Split grid (CLAUDE.md vs auto memory examples) */
+  .split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-5) 0 var(--space-6);
+  }
+
+  .split-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .split-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .split-card--soft {
+    background-color: var(--color-bg);
+  }
+
+  .split-head {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .split-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .split-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .split-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Warning card */
+  .warning-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid #d97706;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .warning-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #b45309;
+    margin-bottom: var(--space-2);
+  }
+
+  .warning-body {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  /* Command cards (/compact, /clear, /context) */
+  .cmd-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .cmd-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .cmd-card:hover {
+    border-color: var(--color-accent);
+    transform: translateX(2px);
+  }
+
+  .cmd-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  .cmd-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .cmd-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .cmd-alias {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .cmd-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .cmd-example {
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--color-bg);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .cmd-example-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .cmd-example code {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background: none;
+    padding: 0;
+  }
+
+  /* Summary card */
+  .summary-card {
+    margin: var(--space-8) 0 var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .summary-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .summary-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .summary-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.tip-body) code,
+  :global(.path-body) code,
+  :global(.scenario-list) code,
+  :global(.cmd-desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .compare-grid,
+    .scenario-grid,
+    .split-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cmd-card {
+      padding: var(--space-5);
+    }
+
+    .code-block {
+      padding: var(--space-4);
+      font-size: var(--text-xs);
+    }
+  }
+</style>
