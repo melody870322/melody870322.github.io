@@ -4,7 +4,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="基礎觀念 — AI Agent 拼圖"
-  description="認識 AI Agent 的基礎觀念，了解什麼是 Agent、它的組成要素與運作方式。"
+  description="讓 AI 幫你接工具做事之前，先搞懂大語言模型、Gemini CLI、MCP、API 這四個角色怎麼串在一起。"
   lang="zh"
 >
   <section class="section">
@@ -12,11 +12,376 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/zh/">&larr; 返回首頁</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">基礎觀念</h1>
+        <h1 class="detail-title">讓 AI 幫你接工具做事，先搞懂這幾件事</h1>
         <p class="detail-subtitle">
-          頁面建置中...
+          如果你是第一次接觸 Gemini CLI、MCP、API，看到這些名詞很正常會有點霧煞煞。
+          很多人一開始會以為這就是「跟 AI 聊天」，但其實不是。這一頁要講的，是另一件更實用的事：怎麼讓 AI 不只是回答問題，還能幫你操作工具、整理資料、完成任務。
+        </p>
+        <p class="detail-subtitle">
+          你可以把這一頁當成整個學習旅程的起點。
+          先把幾個最重要的觀念弄懂，後面不管你是想接 Notion、GitHub、Google Drive，還是其他有 API 的工具，都會比較清楚自己到底在做什麼。
         </p>
       </header>
+
+      <!-- ===== Section 1: 我們到底想做什麼 ===== -->
+      <h2 class="detail-heading">我們到底想做什麼</h2>
+      <p class="detail-paragraph">
+        先不要急著記名詞。先想一個很日常的情境。
+      </p>
+      <p class="detail-paragraph">
+        假設你平常會做這些事：
+      </p>
+      <ul class="check-list">
+        <li>查資料</li>
+        <li>整理筆記</li>
+        <li>把內容寫進 Notion</li>
+        <li>更新專案進度</li>
+        <li>把資料分類到不同地方</li>
+      </ul>
+      <p class="detail-paragraph">
+        以前，這些事情通常要自己一個一個做。你要開瀏覽器、切不同分頁、貼資料、整理格式、確認內容有沒有放錯地方。
+      </p>
+      <p class="detail-paragraph">
+        現在比較新的做法是：<strong>讓 AI 變成一個工作介面</strong>。你不是只問它問題，而是讓它「透過工具」幫你做事。例如你可以對它說：
+      </p>
+      <ul class="check-list">
+        <li>幫我找出這個專案的重點，整理成一篇 Notion 筆記</li>
+        <li>幫我查這個資料夾裡的內容，做出一份摘要</li>
+        <li>幫我根據指定格式，建立一篇新的頁面草稿</li>
+      </ul>
+      <p class="detail-paragraph">
+        這種做法的重點，不是 AI 很神，而是它背後有沒有接上正確的工具，而且這些工具有沒有被好好設計和限制。
+      </p>
+
+      <!-- ===== Section 2: 四個角色 ===== -->
+      <h2 class="detail-heading">先認識四個角色：大語言模型、Gemini CLI、MCP、API</h2>
+
+      <div class="role-grid">
+        <article class="role-card">
+          <span class="role-num">1</span>
+          <div class="role-body">
+            <h3 class="role-title">大語言模型：負責理解你的話</h3>
+            <p class="role-desc">
+              你可以先把它想成 AI agent 的「大腦」，常常聽到的有 Gemini、GPT、Claude 等等。它就是那個會讀懂你說的話、幫你整理意思、判斷下一步可能要做什麼的部分。後面為了方便，我們簡稱它為「模型」。
+            </p>
+            <p class="role-desc">
+              你跟它說：「幫我把這些內容整理成 Notion 文章。」它會先理解你的需求，再想：這件事要不要用工具？要用哪個工具？順序是什麼？
+            </p>
+            <p class="role-desc">
+              不過要注意，大語言模型本身不是 Notion，也不是 Google Drive，也不是你的電腦資料夾。它只是會思考和判斷，不代表它自己就有權限去碰那些東西。
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">2</span>
+          <div class="role-body">
+            <h3 class="role-title">Gemini CLI：你操作 AI 的工作介面</h3>
+            <p class="role-desc">
+              Gemini CLI 可以把它想成你跟 AI 一起工作的入口。你在這裡輸入指令、發出需求、查看結果，也是在這裡讓 AI 連接外部工具。
+            </p>
+            <p class="role-desc">
+              如果用比較生活化的比喻，大語言模型像大腦，Gemini CLI 比較像工作桌面。你是在這個桌面上，告訴 AI 要做什麼。
+            </p>
+            <p class="role-desc">
+              所以，Gemini CLI 不是外部工具本身。它比較像一個能讓你把 AI 跟各種工具接起來的操作環境。
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">3</span>
+          <div class="role-body">
+            <h3 class="role-title">MCP：讓 AI 能接工具的共同方式</h3>
+            <p class="role-desc">
+              MCP 你可以先把它理解成一種「接工具的共同規則」。如果沒有這種規則，每接一個工具，AI 都要重新學一次怎麼跟它溝通。這會很亂，也很難擴充。
+            </p>
+            <p class="role-desc">
+              有了 MCP 之後，外部工具就可以用比較一致的方式，把自己的能力提供給 AI 使用。這樣 AI 就知道：
+            </p>
+            <ul class="role-list">
+              <li>這個工具叫什麼</li>
+              <li>它能做什麼</li>
+              <li>它需要什麼參數</li>
+              <li>它會回傳什麼結果</li>
+            </ul>
+            <p class="role-desc">
+              所以，MCP 不是某一個單獨的工具。它比較像一種大家共同遵守的接線方式。
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">4</span>
+          <div class="role-body">
+            <h3 class="role-title">API：真正做事的底層能力</h3>
+            <p class="role-desc">
+              API 可以先理解成「某個服務願意開放給外部使用的功能入口」。例如 Notion 有自己的 API，這代表如果你有合適的權限，就可以透過 API 去讀取內容、建立頁面、更新資料。
+            </p>
+            <p class="role-desc">
+              所以真正把頁面寫進 Notion 的，不是 Gemini CLI，也不是 MCP 本身。真正做這件事的，通常還是底層的 API。
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Highlight 1: 一句話總結 -->
+      <details class="highlight-fold">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          一句話總結這四個角色的關係
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-text">
+            Gemini CLI 是你操作的地方，MCP 是接工具的方法，API 是真正執行動作的底層能力。
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 3: 怎麼串在一起 ===== -->
+      <details class="highlight-fold highlight-fold--section">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          這四個東西怎麼串在一起
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-desc">
+            如果把整件事講成一句話，大概會像這樣：你在 Gemini CLI 下指令，大語言模型理解你的需求，接著透過 MCP 去使用某個工具，而那個工具最後再去呼叫底層 API 完成任務。
+          </p>
+
+          <div class="chain-flow">
+            <span class="chain-step">你下指令</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">AI 理解需求</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">AI 找工具</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">工具去碰外部服務</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">結果再回到你眼前</span>
+          </div>
+
+          <p class="highlight-desc">
+            所以當你說：「幫我在 Notion 建一篇新的課堂筆記」，真正發生的事情，通常不是一句話直接魔法完成。背後其實是一連串步驟：
+          </p>
+          <ol class="highlight-steps">
+            <li>AI 先理解你要做的是「建立內容」</li>
+            <li>它發現自己可以用某個 Notion 工具</li>
+            <li>那個工具透過對應方式去接 Notion</li>
+            <li>Notion 的 API 收到請求後建立頁面</li>
+            <li>結果再回傳給你</li>
+          </ol>
+          <p class="highlight-desc">
+            當你把這條鏈想清楚，後面學任何串接都會容易很多。
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 4: 為什麼聽得懂卻做不好 ===== -->
+      <h2 class="detail-heading">為什麼 AI 有時候聽得懂，卻還是做不好</h2>
+      <p class="detail-paragraph">
+        這是很多人一開始最困惑的地方。你明明覺得自己講得很清楚，AI 也好像知道你要什麼，結果事情卻沒有做成。
+      </p>
+      <p class="detail-paragraph">
+        通常不是因為它完全不懂，而是因為中間還有「格式」這一關。AI 不是直接用人的方式理解工具，它是透過工具提供的說明來理解。所以一個工具如果寫得清楚，AI 比較容易用對。如果一個工具寫得很含糊，AI 就比較容易誤判。
+      </p>
+
+      <div class="contrast-grid">
+        <div class="contrast-card contrast-card--bad">
+          <p class="contrast-tag">常見的問題</p>
+          <ul class="contrast-list">
+            <li>參數太多</li>
+            <li>名稱不清楚</li>
+            <li>說明太模糊</li>
+            <li>回傳內容太亂</li>
+            <li>一個工具做太多事</li>
+          </ul>
+        </div>
+        <div class="contrast-card contrast-card--good">
+          <p class="contrast-tag contrast-tag--good">好的設計方向</p>
+          <ul class="contrast-list">
+            <li>名字清楚</li>
+            <li>功能單純</li>
+            <li>輸入簡單</li>
+            <li>回傳乾淨</li>
+          </ul>
+        </div>
+      </div>
+      <p class="detail-paragraph">
+        這樣 AI 反而更容易穩定使用。
+      </p>
+
+      <!-- ===== Section 5: 有帳號不代表有權限 ===== -->
+      <h2 class="detail-heading">有帳號，不代表就有權限</h2>
+      <p class="detail-paragraph">
+        很多人會以為：「我都登入了，為什麼還不能做？」「我有 token，為什麼還是失敗？」「這個頁面明明存在，為什麼 AI 看不到？」
+      </p>
+      <p class="detail-paragraph">
+        原因通常出在三個層面：
+      </p>
+
+      <div class="layer-list">
+        <article class="layer-card">
+          <span class="layer-num">1</span>
+          <div class="layer-body">
+            <h3 class="layer-title">你是誰</h3>
+            <p class="layer-desc">
+              這是身分問題。系統要先知道你是誰，才有辦法決定能不能讓你進來。
+            </p>
+          </div>
+        </article>
+
+        <article class="layer-card">
+          <span class="layer-num">2</span>
+          <div class="layer-body">
+            <h3 class="layer-title">你被允許做什麼</h3>
+            <p class="layer-desc">
+              就算你成功登入，也不代表你什麼都能做。有些情況你只能讀，不能改。有些情況你能新增，但不能刪除。有些情況你甚至只能看到部分資料。
+            </p>
+          </div>
+        </article>
+
+        <article class="layer-card">
+          <span class="layer-num">3</span>
+          <div class="layer-body">
+            <h3 class="layer-title">你碰得到哪些範圍</h3>
+            <p class="layer-desc">
+              就算你有權限，也可能只限某些頁面、某些資料庫、某些資料夾。這是很多人最容易忽略的部分。
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        所以一個工具接不上，不一定是技術問題。很多時候只是因為它根本沒有被授權去看或去改那些內容。
+      </p>
+
+      <!-- ===== Section 6: 先讀再寫 ===== -->
+      <h2 class="detail-heading">為什麼要先學「讀」，再學「寫」</h2>
+      <p class="detail-paragraph">
+        如果你是第一次接這類工具，我很建議先建立一個習慣：<strong>先做讀取，再做寫入</strong>。
+      </p>
+
+      <div class="contrast-grid">
+        <div class="contrast-card">
+          <p class="contrast-tag">先讓 AI 幫你</p>
+          <ul class="contrast-list">
+            <li>查資料</li>
+            <li>搜尋內容</li>
+            <li>列出資訊</li>
+            <li>做摘要</li>
+            <li>看目前有哪些東西</li>
+          </ul>
+        </div>
+        <div class="contrast-card">
+          <p class="contrast-tag">確認穩了，再慢慢放開</p>
+          <ul class="contrast-list">
+            <li>建立新頁面</li>
+            <li>更新內容</li>
+            <li>新增資料</li>
+            <li>改狀態</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        原因很簡單。讀取型的操作，風險通常比較低。寫入型的操作，一旦做錯，可能就真的把資料改掉了。
+      </p>
+
+      <!-- Highlight 2: 先讀再寫的核心原則 -->
+      <details class="highlight-fold">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          核心原則
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-text">
+            不是能寫就立刻寫，而是先確認看得懂、找得到、判斷得準，再來做修改。
+          </p>
+          <p class="highlight-desc">
+            這樣比較安全，也比較符合真實工作流程。
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 7: 失敗不是你太笨 ===== -->
+      <h2 class="detail-heading">失敗不是你太笨，而是這本來就會出錯</h2>
+      <p class="detail-paragraph">
+        很多人第一次碰這些東西，很容易有挫折感。尤其是你看別人的示範好像很順，輪到自己做就卡住。其實這非常正常。
+      </p>
+      <p class="detail-paragraph">
+        因為這種工作流程本來就不是只有一層，而是好幾層一起合作：
+      </p>
+      <ul class="check-list">
+        <li>你輸入的指令</li>
+        <li>大語言模型的理解</li>
+        <li>工具的說明</li>
+        <li>工具和外部服務的連線</li>
+        <li>權限設定</li>
+        <li>回傳資料格式</li>
+      </ul>
+      <p class="detail-paragraph">
+        任何一層出問題，都可能失敗。所以之後如果你遇到問題，不要第一時間就想「是不是我不適合學這個」。比較好的做法是按順序檢查：
+      </p>
+      <ol class="debug-list" type="a">
+        <li>工具有沒有真的接上</li>
+        <li>權限有沒有開對</li>
+        <li>範圍有沒有分享到</li>
+        <li>指令是不是太模糊</li>
+        <li>工具的功能是不是做太多</li>
+        <li>回傳內容是不是太亂</li>
+      </ol>
+      <p class="detail-paragraph">
+        很多時候，問題不是 AI 不聰明，而是整條工作鏈中某個地方還沒對好。
+      </p>
+
+      <!-- ===== Section 8: 不要給 AI 太多權力 ===== -->
+      <h2 class="detail-heading">為什麼一直強調「不要給 AI 太多權力」</h2>
+      <p class="detail-paragraph">
+        很多人一開始會覺得，既然都要做 agent 了，那就乾脆讓它什麼都能做，這樣不是比較方便嗎？
+      </p>
+      <p class="detail-paragraph">
+        表面上看起來好像很方便，但實際上通常會有三個問題：
+      </p>
+
+      <div class="problem-list">
+        <article class="problem-card">
+          <span class="problem-num">1</span>
+          <div class="problem-body">
+            <h3 class="problem-title">容易做錯事</h3>
+            <p class="problem-desc">
+              當工具太多、功能太廣時，AI 比較容易挑錯工具，或者在不必要的時候做了多餘的動作。
+            </p>
+          </div>
+        </article>
+
+        <article class="problem-card">
+          <span class="problem-num">2</span>
+          <div class="problem-body">
+            <h3 class="problem-title">容易改到不該改的地方</h3>
+            <p class="problem-desc">
+              如果它有很大的寫入權限，一個小失誤就可能把資料改亂。
+            </p>
+          </div>
+        </article>
+
+        <article class="problem-card">
+          <span class="problem-num">3</span>
+          <div class="problem-body">
+            <h3 class="problem-title">你自己也會搞不清楚它到底能做什麼</h3>
+            <p class="problem-desc">
+              一個好的工具面，應該是讓人一看就知道：它能做什麼、它不能做什麼、出錯時大概會卡在哪裡。
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="info-card">
+        <p class="info-title">所以後面會一直帶你做一件事</p>
+        <p class="info-desc">
+          把工具能力縮小，只留下完成任務真正需要的那幾個。這不是保守，而是專業。
+        </p>
+      </div>
 
     </div>
   </section>
@@ -39,6 +404,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     text-decoration: underline;
   }
 
+  /* Header */
   .detail-header {
     margin-bottom: var(--space-12);
     padding-bottom: var(--space-6);
@@ -57,5 +423,564 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+    margin-bottom: var(--space-2);
+  }
+
+  .detail-subtitle:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Paragraphs */
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .check-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Role cards (四個角色) */
+  .role-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .role-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .role-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .role-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .role-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .role-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .role-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .role-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .role-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .role-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: var(--text-xs);
+  }
+
+  /* ===== Highlight fold (黃色底線折疊) ===== */
+  .highlight-fold {
+    margin: var(--space-6) 0 var(--space-8);
+    border: 2px solid #e8c547;
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, #fdf8e4 0%, #fef9ec 100%);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  :global(.dark) .highlight-fold {
+    background: linear-gradient(135deg, #2a2517 0%, #2d2819 100%);
+    border-color: #a08930;
+  }
+
+  .highlight-fold:hover {
+    box-shadow: 0 2px 12px rgba(232, 197, 71, 0.15);
+  }
+
+  .highlight-fold[open] {
+    box-shadow: 0 2px 16px rgba(232, 197, 71, 0.2);
+  }
+
+  .highlight-fold--section {
+    margin-top: var(--space-12);
+  }
+
+  .highlight-summary {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    user-select: none;
+  }
+
+  .highlight-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .highlight-summary::after {
+    content: '';
+    flex-shrink: 0;
+    margin-left: auto;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid #b59e2e;
+    border-bottom: 2px solid #b59e2e;
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .highlight-fold[open] > .highlight-summary::after {
+    transform: rotate(45deg);
+  }
+
+  .highlight-icon {
+    color: #d4a917;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  .highlight-body {
+    padding: 0 var(--space-6) var(--space-6);
+    border-top: 1px dashed #e0ca6a;
+    padding-top: var(--space-4);
+  }
+
+  :global(.dark) .highlight-body {
+    border-top-color: #6b5d28;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.8;
+    padding: var(--space-3) var(--space-4);
+    background-color: rgba(232, 197, 71, 0.12);
+    border-left: 3px solid #d4a917;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--space-3);
+  }
+
+  :global(.dark) .highlight-text {
+    background-color: rgba(232, 197, 71, 0.08);
+  }
+
+  .highlight-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .highlight-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    counter-reset: step-counter;
+  }
+
+  .highlight-steps li {
+    padding-left: var(--space-6);
+    position: relative;
+    counter-increment: step-counter;
+  }
+
+  .highlight-steps li::before {
+    content: counter(step-counter, lower-alpha) '.';
+    position: absolute;
+    left: 0;
+    color: #b59e2e;
+    font-weight: 700;
+  }
+
+  /* Chain flow (工作鏈) */
+  .chain-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-5) 0;
+    padding: var(--space-4);
+    background-color: rgba(232, 197, 71, 0.08);
+    border-radius: var(--border-radius);
+  }
+
+  .chain-step {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-heading);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    white-space: nowrap;
+  }
+
+  .chain-arrow {
+    color: #d4a917;
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+
+  /* Contrast grid (問題 vs 好設計 / 讀 vs 寫) */
+  .contrast-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .contrast-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .contrast-card--bad {
+    border-color: var(--color-text-secondary);
+  }
+
+  .contrast-card--good {
+    border-color: var(--color-accent);
+  }
+
+  .contrast-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  .contrast-tag--good {
+    background-color: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+  }
+
+  .contrast-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .contrast-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .contrast-list li::before {
+    content: '·';
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Layer cards (權限三層) */
+  .layer-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .layer-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .layer-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .layer-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .layer-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .layer-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .layer-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Debug list */
+  .debug-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    counter-reset: debug-counter;
+  }
+
+  .debug-list li {
+    padding-left: var(--space-6);
+    position: relative;
+    counter-increment: debug-counter;
+  }
+
+  .debug-list li::before {
+    content: counter(debug-counter, lower-alpha) '.';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Problem cards (三個問題) */
+  .problem-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .problem-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .problem-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .problem-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .problem-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .problem-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .problem-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Info card */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .info-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .contrast-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .role-card {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .chain-flow {
+      flex-direction: column;
+    }
+
+    .chain-arrow {
+      transform: rotate(90deg);
+    }
+
+    .layer-card,
+    .problem-card {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
   }
 </style>
