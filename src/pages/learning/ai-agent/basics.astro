@@ -4,7 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Basic Concepts — AI Agent Puzzle"
-  description="Learn the basic concepts of AI Agents: what an Agent is, its components, and how it works."
+  description="Before letting AI connect to tools and do tasks for you, understand how LLMs, Gemini CLI, MCP, and APIs work together."
   lang="en"
 >
   <section class="section">
@@ -12,11 +12,376 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/">&larr; Back to Home</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">Basic Concepts</h1>
+        <h1 class="detail-title">Before Letting AI Use Tools, Understand These Basics</h1>
         <p class="detail-subtitle">
-          Page under construction...
+          If it's your first time encountering Gemini CLI, MCP, or API, feeling confused by these terms is perfectly normal.
+          Many people initially assume this is just "chatting with AI," but it's not. This page covers something more practical: how to make AI not only answer questions, but also operate tools, organize data, and complete tasks for you.
+        </p>
+        <p class="detail-subtitle">
+          Think of this page as your starting point for the entire learning journey.
+          Get these key concepts down first, and whether you later want to connect Notion, GitHub, Google Drive, or any other tool with an API, you'll have a much clearer picture of what you're actually doing.
         </p>
       </header>
+
+      <!-- ===== Section 1: What are we trying to do ===== -->
+      <h2 class="detail-heading">What Are We Actually Trying to Do</h2>
+      <p class="detail-paragraph">
+        Don't rush to memorize terms. Start with an everyday scenario.
+      </p>
+      <p class="detail-paragraph">
+        Imagine you regularly do things like:
+      </p>
+      <ul class="check-list">
+        <li>Look up information</li>
+        <li>Organize notes</li>
+        <li>Write content into Notion</li>
+        <li>Update project progress</li>
+        <li>Sort data into different locations</li>
+      </ul>
+      <p class="detail-paragraph">
+        Previously, you had to do each of these manually &mdash; opening browsers, switching tabs, pasting data, formatting, checking if things ended up in the right place.
+      </p>
+      <p class="detail-paragraph">
+        The newer approach is: <strong>make AI your work interface</strong>. Instead of just asking it questions, you let it do things "through tools." For example:
+      </p>
+      <ul class="check-list">
+        <li>Find the key points of this project and organize them into a Notion note</li>
+        <li>Check the contents of this folder and create a summary</li>
+        <li>Create a new page draft following a specific format</li>
+      </ul>
+      <p class="detail-paragraph">
+        The key isn't that AI is magical &mdash; it's whether the right tools are connected behind it, and whether those tools are well-designed and properly constrained.
+      </p>
+
+      <!-- ===== Section 2: Four roles ===== -->
+      <h2 class="detail-heading">Meet the Four Roles: LLM, Gemini CLI, MCP, API</h2>
+
+      <div class="role-grid">
+        <article class="role-card">
+          <span class="role-num">1</span>
+          <div class="role-body">
+            <h3 class="role-title">Large Language Model: Understands What You Say</h3>
+            <p class="role-desc">
+              Think of it as the AI agent's "brain." Common ones include Gemini, GPT, Claude, etc. It reads and understands what you say, organizes meaning, and decides what to do next. We'll call it "the model" for short.
+            </p>
+            <p class="role-desc">
+              When you say "Help me organize this content into a Notion article," it first understands your need, then thinks: Does this require a tool? Which tool? In what order?
+            </p>
+            <p class="role-desc">
+              However, the model itself isn't Notion, Google Drive, or your computer's file system. It can think and judge, but that doesn't mean it has permission to touch those things.
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">2</span>
+          <div class="role-body">
+            <h3 class="role-title">Gemini CLI: Your Work Interface for Operating AI</h3>
+            <p class="role-desc">
+              Think of Gemini CLI as the entry point for working with AI. You input commands, make requests, view results, and connect AI to external tools here.
+            </p>
+            <p class="role-desc">
+              Using a more everyday analogy: if the model is the brain, Gemini CLI is more like the desktop. You're at this desktop telling AI what to do.
+            </p>
+            <p class="role-desc">
+              So Gemini CLI isn't an external tool itself. It's more like an operating environment that lets you connect AI to various tools.
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">3</span>
+          <div class="role-body">
+            <h3 class="role-title">MCP: A Common Way for AI to Connect Tools</h3>
+            <p class="role-desc">
+              Think of MCP as a "common set of rules for connecting tools." Without it, AI would have to relearn how to communicate every time it connects a new tool. That would be chaotic and hard to scale.
+            </p>
+            <p class="role-desc">
+              With MCP, external tools can offer their capabilities to AI in a consistent way. This way AI knows:
+            </p>
+            <ul class="role-list">
+              <li>What this tool is called</li>
+              <li>What it can do</li>
+              <li>What parameters it needs</li>
+              <li>What results it returns</li>
+            </ul>
+            <p class="role-desc">
+              So MCP isn't a single tool. It's more like a shared wiring protocol that everyone follows.
+            </p>
+          </div>
+        </article>
+
+        <article class="role-card">
+          <span class="role-num">4</span>
+          <div class="role-body">
+            <h3 class="role-title">API: The Underlying Capability That Actually Does Things</h3>
+            <p class="role-desc">
+              Think of API as "the functionality entry point that a service opens up for external use." For example, Notion has its own API. This means if you have the right permissions, you can read content, create pages, and update data through the API.
+            </p>
+            <p class="role-desc">
+              So what actually writes a page into Notion isn't Gemini CLI, nor MCP itself. It's usually the underlying API doing the real work.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Highlight 1 -->
+      <details class="highlight-fold">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          One-sentence summary of how these four roles relate
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-text">
+            Gemini CLI is where you operate, MCP is how tools get connected, and API is the underlying capability that actually executes actions.
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 3: How they connect ===== -->
+      <details class="highlight-fold highlight-fold--section">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          How These Four Pieces Fit Together
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-desc">
+            In one sentence: You give a command in Gemini CLI, the model understands your need, then uses MCP to access a tool, and that tool calls the underlying API to complete the task.
+          </p>
+
+          <div class="chain-flow">
+            <span class="chain-step">You give a command</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">AI understands</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">AI finds a tool</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">Tool accesses external service</span>
+            <span class="chain-arrow">&rarr;</span>
+            <span class="chain-step">Results come back to you</span>
+          </div>
+
+          <p class="highlight-desc">
+            So when you say "Create a new class note in Notion for me," it's not magic happening in one step. Behind the scenes, it's a chain of steps:
+          </p>
+          <ol class="highlight-steps">
+            <li>AI understands you want to "create content"</li>
+            <li>It discovers it can use a Notion tool</li>
+            <li>That tool connects to Notion through the appropriate method</li>
+            <li>Notion's API receives the request and creates the page</li>
+            <li>The result comes back to you</li>
+          </ol>
+          <p class="highlight-desc">
+            Once you understand this chain clearly, learning any integration becomes much easier.
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 4: Why AI understands but can't deliver ===== -->
+      <h2 class="detail-heading">Why AI Sometimes Understands but Still Fails</h2>
+      <p class="detail-paragraph">
+        This confuses many beginners. You feel like you explained clearly, AI seems to know what you want, yet it still doesn't get the job done.
+      </p>
+      <p class="detail-paragraph">
+        It's usually not because AI is completely lost, but because there's still a "format" hurdle in between. AI doesn't understand tools the way humans do &mdash; it understands through the descriptions tools provide. So if a tool is well-documented, AI is more likely to use it correctly. If a tool's description is vague, AI is more likely to misjudge.
+      </p>
+
+      <div class="contrast-grid">
+        <div class="contrast-card contrast-card--bad">
+          <p class="contrast-tag">Common problems</p>
+          <ul class="contrast-list">
+            <li>Too many parameters</li>
+            <li>Unclear naming</li>
+            <li>Vague descriptions</li>
+            <li>Messy return data</li>
+            <li>One tool doing too many things</li>
+          </ul>
+        </div>
+        <div class="contrast-card contrast-card--good">
+          <p class="contrast-tag contrast-tag--good">Good design direction</p>
+          <ul class="contrast-list">
+            <li>Clear names</li>
+            <li>Simple functionality</li>
+            <li>Simple inputs</li>
+            <li>Clean returns</li>
+          </ul>
+        </div>
+      </div>
+      <p class="detail-paragraph">
+        This way, AI can actually use tools more reliably.
+      </p>
+
+      <!-- ===== Section 5: Having an account doesn't mean having permission ===== -->
+      <h2 class="detail-heading">Having an Account Doesn't Mean Having Permission</h2>
+      <p class="detail-paragraph">
+        Many people assume: "I'm already logged in, why can't I do this?" "I have a token, why is it still failing?" "This page clearly exists, why can't AI see it?"
+      </p>
+      <p class="detail-paragraph">
+        The reason usually comes down to three layers:
+      </p>
+
+      <div class="layer-list">
+        <article class="layer-card">
+          <span class="layer-num">1</span>
+          <div class="layer-body">
+            <h3 class="layer-title">Who You Are</h3>
+            <p class="layer-desc">
+              This is an identity question. The system needs to know who you are before it can decide whether to let you in.
+            </p>
+          </div>
+        </article>
+
+        <article class="layer-card">
+          <span class="layer-num">2</span>
+          <div class="layer-body">
+            <h3 class="layer-title">What You're Allowed to Do</h3>
+            <p class="layer-desc">
+              Even if you're logged in, it doesn't mean you can do everything. Sometimes you can only read, not edit. Sometimes you can create but not delete. Sometimes you can only see partial data.
+            </p>
+          </div>
+        </article>
+
+        <article class="layer-card">
+          <span class="layer-num">3</span>
+          <div class="layer-body">
+            <h3 class="layer-title">What Scope You Can Access</h3>
+            <p class="layer-desc">
+              Even with permissions, you might be limited to certain pages, databases, or folders. This is the part most people overlook.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        So when a tool won't connect, it's not always a technical problem. Often it simply hasn't been authorized to view or modify that content.
+      </p>
+
+      <!-- ===== Section 6: Read first, write later ===== -->
+      <h2 class="detail-heading">Why You Should Learn to "Read" Before "Write"</h2>
+      <p class="detail-paragraph">
+        If this is your first time connecting these types of tools, I strongly recommend building this habit: <strong>start with reading, then move to writing</strong>.
+      </p>
+
+      <div class="contrast-grid">
+        <div class="contrast-card">
+          <p class="contrast-tag">First, let AI help you</p>
+          <ul class="contrast-list">
+            <li>Look up data</li>
+            <li>Search content</li>
+            <li>List information</li>
+            <li>Create summaries</li>
+            <li>See what currently exists</li>
+          </ul>
+        </div>
+        <div class="contrast-card">
+          <p class="contrast-tag">Once stable, gradually enable</p>
+          <ul class="contrast-list">
+            <li>Create new pages</li>
+            <li>Update content</li>
+            <li>Add data</li>
+            <li>Change status</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        The reason is simple. Read operations are usually low-risk. Write operations, once done wrong, might actually change or destroy your data.
+      </p>
+
+      <!-- Highlight 2 -->
+      <details class="highlight-fold">
+        <summary class="highlight-summary">
+          <span class="highlight-icon">&#9679;</span>
+          Core Principle
+        </summary>
+        <div class="highlight-body">
+          <p class="highlight-text">
+            Don't write just because you can. First confirm you can read it, find it, and judge correctly &mdash; then make changes.
+          </p>
+          <p class="highlight-desc">
+            This is safer and more aligned with real-world workflows.
+          </p>
+        </div>
+      </details>
+
+      <!-- ===== Section 7: Failure isn't your fault ===== -->
+      <h2 class="detail-heading">Failure Isn't Because You're Not Smart Enough</h2>
+      <p class="detail-paragraph">
+        Many people feel frustrated the first time they try this. Especially when others' demos look smooth, but you get stuck immediately. This is completely normal.
+      </p>
+      <p class="detail-paragraph">
+        This workflow isn't just one layer &mdash; it's several layers working together:
+      </p>
+      <ul class="check-list">
+        <li>Your input commands</li>
+        <li>The model's understanding</li>
+        <li>The tool's description</li>
+        <li>The connection between tool and external service</li>
+        <li>Permission settings</li>
+        <li>Return data format</li>
+      </ul>
+      <p class="detail-paragraph">
+        Any layer can fail. So when you hit a problem, don't immediately think "maybe I'm not cut out for this." A better approach is to check in order:
+      </p>
+      <ol class="debug-list" type="a">
+        <li>Is the tool actually connected?</li>
+        <li>Are permissions set correctly?</li>
+        <li>Is the scope properly shared?</li>
+        <li>Is the command too vague?</li>
+        <li>Is the tool trying to do too much?</li>
+        <li>Is the return data too messy?</li>
+      </ol>
+      <p class="detail-paragraph">
+        Most of the time, the problem isn't that AI isn't smart &mdash; it's that somewhere in the chain, something hasn't been properly aligned.
+      </p>
+
+      <!-- ===== Section 8: Don't give AI too much power ===== -->
+      <h2 class="detail-heading">Why We Keep Saying "Don't Give AI Too Much Power"</h2>
+      <p class="detail-paragraph">
+        Many people initially think: since we're building an agent anyway, why not let it do everything? Wouldn't that be more convenient?
+      </p>
+      <p class="detail-paragraph">
+        It might seem convenient, but in practice there are usually three problems:
+      </p>
+
+      <div class="problem-list">
+        <article class="problem-card">
+          <span class="problem-num">1</span>
+          <div class="problem-body">
+            <h3 class="problem-title">More Likely to Make Mistakes</h3>
+            <p class="problem-desc">
+              When there are too many tools with too broad capabilities, AI is more likely to pick the wrong tool or take unnecessary actions.
+            </p>
+          </div>
+        </article>
+
+        <article class="problem-card">
+          <span class="problem-num">2</span>
+          <div class="problem-body">
+            <h3 class="problem-title">More Likely to Change Things It Shouldn't</h3>
+            <p class="problem-desc">
+              With broad write permissions, one small mistake could mess up your data.
+            </p>
+          </div>
+        </article>
+
+        <article class="problem-card">
+          <span class="problem-num">3</span>
+          <div class="problem-body">
+            <h3 class="problem-title">You Won't Know What It Can Actually Do</h3>
+            <p class="problem-desc">
+              A good tool interface should make it clear at a glance: what it can do, what it can't do, and where things might go wrong.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="info-card">
+        <p class="info-title">What we'll keep practicing</p>
+        <p class="info-desc">
+          Narrow down tool capabilities to only what's truly needed for the task. This isn't being conservative &mdash; it's being professional.
+        </p>
+      </div>
 
     </div>
   </section>
@@ -39,6 +404,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     text-decoration: underline;
   }
 
+  /* Header */
   .detail-header {
     margin-bottom: var(--space-12);
     padding-bottom: var(--space-6);
@@ -57,5 +423,564 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+    margin-bottom: var(--space-2);
+  }
+
+  .detail-subtitle:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Paragraphs */
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .check-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Role cards */
+  .role-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .role-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .role-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .role-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .role-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .role-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .role-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .role-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .role-list li {
+    padding-left: var(--space-6);
+    position: relative;
+  }
+
+  .role-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: var(--text-xs);
+  }
+
+  /* ===== Highlight fold ===== */
+  .highlight-fold {
+    margin: var(--space-6) 0 var(--space-8);
+    border: 2px solid #e8c547;
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, #fdf8e4 0%, #fef9ec 100%);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  :global(.dark) .highlight-fold {
+    background: linear-gradient(135deg, #2a2517 0%, #2d2819 100%);
+    border-color: #a08930;
+  }
+
+  .highlight-fold:hover {
+    box-shadow: 0 2px 12px rgba(232, 197, 71, 0.15);
+  }
+
+  .highlight-fold[open] {
+    box-shadow: 0 2px 16px rgba(232, 197, 71, 0.2);
+  }
+
+  .highlight-fold--section {
+    margin-top: var(--space-12);
+  }
+
+  .highlight-summary {
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    user-select: none;
+  }
+
+  .highlight-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .highlight-summary::after {
+    content: '';
+    flex-shrink: 0;
+    margin-left: auto;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid #b59e2e;
+    border-bottom: 2px solid #b59e2e;
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .highlight-fold[open] > .highlight-summary::after {
+    transform: rotate(45deg);
+  }
+
+  .highlight-icon {
+    color: #d4a917;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  .highlight-body {
+    padding: 0 var(--space-6) var(--space-6);
+    border-top: 1px dashed #e0ca6a;
+    padding-top: var(--space-4);
+  }
+
+  :global(.dark) .highlight-body {
+    border-top-color: #6b5d28;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.8;
+    padding: var(--space-3) var(--space-4);
+    background-color: rgba(232, 197, 71, 0.12);
+    border-left: 3px solid #d4a917;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--space-3);
+  }
+
+  :global(.dark) .highlight-text {
+    background-color: rgba(232, 197, 71, 0.08);
+  }
+
+  .highlight-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .highlight-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .highlight-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    counter-reset: step-counter;
+  }
+
+  .highlight-steps li {
+    padding-left: var(--space-6);
+    position: relative;
+    counter-increment: step-counter;
+  }
+
+  .highlight-steps li::before {
+    content: counter(step-counter, lower-alpha) '.';
+    position: absolute;
+    left: 0;
+    color: #b59e2e;
+    font-weight: 700;
+  }
+
+  /* Chain flow */
+  .chain-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-5) 0;
+    padding: var(--space-4);
+    background-color: rgba(232, 197, 71, 0.08);
+    border-radius: var(--border-radius);
+  }
+
+  .chain-step {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-heading);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    white-space: nowrap;
+  }
+
+  .chain-arrow {
+    color: #d4a917;
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+
+  /* Contrast grid */
+  .contrast-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .contrast-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .contrast-card--bad {
+    border-color: var(--color-text-secondary);
+  }
+
+  .contrast-card--good {
+    border-color: var(--color-accent);
+  }
+
+  .contrast-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  .contrast-tag--good {
+    background-color: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+  }
+
+  .contrast-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .contrast-list li {
+    padding-left: var(--space-4);
+    position: relative;
+  }
+
+  .contrast-list li::before {
+    content: '·';
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Layer cards */
+  .layer-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .layer-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .layer-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .layer-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .layer-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .layer-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .layer-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Debug list */
+  .debug-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    counter-reset: debug-counter;
+  }
+
+  .debug-list li {
+    padding-left: var(--space-6);
+    position: relative;
+    counter-increment: debug-counter;
+  }
+
+  .debug-list li::before {
+    content: counter(debug-counter, lower-alpha) '.';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Problem cards */
+  .problem-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .problem-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .problem-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .problem-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .problem-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .problem-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-1);
+  }
+
+  .problem-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Info card */
+  .info-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .info-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .contrast-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .role-card {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .chain-flow {
+      flex-direction: column;
+    }
+
+    .chain-arrow {
+      transform: rotate(90deg);
+    }
+
+    .layer-card,
+    .problem-card {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
   }
 </style>
