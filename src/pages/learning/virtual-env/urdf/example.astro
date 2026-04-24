@@ -1,0 +1,762 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Basic Structure & Example Walkthrough — URDF Format & Model Description"
+  description="Starting from the simplest 'snowman robot' URDF example, walk through robot, link, joint, visual, parent / child, and origin step by step to see how a model is actually written."
+  lang="en"
+>
+  <section class="section">
+    <div class="container urdf-example">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Opening It Up: What Does the Most Basic URDF Look Like?</h1>
+        <p class="detail-subtitle">
+          By now we've already met URDF and know it describes a robot's appearance, structure, and how its parts fit together. The next really important step is to open up a URDF and actually look at what it looks like. A lot of people find URDF abstract at first, because everything so far has been concepts. But once you see one tiny example and slowly take it apart, you'll find it isn't as scary as it seems.
+        </p>
+      </header>
+
+      <!-- Section: Goals -->
+      <h2 class="detail-heading">What This Page Aims to Do</h2>
+      <ul class="check-list">
+        <li>Read through one minimal URDF example</li>
+        <li>Know where Robot, Link, and Joint tags appear</li>
+        <li>Understand how a model is gradually assembled from text</li>
+      </ul>
+      <p class="detail-paragraph">
+        We're not aiming for completeness here, and not trying to learn every feature at once. The point is to build one feeling: <strong>so this is how URDF writes out a robot.</strong>
+      </p>
+
+      <!-- Section: Snowman example -->
+      <h2 class="detail-heading">A Super Simple URDF Example</h2>
+      <p class="detail-paragraph">
+        Suppose we want to make a very simple "snowman robot": it has a cylindrical body, a spherical head, and a fixed joint connecting the head to the body. The URDF can look like this:
+      </p>
+
+      <pre class="code-block code-block--xml"><code>&lt;?xml version="1.0"?&gt;
+&lt;robot name="snowman_robot"&gt;
+
+  &lt;!-- 1. Define the robot's body --&gt;
+  &lt;link name="base_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;cylinder length="0.6" radius="0.2"/&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+
+  &lt;!-- 2. Define the robot's head --&gt;
+  &lt;link name="head_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;sphere radius="0.2"/&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+
+  &lt;!-- 3. Connect the head to the body --&gt;
+  &lt;joint name="neck_joint" type="fixed"&gt;
+    &lt;parent link="base_link"/&gt;
+    &lt;child link="head_link"/&gt;
+    &lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;
+  &lt;/joint&gt;
+
+&lt;/robot&gt;</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This is a tiny, very basic example. The point isn't to build a complete robot — it's to <strong>let us see URDF's most basic structure first</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Big picture -->
+      <h2 class="detail-heading">Don't Rush to Understand Everything — Grab the Big Picture First</h2>
+      <p class="detail-paragraph">
+        If we look at it the simplest way, this URDF is really only doing three things:
+      </p>
+
+      <ol class="bigpic-list">
+        <li class="bigpic-item">
+          <span class="bigpic-letter">a</span>
+          <span class="bigpic-text">Set up the robot's outer frame</span>
+        </li>
+        <li class="bigpic-item">
+          <span class="bigpic-letter">b</span>
+          <span class="bigpic-text">Build two <strong>links</strong> — the body and the head</span>
+        </li>
+        <li class="bigpic-item">
+          <span class="bigpic-letter">c</span>
+          <span class="bigpic-text">Use one <strong>joint</strong> to connect them</span>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        That alone is already a basic URDF. You can think of it like building Lego:
+      </p>
+
+      <div class="concept-grid concept-grid--three">
+        <div class="concept-card">
+          <h3 class="concept-label">link</h3>
+          <p class="concept-desc">individual parts</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">joint</h3>
+          <p class="concept-desc">where the parts connect</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">robot</h3>
+          <p class="concept-desc">the outer wrapper for the whole robot</p>
+        </div>
+      </div>
+
+      <!-- Section: Layer 1 - robot -->
+      <h2 class="detail-heading">Layer 1: The Outermost <code class="heading-code">&lt;robot&gt;</code></h2>
+
+      <h3 class="sub-heading">The XML opening line</h3>
+      <pre class="code-block code-block--xml"><code>&lt;?xml version="1.0"?&gt;</code></pre>
+      <p class="detail-paragraph">
+        This line tells the computer: <strong>this is an XML file.</strong> It's a kind of opening statement, letting the computer know it should read what follows as XML.
+      </p>
+
+      <h3 class="sub-heading">The big outer box</h3>
+      <pre class="code-block code-block--xml"><code>&lt;robot name="snowman_robot"&gt;</code></pre>
+      <p class="detail-paragraph">
+        You can think of this tag as a big box. <strong>Everything in the entire robot lives inside this box.</strong> Here, <code>name="snowman_robot"</code> is just giving the robot a name.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So the outer <strong>robot</strong> tag's job is simple: wrap the whole model and tell the system what this robot is called.
+        </p>
+      </div>
+
+      <!-- Section: Layer 2 - link -->
+      <h2 class="detail-heading">Layer 2: Use <code class="heading-code">&lt;link&gt;</code> to Build the Robot's Parts</h2>
+      <p class="detail-paragraph">
+        In this example, there are two links:
+      </p>
+      <ul class="check-list">
+        <li><code>base_link</code></li>
+        <li><code>head_link</code></li>
+      </ul>
+      <p class="detail-paragraph">
+        They represent the snowman's body and head, respectively.
+      </p>
+
+      <h3 class="sub-heading">The body link</h3>
+      <pre class="code-block code-block--xml"><code>&lt;link name="base_link"&gt;
+  &lt;visual&gt;
+    &lt;geometry&gt;
+      &lt;cylinder length="0.6" radius="0.2"/&gt;
+    &lt;/geometry&gt;
+  &lt;/visual&gt;
+&lt;/link&gt;</code></pre>
+      <p class="detail-paragraph">
+        This block means:
+      </p>
+      <ul class="check-list">
+        <li>Create a part called <code>base_link</code></li>
+        <li>This part has an appearance</li>
+        <li>The appearance is a cylinder</li>
+        <li>The cylinder's length is <code>0.6</code></li>
+        <li>The radius is <code>0.2</code></li>
+      </ul>
+
+      <h3 class="sub-heading">The head link</h3>
+      <pre class="code-block code-block--xml"><code>&lt;link name="head_link"&gt;
+  &lt;visual&gt;
+    &lt;geometry&gt;
+      &lt;sphere radius="0.2"/&gt;
+    &lt;/geometry&gt;
+  &lt;/visual&gt;
+&lt;/link&gt;</code></pre>
+      <p class="detail-paragraph">
+        This block follows the same idea:
+      </p>
+      <ul class="check-list">
+        <li>Create a part called <code>head_link</code></li>
+        <li>Its appearance is a sphere</li>
+        <li>The radius is <code>0.2</code></li>
+      </ul>
+
+      <h3 class="sub-heading">Why does a link contain visual?</h3>
+      <p class="detail-paragraph">
+        Because a link by itself is just a "part" — but if you want it to be visible on screen, you have to give it an appearance. <strong>That's what visual does.</strong>
+      </p>
+      <p class="detail-paragraph">
+        In this example we only added visual so the model can be seen. We do this because the focus right now is understanding URDF's basic structure, not stuffing every feature in at once. So you can think of this example as: <strong>a minimal model designed for learning the basic syntax.</strong>
+      </p>
+      <p class="detail-paragraph">
+        Later, if you want to drop it into a simulator for proper collision and physics, you'd usually also add:
+      </p>
+      <ul class="check-list">
+        <li><code>collision</code></li>
+        <li><code>inertial</code></li>
+      </ul>
+
+      <!-- Section: Layer 3 - joint -->
+      <h2 class="detail-heading">Layer 3: Use <code class="heading-code">&lt;joint&gt;</code> to Connect the Parts</h2>
+      <p class="detail-paragraph">
+        We already have two parts, but they still exist separately. To actually attach the head to the body, we need a joint.
+      </p>
+      <pre class="code-block code-block--xml"><code>&lt;joint name="neck_joint" type="fixed"&gt;
+  &lt;parent link="base_link"/&gt;
+  &lt;child link="head_link"/&gt;
+  &lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;
+&lt;/joint&gt;</code></pre>
+
+      <h3 class="sub-heading">What kind of joint is this?</h3>
+      <pre class="code-block code-block--xml"><code>&lt;joint name="neck_joint" type="fixed"&gt;</code></pre>
+      <p class="detail-paragraph">
+        This creates a joint named <code>neck_joint</code>. <code>type="fixed"</code> means it's a <strong>fixed joint</strong> — once connected, it can't rotate or slide. So this isn't about "making it move"; it's about firmly attaching the two parts into one complete model.
+      </p>
+
+      <h3 class="sub-heading">Who connects to whom?</h3>
+      <pre class="code-block code-block--xml"><code>&lt;parent link="base_link"/&gt;
+&lt;child link="head_link"/&gt;</code></pre>
+      <p class="detail-paragraph">
+        These two lines tell the computer:
+      </p>
+      <ul class="check-list">
+        <li><code>base_link</code> is the <strong>parent</strong></li>
+        <li><code>head_link</code> is the <strong>child</strong></li>
+      </ul>
+      <p class="detail-paragraph">
+        You can picture it as: the body is the main piece, and the head is the part that attaches to it. This is also a very common URDF pattern — using <strong>parent</strong> and <strong>child</strong> to express how parts connect within a model.
+      </p>
+
+      <div class="relation-grid">
+        <div class="relation-card relation-card--parent">
+          <p class="relation-tag">Parent</p>
+          <p class="relation-desc"><code>base_link</code> (body)</p>
+        </div>
+        <div class="relation-arrow" aria-hidden="true">↓</div>
+        <div class="relation-card relation-card--child">
+          <p class="relation-tag">Child</p>
+          <p class="relation-desc"><code>head_link</code> (head)</p>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Where does it connect?</h3>
+      <pre class="code-block code-block--xml"><code>&lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;</code></pre>
+      <p class="detail-paragraph">
+        This line is really important. The thing most beginners miss when they first read URDF is <code>origin</code>.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          But it's actually telling the computer: <strong>where this joint should sit, and in what direction it connects.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Here, <code>xyz="0 0 0.5"</code> can simply be read as: place this joint <code>0.5</code> up along the z axis. Why <code>0.5</code>? Because:
+      </p>
+      <ul class="check-list">
+        <li>The body is a cylinder of height <code>0.6</code>, so the distance from its center to the top is <code>0.3</code></li>
+        <li>The head is a sphere with radius <code>0.2</code></li>
+        <li>If you want the head to sit on top of the body, the sphere's center needs to go up another <code>0.2</code></li>
+      </ul>
+
+      <div class="math-card">
+        <p class="math-text"><strong>0.3 + 0.2 = 0.5</strong></p>
+      </div>
+
+      <p class="detail-paragraph">
+        Without this <code>origin</code>, the centers of the head and the body would overlap, and on screen it would look like two models squashed in the same place — instead of the head sitting nicely on top of the body.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So <code>origin</code>'s job can be remembered in one sentence: <strong>it tells the computer where a part or joint should be placed.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Recap -->
+      <h2 class="detail-heading">What Did This Example Teach Us?</h2>
+      <p class="detail-paragraph">
+        If we boil the whole snowman example down to the most important sentences, it would be:
+      </p>
+
+      <ul class="recap-list">
+        <li class="recap-item">
+          <code class="recap-tag">robot</code>
+          <span class="recap-desc">wraps the whole robot</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">link</code>
+          <span class="recap-desc">creates parts</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">visual</code>
+          <span class="recap-desc">decides how a part looks</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">joint</code>
+          <span class="recap-desc">connects the parts</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">parent / child</code>
+          <span class="recap-desc">decides who connects to whom</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">origin</code>
+          <span class="recap-desc">decides where the connection sits</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        These are the <strong>basic skeleton</strong> you'll see most often when reading URDF.
+      </p>
+
+      <!-- Section: Is this complete? -->
+      <h2 class="detail-heading">Is This Example Still Incomplete?</h2>
+      <p class="detail-paragraph">
+        For learning the "basic structure," it's already enough. But if you want to turn it into a more complete model that can run physics simulation, you'd usually also add:
+      </p>
+      <ul class="check-list">
+        <li><strong>collision</strong>: collision boundaries</li>
+        <li><strong>inertial</strong>: weight and basic physical info</li>
+      </ul>
+      <p class="detail-paragraph">
+        In other words, this snowman example is more like: <strong>a starting point for understanding how URDF is written and assembled.</strong> Once you're comfortable with this style of writing, looking at more complete models won't feel as confusing.
+      </p>
+
+      <!-- Section: Try it yourself -->
+      <h2 class="detail-heading">What Can You Try Changing Yourself?</h2>
+      <p class="detail-paragraph">
+        If you want to understand URDF faster, the best way isn't just to read — it's to <strong>tweak a few small things and see what happens</strong>. For example, try:
+      </p>
+      <ul class="check-list">
+        <li>Changing the body from a cylinder to a box</li>
+        <li>Making the head's radius bigger or smaller</li>
+        <li>Adjusting the z value of <code>origin</code> a bit higher or lower</li>
+        <li>Changing <code>fixed</code> to another joint type and watching how the meaning changes</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          These small edits help a lot, because you'll start to feel: <strong>URDF isn't just for reading — it really is something you can edit hands-on.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-example {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .heading-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    padding: 0.05em 0.4em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Code block (XML) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  .code-block--xml {
+    background-color: var(--color-bg-secondary);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.relation-desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-4) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Big-picture list (a / b / c letters) */
+  .bigpic-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .bigpic-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .bigpic-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .bigpic-letter {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .bigpic-text {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .bigpic-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept grid (Lego analogy) */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .concept-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .concept-card {
+    padding: var(--space-3);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+    transition: transform var(--transition);
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .concept-label {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .concept-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Relation (Parent / Child) */
+  .relation-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .relation-card {
+    width: 100%;
+    max-width: 28rem;
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+  }
+
+  .relation-card--parent {
+    border-color: var(--color-accent);
+  }
+
+  .relation-card--child {
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .relation-tag {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.04em;
+  }
+
+  .relation-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .relation-arrow {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  /* Math card (origin formula) */
+  .math-card {
+    margin: var(--space-4) auto var(--space-6);
+    padding: var(--space-5) var(--space-8);
+    max-width: 22rem;
+    background-color: var(--color-bg-secondary);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    text-align: center;
+  }
+
+  .math-text {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-lg);
+    color: var(--color-accent);
+  }
+
+  /* Recap list (final 6 tags) */
+  .recap-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .recap-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .recap-tag {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border-radius: var(--border-radius);
+    letter-spacing: 0.03em;
+  }
+
+  .recap-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .concept-grid,
+    .concept-grid--three,
+    .recap-list {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .bigpic-item {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .relation-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .math-card {
+      padding: var(--space-4) var(--space-6);
+    }
+  }
+</style>

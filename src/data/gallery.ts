@@ -6,6 +6,15 @@ export interface Album {
 
 export const albums: Album[] = [
   {
+    id: 'album-6',
+    title: '20260417－學生吳貞昀、黃晟偉榮獲中研院暑期實習機會',
+    photos: [
+      '中研院實習錄取通知.png',
+      '確認信_晟偉.png',
+      '確認信_貞昀.png',
+    ],
+  },
+  {
     id: 'album-1',
     title: '20251122－學生陳冠廷、吳貞昀、黃晟偉晉級「2025中興大學AI賦能與機器人於智慧製造應用專題實作競賽」決賽',
     photos: [

@@ -4,7 +4,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Model Structure & Components — URDF Format & Model Description"
-  description="Understand the structure of URDF models, including core elements like links and joints."
+  description="Take URDF apart and look at its core elements: Link, Joint, Visual, Collision, and Inertial — plus the often-overlooked details of position and orientation that bring a robot model together."
   lang="en"
 >
   <section class="section">
@@ -12,11 +12,316 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/">&larr; Back to Home</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">Model Structure & Components</h1>
+        <h1 class="detail-title">Taking It Apart: How a URDF Model Comes Together</h1>
         <p class="detail-subtitle">
-          Page under construction...
+          As mentioned earlier, URDF is like a digital blueprint for a robot. It tells the computer
+          which parts the robot has, how those parts connect, and how the model should be loaded
+          and used. If we take a full URDF apart, the most important pieces fall into two main groups.
         </p>
       </header>
+
+      <!-- Section: Intro overview -->
+      <h2 class="detail-heading">The Two Main Building Blocks of URDF</h2>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <p class="overview-tag">Part 1</p>
+          <h3 class="overview-title">Link and Joint</h3>
+          <p class="overview-desc">
+            These build the structure of the robot. A Link is a part, and a Joint is what connects
+            those parts together.
+          </p>
+        </div>
+        <div class="overview-card">
+          <p class="overview-tag">Part 2</p>
+          <h3 class="overview-title">Visual, Collision, and Inertial</h3>
+          <p class="overview-desc">
+            These add appearance, collision, and physics information to each part — so the model
+            isn't just visible, but can also behave correctly in a simulator.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          You can also think of it like assembling a robot: first build each individual part, then
+          connect them together, and finally fill in their appearance and basic physical
+          information. That way the model is not only something you can see, but something that
+          can actually work properly inside a simulator.
+        </p>
+      </div>
+
+      <!-- Section: Link -->
+      <h2 class="detail-heading">Link: A Part of the Robot</h2>
+      <p class="detail-paragraph">
+        In URDF, a Link can be thought of as a single part of the robot. The base, an arm, a
+        forearm, a wheel, a gripper — each of these can be a link.
+      </p>
+      <p class="detail-paragraph">
+        You can think of a Link as a <strong>"body part"</strong> or a <strong>"skeleton piece"</strong>
+        of the robot. With only Links, the robot is just a pile of separate parts — not yet a
+        complete structure.
+      </p>
+      <p class="detail-paragraph">
+        Inside a Link in URDF, you'll often see a few important sub-elements:
+      </p>
+
+      <div class="concept-grid concept-grid--three">
+        <div class="concept-card">
+          <h3 class="concept-label">Visual</h3>
+          <p class="concept-desc">What it looks like</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">Collision</h3>
+          <p class="concept-desc">How its collision area is calculated</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">Inertial</h3>
+          <p class="concept-desc">Its weight and physical properties</p>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        Note that not every link will have all of these filled in. In simple models, sometimes
+        only the appearance is defined; the collision and physics information is usually added
+        later when simulation is needed.
+      </p>
+
+      <!-- Section: Joint -->
+      <h2 class="detail-heading">Joint: What Connects the Parts</h2>
+      <p class="detail-paragraph">
+        If a Link is a part, a Joint is the place where parts connect. Its job is important
+        because it tells the computer:
+      </p>
+      <ul class="check-list">
+        <li>Which two Links are connected</li>
+        <li>How they can move relative to each other</li>
+        <li>Where the joint is mounted</li>
+        <li>Which axis it moves along</li>
+      </ul>
+      <p class="detail-paragraph">
+        In other words, a Joint isn't just about "connecting" — it also defines how the entire
+        robot moves.
+      </p>
+
+      <p class="detail-paragraph">
+        You can also think of the whole robot as a tree: starting from the base, parts grow
+        outward one by one. That's why inside a Joint, you'll often see <strong>Parent</strong>
+        and <strong>Child</strong> notation.
+      </p>
+
+      <div class="relation-grid">
+        <div class="relation-card relation-card--parent">
+          <p class="relation-tag">Parent</p>
+          <p class="relation-desc">The upper, "main body" link</p>
+          <p class="relation-example">For example: shoulder, axle</p>
+        </div>
+        <div class="relation-arrow" aria-hidden="true">↓</div>
+        <div class="relation-card relation-card--child">
+          <p class="relation-tag">Child</p>
+          <p class="relation-desc">The link attached underneath that follows along</p>
+          <p class="relation-example">For example: arm, wheel</p>
+        </div>
+      </div>
+
+      <!-- Section: Joint types -->
+      <h2 class="detail-heading">Common Joint Types</h2>
+      <p class="detail-paragraph">
+        There's more than one kind of Joint. Different joint types decide whether parts can move
+        and how they move. For getting started, these four are the most useful to be familiar with.
+      </p>
+
+      <ol class="stage-list">
+        <li class="stage-item">
+          <span class="stage-num">1</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Fixed</h3>
+            <p class="stage-desc">
+              This kind of Joint doesn't move — it locks two parts together. If two parts are
+              meant to stay still relative to each other, Fixed is usually the right choice.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">2</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Revolute</h3>
+            <p class="stage-desc">
+              This kind of Joint can rotate, but only within an angle limit. It's a lot like an
+              elbow or a knee — it can only turn within a certain range.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">3</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Continuous</h3>
+            <p class="stage-desc">
+              This kind of Joint also rotates, but without an angle limit. The most common
+              example is a wheel, since wheels usually need to spin freely.
+            </p>
+          </div>
+        </li>
+        <li class="stage-item">
+          <span class="stage-num">4</span>
+          <div class="stage-body">
+            <h3 class="stage-title">Prismatic</h3>
+            <p class="stage-desc">
+              This kind of Joint doesn't rotate — it slides in a straight line. You can think of
+              it like pulling a drawer out and pushing it back in.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        There are other joint types too, but for getting started, getting comfortable with these
+        four will already take you a long way.
+      </p>
+
+      <!-- Section: Visual -->
+      <h2 class="detail-heading">Visual: What It Looks Like</h2>
+      <p class="detail-paragraph">
+        Visual is responsible for the model's appearance. In short, it defines what this part
+        looks like on screen. Things you can set here include:
+      </p>
+      <ul class="check-list">
+        <li>Geometric shape — for example, a box, cylinder, or sphere</li>
+        <li>Color</li>
+        <li>Material</li>
+        <li>Importing a 3D model file</li>
+      </ul>
+      <p class="detail-paragraph">
+        So Visual is mainly for people to see and for the screen to display. When we look at a
+        robot's appearance inside a simulator, what we're seeing is mostly the Visual part doing
+        its job.
+      </p>
+
+      <!-- Section: Collision -->
+      <h2 class="detail-heading">Collision: How Collisions Are Calculated</h2>
+      <p class="detail-paragraph">
+        Collision tells the computer roughly where this part's "physical extent" is.
+      </p>
+      <p class="detail-paragraph">
+        With Collision defined, the simulator can tell whether the model is bumping into the
+        floor, walls, or other objects. Without a proper collision area, the model might just
+        pass through things like a ghost.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Collision doesn't have to look exactly the same as Visual.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        In many cases, Visual is made more detailed so the model looks nice on screen, while
+        Collision is intentionally kept simple — wrapping the part in a box, a cylinder, or some
+        other simplified shell.
+      </p>
+      <p class="detail-paragraph">
+        This isn't laziness — it's actually a very common practice. The simpler the collision
+        model, the more stable the simulation tends to be, and the faster it runs.
+      </p>
+
+      <!-- Section: Inertial -->
+      <h2 class="detail-heading">Inertial: The Model's Physical Information</h2>
+      <p class="detail-paragraph">
+        Inertial is responsible for the part's basic physical information. If you're only drawing
+        the model, missing Inertial may not show an immediate problem — but as soon as physics
+        simulation gets involved, this part becomes very important.
+      </p>
+      <p class="detail-paragraph">
+        It usually affects things like:
+      </p>
+      <ul class="check-list">
+        <li>How heavy the part is</li>
+        <li>Roughly where its center of mass is</li>
+        <li>How much rotational inertia it has</li>
+      </ul>
+      <p class="detail-paragraph">
+        These settings affect the model's balance, the forces acting on it, and how it moves in
+        simulation. If they're set strangely, the robot may look unstable, fall over easily, or
+        move in ways that feel unnatural.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So you can think of Inertial as: the information that makes a model not just
+          <strong>"look real"</strong>, but also <strong>"move like it's real"</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Position and direction -->
+      <h2 class="detail-heading">Knowing Link and Joint Isn't Enough — Position and Orientation Matter Too</h2>
+      <p class="detail-paragraph">
+        When beginners first start learning URDF, the things they usually pick up first are:
+      </p>
+      <ul class="check-list">
+        <li>There are links</li>
+        <li>There are joints</li>
+        <li>Joints come in different types</li>
+      </ul>
+      <p class="detail-paragraph">
+        All of that is correct, but there's one important detail that's often overlooked:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Where the joint is mounted, and which axis it moves along.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        If these aren't set correctly, common symptoms look like this:
+      </p>
+      <ul class="cross-list">
+        <li>The arm rotates in a strange direction</li>
+        <li>The wheel spins at an angle</li>
+        <li>Parts connect at the wrong location</li>
+        <li>The whole model looks crooked</li>
+      </ul>
+      <p class="detail-paragraph">
+        So when actually writing URDF, beyond the parts and joints themselves,
+        <strong>"position" and "orientation"</strong> are also a very important piece of the picture.
+      </p>
+
+      <!-- Section: Summary -->
+      <h2 class="detail-heading">Summary</h2>
+      <p class="detail-paragraph">
+        At its simplest, the core work of a URDF file is really just doing two things over and over:
+      </p>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <p class="summary-step">Step 1</p>
+          <h3 class="summary-title">Build the parts</h3>
+          <p class="summary-desc">
+            Use <strong>Link</strong> to define each part of the robot, then add to each part:
+          </p>
+          <ul class="summary-list">
+            <li><strong>Visual</strong> — what it looks like</li>
+            <li><strong>Collision</strong> — how its collision area is calculated</li>
+            <li><strong>Inertial</strong> — how its physical information is set</li>
+          </ul>
+        </div>
+        <div class="summary-card">
+          <p class="summary-step">Step 2</p>
+          <h3 class="summary-title">Connect the parts</h3>
+          <p class="summary-desc">
+            Use <strong>Joint</strong> to link these parts together, and tell the computer:
+          </p>
+          <ul class="summary-list">
+            <li>Which connects to which</li>
+            <li>What kind of joint it is</li>
+            <li>Where the joint is mounted</li>
+            <li>Which axis it moves along</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        As these two things gradually come together, the model of a robot becomes more and more complete.
+      </p>
 
     </div>
   </section>
@@ -39,6 +344,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     text-decoration: underline;
   }
 
+  /* Header */
   .detail-header {
     margin-bottom: var(--space-12);
     padding-bottom: var(--space-6);
@@ -57,5 +363,427 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Cross list (✗ items) */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (for important takeaways — replaces red text) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-5) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Overview grid (Link & Joint / Visual Collision Inertial intro) */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .overview-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .overview-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .overview-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .overview-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .overview-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Concept grid (Visual / Collision / Inertial) */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .concept-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .concept-card {
+    padding: var(--space-6);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .concept-label {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.02em;
+  }
+
+  .concept-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Relation (Parent / Child) */
+  .relation-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .relation-card {
+    width: 100%;
+    max-width: 28rem;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+  }
+
+  .relation-card--parent {
+    border-color: var(--color-accent);
+  }
+
+  .relation-card--child {
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .relation-tag {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.04em;
+  }
+
+  .relation-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+    margin-bottom: var(--space-2);
+  }
+
+  .relation-example {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .relation-arrow {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  /* Stage list (numbered Joint types) */
+  .stage-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .stage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: all var(--transition);
+  }
+
+  .stage-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .stage-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  .stage-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stage-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .stage-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Summary grid (final two-step recap) */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .summary-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .summary-step {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .summary-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .summary-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-3);
+  }
+
+  .summary-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .summary-list li {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .summary-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .summary-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .overview-grid,
+    .concept-grid,
+    .concept-grid--three,
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stage-item {
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+
+    .stage-num {
+      width: 2rem;
+      height: 2rem;
+      font-size: var(--text-sm);
+    }
+
+    .overview-card,
+    .summary-card {
+      padding: var(--space-6);
+    }
+
+    .relation-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-text {
+      font-size: var(--text-sm);
+    }
   }
 </style>

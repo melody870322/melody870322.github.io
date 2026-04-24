@@ -1,0 +1,762 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="基本結構與範例解析 — URDF 格式與模型描述"
+  description="從一份最簡單的「雪人機器人」URDF 範例切入，一步一步看懂 robot、link、joint、visual、parent / child、origin 是怎麼把一台模型寫出來的。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container urdf-example">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">打開來看：URDF 最基本的長相是什麼？</h1>
+        <p class="detail-subtitle">
+          前面我們已經認識了 URDF，也知道它是在描述機器人的外觀、結構，以及各個零件怎麼接在一起。接下來，真正重要的一步就是：打開一份 URDF，看看它到底長什麼樣子。很多人一開始會覺得 URDF 好像很抽象，因為前面都還在講概念。但其實只要看到一份最簡單的範例，再慢慢拆開來看，你就會發現它沒有想像中那麼可怕。
+        </p>
+      </header>
+
+      <!-- Section: Goals -->
+      <h2 class="detail-heading">這一頁的目標很單純</h2>
+      <ul class="check-list">
+        <li>先看懂一份最小的 URDF 範例</li>
+        <li>知道 Robot、Link、Joint 這些標籤出現在什麼地方</li>
+        <li>理解一台模型是怎麼從文字慢慢組起來的</li>
+      </ul>
+      <p class="detail-paragraph">
+        這裡先不用追求完整，也不用一次把所有功能學完。重點是先建立一個感覺：<strong>原來 URDF 就是這樣把機器人寫出來的。</strong>
+      </p>
+
+      <!-- Section: Snowman example -->
+      <h2 class="detail-heading">先看一份超簡單的 URDF 範例</h2>
+      <p class="detail-paragraph">
+        假設現在要做一個很簡單的「雪人機器人」：它有一個圓柱形的身體，還有一顆球形的頭，頭和身體之間用固定關節接起來。這份 URDF 可以長成這樣：
+      </p>
+
+      <pre class="code-block code-block--xml"><code>&lt;?xml version="1.0"?&gt;
+&lt;robot name="snowman_robot"&gt;
+
+  &lt;!-- 1. 定義機器人的身體 --&gt;
+  &lt;link name="base_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;cylinder length="0.6" radius="0.2"/&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+
+  &lt;!-- 2. 定義機器人的頭部 --&gt;
+  &lt;link name="head_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;sphere radius="0.2"/&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+
+  &lt;!-- 3. 把頭跟身體接起來 --&gt;
+  &lt;joint name="neck_joint" type="fixed"&gt;
+    &lt;parent link="base_link"/&gt;
+    &lt;child link="head_link"/&gt;
+    &lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;
+  &lt;/joint&gt;
+
+&lt;/robot&gt;</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這是一個很小、很基本的範例。它的重點不是做出一台完整的機器人，而是<strong>先讓我們看懂 URDF 最基本的結構</strong>。
+        </p>
+      </div>
+
+      <!-- Section: Big picture -->
+      <h2 class="detail-heading">先不要急著看懂全部，先抓住整體架構</h2>
+      <p class="detail-paragraph">
+        如果先用最簡單的方式來看，這份 URDF 其實只是在做三件事：
+      </p>
+
+      <ol class="bigpic-list">
+        <li class="bigpic-item">
+          <span class="bigpic-letter">a</span>
+          <span class="bigpic-text">建立一個機器人的大框架</span>
+        </li>
+        <li class="bigpic-item">
+          <span class="bigpic-letter">b</span>
+          <span class="bigpic-text">做出兩個 <strong>link</strong>，也就是身體和頭</span>
+        </li>
+        <li class="bigpic-item">
+          <span class="bigpic-letter">c</span>
+          <span class="bigpic-text">用一個 <strong>joint</strong> 把它們接起來</span>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        光這樣，就已經是一份最基本的 URDF 了。你可以把它想成在拼樂高：
+      </p>
+
+      <div class="concept-grid concept-grid--three">
+        <div class="concept-card">
+          <h3 class="concept-label">link</h3>
+          <p class="concept-desc">一塊一塊零件</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">joint</h3>
+          <p class="concept-desc">把零件接起來的地方</p>
+        </div>
+        <div class="concept-card">
+          <h3 class="concept-label">robot</h3>
+          <p class="concept-desc">把整台機器人包起來的外層</p>
+        </div>
+      </div>
+
+      <!-- Section: Layer 1 - robot -->
+      <h2 class="detail-heading">第一層：最外面的 <code class="heading-code">&lt;robot&gt;</code></h2>
+
+      <h3 class="sub-heading">XML 開場白</h3>
+      <pre class="code-block code-block--xml"><code>&lt;?xml version="1.0"?&gt;</code></pre>
+      <p class="detail-paragraph">
+        這一行是在告訴電腦：<strong>這是一份 XML 格式的檔案。</strong>它有點像開場白，讓電腦先知道後面要用 XML 的方式來讀內容。
+      </p>
+
+      <h3 class="sub-heading">最外層的大箱子</h3>
+      <pre class="code-block code-block--xml"><code>&lt;robot name="snowman_robot"&gt;</code></pre>
+      <p class="detail-paragraph">
+        這個標籤可以把它想成一個大箱子。<strong>整台機器人的所有內容，都會放在這個箱子裡面。</strong>這裡的 <code>name="snowman_robot"</code> 就是在幫這台機器人取名字。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          所以最外層的 <strong>robot</strong>，做的事情很簡單：把整份模型包起來，並且告訴系統這台機器人叫什麼。
+        </p>
+      </div>
+
+      <!-- Section: Layer 2 - link -->
+      <h2 class="detail-heading">第二層：用 <code class="heading-code">&lt;link&gt;</code> 做出機器人的零件</h2>
+      <p class="detail-paragraph">
+        在這個範例裡，有兩個 link：
+      </p>
+      <ul class="check-list">
+        <li><code>base_link</code></li>
+        <li><code>head_link</code></li>
+      </ul>
+      <p class="detail-paragraph">
+        它們分別代表雪人的身體和頭。
+      </p>
+
+      <h3 class="sub-heading">身體的 link</h3>
+      <pre class="code-block code-block--xml"><code>&lt;link name="base_link"&gt;
+  &lt;visual&gt;
+    &lt;geometry&gt;
+      &lt;cylinder length="0.6" radius="0.2"/&gt;
+    &lt;/geometry&gt;
+  &lt;/visual&gt;
+&lt;/link&gt;</code></pre>
+      <p class="detail-paragraph">
+        這一段的意思是：
+      </p>
+      <ul class="check-list">
+        <li>建立一個叫做 <code>base_link</code> 的零件</li>
+        <li>這個零件有外觀</li>
+        <li>外觀是一個圓柱體</li>
+        <li>圓柱體長度是 <code>0.6</code></li>
+        <li>半徑是 <code>0.2</code></li>
+      </ul>
+
+      <h3 class="sub-heading">頭部的 link</h3>
+      <pre class="code-block code-block--xml"><code>&lt;link name="head_link"&gt;
+  &lt;visual&gt;
+    &lt;geometry&gt;
+      &lt;sphere radius="0.2"/&gt;
+    &lt;/geometry&gt;
+  &lt;/visual&gt;
+&lt;/link&gt;</code></pre>
+      <p class="detail-paragraph">
+        這一段也是同樣的概念：
+      </p>
+      <ul class="check-list">
+        <li>建立一個叫做 <code>head_link</code> 的零件</li>
+        <li>它的外觀是一顆球</li>
+        <li>半徑是 <code>0.2</code></li>
+      </ul>
+
+      <h3 class="sub-heading">為什麼 link 裡面會有 visual？</h3>
+      <p class="detail-paragraph">
+        因為 link 本身只是「零件」，但如果想讓它在畫面中看得見，就要幫它加上外觀。<strong>這就是 visual 的工作。</strong>
+      </p>
+      <p class="detail-paragraph">
+        在這個範例裡，我們只先放了 visual，讓模型能被看到。這樣做是因為現在的重點是先看懂 URDF 的基本結構，不是一次把所有東西都塞滿。所以你可以先把這個範例理解成：<strong>它是一份用來學基本寫法的最小模型。</strong>
+      </p>
+      <p class="detail-paragraph">
+        之後如果要放進模擬器做更完整的碰撞或物理計算，通常還會再補上：
+      </p>
+      <ul class="check-list">
+        <li><code>collision</code></li>
+        <li><code>inertial</code></li>
+      </ul>
+
+      <!-- Section: Layer 3 - joint -->
+      <h2 class="detail-heading">第三層：用 <code class="heading-code">&lt;joint&gt;</code> 把零件接起來</h2>
+      <p class="detail-paragraph">
+        前面已經有兩個零件了，但它們還只是分開存在。要讓頭真的接到身體上，就需要 joint。
+      </p>
+      <pre class="code-block code-block--xml"><code>&lt;joint name="neck_joint" type="fixed"&gt;
+  &lt;parent link="base_link"/&gt;
+  &lt;child link="head_link"/&gt;
+  &lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;
+&lt;/joint&gt;</code></pre>
+
+      <h3 class="sub-heading">這是一個什麼關節？</h3>
+      <pre class="code-block code-block--xml"><code>&lt;joint name="neck_joint" type="fixed"&gt;</code></pre>
+      <p class="detail-paragraph">
+        這裡建立了一個叫做 <code>neck_joint</code> 的關節。<code>type="fixed"</code> 表示這是一個<strong>固定關節</strong>，也就是接起來之後不能轉、不能滑動。所以這裡的意思不是「讓它動起來」，而是先把兩個零件固定地接成一個完整模型。
+      </p>
+
+      <h3 class="sub-heading">是誰接誰？</h3>
+      <pre class="code-block code-block--xml"><code>&lt;parent link="base_link"/&gt;
+&lt;child link="head_link"/&gt;</code></pre>
+      <p class="detail-paragraph">
+        這兩行是在告訴電腦：
+      </p>
+      <ul class="check-list">
+        <li><code>base_link</code> 是 <strong>parent</strong></li>
+        <li><code>head_link</code> 是 <strong>child</strong></li>
+      </ul>
+      <p class="detail-paragraph">
+        你可以把它想成：身體是主體，頭是接在身體上的那一個部分。這也是 URDF 很常見的寫法 — 用 <strong>parent</strong> 和 <strong>child</strong> 來表達模型裡零件之間的連接關係。
+      </p>
+
+      <div class="relation-grid">
+        <div class="relation-card relation-card--parent">
+          <p class="relation-tag">Parent</p>
+          <p class="relation-desc"><code>base_link</code>（身體）</p>
+        </div>
+        <div class="relation-arrow" aria-hidden="true">↓</div>
+        <div class="relation-card relation-card--child">
+          <p class="relation-tag">Child</p>
+          <p class="relation-desc"><code>head_link</code>（頭）</p>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">接在什麼位置？</h3>
+      <pre class="code-block code-block--xml"><code>&lt;origin xyz="0 0 0.5" rpy="0 0 0"/&gt;</code></pre>
+      <p class="detail-paragraph">
+        這一行非常重要。很多初學者第一次看 URDF，最容易忽略的就是 <code>origin</code>。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          但其實它是在告訴電腦：<strong>這個關節要放在什麼位置、用什麼方向接起來。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這裡的 <code>xyz="0 0 0.5"</code> 可以先簡單理解成：這個關節放在 z 軸往上 <code>0.5</code> 的位置。為什麼是 <code>0.5</code> 呢？因為：
+      </p>
+      <ul class="check-list">
+        <li>身體是圓柱，高度 <code>0.6</code>，所以從中心到頂部是 <code>0.3</code></li>
+        <li>頭是球，半徑 <code>0.2</code></li>
+        <li>如果想讓頭放在身體上方，球心大概就要再往上 <code>0.2</code></li>
+      </ul>
+
+      <div class="math-card">
+        <p class="math-text"><strong>0.3 + 0.2 = 0.5</strong></p>
+      </div>
+
+      <p class="detail-paragraph">
+        如果不加這個 <code>origin</code>，頭和身體的中心就會重疊在一起，畫面看起來就會像兩個模型擠在同一個地方，而不是頭乖乖坐在身體上面。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          所以 <code>origin</code> 的功能可以先記成一句話：<strong>它是在告訴電腦，零件或關節應該放在哪裡。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Recap -->
+      <h2 class="detail-heading">這份範例學到的重點是什麼？</h2>
+      <p class="detail-paragraph">
+        如果把整個雪人範例濃縮成最重要的幾句話，那就是：
+      </p>
+
+      <ul class="recap-list">
+        <li class="recap-item">
+          <code class="recap-tag">robot</code>
+          <span class="recap-desc">把整台機器人包起來</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">link</code>
+          <span class="recap-desc">建立零件</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">visual</code>
+          <span class="recap-desc">決定零件看起來長什麼樣</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">joint</code>
+          <span class="recap-desc">把零件接起來</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">parent / child</code>
+          <span class="recap-desc">決定誰接誰</span>
+        </li>
+        <li class="recap-item">
+          <code class="recap-tag">origin</code>
+          <span class="recap-desc">決定接在什麼位置</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這幾個就是你在看 URDF 時最常遇到的<strong>基本骨架</strong>。
+      </p>
+
+      <!-- Section: Is this complete? -->
+      <h2 class="detail-heading">這份範例還不完整嗎？</h2>
+      <p class="detail-paragraph">
+        如果是拿來學「基本結構」，它已經夠用了。但如果你想把它變成更完整、能做物理模擬的模型，那通常還會再補上：
+      </p>
+      <ul class="check-list">
+        <li><strong>collision</strong>：碰撞範圍</li>
+        <li><strong>inertial</strong>：重量和基本物理資訊</li>
+      </ul>
+      <p class="detail-paragraph">
+        也就是說，現在這份雪人範例比較像是：<strong>先看懂 URDF 怎麼寫、怎麼組裝的一個起點。</strong>等你先習慣這種寫法之後，再去看更完整的模型，就不會那麼容易亂掉。
+      </p>
+
+      <!-- Section: Try it yourself -->
+      <h2 class="detail-heading">可以自己試著改什麼？</h2>
+      <p class="detail-paragraph">
+        如果你想更快看懂 URDF，其實最好的方法不是只看，而是<strong>小改幾個地方試試看</strong>。例如你可以試著改：
+      </p>
+      <ul class="check-list">
+        <li>把身體從圓柱改成方塊</li>
+        <li>把頭的半徑改大或改小</li>
+        <li>把 <code>origin</code> 的 z 值改高一點或低一點</li>
+        <li>把 <code>fixed</code> 改成其他 joint 類型，觀察意思有什麼不同</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這些小修改很有幫助，因為你會開始感受到：<strong>URDF 不是只拿來讀，它是真的可以動手改的。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-example {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .heading-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    padding: 0.05em 0.4em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Code block (XML) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  .code-block--xml {
+    background-color: var(--color-bg-secondary);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.relation-desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-4) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Big-picture list (a / b / c letters) */
+  .bigpic-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .bigpic-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .bigpic-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .bigpic-letter {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .bigpic-text {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .bigpic-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Concept grid (Lego analogy) */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .concept-grid--three {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .concept-card {
+    padding: var(--space-3);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+    transition: transform var(--transition);
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .concept-label {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .concept-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Relation (Parent / Child) */
+  .relation-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .relation-card {
+    width: 100%;
+    max-width: 28rem;
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+  }
+
+  .relation-card--parent {
+    border-color: var(--color-accent);
+  }
+
+  .relation-card--child {
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .relation-tag {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    letter-spacing: 0.04em;
+  }
+
+  .relation-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .relation-arrow {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  /* Math card (origin formula) */
+  .math-card {
+    margin: var(--space-4) auto var(--space-6);
+    padding: var(--space-5) var(--space-8);
+    max-width: 22rem;
+    background-color: var(--color-bg-secondary);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    text-align: center;
+  }
+
+  .math-text {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-lg);
+    color: var(--color-accent);
+  }
+
+  /* Recap list (final 6 tags) */
+  .recap-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .recap-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .recap-tag {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border-radius: var(--border-radius);
+    letter-spacing: 0.03em;
+  }
+
+  .recap-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .concept-grid,
+    .concept-grid--three,
+    .recap-list {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .bigpic-item {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .relation-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .math-card {
+      padding: var(--space-4) var(--space-6);
+    }
+  }
+</style>

@@ -1,0 +1,631 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Common Model Issues & Troubleshooting — URDF Format & Model Description"
+  description="After the basic preview checks, if the model still feels off, start from these four situations: the structure isn't truly connected into one model, joints move unreasonably, the preview looks fine but the simulator falls apart, or the file has grown too messy to maintain."
+  lang="en"
+>
+  <section class="section">
+    <div class="container urdf-troubleshoot">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Model Still Wrong? These Are the Issues Worth Checking First</h1>
+        <p class="detail-subtitle">
+          The previous page was more like a first-layer check: whether the model shows up, whether parts are wrongly attached, whether positions and orientations are roughly right. But in practice, the truly tricky part of URDF often isn't the kind of mistake you can spot at first glance — it's when <strong>the model looks about right, yet still has a deeper layer of problems</strong>.
+        </p>
+      </header>
+
+      <!-- Section: 4 cases overview -->
+      <h2 class="detail-heading">The Four Situations We'll Walk Through</h2>
+      <p class="detail-paragraph">
+        This page doesn't repeat the earlier basic checks. Instead, it groups four situations that are each worth looking at on their own:
+      </p>
+
+      <ol class="cases-list">
+        <li class="cases-item">
+          <span class="cases-num">1</span>
+          <span class="cases-text">The structure isn't actually connected into one complete model</span>
+        </li>
+        <li class="cases-item">
+          <span class="cases-num">2</span>
+          <span class="cases-text">Joints move, but the limits don't make sense</span>
+        </li>
+        <li class="cases-item">
+          <span class="cases-num">3</span>
+          <span class="cases-text">The preview looks fine, but things break inside the simulator</span>
+        </li>
+        <li class="cases-item">
+          <span class="cases-num">4</span>
+          <span class="cases-text">The file gets messier and harder to maintain over time</span>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If you've already done the basic preview and the model still feels off, <strong>these four situations are a good place to start looking</strong>.
+        </p>
+      </div>
+
+      <!-- Case 1 -->
+      <div class="case-header">
+        <p class="case-label">Case 1</p>
+        <h2 class="case-title">It Looks Like a Robot With Many Parts — But the Parts Aren't Really Connected</h2>
+      </div>
+      <p class="detail-paragraph">
+        This one isn't always obvious at first glance. You might feel like:
+      </p>
+      <ul class="check-list">
+        <li><code>link</code>s are all written</li>
+        <li><code>joint</code>s are all written</li>
+        <li>Every part seems to be there</li>
+      </ul>
+      <p class="detail-paragraph">
+        But overall, it just doesn't look like one complete robot. Sometimes the symptoms look like:
+      </p>
+      <ul class="check-list">
+        <li>The model splits into two pieces that aren't connected</li>
+        <li>Some parts float off to the side, forming their own little group</li>
+        <li>Every component exists, yet there's no clear main body holding it all together</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Step back and remember this: <strong>URDF's structure is a lot like a tree.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        In other words, a robot isn't just a pile of parts thrown together — there has to be a clear connection relationship, each piece linking to the next.
+      </p>
+
+      <h3 class="sub-heading">Places to check first</h3>
+      <ol class="diagnosis-list">
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">1</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is every link actually connected to the overall structure?</h4>
+            <p class="diagnosis-desc">
+              Some links are defined, but never attached to the rest of the model via a <code>joint</code> — so they end up as isolated pieces.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">2</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Did you accidentally make two separate parts?</h4>
+            <p class="diagnosis-desc">
+              Sometimes you think you're building one robot, but you've actually built two small disjoint trees that never connect to each other.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">3</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Does the whole model have a clear starting point?</h4>
+            <p class="diagnosis-desc">
+              There's usually one piece — something like the base or the main body — that everything else extends from. If even this starting point is unclear, the structure tends to fall apart.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 class="sub-heading">Another way to see it</h3>
+      <p class="detail-paragraph">
+        If the earlier "wrong position" issue is more like parts being placed crookedly, this one is more like:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The skeleton itself hasn't really been built yet.</strong>
+        </p>
+      </div>
+
+      <!-- Case 2 -->
+      <div class="case-header">
+        <p class="case-label">Case 2</p>
+        <h2 class="case-title">Joints Do Move — But the Motion Doesn't Feel Right</h2>
+      </div>
+      <p class="detail-paragraph">
+        This one's actually trickier than "completely unable to move." Because on the surface the model looks fine, and the joints really do move, <strong>but once it starts moving, something feels off</strong>. Common symptoms:
+      </p>
+      <ul class="check-list">
+        <li>A joint gets stuck almost immediately</li>
+        <li>It should only move a little, but swings way too far</li>
+        <li>A prismatic joint shoots off far beyond where it should</li>
+        <li>A revolute joint rotates to an unreasonable angle</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          At this point, the question usually isn't "is there a joint" — it's: <strong>whether the joint's limit settings are reasonable.</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Places to check first</h3>
+      <ol class="diagnosis-list">
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">1</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is limit missing?</h4>
+            <p class="diagnosis-desc">
+              Some joints aren't really immobile — they behave oddly because the limit was never set up properly.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">2</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is the limit range too small or too large?</h4>
+            <p class="diagnosis-desc">
+              Too small and the joint looks like it gets stuck the moment it moves; too large and the model may swing around in ways that clearly don't make sense.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">3</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Have you mixed up different joint concepts?</h4>
+            <p class="diagnosis-desc">
+              <strong>Revolute joints</strong> think in terms of "how far can it rotate"; <strong>prismatic joints</strong> think in terms of "how far can it slide." If these two ideas get tangled, the model can easily move — but in ways that don't make sense.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 class="sub-heading">What makes this kind of problem distinctive?</h3>
+      <p class="detail-paragraph">
+        Unlike a wrong position, you can't spot it at a glance — <strong>the problem only surfaces once the model actually starts moving</strong>. So if you feel that:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>It's not that the model can't move — it's that it doesn't move like the robot you had in mind.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Then it's well worth going back and checking the <code>joint</code> limits.
+      </p>
+
+      <!-- Case 3 -->
+      <div class="case-header">
+        <p class="case-label">Case 3</p>
+        <h2 class="case-title">The Preview Looks Fine — But the Simulator Is Full of Problems</h2>
+      </div>
+      <p class="detail-paragraph">
+        This one is really worth <strong>knowing about in advance</strong>. Many models look fine in a preview tool, but the moment they're dropped into an environment with real physics calculations, problems start showing up. For example:
+      </p>
+      <ul class="check-list">
+        <li>Falling through the floor</li>
+        <li>Overlapping with other objects</li>
+        <li>Weird collision reactions</li>
+        <li>The model shakes unnaturally</li>
+        <li>Tips over at the slightest touch, or behaves as if it has no weight</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This means what you need to look at is no longer just appearance — it's: <strong>whether the collision and physics information is actually complete.</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Places to check first</h3>
+      <ol class="diagnosis-list">
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">1</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is collision set up?</h4>
+            <p class="diagnosis-desc">
+              With only <code>visual</code>, the model is visible — but that doesn't mean collisions are computed correctly. Any part that needs collision checking usually needs a reasonable <code>collision</code> definition.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">2</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is the collision shape set to something unreasonable?</h4>
+            <p class="diagnosis-desc">
+              Sometimes it isn't missing — it's just that the collision shell is way too big or too small. When that happens, the simulator's collision results end up looking very different from the visual.
+            </p>
+          </div>
+        </li>
+        <li class="diagnosis-item">
+          <span class="diagnosis-num">3</span>
+          <div class="diagnosis-body">
+            <h4 class="diagnosis-title">Is inertial filled in?</h4>
+            <p class="diagnosis-desc">
+              For physics simulation, <code>inertial</code> matters. It affects things like <strong>weight, center of mass, and balance</strong>. If this part isn't set up well, the model easily moves in unnatural ways.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 class="sub-heading">One thing to keep in mind</h3>
+      <div class="callout-card">
+        <p class="callout-text">
+          Preview tools mainly help you see the <strong>model's appearance and basic structure</strong>. But problems truly related to "physics" often only reveal themselves once the model is inside a simulator. So if your goal is eventually to drop the model into <strong>PyBullet</strong> or <strong>Gazebo</strong>, <code>collision</code> and <code>inertial</code> aren't something you can keep postponing.
+        </p>
+      </div>
+
+      <!-- Case 4 -->
+      <div class="case-header">
+        <p class="case-label">Case 4</p>
+        <h2 class="case-title">The Model Itself Isn't Necessarily Wrong — But the File Has Become Too Messy to Edit</h2>
+      </div>
+      <p class="detail-paragraph">
+        This one is different from the previous cases. It <strong>doesn't necessarily throw off the model right away, or obviously break the visuals</strong>, but it makes every edit more painful. Common symptoms:
+      </p>
+      <ul class="check-list">
+        <li>The same content gets pasted over and over</li>
+        <li>You edit one place and forget another place that should have been edited too</li>
+        <li>As the file grows, it gets harder to find where the problem is</li>
+        <li>The model itself isn't badly broken, but every edit feels like defusing a bomb</li>
+      </ul>
+      <p class="detail-paragraph">
+        At this point, it isn't necessarily that the model structure is wrong — it's that <strong>the file has become hard to maintain</strong>.
+      </p>
+
+      <h3 class="sub-heading">What can you do here?</h3>
+      <p class="detail-paragraph">
+        This is a great moment to start looking into <strong>Xacro</strong>. You can think of Xacro as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A tool that helps you organize URDF.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        It isn't a one-click fix button, and it isn't specifically a bug hunter either. It's more about helping you with things like:
+      </p>
+      <ul class="check-list">
+        <li>Organizing repeated snippets</li>
+        <li>Managing dimensions with variables</li>
+        <li>Reducing the need to copy-paste</li>
+        <li>Keeping the file shorter and easier to read</li>
+      </ul>
+
+      <h3 class="sub-heading">When to consider using Xacro</h3>
+      <p class="detail-paragraph">
+        If you start feeling that:
+      </p>
+      <ul class="check-list">
+        <li>The model is getting larger</li>
+        <li>There are more and more joints</li>
+        <li>Every edit comes with a fear of missing something</li>
+        <li>You're having a hard time reading your own URDF</li>
+      </ul>
+      <p class="detail-paragraph">
+        Then it's probably about time to pick up Xacro.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Its point isn't direct debugging — it's <strong>making it harder for you to accidentally mess up the file in the future.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-troubleshoot {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Case header (Case 1 / 2 / 3 / 4) */
+
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.diagnosis-desc) code,
+  :global(.diagnosis-title) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway — replaces red text) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Cases list (4 cases overview) */
+  .cases-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .cases-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) ;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .cases-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .cases-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .cases-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  /* Diagnosis list (places to check first) */
+  .diagnosis-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .diagnosis-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: border-color var(--transition);
+  }
+
+  .diagnosis-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .diagnosis-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .diagnosis-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .diagnosis-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    line-height: 1.5;
+  }
+
+  .diagnosis-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .diagnosis-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .cases-list {
+      grid-template-columns: 1fr;
+    }
+
+    .case-header {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .diagnosis-item {
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

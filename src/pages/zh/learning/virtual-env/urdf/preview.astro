@@ -1,0 +1,783 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="檔案的查看、修改與預覽 — URDF 格式與模型描述"
+  description="先用 VS Code 打開 URDF、安裝 URDF Visualizer 與 XML 擴充功能，把模型直接預覽出來。再透過寫一點、預覽、修改、再預覽的循環，慢慢把模型調到對的位置、方向和比例。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container urdf-preview">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">打開來看：怎麼檢查和修改 URDF</h1>
+        <p class="detail-subtitle">
+          前面我們已經認識了 URDF，也看過最基本的結構和範例。接下來很自然會遇到一個問題：檔案寫完之後，<strong>要怎麼知道自己有沒有寫對？</strong>如果只是一直盯著 XML 文字看，其實很難馬上發現模型哪裡歪掉、哪裡接錯，或是哪個零件大小不合理。所以這裡的重點很單純：把 URDF 打開、如果有需要就改一改，再把模型預覽出來。
+        </p>
+      </header>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這裡先不走 ROS 2 的流程，而是先用比較輕鬆的方式來做。只要有 <strong>VS Code</strong>，再安裝可以預覽 URDF 的擴充功能，就能先看到模型長什麼樣、零件有沒有接對、位置有沒有跑掉。這樣很適合現在這個階段，也和前面已經在用的 VS Code 編輯方式接得起來。
+        </p>
+      </div>
+
+      <!-- Section: Where files live -->
+      <h2 class="detail-heading">URDF 檔案通常放在哪裡？</h2>
+      <p class="detail-paragraph">
+        URDF 本質上就是文字檔，所以你可以把它放在自己的專案資料夾裡。很多人會另外整理一個叫做 <code>urdf</code> 的資料夾，專門放模型檔；如果還有 3D 模型或材質，也會再分開放到 <code>meshes</code>、<code>textures</code> 這些資料夾。你可以像這樣整理：
+      </p>
+
+      <pre class="code-block code-block--tree"><code>my_robot/
+├─ urdf/
+│   └─ my_robot.urdf
+├─ meshes/
+└─ textures/</code></pre>
+
+      <p class="detail-paragraph">
+        如果之後你會接 <strong>ROS 2</strong>，也很常看到 URDF 被放在 package 裡的 urdf 資料夾。不過現在這個階段，不需要先被 ROS 2 的資料夾結構綁住，先把模型檔和用到的資源整理在同一個專案裡就可以了。
+      </p>
+
+      <!-- Section: What tool -->
+      <h2 class="detail-heading">用什麼工具打開和修改？</h2>
+      <p class="detail-paragraph">
+        最方便的做法，就是直接用 <strong>VS Code</strong>。因為 URDF 是 XML 格式的文字檔，所以本來就可以直接用文字編輯器修改。但如果用 VS Code，看起來會清楚很多，標籤比較好分辨，也比較不容易在改的時候看花掉。
+      </p>
+      <p class="detail-paragraph">
+        打開檔案之後，你平常會改到的通常是這些地方：
+      </p>
+      <ul class="check-list">
+        <li>尺寸，例如長度、半徑、高度</li>
+        <li>顏色或外觀</li>
+        <li><code>origin</code> 的位置</li>
+        <li><code>joint</code> 的種類、方向和連接方式</li>
+      </ul>
+      <p class="detail-paragraph">
+        改完之後先存檔。下一步不是繼續盯著文字看，而是<strong>要把它預覽出來</strong>。
+      </p>
+
+      <!-- Section: VS Code extensions -->
+      <h2 class="detail-heading">推薦安裝的 VS Code 擴充功能</h2>
+
+      <div class="ext-grid">
+        <article class="ext-card">
+          <p class="ext-tag">主工具</p>
+          <h3 class="ext-title">URDF Visualizer</h3>
+          <p class="ext-desc">
+            這是拿來預覽 URDF 的主工具。它可以在 VS Code 裡直接顯示模型，讓你不用先進 ROS 2，也能先看到結果。
+          </p>
+        </article>
+        <article class="ext-card">
+          <p class="ext-tag">輔助工具</p>
+          <h3 class="ext-title">XML</h3>
+          <p class="ext-desc">
+            這個不是拿來看 3D，而是讓你在改 URDF 的時候更舒服。因為 URDF 本來就是 XML 格式，所以有這類工具幫忙，標籤結構會比較清楚，也比較不容易漏掉開頭或結尾。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section: Operation flow -->
+      <h2 class="detail-heading">操作流程</h2>
+
+      <ol class="flow-list">
+        <li class="flow-item">
+          <span class="flow-num">1</span>
+          <div class="flow-body">
+            <h3 class="flow-title">用 VS Code 打開整個專案資料夾</h3>
+            <p class="flow-desc">
+              不要只雙擊 <code>.urdf</code> 檔，盡量直接用 VS Code 開整個專案資料夾。這樣如果模型有用到 mesh、材質或其他檔案，比較不容易發生路徑找不到的問題。
+            </p>
+          </div>
+        </li>
+
+        <li class="flow-item">
+          <span class="flow-num">2</span>
+          <div class="flow-body">
+            <h3 class="flow-title">開啟 URDF 預覽</h3>
+            <p class="flow-desc">
+              在 VS Code 裡，可以用兩種常見方式開啟預覽：
+            </p>
+            <ul class="check-list check-list--inset">
+              <li>按 <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>，輸入 <code>URDF Visualizer: Preview URDF/Xacro</code></li>
+              <li>或按檔案右上角的預覽按鈕</li>
+            </ul>
+            <p class="flow-desc">
+              兩種方法都可以，但前提是你現在開著的就是要預覽的那份 URDF 或 Xacro。
+            </p>
+          </div>
+        </li>
+
+        <li class="flow-item">
+          <span class="flow-num">3</span>
+          <div class="flow-body">
+            <h3 class="flow-title">先看模型有沒有正常出現</h3>
+            <p class="flow-desc">
+              預覽打開後，先不要急著看很細的語法。先看最直覺的幾件事：
+            </p>
+            <ul class="check-list check-list--inset">
+              <li>模型有沒有顯示出來</li>
+              <li>零件大小是不是合理</li>
+              <li>頭、身體、輪子、手臂有沒有接在對的位置</li>
+              <li>有沒有整個疊在一起，或飛到奇怪的地方</li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="flow-item">
+          <span class="flow-num">4</span>
+          <div class="flow-body">
+            <h3 class="flow-title">有問題就改完再看一次</h3>
+            <p class="flow-desc">
+              如果發現有問題，就回到 URDF 檔再改。這個過程通常不是一次寫完，而是一個循環：
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="cycle-card">
+        <p class="cycle-text">
+          <span class="cycle-step">寫一點</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-step">預覽</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-step">修改</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-step">再預覽</span>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這其實就是學 URDF 最實用的方式。
+      </p>
+
+      <!-- Section: Preview features -->
+      <h2 class="detail-heading">預覽時可以用哪些功能？</h2>
+      <p class="detail-paragraph">
+        URDF Visualizer 這類工具通常不只是「看畫面」而已。官方說明提到，它支援視角操作，也能直接開始預覽 URDF / Xacro；另外，可以透過滑鼠拖動來做關節控制，以及使用測量工具查看座標值、距離、角度或面積。所以在預覽時，你可以特別留意這幾件事：
+      </p>
+
+      <ul class="feature-list">
+        <li class="feature-item">
+          <h3 class="feature-title">轉一轉視角</h3>
+          <p class="feature-desc">從正面看沒問題，不代表側面也正常。</p>
+        </li>
+        <li class="feature-item">
+          <h3 class="feature-title">看 link / joint 名稱</h3>
+          <p class="feature-desc">確認是不是你以為的那個零件。</p>
+        </li>
+        <li class="feature-item">
+          <h3 class="feature-title">試著拖動關節</h3>
+          <p class="feature-desc">如果模型有可動關節，觀察它是不是照預期轉動。</p>
+        </li>
+        <li class="feature-item">
+          <h3 class="feature-title">看座標或量測</h3>
+          <p class="feature-desc">有時候只是差一點點位置，畫面看不太出來，但量一下就知道。</p>
+        </li>
+      </ul>
+
+      <!-- Section: What to check after modifying -->
+      <h2 class="detail-heading">修改後，最值得先檢查</h2>
+
+      <div class="check-grid">
+        <article class="check-card">
+          <p class="check-card__step">1</p>
+          <h3 class="check-card__title">位置對不對</h3>
+          <p class="check-card__desc">
+            這通常跟 <code>origin</code> 很有關係。如果 <code>origin</code> 沒設好，最常出現的就是零件全疊在一起，或是明明應該接在旁邊，結果跑到模型中央。
+          </p>
+        </article>
+
+        <article class="check-card">
+          <p class="check-card__step">2</p>
+          <h3 class="check-card__title">方向對不對</h3>
+          <p class="check-card__desc">
+            有些模型看起來都有接上，但 <code>joint</code> 的方向寫錯了，手臂會朝奇怪方向轉，輪子也可能是歪著動。如果預覽工具能看到座標系或拖動關節，這種問題通常很快就會露出來。
+          </p>
+        </article>
+
+        <article class="check-card">
+          <p class="check-card__step">3</p>
+          <h3 class="check-card__title">比例對不對</h3>
+          <p class="check-card__desc">
+            這是新手很常遇到的問題。有時候只是多打一個 0，整個零件就會大到離譜，或小到幾乎看不見。所以每次預覽時，先看整體比例是不是像你想像中的機器人。
+          </p>
+        </article>
+      </div>
+
+      <!-- Section: Common mistakes -->
+      <h2 class="detail-heading">新手最常踩雷的例子</h2>
+
+      <ol class="trap-list">
+        <li class="trap-item">
+          <span class="trap-num">1</span>
+          <div class="trap-body">
+            <h3 class="trap-title">只打開單一 .urdf 檔，沒有打開整個資料夾</h3>
+            <p class="trap-desc">這會造成 mesh 或材質路徑找不到，預覽畫面可能只剩下空殼，或什麼都沒顯示。</p>
+          </div>
+        </li>
+
+        <li class="trap-item">
+          <span class="trap-num">2</span>
+          <div class="trap-body">
+            <h3 class="trap-title">改了檔案，但忘記存檔</h3>
+            <p class="trap-desc">這個看起來很小，實際上超常發生。你以為自己改了模型，其實預覽看到的還是舊版本。</p>
+          </div>
+        </li>
+
+        <li class="trap-item">
+          <span class="trap-num">3</span>
+          <div class="trap-body">
+            <h3 class="trap-title">origin 沒設好</h3>
+            <p class="trap-desc">最常見的結果就是零件疊在一起，或者明明應該在上面的頭，直接跑進身體裡。</p>
+          </div>
+        </li>
+
+        <li class="trap-item">
+          <span class="trap-num">4</span>
+          <div class="trap-body">
+            <h3 class="trap-title">joint 軸向或方向設錯</h3>
+            <p class="trap-desc">模型表面上看起來沒壞，但一動起來就很奇怪。像是輪子橫著轉、手臂往反方向折，這種問題通常都和 <code>joint</code> 的方向設定有關。</p>
+          </div>
+        </li>
+
+        <li class="trap-item">
+          <span class="trap-num">5</span>
+          <div class="trap-body">
+            <h3 class="trap-title">尺寸單位不小心寫太大或太小</h3>
+            <p class="trap-desc">URDF 裡很多數值都是以公尺為單位來看。如果不小心多打一個 0，模型很容易瞬間變得像房子一樣大。</p>
+          </div>
+        </li>
+
+        <li class="trap-item">
+          <span class="trap-num">6</span>
+          <div class="trap-body">
+            <h3 class="trap-title">XML 標籤沒關好</h3>
+            <p class="trap-desc">URDF 本來就是 XML，所以像 <code>&lt;link&gt;</code>、<code>&lt;/link&gt;</code> 這種開頭和結尾要對得起來。少一個符號，整份檔案就可能讀不起來。XML 擴充功能在這裡就很有幫助，因為它能讓標籤結構比較清楚。</p>
+          </div>
+        </li>
+      </ol>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .urdf-preview {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Code block (folder tree) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.flow-desc) code,
+  :global(.check-card__desc) code,
+  :global(.trap-desc) code,
+  :global(.trap-title) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Keyboard shortcut */
+  .kbd {
+    display: inline-block;
+    padding: 0.05em 0.5em;
+    margin: 0 0.1em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: var(--color-heading);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list--inset {
+    margin: var(--space-3) 0 var(--space-3);
+  }
+
+  .check-list--inset li {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    margin-bottom: var(--space-1);
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Extension grid (URDF Visualizer / XML) */
+  .ext-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .ext-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .ext-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .ext-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .ext-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .ext-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Flow list (numbered operation steps) */
+  .flow-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .flow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .flow-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .flow-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .flow-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .flow-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .flow-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0 0 var(--space-2);
+  }
+
+  .flow-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Cycle card (write → preview → modify → preview again) */
+  .cycle-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+    text-align: center;
+  }
+
+  .cycle-text {
+    margin: 0;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .cycle-step {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    background-color: #fff;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    font-weight: 700;
+  }
+
+  .cycle-arrow {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Feature list (4 things to watch in preview) */
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .feature-item {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .feature-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .feature-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Check-card grid (3 things to verify after modifying) */
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .check-card {
+    padding: var(--space-6);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: transform var(--transition);
+  }
+
+  .check-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .check-card__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: var(--space-3);
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .check-card__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .check-card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Trap list (common beginner mistakes) */
+  .trap-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .trap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: background-color var(--transition);
+  }
+
+  .trap-item:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .trap-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .trap-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trap-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+    line-height: 1.5;
+  }
+
+  .trap-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .ext-grid,
+    .feature-list,
+    .check-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .ext-card {
+      padding: var(--space-6);
+    }
+
+    .flow-item {
+      gap: var(--space-4);
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .flow-num {
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: var(--text-xs);
+    }
+
+    .cycle-card {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .cycle-step {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-sm);
+    }
+
+    .check-card {
+      padding: var(--space-5);
+    }
+
+    .trap-item {
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

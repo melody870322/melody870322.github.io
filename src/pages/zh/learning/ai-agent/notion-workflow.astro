@@ -1,0 +1,780 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="使用 Notion 建立第一個 AI 工作流 — AI Agent 拼圖"
+  description="從 Notion 出發，跑完一輪最完整、也最容易看懂的 AI 工作流：搜尋 → 讀取 → 建立 → 更新。讓你不只是把 MCP 接上，而是真的看懂 AI agent 怎麼一步一步用工具完成任務。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-notion-workflow">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">第一次真的讓 AI 幫你在 Notion 裡做事</h1>
+        <p class="detail-subtitle">
+          剛剛你已經完成一件很重要的事：把 Gemini CLI 裝好、打開，並且把第一個現成 MCP 接進來。這裡開始，我們<strong>不只是確認它「有連上」，而是要真的讓它做一輪完整的事情</strong>。
+        </p>
+      </header>
+
+      <!-- Section: Why Notion -->
+      <h2 class="detail-heading">為什麼第一次真正的工作流，我會選 Notion</h2>
+      <p class="detail-paragraph">
+        如果是第一次讓 AI 真正幫你做事，我很建議先選 Notion，而不是一開始就去碰太複雜的系統。原因很簡單：<strong>Notion 的工作單位很直觀</strong>，就是頁面、資料庫、文字內容、欄位狀態。你很容易看懂「它找到了什麼、讀了什麼、建了什麼、改了什麼」。
+      </p>
+      <p class="detail-paragraph">
+        這很像我們平常做知識工作的流程：<strong>先找到資料，再讀懂，再整理成一份新內容，最後再修一遍</strong>。
+      </p>
+
+      <!-- Section: Page goal -->
+      <h2 class="detail-heading">這一頁的目標很單純</h2>
+      <p class="detail-paragraph">
+        這一頁不是要你一次學會所有 Notion 技巧，也不是要你把整個工作區都交給 AI 管。這一頁只做一件事：
+      </p>
+
+      <div class="workflow-card">
+        <p class="workflow-label">第一次完整的四步工作流</p>
+        <p class="workflow-text">
+          <span class="workflow-step">搜尋</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">讀取</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">建立</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">更新</span>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你只要能順利做完這一輪，就已經很夠了。因為這代表你不只是把工具接上，而是<strong>真的開始理解：AI agent 怎麼一步一步用工具完成任務</strong>。
+      </p>
+
+      <!-- Section: Prerequisites -->
+      <h2 class="detail-heading">開始前，先確認三件事</h2>
+
+      <ol class="prereq-list">
+        <li class="prereq-item">
+          <span class="prereq-num">1</span>
+          <p class="prereq-text">你已經<strong>裝好 Gemini CLI</strong>，而且打得開。</p>
+        </li>
+        <li class="prereq-item">
+          <span class="prereq-num">2</span>
+          <p class="prereq-text">你已經把 <strong>Notion MCP 接上</strong>，而且完成授權。</p>
+        </li>
+        <li class="prereq-item">
+          <span class="prereq-num">3</span>
+          <p class="prereq-text">你的 Notion 裡<strong>最好已經有一些頁面可以拿來測試</strong>。不一定要很多，但至少要有幾頁你看得懂內容、知道大概放在哪裡。這樣你第一次做工作流時，比較容易判斷 AI 做得對不對。</p>
+        </li>
+      </ol>
+
+      <!-- Step 1: Search -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">先學會搜尋頁面</h2>
+      </div>
+      <p class="detail-paragraph">
+        第一次工作流，最適合的起點是<strong>搜尋</strong>。因為搜尋是一種風險很低、結果又很容易判斷的動作。你一看就知道它有沒有找到對的東西。
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-search</code></p>
+        <p class="tool-box__desc">
+          可以搜尋你的 Notion 工作區；如果你有 Notion AI，還可以搜尋連接來源，例如 Slack、Google Drive、Jira。沒有 Notion AI 的情況下，搜尋會限於 Notion 工作區本身。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你可以先對 Gemini CLI 說這種話：
+      </p>
+
+      <blockquote class="prompt-example">
+        請先幫我搜尋 Notion 裡和「課程」有關的頁面，先不要修改任何內容。
+      </blockquote>
+      <p class="detail-paragraph">或者：</p>
+      <blockquote class="prompt-example">
+        請找出標題或內容中提到「期末報告」的頁面，列出最相關的 3 個。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這一步的重點不是叫它一次做很多事，而是<strong>先看它能不能找到對的頁面</strong>。
+      </p>
+
+      <h3 class="sub-heading">搜尋頁面時，你要看什麼</h3>
+      <p class="detail-paragraph">
+        第一次搜尋，不要只看「它有沒有回你一串答案」，你要看的是：
+      </p>
+      <ul class="check-list">
+        <li>它找到的頁面是不是<strong>你真的認得</strong></li>
+        <li>它抓到的關鍵字是不是合理</li>
+        <li>它有沒有把不相干的東西也一起拉進來</li>
+        <li>它有沒有先照你的要求「<strong>只搜尋，不修改</strong>」</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          如果這一步做得不穩，後面讀頁面、建頁面、更新頁面都很容易歪掉。所以第一次工作流，<strong>搜尋這一步其實非常重要</strong>。
+        </p>
+      </div>
+
+      <!-- Step 2: Read -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">從找到頁面，到真的讀頁面</h2>
+      </div>
+      <p class="detail-paragraph">
+        搜尋只是找到入口，還不算真的理解內容。所以第二步要做的，是<strong>把某一頁打開來讀</strong>。
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-fetch</code></p>
+        <p class="tool-box__desc">
+          可以根據頁面 URL 或 ID 抓出頁面內容，也可以抓資料庫或資料來源的細節。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你可以接著這樣說：
+      </p>
+
+      <blockquote class="prompt-example">
+        請打開剛剛最相關的那一頁，幫我整理出它的重點，但先不要建立新頁面。
+      </blockquote>
+      <p class="detail-paragraph">或者更具體一點：</p>
+      <blockquote class="prompt-example">
+        請讀取剛剛那一頁，告訴我裡面有哪些和期末報告要求有關的重點。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這一步的重點，是讓 AI <strong>不只是「找到頁面」，而是真的根據頁面內容往下做事</strong>。
+      </p>
+
+      <h3 class="sub-heading">讀頁面時，不要只問「它在寫什麼」</h3>
+      <p class="detail-paragraph">
+        更好的問法是：
+      </p>
+      <ul class="check-list">
+        <li>這頁有哪些我等等可以拿來整理成報告的重點？</li>
+        <li>這頁有哪些明確要求、步驟或時間點？</li>
+        <li>這頁哪些地方適合拿來變成摘要？</li>
+        <li>這頁裡有哪些內容適合被整理成新頁面？</li>
+      </ul>
+      <p class="detail-paragraph">
+        這樣 AI 讀完之後，才比較容易自然接到下一步：<strong>建立新頁面</strong>。
+      </p>
+
+      <!-- Step 3: Create -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">根據讀到的內容，建立一個新頁面</h2>
+      </div>
+      <p class="detail-paragraph">
+        這一步就是<strong>第一次真正的「寫入」</strong>。不是只看資料，而是讓 AI 幫你在 Notion 裡建立一個新頁面。
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-create-pages</code></p>
+        <p class="tool-box__desc">
+          可以建立一個或多個頁面，還可以指定屬性、內容、圖示，甚至支援模板。如果沒有特別指定 parent，系統會建立私人頁面。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        第一次建立頁面時，建議你做最簡單的版本：
+      </p>
+
+      <blockquote class="prompt-example">
+        根據剛剛那一頁的內容，幫我建立一個新的 Notion 頁面，標題叫做「期末報告重點整理」，先整理成條列式草稿。
+      </blockquote>
+      <p class="detail-paragraph">或者：</p>
+      <blockquote class="prompt-example">
+        請根據剛剛讀到的內容，建立一篇新的課堂筆記，只保留重點，不要寫太長。
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這一步會讓你第一次明確感受到：<strong>AI 不只是看資料，而是真的幫你生出一份新內容。</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">第一次建立頁面，越小越好</h3>
+      <p class="detail-paragraph">
+        很多人一到這一步就會忍不住想說：
+      </p>
+      <ul class="cross-list">
+        <li>幫我直接做完整報告</li>
+        <li>幫我整理整門課所有筆記</li>
+        <li>幫我建立一整套期末專題架構</li>
+      </ul>
+      <p class="detail-paragraph">
+        這些不是不能做，而是<strong>第一次不適合</strong>。第一次建立頁面，最好的目標是：
+      </p>
+      <ul class="check-list">
+        <li>頁面小一點</li>
+        <li>內容短一點</li>
+        <li>主題明確一點</li>
+        <li>你看得懂它怎麼整理出來的</li>
+      </ul>
+      <p class="detail-paragraph">
+        因為第一次最重要的不是產量，而是你要真的看懂：<strong>它是怎麼從「搜尋」和「讀取」走到「建立」</strong>。
+      </p>
+
+      <!-- Step 4: Update -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">對剛建立的頁面做一次更新</h2>
+      </div>
+      <p class="detail-paragraph">
+        第四步不是重做一份新的，而是<strong>在剛剛建立的頁面上做小修改</strong>。這一步很重要，因為它能讓你感受到「更新」和「建立」其實是兩種不同的工作。
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-update</code></p>
+        <p class="tool-box__desc">
+          可以根據前一步找到或建立的內容，再更新頁面屬性或內容。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你可以這樣做：
+      </p>
+
+      <blockquote class="prompt-example">
+        請把剛剛建立的「期末報告重點整理」頁面更新一下：<br/>
+        1. 開頭加上一句 50 字內的摘要<br/>
+        2. 把條列整理成「題目、要求、截止時間」三個小段落<br/>
+        3. 不要刪掉原本內容太多
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這種更新方式很適合初學者，因為你能明顯看出：
+      </p>
+      <ul class="check-list">
+        <li>哪裡是<strong>原本的內容</strong></li>
+        <li>哪裡是<strong>後來改的</strong></li>
+        <li>AI 是不是照你的要求只改指定範圍</li>
+      </ul>
+
+      <h3 class="sub-heading">更新頁面時，越具體越安全</h3>
+      <p class="detail-paragraph">
+        第一次做更新，最怕的不是它改不動，而是<strong>它改太多</strong>。所以你在下指令時，最好講清楚三件事：
+      </p>
+      <ul class="check-list">
+        <li>要改哪一頁</li>
+        <li>要改哪一段</li>
+        <li>不要改哪些地方</li>
+      </ul>
+
+      <p class="detail-paragraph">例如：</p>
+
+      <blockquote class="prompt-example">
+        請只修改剛剛建立頁面的第一段，其他段落先不要動。
+      </blockquote>
+      <p class="detail-paragraph">或者：</p>
+      <blockquote class="prompt-example">
+        請把原本的條列改得更好讀，但不要改掉原本的意思。
+      </blockquote>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這樣的指令比較適合第一次做更新。因為第一次的目標<strong>不是讓它自由發揮，而是讓你知道它有沒有照規則做事</strong>。
+        </p>
+      </div>
+
+      <!-- Section: When it goes wrong -->
+      <h2 class="detail-heading">如果它做錯了，不代表這條路線沒用</h2>
+      <p class="detail-paragraph">
+        第一次做工作流時，<strong>出錯很正常</strong>。常見的問題可能是：
+      </p>
+      <ul class="cross-list">
+        <li>搜到的頁面不夠準</li>
+        <li>讀到的重點太散</li>
+        <li>建立的新頁面太空</li>
+        <li>更新時改太多</li>
+      </ul>
+      <p class="detail-paragraph">
+        這時候不要馬上覺得「Notion 不適合」或「AI 不行」。比較好的做法是<strong>往回看是哪一步出了問題</strong>：
+      </p>
+
+      <ol class="reflect-list">
+        <li class="reflect-item">
+          <span class="reflect-num">1</span>
+          <span class="reflect-text">搜尋詞太模糊嗎？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">2</span>
+          <span class="reflect-text">讀頁面的指令太空泛嗎？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">3</span>
+          <span class="reflect-text">建頁面時沒有講清楚格式嗎？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">4</span>
+          <span class="reflect-text">更新時沒有畫清楚邊界嗎？</span>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣你會更快抓到問題，也<strong>比較容易把下一次做得更穩</strong>。
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-notion-workflow {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Case header (STEP 1 / 2 / 3 / 4) */
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.tool-box__desc) code,
+  :global(.prereq-text) code,
+  :global(.reflect-text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list (✗ items) */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Workflow card (4-step flow) */
+  .workflow-card {
+    margin: var(--space-6) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+    text-align: center;
+  }
+
+  .workflow-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .workflow-text {
+    margin: 0;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .workflow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-2);
+    background-color: #fff;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    font-weight: 700;
+  }
+
+  .workflow-arrow {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+
+  /* Prerequisites list */
+  .prereq-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .prereq-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .prereq-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .prereq-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .prereq-text {
+    flex: 1;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prereq-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Tool box (notion-search / notion-fetch / etc.) */
+  .tool-box {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Prompt example (quote-style) */
+  .prompt-example {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Reflect list (4 questions to ask after error) */
+  .reflect-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .reflect-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .reflect-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .reflect-text {
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .reflect-list {
+      grid-template-columns: 1fr;
+    }
+
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .workflow-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .workflow-step {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-sm);
+    }
+
+    .prereq-item,
+    .reflect-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .tool-box {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .prompt-example {
+      padding: var(--space-3) var(--space-5);
+    }
+  }
+</style>

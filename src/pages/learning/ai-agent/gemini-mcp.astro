@@ -1,0 +1,1040 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Gemini CLI Getting Started & First MCP Integration — AI Agent Puzzle"
+  description="From installing Gemini CLI to confirming it opens, completing login, and connecting your first off-the-shelf MCP (using Notion as an example) — walk through the most common entry-level workflow step by step."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-gemini-mcp">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">From Installing Gemini CLI to Connecting Your First Tool</h1>
+        <p class="detail-subtitle">
+          By now you already understand roughly how the LLM, Gemini CLI, MCP, and API divide their work. Next, we'll move forward one step: install Gemini CLI, open it, know where you're operating, then connect your first off-the-shelf MCP and confirm it works. As for OAuth, permissions, and deeper config-file edits — those can wait. Gemini CLI is Google's open-source AI agent designed to work with Gemini directly in the terminal, with built-in MCP extension support.
+        </p>
+      </header>
+
+      <!-- Section: Prep -->
+      <h2 class="detail-heading">Just Two Things to Get Ready</h2>
+      <div class="prep-grid">
+        <div class="prep-card">
+          <p class="prep-num">1</p>
+          <h3 class="prep-title">A computer that can install and run Gemini CLI</h3>
+          <p class="prep-desc">
+            The official baseline requirements are: <strong>Node.js 20 or above</strong>, a usable shell (Bash, Zsh, or PowerShell), and an internet connection.
+          </p>
+          <p class="prep-desc">
+            Recommended OS versions: macOS 15+, Windows 11 24H2+, Ubuntu 20.04+.
+          </p>
+        </div>
+        <div class="prep-card">
+          <p class="prep-num">2</p>
+          <h3 class="prep-title">An account for the service you want to connect</h3>
+          <p class="prep-desc">
+            We'll use <strong>Notion</strong> as the first example here, because Notion has an official hosted MCP and explicitly positions it as a way for AI tools to securely access a Notion workspace.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section: Check Node.js -->
+      <h2 class="detail-heading">First Check: Do You Have Node.js Installed?</h2>
+      <p class="detail-paragraph">
+        If you plan to install Gemini CLI the most common way, the official docs require <strong>Node.js 20 or above</strong>. If you don't know whether you have it, type this in your terminal first:
+      </p>
+      <pre class="code-block"><code>node -v</code></pre>
+      <p class="detail-paragraph">
+        If a version number appears and it's 20.x or higher, this step is basically fine. If there's no version number, or the version is too old, install or update Node.js before moving on.
+      </p>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">Supplement: Node.js installation steps (Windows example)</summary>
+          <div class="faq-answer">
+            <ol class="step-list">
+              <li class="step-item">
+                <span class="step-num">1</span>
+                <div class="step-body">
+                  <h4 class="step-title">Confirm your computer's architecture first</h4>
+                  <p class="step-desc">
+                    Check via "Settings → System → About → System type". If you see a typical Intel or AMD CPU, almost always pick <strong>x64</strong>.
+                  </p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-num">2</span>
+                <div class="step-body">
+                  <h4 class="step-title">Open the official download page and grab the matching Windows installer</h4>
+                  <p class="step-desc">
+                    Go to the Node.js official download page, find the LTS version (currently 24.15.0, the version updates over time), and download based on your architecture:
+                  </p>
+                  <ul class="check-list check-list--compact">
+                    <li>Most people: <code>node-v24.15.0-x64.msi</code></li>
+                    <li>ARM devices: <code>node-v24.15.0-arm64.msi</code></li>
+                  </ul>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-num">3</span>
+                <div class="step-body">
+                  <h4 class="step-title">Run the .msi to install</h4>
+                  <p class="step-desc">
+                    After downloading, double-click the .msi file and follow the install wizard. In general, accept all defaults unless you have a special need — that's the least error-prone path.
+                  </p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-num">4</span>
+                <div class="step-body">
+                  <h4 class="step-title">How to confirm the install succeeded</h4>
+                  <p class="step-desc">
+                    After installing, close the existing PowerShell / CMD, open a fresh terminal window, then type:
+                  </p>
+                  <pre class="code-block"><code>node -v
+npm -v</code></pre>
+                  <p class="step-desc">
+                    If you installed the latest LTS, <code>node -v</code> should show something like <code>v24.15.0</code>, and the npm version that ships with it is <code>11.12.1</code>.
+                  </p>
+                </div>
+              </li>
+              <li class="step-item">
+                <span class="step-num">5</span>
+                <div class="step-body">
+                  <h4 class="step-title">One more simple test</h4>
+                  <p class="step-desc">In PowerShell, type:</p>
+                  <pre class="code-block"><code>node</code></pre>
+                  <p class="step-desc">If it works, you'll enter Node.js's interactive mode. Then type:</p>
+                  <pre class="code-block"><code>console.log("Hello Node.js")</code></pre>
+                  <p class="step-desc">After seeing the output, type:</p>
+                  <pre class="code-block"><code>.exit</code></pre>
+                  <p class="step-desc">This means Node.js itself is running properly.</p>
+                </div>
+              </li>
+            </ol>
+
+            <div class="sub-card">
+              <p class="sub-card__label">◇ What is npm, and why does it install alongside?</p>
+              <p class="sub-card__text">
+                npm is the standard package manager in the Node.js ecosystem, used to install libraries and tools. The Node.js official download page notes that the installer ships with npm, so you usually don't need to install it separately. For example, you'll often use:
+              </p>
+              <pre class="code-block"><code>npm init -y
+npm install express</code></pre>
+            </div>
+
+            <div class="sub-card">
+              <p class="sub-card__label">◇ Common issues and how to fix them</p>
+              <ol class="trouble-list">
+                <li>
+                  <strong>"'node' is not recognized as an internal or external command"</strong>
+                  <p>This usually means the new environment variables haven't been picked up by the current terminal. Try these in order:</p>
+                  <ol class="trouble-sub" type="a">
+                    <li>Close PowerShell / CMD and reopen</li>
+                    <li>If that still fails, log out or restart</li>
+                    <li>If still no luck, verify Node.js was actually fully installed</li>
+                  </ol>
+                  <p>You can also check whether this folder exists: <code>C:\Program Files\nodejs\</code>. If <code>node.exe</code> is there but the command still doesn't work, the PATH usually didn't take effect properly.</p>
+                </li>
+                <li>
+                  <strong>Is my computer ARM or x64?</strong>
+                  <p>Most Windows laptops and desktops are x64. Only pick ARM64 if you specifically know you have a Windows on ARM device. Node.js officially provides both Windows installers.</p>
+                </li>
+                <li>
+                  <strong>Do I need to verify the download wasn't tampered with?</strong>
+                  <p>If you care about security, the Node.js official download page provides SHASUMS verification info and instructions; v24.15.0 has a corresponding SHASUMS256.txt to compare against. In PowerShell you can use:</p>
+                  <pre class="code-block"><code>Get-FileHash .\node-v24.15.0-x64.msi -Algorithm SHA256</code></pre>
+                  <p>Then compare the result against the value in the official SHASUMS256.txt.</p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Section: Install Gemini CLI -->
+      <h2 class="detail-heading">Two Beginner-Friendly Ways to Install Gemini CLI</h2>
+      <p class="detail-paragraph">
+        If this is your first time touching Gemini CLI, just pick one of the two methods below.
+      </p>
+
+      <div class="install-grid">
+        <article class="install-card">
+          <p class="install-tag">Option 1</p>
+          <h3 class="install-title">Try it first with npx</h3>
+          <p class="install-desc">
+            This is the best option for "I just want to try it once." Both the official README and install docs list <code>npx @google/gemini-cli</code> as the install-free way to run it directly.
+          </p>
+          <pre class="code-block"><code>npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            The advantage: you don't need to install Gemini CLI permanently to your system before opening it, looking around, and trying to log in. If you just want to experience it once, this method is a great fit.
+          </p>
+        </article>
+
+        <article class="install-card">
+          <p class="install-tag">Option 2</p>
+          <h3 class="install-title">Properly install it on your computer</h3>
+          <p class="install-desc">
+            If you know you'll use Gemini CLI often, it's better to install it globally with npm:
+          </p>
+          <pre class="code-block"><code>npm install -g @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            This is usually more convenient than running npx every time.
+          </p>
+        </article>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/成功進入Gemini CLI.jpg"
+          alt="Terminal screen after successfully entering Gemini CLI"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 1. Successfully entering Gemini CLI</figcaption>
+      </figure>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">Installation methods for other systems</summary>
+          <div class="faq-answer">
+            <p>If you're on macOS or Linux and already use Homebrew, you can use:</p>
+            <pre class="code-block"><code>brew install gemini-cli</code></pre>
+            <p>If you're on macOS and prefer MacPorts, you can use:</p>
+            <pre class="code-block"><code>sudo port install gemini-cli</code></pre>
+            <p>If your environment is more constrained, the official docs also offer an Anaconda route: first create a conda environment that includes nodejs, then use npm inside that environment to install Gemini CLI.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Section: After install -->
+      <h2 class="detail-heading">After Installing, Confirm It Actually Opens</h2>
+      <p class="detail-paragraph">
+        Once installed, you can simply type:
+      </p>
+      <pre class="code-block"><code>gemini</code></pre>
+      <p class="detail-paragraph">
+        On first launch, you may see three login options:
+      </p>
+      <ol class="login-list">
+        <li><span class="login-letter">a</span><span class="login-text">Login with Google</span></li>
+        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API key</span></li>
+        <li><span class="login-letter">c</span><span class="login-text">Vertex AI</span></li>
+      </ol>
+      <p class="detail-paragraph">
+        For most people, the simplest option is to log in directly with a Google account. During login, Gemini CLI opens your browser and walks you through the sign-in flow; afterward the credentials are cached locally, so you don't have to redo this every time.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So if you see the login menu after first launch, don't panic. <strong>This isn't a stuck state — it's part of the normal flow.</strong> If you see Gemini CLI launch (as in Figure 1), the install step has basically succeeded.
+        </p>
+      </div>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">If you can't open Gemini CLI, check these first</summary>
+          <div class="faq-answer">
+            <ol class="trouble-list">
+              <li>
+                <p>First check whether your <strong>Node.js version</strong> is too old. The official docs explicitly require Node.js 20.0.0 or above.</p>
+              </li>
+              <li>
+                <p>Confirm you haven't confused <strong>install</strong> with <strong>run</strong>.</p>
+                <p><code>npm install -g @google/gemini-cli</code> installs it; <code>gemini</code> launches it.</p>
+              </li>
+              <li>
+                <p>If you're using npx, make sure your terminal can reach the internet, since it needs to fetch the package.</p>
+              </li>
+              <li>
+                <p>If you've already opened it but don't know how to log in, just remember: most people, on their first time, can simply pick <strong>Login with Google</strong>.</p>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+
+      <!-- Section: Warm-up before MCP -->
+      <h2 class="detail-heading">Warm-up Before Using MCP</h2>
+      <p class="detail-paragraph">
+        Once you've finished these few things:
+      </p>
+      <ul class="check-list">
+        <li>Gemini CLI is installed</li>
+        <li>Gemini CLI opens</li>
+        <li>You've completed basic login</li>
+      </ul>
+      <p class="detail-paragraph">
+        That's the right moment to start connecting your first off-the-shelf MCP. Because by this point, you already know you're operating inside the Gemini CLI workspace — instead of jumping straight into a pile of external configuration from the start.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This order matters. Because what you're about to do isn't "turn Gemini CLI into Notion" — it's <strong>add a tool entry point from Gemini CLI to Notion</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        The official Gemini CLI docs describe an MCP server as a bridge to external systems, APIs, or data sources; Notion's official docs provide a hosted MCP endpoint, letting MCP-aware AI tools connect into Notion.
+      </p>
+
+      <!-- Section: Where MCP settings live -->
+      <h2 class="detail-heading">Where MCP Settings Get Written</h2>
+      <p class="detail-paragraph">
+        When you use <code>gemini mcp add</code> to add a new MCP server, Gemini CLI writes the configuration into <code>settings.json</code>. There are two common locations:
+      </p>
+
+      <div class="scope-grid">
+        <article class="scope-card">
+          <p class="scope-card__label">User level</p>
+          <p class="scope-card__path"><code>~/.gemini/settings.json</code></p>
+          <p class="scope-card__desc">
+            More like "the whole computer remembers it." Only consider this level if you want to use the same MCP across many places in the future.
+          </p>
+        </article>
+        <article class="scope-card">
+          <p class="scope-card__label">Project level</p>
+          <p class="scope-card__path"><code>.gemini/settings.json</code></p>
+          <p class="scope-card__desc">
+            More like "only this folder's project remembers it." If you just want to try connecting an MCP within a single project, this level is safer.
+          </p>
+        </article>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          When you're starting out, <strong>using project level to understand this concept is usually steadier than going straight to a global setup</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Add first MCP -->
+      <h2 class="detail-heading">Add Your First Off-the-Shelf MCP</h2>
+      <p class="detail-paragraph">
+        Once you're ready, you can add your first MCP in the terminal. The official Gemini CLI syntax for adding an HTTP-type MCP is:
+      </p>
+      <pre class="code-block"><code>gemini mcp add --transport http &lt;name&gt; &lt;url&gt;</code></pre>
+
+      <h3 class="sub-heading">Why HTTP here?</h3>
+      <p class="detail-paragraph">
+        MCP servers come in different connection types — common ones include stdio, HTTP, and SSE. We start with HTTP here because Notion provides a remote endpoint, and connecting it directly via HTTP is the most intuitive. As a beginner, knowing "different tools use different connection types" is enough:
+      </p>
+      <ul class="check-list">
+        <li><strong>stdio</strong>: common for small tools launched locally</li>
+        <li><strong>HTTP</strong>: common for remote services</li>
+        <li><strong>SSE</strong>: also a remote connection type — for now, just knowing the name is enough</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So using Notion as our first example, and given that Notion's official MCP endpoint is <code>https://mcp.notion.com/mcp</code>, you can do this:
+      </p>
+      <pre class="code-block"><code>gemini mcp add --transport http notion https://mcp.notion.com/mcp</code></pre>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <h3 class="step-title">Finish adding</h3>
+            <p class="step-desc">
+              On success, you'll see:
+            </p>
+            <pre class="code-block code-block--quote"><code>The Notion MCP server has been successfully added to your Gemini CLI configuration.</code></pre>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <h3 class="step-title">Restart Gemini CLI and complete OAuth</h3>
+            <p class="step-desc">After restarting Gemini CLI, type:</p>
+            <pre class="code-block"><code>/mcp auth notion</code></pre>
+            <p class="step-desc">After authorization succeeds, you'll see:</p>
+            <pre class="code-block code-block--quote"><code>Successfully authenticated and reloaded tools for 'notion'</code></pre>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <h3 class="step-title">Check the current MCP status</h3>
+            <p class="step-desc">Finally, you can check the current MCP status with either of these commands:</p>
+            <pre class="code-block"><code>/mcp list</code></pre>
+            <pre class="code-block"><code>gemini mcp list</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>A quick note:</strong> in short, <code>gemini mcp list</code> is more like "checking directly from the terminal," while <code>/mcp list</code> is for "checking inside Gemini CLI once it's already open."
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-gemini-mcp {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Prep grid */
+  .prep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .prep-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .prep-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .prep-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+  }
+
+  .prep-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .prep-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .prep-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .prep-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  .code-block--quote {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    font-style: italic;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.prep-desc) code,
+  :global(.install-desc) code,
+  :global(.step-desc) code,
+  :global(.faq-answer) code:not(.code-block code),
+  :global(.callout-text) code,
+  :global(.trouble-list) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list--compact li {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin-bottom: var(--space-1);
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Scope grid (user-level vs project-level) */
+  .scope-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .scope-card {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .scope-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .scope-card__label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .scope-card__path {
+    margin-bottom: var(--space-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+  }
+
+  .scope-card__path code {
+    padding: 0.1em 0.4em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .scope-card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  /* Sub-heading (smaller h3 inside a section) */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* FAQ accordion */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .faq-item[open] {
+    border-color: var(--color-accent);
+  }
+
+  .faq-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-heading);
+    cursor: pointer;
+    list-style: none;
+    line-height: 1.6;
+    transition: background-color var(--transition);
+  }
+
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-summary::before {
+    content: '';
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: transform var(--transition);
+  }
+
+  .faq-item[open] > .faq-summary::before {
+    transform: rotate(180deg);
+  }
+
+  .faq-summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .faq-answer {
+    padding: 0 var(--space-6) var(--space-6);
+  }
+
+  .faq-answer > p {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  .faq-answer > p:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer > p strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Step list (numbered) */
+  .step-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: border-color var(--transition);
+  }
+
+  .step-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .step-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .step-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-card (npm explanation / common issues inside FAQ) */
+  .sub-card {
+    margin-top: var(--space-5);
+    padding: var(--space-8);
+    background-color: var(--color-bg);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .sub-card__label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+  }
+
+  .sub-card__text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-3);
+  }
+
+  /* Trouble list (numbered FAQ inside) */
+  .trouble-list {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .trouble-list > li {
+    margin-bottom: var(--space-4);
+  }
+
+  .trouble-list > li:last-child {
+    margin-bottom: 0;
+  }
+
+  .trouble-list p {
+    margin: var(--space-2) 0;
+  }
+
+  .trouble-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .trouble-sub {
+    margin: var(--space-2) 0;
+    padding-left: var(--space-5);
+    color: var(--color-text-secondary);
+  }
+
+  .trouble-sub li {
+    margin-bottom: var(--space-1);
+  }
+
+  /* Install grid */
+  .install-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .install-card {
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--transition);
+  }
+
+  .install-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .install-tag {
+    display: inline-block;
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .install-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .install-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .install-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Figure / Image */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Login list */
+  .login-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .login-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+  }
+
+  .login-letter {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .login-text {
+    font-weight: 500;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .prep-grid,
+    .install-grid,
+    .scope-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .scope-card {
+      padding: var(--space-6);
+    }
+
+    .step-item {
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    .step-num {
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: var(--text-xs);
+    }
+
+    .prep-card,
+    .install-card {
+      padding: var(--space-6);
+    }
+
+    .faq-summary {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .faq-answer {
+      padding: 0 var(--space-5) var(--space-5);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-6);
+    }
+
+    .sub-card {
+      padding: var(--space-6);
+    }
+
+    .login-list li {
+      padding: var(--space-6);
+    }
+  }
+</style>

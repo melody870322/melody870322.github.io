@@ -1,0 +1,778 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Building Your First AI Workflow with Notion — AI Agent Puzzle"
+  description="Starting from Notion, run through the most complete and easiest-to-follow AI workflow: Search → Read → Create → Update. Not just plugging in an MCP, but actually seeing how an AI agent uses tools step by step to finish a task."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-notion-workflow">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Letting AI Actually Get Things Done for You in Notion — For the First Time</h1>
+        <p class="detail-subtitle">
+          You've just finished something important: installing Gemini CLI, opening it, and connecting your first off-the-shelf MCP. From here on, we're <strong>not just confirming it "connects" — we're going to have it actually complete one full round of work</strong>.
+        </p>
+      </header>
+
+      <!-- Section: Why Notion -->
+      <h2 class="detail-heading">Why Notion Is My Pick for the First Real Workflow</h2>
+      <p class="detail-paragraph">
+        If this is your first time letting AI actually help you get work done, I'd strongly suggest starting with Notion, rather than jumping into something overly complicated. The reason is simple: <strong>Notion's units of work are very intuitive</strong> — pages, databases, text content, field states. You can easily tell "what it found, what it read, what it created, what it changed."
+      </p>
+      <p class="detail-paragraph">
+        It's very similar to the way we normally do knowledge work: <strong>first find the material, then understand it, then organize it into new content, and finally revise it once</strong>.
+      </p>
+
+      <!-- Section: Page goal -->
+      <h2 class="detail-heading">What This Page Aims to Do</h2>
+      <p class="detail-paragraph">
+        This page isn't trying to teach you every Notion trick at once, and it isn't asking you to hand your entire workspace over to AI. This page does just one thing:
+      </p>
+
+      <div class="workflow-card">
+        <p class="workflow-label">YOUR FIRST COMPLETE 4-STEP WORKFLOW</p>
+        <p class="workflow-text">
+          <span class="workflow-step">Search</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">Read</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">Create</span>
+          <span class="workflow-arrow">→</span>
+          <span class="workflow-step">Update</span>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        If you can smoothly finish this one round, that's already plenty. Because it means you aren't just wiring up a tool — you're <strong>actually starting to understand how an AI agent uses tools step by step to complete a task</strong>.
+      </p>
+
+      <!-- Section: Prerequisites -->
+      <h2 class="detail-heading">Before You Start, Confirm These Three Things</h2>
+
+      <ol class="prereq-list">
+        <li class="prereq-item">
+          <span class="prereq-num">1</span>
+          <p class="prereq-text">You've already <strong>installed Gemini CLI</strong>, and it opens properly.</p>
+        </li>
+        <li class="prereq-item">
+          <span class="prereq-num">2</span>
+          <p class="prereq-text">You've already <strong>connected the Notion MCP</strong> and completed authorization.</p>
+        </li>
+        <li class="prereq-item">
+          <span class="prereq-num">3</span>
+          <p class="prereq-text">Your Notion <strong>already has some pages you can use for testing</strong>. Not a huge amount is needed, but at least a few pages whose content you recognize and whose rough location you know. That way, when you run your first workflow, it's easier to tell whether AI got it right.</p>
+        </li>
+      </ol>
+
+      <!-- Step 1: Search -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Learn to Search Pages First</h2>
+      </div>
+      <p class="detail-paragraph">
+        For a first workflow, the best starting point is <strong>search</strong>. Search is a low-risk action whose results are easy to evaluate — you can tell at a glance whether it found the right thing.
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-search</code></p>
+        <p class="tool-box__desc">
+          Searches your Notion workspace; if you have Notion AI, it can also search connected sources like Slack, Google Drive, and Jira. Without Notion AI, search is limited to the Notion workspace itself.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        You can start by saying something like this to Gemini CLI:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please search Notion for pages related to "courses" first — don't modify anything for now.
+      </blockquote>
+      <p class="detail-paragraph">Or:</p>
+      <blockquote class="prompt-example">
+        Find pages whose title or content mentions "final report", and list the 3 most relevant ones.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        The point of this step isn't to have it do many things at once. It's to <strong>first see whether it can find the right pages</strong>.
+      </p>
+
+      <h3 class="sub-heading">What to look for when searching</h3>
+      <p class="detail-paragraph">
+        On your first search, don't just check "did it give me a list of answers." What you should look at:
+      </p>
+      <ul class="check-list">
+        <li>Are the pages it found <strong>ones you actually recognize</strong></li>
+        <li>Are the keywords it picked up reasonable</li>
+        <li>Did it pull in irrelevant things too</li>
+        <li>Did it respect your instruction to "<strong>search only, don't modify</strong>"</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If this step is unstable, reading, creating, and updating pages afterward all tend to go off track. So for a first workflow, <strong>search is actually the most important step</strong>.
+        </p>
+      </div>
+
+      <!-- Step 2: Read -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">From Finding a Page to Actually Reading It</h2>
+      </div>
+      <p class="detail-paragraph">
+        Searching only finds the entry point — it doesn't really understand the content. So Step 2 is <strong>opening up one page and reading it</strong>.
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-fetch</code></p>
+        <p class="tool-box__desc">
+          Fetches page content by URL or ID, and can also retrieve details of a database or data source.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        You can follow up with something like:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please open the most relevant page from earlier and summarize its key points for me — don't create a new page yet.
+      </blockquote>
+      <p class="detail-paragraph">Or something more specific:</p>
+      <blockquote class="prompt-example">
+        Please read the page I just mentioned and tell me what points it contains that are related to the final report requirements.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        The point of this step is to get AI <strong>not just to "find the page," but to actually do something based on the page's content</strong>.
+      </p>
+
+      <h3 class="sub-heading">When reading, don't just ask "what does it say"</h3>
+      <p class="detail-paragraph">
+        Better questions look like:
+      </p>
+      <ul class="check-list">
+        <li>What points here could I later turn into a report?</li>
+        <li>What are the explicit requirements, steps, or deadlines on this page?</li>
+        <li>Which parts of this page are good candidates for a summary?</li>
+        <li>What content on this page is suitable for turning into a new page?</li>
+      </ul>
+      <p class="detail-paragraph">
+        With questions like these, once AI finishes reading, it flows more naturally into the next step: <strong>creating a new page</strong>.
+      </p>
+
+      <!-- Step 3: Create -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Based on What It Read, Create a New Page</h2>
+      </div>
+      <p class="detail-paragraph">
+        This step is <strong>the first real "write"</strong>. Instead of just looking at data, you're letting AI create a new page in Notion for you.
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-create-pages</code></p>
+        <p class="tool-box__desc">
+          Creates one or more pages, and can also specify properties, content, icons, and even supports templates. If no parent is specified, the system creates a private page.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        For your first page creation, I suggest the simplest possible version:
+      </p>
+
+      <blockquote class="prompt-example">
+        Based on the content of that page, create a new Notion page titled "Final Report Key Points" — start with a bullet-list draft.
+      </blockquote>
+      <p class="detail-paragraph">Or:</p>
+      <blockquote class="prompt-example">
+        Based on what you just read, create a new class note — keep only the key points, don't make it too long.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This step gives you your first clear sense that: <strong>AI isn't just looking at data — it's actually producing new content for you.</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">For the first time, smaller is better</h3>
+      <p class="detail-paragraph">
+        At this step, many people can't resist asking:
+      </p>
+      <ul class="cross-list">
+        <li>Just write me the full report</li>
+        <li>Organize all my notes for the entire course</li>
+        <li>Build me a whole final-project outline</li>
+      </ul>
+      <p class="detail-paragraph">
+        Those aren't impossible — they're just <strong>not appropriate for the first time</strong>. For a first page creation, the best target is:
+      </p>
+      <ul class="check-list">
+        <li>A smaller page</li>
+        <li>Shorter content</li>
+        <li>A clearer, more focused topic</li>
+        <li>Something you can clearly see how it was organized</li>
+      </ul>
+      <p class="detail-paragraph">
+        Because on the first round, what matters most isn't volume — it's that you can really see: <strong>how it moved from "search" and "read" to "create"</strong>.
+      </p>
+
+      <!-- Step 4: Update -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Update the Page You Just Created</h2>
+      </div>
+      <p class="detail-paragraph">
+        Step 4 isn't about redoing a new page — it's about <strong>making small edits to the page you just created</strong>. This step matters because it lets you feel that "update" and "create" are actually two different kinds of work.
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Notion MCP supported tool</p>
+        <p class="tool-box__name"><code>notion-update</code></p>
+        <p class="tool-box__desc">
+          Updates page properties or content based on what was found or created in the previous step.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        You can do something like:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please update the "Final Report Key Points" page you just created:<br/>
+        1. Add a summary of 50 characters or less at the top<br/>
+        2. Organize the bullet list into three small sections: "Topic, Requirements, Deadline"<br/>
+        3. Don't delete too much of the original content
+      </blockquote>
+
+      <p class="detail-paragraph">
+        This kind of update is great for beginners, because you can clearly see:
+      </p>
+      <ul class="check-list">
+        <li>Which parts are the <strong>original content</strong></li>
+        <li>Which parts were <strong>changed afterward</strong></li>
+        <li>Whether AI only touched the scope you specified</li>
+      </ul>
+
+      <h3 class="sub-heading">When updating, more specific = safer</h3>
+      <p class="detail-paragraph">
+        For a first update, the thing to fear isn't that it won't make changes — it's that <strong>it changes too much</strong>. So when writing your instruction, spell out three things:
+      </p>
+      <ul class="check-list">
+        <li>Which page to modify</li>
+        <li>Which paragraph to modify</li>
+        <li>Which places not to touch</li>
+      </ul>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <blockquote class="prompt-example">
+        Please only modify the first paragraph of the page you just created — leave the other paragraphs alone for now.
+      </blockquote>
+      <p class="detail-paragraph">Or:</p>
+      <blockquote class="prompt-example">
+        Please rewrite the original bullet list to be easier to read, but don't change the original meaning.
+      </blockquote>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Instructions like these are more appropriate for a first update. Because the goal on the first round <strong>isn't to let it improvise freely — it's to let you see whether it follows the rules</strong>.
+        </p>
+      </div>
+
+      <!-- Section: When it goes wrong -->
+      <h2 class="detail-heading">If It Gets It Wrong, That Doesn't Mean the Approach Is Broken</h2>
+      <p class="detail-paragraph">
+        For a first workflow, <strong>mistakes are normal</strong>. Common problems look like:
+      </p>
+      <ul class="cross-list">
+        <li>The pages it found weren't accurate enough</li>
+        <li>The points it pulled out were too scattered</li>
+        <li>The new page it created was too empty</li>
+        <li>The update changed too much</li>
+      </ul>
+      <p class="detail-paragraph">
+        At that moment, don't immediately conclude "Notion isn't right" or "AI can't handle this." A better move is to <strong>look back and see which step went off</strong>:
+      </p>
+
+      <ol class="reflect-list">
+        <li class="reflect-item">
+          <span class="reflect-num">1</span>
+          <span class="reflect-text">Were the search terms too vague?</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">2</span>
+          <span class="reflect-text">Was the read instruction too broad?</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">3</span>
+          <span class="reflect-text">Did you specify the format clearly when creating?</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">4</span>
+          <span class="reflect-text">Did you set clear boundaries when updating?</span>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          That way, you'll pinpoint the problem faster, and <strong>it'll be easier to make the next round more solid.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-notion-workflow {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Case header (STEP 1 / 2 / 3 / 4) */
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.tool-box__desc) code,
+  :global(.prereq-text) code,
+  :global(.reflect-text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list (✗ items) */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Workflow card (4-step flow) */
+  .workflow-card {
+    margin: var(--space-6) 0 var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+    text-align: center;
+  }
+
+  .workflow-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .workflow-text {
+    margin: 0;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .workflow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    background-color: #fff;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    font-weight: 700;
+  }
+
+  .workflow-arrow {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+
+  /* Prerequisites list */
+  .prereq-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .prereq-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .prereq-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .prereq-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .prereq-text {
+    flex: 1;
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prereq-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Tool box (notion-search / notion-fetch / etc.) */
+  .tool-box {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Prompt example (quote-style) */
+  .prompt-example {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Reflect list (4 questions to ask after error) */
+  .reflect-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .reflect-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .reflect-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .reflect-text {
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .reflect-list {
+      grid-template-columns: 1fr;
+    }
+
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .workflow-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .workflow-step {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-sm);
+    }
+
+    .prereq-item,
+    .reflect-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .tool-box {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .prompt-example {
+      padding: var(--space-3) var(--space-6);
+    }
+  }
+</style>
