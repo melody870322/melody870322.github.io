@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="現成 MCP 的課堂版工具面設計 — AI Agent 拼圖"
+  description="以課堂情境為例，學習如何在現成 MCP 上規劃合適的工具面。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-classroom-tools">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">現成 MCP 的課堂版工具面設計</h1>
+        <p class="detail-subtitle">
+          頁面建置中...
+        </p>
+      </header>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-classroom-tools {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+</style>

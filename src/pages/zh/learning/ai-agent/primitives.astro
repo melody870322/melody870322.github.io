@@ -1,0 +1,935 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Tools、Resources 與 Prompts 的分工 — AI Agent 拼圖"
+  description="MCP 官方把 server 的能力分成三種：tools 讓模型去做事、resources 把資料拿給模型看、prompts 把工作格式拿給模型用。先把這三件事分清楚，後面自己做 MCP server 時設計才會穩。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-primitives">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">不是什麼都要做成工具</h1>
+        <p class="detail-subtitle">
+          剛剛我們學的是：AI agent 雖然可以接很多工具，但<strong>不要一口氣全開</strong>。這裡要再往前走一步，處理一個更根本的問題。
+        </p>
+      </header>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          就算我只開少數能力，這些能力到底該做成 <strong>tool</strong>、<strong>resource</strong>，還是 <strong>prompt</strong>？
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這個問題很重要。因為很多初學者一碰到 MCP，就會很自然地<strong>把所有東西都做成 tool</strong>。結果就是：
+      </p>
+      <ul class="cross-list">
+        <li>能力很亂</li>
+        <li>工具名字越來越多</li>
+        <li>AI 很容易用錯</li>
+        <li>人也越來越看不懂系統在做什麼</li>
+      </ul>
+      <p class="detail-paragraph">
+        MCP 官方本來就不是把所有東西都塞進 tools 裡，而是<strong>分成 tools、resources、prompts 三種 server feature</strong>。
+      </p>
+
+      <!-- Section: 3 primitives at a glance -->
+      <h2 class="detail-heading">先講結論：三種東西在做三種不同的事</h2>
+      <p class="detail-paragraph">
+        MCP 官方文件寫得很清楚，這三件事的分工分別是：
+      </p>
+
+      <div class="primitive-grid">
+        <article class="primitive-card primitive-card--tool">
+          <p class="primitive-card__icon" aria-hidden="true">✋</p>
+          <p class="primitive-card__tag">model-controlled</p>
+          <h3 class="primitive-card__name"><code>tools</code></h3>
+          <p class="primitive-card__role">讓模型去做事</p>
+          <p class="primitive-card__desc">
+            讓模型可以和外部系統互動，例如查資料庫、呼叫 API、做計算。<strong>偏向模型自己決定要不要呼叫</strong>。
+          </p>
+        </article>
+        <article class="primitive-card primitive-card--resource">
+          <p class="primitive-card__icon" aria-hidden="true">📁</p>
+          <p class="primitive-card__tag">application-driven</p>
+          <h3 class="primitive-card__name"><code>resources</code></h3>
+          <p class="primitive-card__role">把資料拿給模型看</p>
+          <p class="primitive-card__desc">
+            server 提供給模型的資料與上下文，例如檔案、資料庫 schema、應用程式資訊。<strong>每個 resource 都會有 URI</strong>。
+          </p>
+        </article>
+        <article class="primitive-card primitive-card--prompt">
+          <p class="primitive-card__icon" aria-hidden="true">📋</p>
+          <p class="primitive-card__tag">user-controlled</p>
+          <h3 class="primitive-card__name"><code>prompts</code></h3>
+          <p class="primitive-card__role">把工作格式拿給模型用</p>
+          <p class="primitive-card__desc">
+            server 提供的提示模板，能帶參數，讓使用者或介面用<strong>比較固定的方式啟動某個工作流程</strong>。
+          </p>
+        </article>
+      </div>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          所以這一頁最重要的一句話就是：<br/>
+          <strong>不是所有能力都該做成 tool。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Why this page matters -->
+      <h2 class="detail-heading">為什麼這一頁特別重要</h2>
+      <p class="detail-paragraph">
+        因為初學者最常犯的一個錯，就是：<strong>看到「AI 可以呼叫工具」，就把所有事情都做成工具</strong>。但這樣做很容易讓整個系統越做越重。例如：
+      </p>
+
+      <ol class="misuse-list">
+        <li class="misuse-item">
+          <div class="misuse-body">
+            <p class="misuse-title">一份課程規範</p>
+            <p class="misuse-desc">其實只是固定資料，卻被做成一個奇怪的 <code>tool</code>。</p>
+          </div>
+          <span class="misuse-tag">應該是 resource</span>
+        </li>
+        <li class="misuse-item">
+          <div class="misuse-body">
+            <p class="misuse-title">一個報告模板</p>
+            <p class="misuse-desc">其實只是固定流程，卻被包成「幫我產生報告」的大 <code>tool</code>。</p>
+          </div>
+          <span class="misuse-tag">應該是 prompt</span>
+        </li>
+        <li class="misuse-item">
+          <div class="misuse-body">
+            <p class="misuse-title">一個資料表 schema</p>
+            <p class="misuse-desc">本來只是給模型看的說明，卻被做成一個會執行的功能。</p>
+          </div>
+          <span class="misuse-tag">應該是 resource</span>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          最後就會變成：<strong>prompt 和 resource 本來該做的事，全被塞進 tool 裡。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        如果先把這個觀念學會，<strong>後面自己做 MCP server 時，設計會穩很多</strong>。
+      </p>
+
+      <!-- Section: Tool -->
+      <h2 class="detail-heading">先看 tool：真的要去做動作的，才叫 tool</h2>
+      <p class="detail-paragraph">
+        tool 最直白的理解方式就是：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>它會真的動手。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        MCP 官方對 tools 的定義是：<strong>server 暴露出一個可被模型呼叫的能力</strong>，讓模型可以和外部系統互動，例如查詢資料庫、呼叫 API、做運算。官方也特別指出，tools 比較偏向 <strong>model-controlled</strong>，也就是模型可以根據上下文決定要不要呼叫。
+      </p>
+      <p class="detail-paragraph">
+        所以如果一個能力會真的做這些事，它通常就很適合當 tool：
+      </p>
+      <ul class="check-list">
+        <li>建立頁面</li>
+        <li>更新頁面</li>
+        <li>發送請求</li>
+        <li>新增紀錄</li>
+        <li>修改狀態</li>
+        <li>呼叫某個 API</li>
+        <li>進行搜尋並回傳結果</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          你可以把 tool 想成「<strong>手</strong>」。它不是拿來提供背景知識，而是<strong>拿來真的做事</strong>。
+        </p>
+      </div>
+
+      <!-- Section: Resource -->
+      <h2 class="detail-heading">再看 resource：給模型看的背景資料</h2>
+      <p class="detail-paragraph">
+        resource 的角色比較像：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>把上下文拿給模型看。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        MCP 官方文件寫得很清楚，resources 是 <strong>server 提供給模型的資料來源</strong>，可以是檔案、資料庫 schema、應用程式資訊等等，而且<strong>每個 resource 都有自己的 URI</strong>。官方也提到 resources 是偏向 <strong>application-driven</strong>：由 host app 或系統決定怎麼把這些上下文納進來。
+      </p>
+      <p class="detail-paragraph">
+        這種東西通常不需要「執行」，只需要「<strong>被讀</strong>」。所以很適合當 resource 的東西，像是：
+      </p>
+      <ul class="check-list">
+        <li>課程規範</li>
+        <li>專題評分標準</li>
+        <li>Notion 資料庫欄位說明</li>
+        <li>某個專案的固定設定</li>
+        <li>組織內部的命名規則</li>
+        <li>API schema</li>
+        <li>表格欄位定義</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          如果 tool 像「手」，resource 比較像「<strong>參考資料夾</strong>」。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">為什麼資料表 schema 比較像 resource，不像 tool</h3>
+      <p class="detail-paragraph">
+        很多人一看到資料表 schema，直覺會想：「那我是不是做一個 <code>explain_schema()</code> 工具？」但更自然的做法通常是：<strong>把 schema 當成 resource</strong>。
+      </p>
+      <p class="detail-paragraph">
+        原因很簡單。schema 的本質不是「去做某件事」，而是<strong>「告訴模型這個世界長什麼樣」</strong>。它提供的是背景知識，不是外部動作。MCP 官方對 resources 的描述也正是這個方向：提供 context / data。
+      </p>
+      <p class="detail-paragraph">
+        所以如果你有這種 URI 型的資料來源，就很適合被當成 resource：
+      </p>
+      <ul class="uri-list">
+        <li><code>database://course/final-project/schema</code></li>
+        <li><code>notion://rubric/final-project</code></li>
+        <li><code>course://rules/writing-style</code></li>
+      </ul>
+
+      <!-- Section: Prompt -->
+      <h2 class="detail-heading">再看 prompt：把流程和格式整理成可重複使用的模板</h2>
+      <p class="detail-paragraph">
+        prompt 在這裡<strong>不是一般人平常說的「我打給 AI 的一句話」</strong>，而是 server 暴露出來、可被發現、可帶參數的<strong>提示模板</strong>。
+      </p>
+      <p class="detail-paragraph">
+        MCP 官方文件說得很明白：prompts 讓 server 提供結構化訊息與指令模板，client 可以列出可用 prompts、取得內容、帶參數去客製化；而且 prompts 是偏向 <strong>user-controlled</strong>，也就是比較接近使用者主動選擇要不要用。
+      </p>
+      <p class="detail-paragraph">
+        所以 prompt 最適合做的事情是：
+      </p>
+      <ul class="check-list">
+        <li>固定格式的工作流程</li>
+        <li>可重複使用的寫作模板</li>
+        <li>表單化的任務啟動器</li>
+        <li>有清楚輸入欄位的「幫我做某種草稿」</li>
+      </ul>
+      <p class="detail-paragraph">
+        例如這種帶參數的提示模板：
+      </p>
+      <ul class="uri-list">
+        <li><code>draft_reflection_post(topic, audience)</code></li>
+        <li><code>prepare_meeting_summary(meeting_name, tone)</code></li>
+        <li><code>generate_progress_report(project_name, deadline)</code></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          如果 tool 像「手」，resource 像「參考資料夾」，那 prompt 比較像「<strong>工作說明書</strong>」。
+        </p>
+      </div>
+
+      <!-- Section: Notion classroom breakdown -->
+      <h2 class="detail-heading">用 Notion 課堂知識庫做一次完整拆解</h2>
+      <p class="detail-paragraph">
+        同一個系統，<strong>不同能力其實該分到不同地方</strong>。假設你有一個 Notion 課堂知識庫，要支援學生整理期末專題。我們可以把三種能力一次拆開來看：
+      </p>
+
+      <ol class="breakdown-list">
+        <li class="breakdown-item breakdown-item--resource">
+          <p class="breakdown-tag">resource</p>
+          <p class="breakdown-name"><code>course://rubric/final-project</code></p>
+          <p class="breakdown-desc">
+            因為它是<strong>評分規準</strong>，本質上是背景資料，拿來給模型讀、給人查，不是拿來執行動作的。
+          </p>
+        </li>
+        <li class="breakdown-item breakdown-item--prompt">
+          <p class="breakdown-tag">prompt</p>
+          <p class="breakdown-name"><code>draft_reflection_post(topic, audience)</code></p>
+          <p class="breakdown-desc">
+            因為它是一個<strong>固定格式的任務模板</strong>。你可以輸入主題和讀者，然後生成一個有結構的草稿流程。
+          </p>
+        </li>
+        <li class="breakdown-item breakdown-item--tool">
+          <p class="breakdown-tag">tool</p>
+          <p class="breakdown-name"><code>create_page(title, content)</code></p>
+          <p class="breakdown-desc">
+            因為它<strong>真的會去建立頁面</strong>。它會對外部系統做動作，所以很適合當 tool。
+          </p>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣一拆之後，整個設計就會變得很清楚：<br/>
+          <strong>資料是資料，模板是模板，動作是動作。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Decision tree -->
+      <h2 class="detail-heading">設計判斷樹</h2>
+      <p class="detail-paragraph">
+        遇到一個新能力時，可以按下面這三個問題依序判斷：
+      </p>
+
+      <ol class="decision-list">
+        <li class="decision-item">
+          <span class="decision-num">Q1</span>
+          <div class="decision-body">
+            <p class="decision-question">它會真的去改外部系統嗎？</p>
+            <p class="decision-answer">如果會，先往 <strong>tool</strong> 想。</p>
+          </div>
+        </li>
+        <li class="decision-item">
+          <span class="decision-num">Q2</span>
+          <div class="decision-body">
+            <p class="decision-question">它主要是在提供背景資料嗎？</p>
+            <p class="decision-answer">如果是，先往 <strong>resource</strong> 想。</p>
+          </div>
+        </li>
+        <li class="decision-item">
+          <span class="decision-num">Q3</span>
+          <div class="decision-body">
+            <p class="decision-question">它主要是在提供固定格式或工作模板嗎？</p>
+            <p class="decision-answer">如果是，先往 <strong>prompt</strong> 想。</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>如果三種都有一點呢？</strong>那就先拆小。<strong>不要急著把三種功能塞在同一個東西裡。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Relation to previous page -->
+      <h2 class="detail-heading">這一頁和前一頁的差異</h2>
+      <p class="detail-paragraph">
+        這兩頁其實是連在一起的，但講的不是同一件事：
+      </p>
+
+      <div class="relation-grid">
+        <article class="relation-card relation-card--prev">
+          <p class="relation-card__label">前一頁</p>
+          <p class="relation-card__theme">能力不要太多</p>
+          <p class="relation-card__desc">不要把太多工具一次開給 AI。</p>
+        </article>
+        <article class="relation-card relation-card--this">
+          <p class="relation-card__label">這一頁</p>
+          <p class="relation-card__theme">能力不要混在一起</p>
+          <p class="relation-card__desc">就算你只開幾個能力，也要先分清楚哪些是 tool、哪些是 resource、哪些是 prompt。</p>
+        </article>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-primitives {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading inside a section */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.misuse-desc) code,
+  :global(.decision-question) code,
+  :global(.decision-answer) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Cross list (✗ items) */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    padding: var(--space-6) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Primitive grid (tool / resource / prompt) */
+  .primitive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .primitive-card {
+    padding: var(--space-6);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    text-align: center;
+    transition: transform var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .primitive-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+  }
+
+  .primitive-card__icon {
+    margin: 0 auto var(--space-2);
+    font-size: var(--text-2xl);
+    line-height: 1;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .primitive-card__tag {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .primitive-card__name {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+  }
+
+  .primitive-card__name code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    padding: 0.1em 0.4em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .primitive-card__role {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .primitive-card__desc {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .primitive-card__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Misuse list (3 anti-patterns) */
+  .misuse-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .misuse-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-text-muted);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .misuse-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .misuse-title {
+    margin: 0 0 var(--space-1);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .misuse-desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .misuse-desc code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .misuse-tag {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.03em;
+  }
+
+  /* URI list (URI-style examples) */
+  .uri-list {
+    list-style: none;
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-3) 0 var(--space-6);
+    background-color: var(--color-bg-secondary);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .uri-list li {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+  }
+
+  .uri-list li code {
+    padding: 0.15em 0.5em;
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+    font-size: 1em;
+  }
+
+  /* Breakdown list (Notion classroom split) */
+  .breakdown-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .breakdown-item {
+    padding: var(--space-2) var(--space-6);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .breakdown-item--resource {
+    border-color: var(--color-accent);
+  }
+
+  .breakdown-item--prompt {
+    border-color: var(--color-accent);
+  }
+
+  .breakdown-item--tool {
+    border-color: var(--color-accent);
+  }
+
+  .breakdown-tag {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+    text-transform: uppercase;
+  }
+
+  .breakdown-name {
+    margin: 0 0 var(--space-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .breakdown-name code {
+    padding: 0.15em 0.5em;
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .breakdown-desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .breakdown-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Decision list (Q1 / Q2 / Q3) */
+  .decision-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .decision-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    transition: border-color var(--transition);
+  }
+
+  .decision-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .decision-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2rem;
+    padding: 0 var(--space-3);
+    border-radius: var(--border-radius);
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .decision-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .decision-question {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    line-height: 1.5;
+  }
+
+  .decision-answer {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .decision-answer strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Relation grid (this page vs previous page) */
+  .relation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .relation-card {
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .relation-card--this {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    background-color: var(--color-tag-bg);
+  }
+
+  .relation-card__label {
+    margin: 0 0 var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .relation-card--this .relation-card__label {
+    color: #fff;
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .relation-card__theme {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .relation-card__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .primitive-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .relation-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-card--strong {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .primitive-card,
+    .breakdown-item,
+    .relation-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .misuse-item,
+    .decision-item {
+      padding: var(--space-4) var(--space-5);
+      gap: var(--space-4);
+    }
+
+    .misuse-item {
+      flex-wrap: wrap;
+    }
+
+    .misuse-tag {
+      align-self: flex-start;
+    }
+
+    .uri-list {
+      padding: var(--space-3) var(--space-5);
+    }
+
+    .uri-list li {
+      font-size: var(--text-xs);
+    }
+  }
+</style>
