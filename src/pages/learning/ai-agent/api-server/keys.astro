@@ -1,0 +1,1043 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Don't Tape the Key on the Door: Where API Keys Belong — AI Agent Puzzle"
+  description="Once you start using an API that needs a key, one problem shows up fast: the key cannot live inside your code. This page covers what an API key is, why it needs protection, and how .env, .gitignore, and .env.example keep it safely outside the source."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-keys">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Don't Tape the Key on the Door: Where Should an API Key Live</h1>
+        <p class="detail-subtitle">
+          We already know an MCP Server can do more than read a local folder — it can talk to external data through APIs. But once you start using APIs, a problem arrives quickly: <strong>some APIs aren't open to anyone</strong>. They ask you for a "key." That key is usually called an <code>API Key</code>.
+        </p>
+      </header>
+
+      <!-- Section: What is API Key -->
+      <h2 class="detail-heading">What an API Key Is</h2>
+      <p class="detail-paragraph">
+        Think of an API key as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The key that lets you use an external service.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">Some services use it to confirm:</p>
+
+      <ul class="check-list">
+        <li><strong>Who you are</strong></li>
+        <li>Whether you're <strong>allowed to use</strong> this service</li>
+        <li>How many calls you can make <strong>per day</strong></li>
+        <li>Whether you have <strong>permission to read certain data</strong></li>
+        <li><strong>Which account</strong> this request bills to</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So an API key really is a key. Whoever holds it can <strong>burn through your quota, use your service, even read data you have access to</strong>. It's not ordinary text — it's something you have to protect.
+        </p>
+      </div>
+
+      <!-- Section: Why not hardcode -->
+      <h2 class="detail-heading">Why You Shouldn't Drop the API Key Into Your Code</h2>
+      <p class="detail-paragraph">
+        First-timers often write something like this:
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">api_key = "sk-xxxxxxxxxxxxxxxx"</code></pre>
+
+      <p class="detail-paragraph">
+        It looks the simplest, but it's <strong>not recommended</strong>. Because:
+      </p>
+
+      <ul class="cross-list">
+        <li>Your code might <strong>get sent to someone</strong></li>
+        <li>Your code might <strong>get shared with a classmate</strong></li>
+        <li>Your code might <strong>get pushed to GitHub</strong></li>
+        <li>Your code might <strong>show up in a tutorial screenshot</strong></li>
+        <li>Your code might <strong>be read by AI or other tools</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Once an API key is visible, it can be reused by someone else. <strong>It's like taping your house key to the front door</strong> — convenient for you, but visible to everyone walking by.
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          So the most important sentence here:<br/>
+          <strong>Don't put API keys directly in your code.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Where to put it -->
+      <h2 class="detail-heading">So Where Does the API Key Go</h2>
+      <p class="detail-paragraph">
+        The better approach:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Put the API key outside your code.</strong><br/>
+          Read it in only when the program needs it.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">A few benefits:</p>
+
+      <ul class="check-list">
+        <li>The <strong>code stays clean</strong></li>
+        <li>The key is <strong>less likely to be shared by accident</strong></li>
+        <li><strong>Rotating the key doesn't require a code change</strong></li>
+        <li>Different machines can use <strong>their own keys</strong></li>
+        <li>It mirrors <strong>how real-world projects do it</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        In Python, the two common patterns are:
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Approach 1</p>
+        <p class="tool-box__name"><code>Environment variables</code></p>
+        <p class="tool-box__desc">Stored on the machine or in the runtime</p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Approach 2</p>
+        <p class="tool-box__name"><code>.env file</code></p>
+        <p class="tool-box__desc">A small config file inside the project folder</p>
+      </div>
+
+      <p class="detail-paragraph">
+        Let's start with the easiest version to picture.
+      </p>
+
+      <!-- Section: What is environment variable -->
+      <h2 class="detail-heading">What an Environment Variable Is</h2>
+      <p class="detail-paragraph">
+        An environment variable is:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A small setting attached to the machine or the runtime.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        For example, you can have an environment variable called <code>WEATHER_API_KEY</code> holding the real key. Your Python code shouldn't write the key directly — it should read it like this:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+
+api_key = os.getenv("WEATHER_API_KEY")</code></pre>
+
+      <p class="detail-paragraph">
+        Translation: please find a setting named <code>WEATHER_API_KEY</code> in the environment, and <strong>if it's there, put it into <code>api_key</code></strong>. The actual key never appears in the source.
+      </p>
+
+      <!-- Section: What is .env -->
+      <h2 class="detail-heading">What .env Is</h2>
+      <p class="detail-paragraph">
+        For beginners, configuring system-wide environment variables can be a bit awkward. So we usually take a friendlier path: <strong>create a <code>.env</code> file</strong>. Think of .env as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A small note that holds your secret settings.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">Your project folder might look like this:</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <p class="detail-paragraph">Inside .env you can put:</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=abc123456789</code></pre>
+
+      <p class="detail-paragraph">
+        Note: <strong>quotes are optional here</strong>. From here, the Python program can read settings out of .env.
+      </p>
+
+      <!-- Sub: .env is not a vault -->
+      <h3 class="sub-heading">.env Is Not a Vault</h3>
+      <p class="detail-paragraph">
+        Worth flagging clearly: <strong>.env is not a vault</strong>. It just moves the secret out of your source. If you send .env to someone, they can still read the API key. If you push .env to GitHub, the key still leaks.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So the point of .env is: <strong>it should stay on your own machine, not get shared publicly.</strong>
+        </p>
+      </div>
+
+      <!-- Sub: .gitignore -->
+      <h3 class="sub-heading">What .gitignore Does</h3>
+      <p class="detail-paragraph">
+        If you'll be using Git or GitHub, you need to know <code>.gitignore</code>. Think of .gitignore as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A list telling Git which files NOT to commit.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        We don't want .env getting committed, so add a <code>.gitignore</code> at the project root with:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env</code></pre>
+
+      <p class="detail-paragraph">
+        Meaning: <strong>don't put .env into version control</strong>. If you have a virtual environment too, ignore that as well:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env
+.venv/
+__pycache__/</code></pre>
+
+      <p class="detail-paragraph">Safer, and tidier.</p>
+
+      <!-- Section: .env.example -->
+      <h2 class="detail-heading">Use .env.example to Show Others What's Needed</h2>
+      <p class="detail-paragraph">
+        Even though .env shouldn't be shared, sometimes someone else needs to know what settings the project requires. For that, create a <code>.env.example</code> — <strong>example values only, not real keys</strong>:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=put-your-own-api-key-here</code></pre>
+
+      <p class="detail-paragraph">
+        When someone sees .env.example they know: <strong>this project needs a WEATHER_API_KEY, but the real key isn't in the repo</strong>.
+      </p>
+
+      <p class="detail-paragraph">So the cleaner shape:</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+├─ .env.example
+└─ .gitignore</code></pre>
+
+      <ul class="check-list">
+        <li><code>.env</code>: holds the <strong>real key</strong>, never committed</li>
+        <li><code>.env.example</code>: holds the <strong>template</strong>, safe to share</li>
+        <li><code>.gitignore</code>: remembers to <strong>exclude .env</strong></li>
+      </ul>
+
+      <!-- Section: Reading .env in Python -->
+      <h2 class="detail-heading">Reading .env in Python</h2>
+      <p class="detail-paragraph">
+        Python's <code>os.getenv()</code> reads environment variables natively. But if we want to <strong>load settings from a .env file</strong>, we usually pull in a small package: <code>python-dotenv</code>. It loads .env into the environment for us.
+      </p>
+
+      <p class="detail-paragraph">
+        If you're using uv, run this in VS Code's integrated terminal:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">uv add python-dotenv</code></pre>
+
+      <p class="detail-paragraph">
+        With pip + .venv:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">python -m pip install python-dotenv</code></pre>
+
+      <p class="detail-paragraph">
+        Then in your Python code:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("WEATHER_API_KEY")
+
+print(api_key)</code></pre>
+
+      <p class="detail-paragraph">
+        Step by step: <code>load_dotenv()</code> reads .env, then <code>os.getenv("WEATHER_API_KEY")</code> pulls out the key, and the temporary <code>print</code> just confirms it loaded.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          But in real code, <strong>don't print API keys</strong>. Once printed, they may end up in terminals, screenshots, or logs.
+        </p>
+      </div>
+
+      <!-- Section: Stop if no API Key -->
+      <h2 class="detail-heading">If the API Key Isn't There, Stop Early</h2>
+      <p class="detail-paragraph">
+        In a real MCP Server, <strong>don't pretend the API key exists</strong>. If it's missing, say so clearly:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("WEATHER_API_KEY")
+
+if not api_key:
+    raise ValueError("WEATHER_API_KEY not found. Please check your .env.")</code></pre>
+
+      <p class="detail-paragraph">
+        Translation: if <code>WEATHER_API_KEY</code> wasn't loaded, <strong>don't keep going</strong>. Without the key, the API call won't work anyway. This is much friendlier than letting the program crash with a confusing error later.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The pattern:<br/>
+          <strong>When a critical setting is missing, stop early and say what's missing.</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: hands-on ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Try It With Gemini CLI</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Create .env in VS Code</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Suppose your project is called <code>my-api-mcp-server</code>. In VS Code's file explorer, create a file named <code>.env</code> with:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=replace-with-your-own-api-key</code></pre>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=abc123456789</code></pre>
+
+      <p class="detail-paragraph">Then create a <code>.env.example</code> with:</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=put-your-own-api-key-here</code></pre>
+
+      <p class="detail-paragraph">Finally, create or open <code>.gitignore</code> and add:</p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env
+.venv/
+__pycache__/</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Now your project is <strong>noticeably safer</strong>. .env stays out of Git, but .env.example sticks around so anyone reading the repo knows which settings are needed.
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Use the API Key Inside the MCP Server</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Inside <code>my-api-mcp-server</code>, create <code>server.py</code> with:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+
+load_dotenv()
+
+mcp = FastMCP("API Demo Server")
+
+API_KEY = os.getenv("WEATHER_API_KEY")
+
+
+@mcp.tool()
+def check_api_key() -> str:
+    """Confirm the API key is set, without revealing the real value."""
+    if not API_KEY:
+        return "WEATHER_API_KEY not found. Please check your .env."
+
+    return "WEATHER_API_KEY loaded — actual value not shown."
+
+
+if __name__ == "__main__":
+    mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        Important detail: we can check that the API key is loaded, but <strong>we shouldn't return the actual key to the AI</strong>. So don't write:
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">return API_KEY</code></pre>
+
+      <p class="detail-paragraph">
+        That's literally handing the key over. The cleaner approach is to return a confirmation message:
+      </p>
+
+      <blockquote class="prompt-example">
+        WEATHER_API_KEY loaded — actual value not shown.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          You confirm the setting works,<br/>
+          <strong>without leaking the key.</strong>
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Connect the MCP Server to Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Same as the local MCP Server before, Gemini CLI launches your Python program through <code>settings.json</code>. Drop this into <code>.gemini/settings.json</code>:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "api-demo": {
+      "command": "uv",
+      "args": ["run", "python", "server.py"],
+      "cwd": "Replace with the full path to your project folder",
+      "timeout": 30000,
+      "trust": false
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        The <code>cwd</code> field matters. <code>cwd</code> tells Gemini CLI <strong>which folder to launch the server from</strong>. Since your .env lives in the project folder, <code>cwd</code> should point at that project folder. The final layout looks at least like:
+      </p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+├─ .env.example
+├─ .gitignore
+└─ .gemini/
+   └─ settings.json</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If <code>cwd</code> points to the wrong place, Python <strong>can't find .env</strong>. So if you have a .env but the program still says the key is missing, the first thing to check: <strong>is cwd pointing at the right folder?</strong>
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Verify the MCP Server Connected</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Once configured, launch Gemini CLI from VS Code's integrated terminal:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
+
+      <p class="detail-paragraph">Inside Gemini CLI, type:</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
+
+      <p class="detail-paragraph">
+        If <code>api-demo</code> shows up as connected, ask Gemini to try the tool:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please call the check_api_key tool from api-demo.
+      </blockquote>
+
+      <p class="detail-paragraph">If it replies:</p>
+
+      <blockquote class="prompt-example">
+        WEATHER_API_KEY loaded — actual value not shown.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          That's <strong>success</strong>.<br/>
+          .env, .gitignore, and python-dotenv are wired up.
+        </p>
+      </div>
+
+      <!-- ============ Part 3: aftermath ============ -->
+
+      <!-- Section: If leaked -->
+      <h2 class="detail-heading">If You Accidentally Leak an API Key</h2>
+      <p class="detail-paragraph">
+        If you accidentally pasted a key somewhere, pushed it to GitHub, or stuck it on a public site, <strong>don't just delete the file and call it done</strong>. The safer process:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Go to the service provider and <strong>revoke that API key</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Generate a fresh API key</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Update your local <code>.env</code></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Confirm <code>.gitignore</code> already excludes .env</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Make sure the key <strong>doesn't end up back in the source</strong></span></li>
+      </ol>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Deleting the file doesn't mean nobody saw or copied it</strong>. Once a key has leaked, the right move is almost always to rotate to a new one.
+        </p>
+      </div>
+
+      <!-- Section: Checklist -->
+      <h2 class="detail-heading">A Simple Checklist Before You Hit the API</h2>
+      <p class="detail-paragraph">
+        Quick run-through before wiring anything up:
+      </p>
+
+      <ul class="checklist">
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Did I avoid putting the API key <strong>directly in the code</strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Did I <strong>create a <code>.env</code></strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Did I <strong>add <code>.env</code> to <code>.gitignore</code></strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Did I <strong>create a <code>.env.example</code></strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Does my Python code <strong>read the key via <code>os.getenv()</code></strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Does my code <strong>avoid printing the API key</strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">Does Gemini CLI's <code>cwd</code> <strong>point to the right project folder</strong>?</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-text">If the key is missing, does the code <strong>flag it clearly</strong>?</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          If all of these are checked,<br/>
+          you're <strong>much safer than the day-one "just paste the key" version</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-keys {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Part divider */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  /* Case header (STEP) */
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.numbered-list__text) code,
+  :global(.checklist-text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    border-width: 2px;
+    padding: var(--space-5) var(--space-8);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Tool box */
+  .tool-box {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  /* Numbered list */
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .code-block--bad {
+    border: 1px solid #d97706;
+    border-left: 4px solid #d97706;
+    position: relative;
+  }
+
+  .code-block--bad::before {
+    content: '✗ Avoid';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.6rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: #d97706;
+    border-bottom-left-radius: var(--border-radius);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition);
+  }
+
+  .checklist-item:last-child {
+    border-bottom: none;
+  }
+
+  .checklist-item:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .checklist-box {
+    flex-shrink: 0;
+    font-size: var(--text-lg);
+    color: var(--color-accent);
+    font-weight: 700;
+    line-height: 1.5;
+    user-select: none;
+  }
+
+  .checklist-text {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .checklist-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .code-block--bad::before {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .checklist-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

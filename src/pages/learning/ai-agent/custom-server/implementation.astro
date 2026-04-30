@@ -1,0 +1,1818 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+
+const fullServerPy = String.raw`from pathlib import Path
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Course Notes Assistant")
+
+BASE_DIR = Path(__file__).parent
+NOTES_DIR = BASE_DIR / "class_notes"
+DRAFTS_DIR = BASE_DIR / "drafts"
+
+
+def safe_note_path(filename: str) -> Path:
+    """Make sure the AI can only read .md files inside class_notes."""
+    name = Path(filename).name
+
+    if name != filename:
+        raise ValueError("Please pass a filename only, not a folder path.")
+
+    path = NOTES_DIR / name
+
+    if path.suffix != ".md":
+        raise ValueError("Only .md notes are allowed for now.")
+
+    return path
+
+
+def safe_draft_filename(title: str) -> str:
+    """Turn the title into a reasonably safe filename."""
+    safe_title = "".join(
+        ch for ch in title
+        if ch.isalnum() or ch in (" ", "-", "_")
+    ).strip()
+
+    safe_title = safe_title.replace(" ", "_")
+
+    if not safe_title:
+        safe_title = "reflection_draft"
+
+    return f"{safe_title}.md"
+
+
+@mcp.tool()
+def hello() -> str:
+    """Confirm the class-notes MCP server is up."""
+    return "Class-notes MCP server is running."
+
+
+@mcp.tool()
+def list_notes() -> str:
+    """List the class notes inside the class_notes folder."""
+    if not NOTES_DIR.exists():
+        return "class_notes folder not found. Please create it first."
+
+    notes = sorted(path.name for path in NOTES_DIR.glob("*.md"))
+
+    if not notes:
+        return "No .md notes are inside class_notes yet."
+
+    return "Available class notes:\n" + "\n".join(notes)
+
+
+@mcp.tool()
+def read_note(filename: str) -> str:
+    """Read one class note from the class_notes folder."""
+    try:
+        path = safe_note_path(filename)
+    except ValueError as error:
+        return str(error)
+
+    if not path.exists():
+        return f"{filename} not found. Use list_notes to confirm the filename."
+
+    return path.read_text(encoding="utf-8")
+
+
+@mcp.tool()
+def create_reflection_draft(title: str, content: str) -> str:
+    """Create a new reflection draft inside drafts/ without overwriting existing files."""
+    DRAFTS_DIR.mkdir(exist_ok=True)
+
+    filename = safe_draft_filename(title)
+    path = DRAFTS_DIR / filename
+
+    if path.exists():
+        return f"Draft already exists: {filename}. I did not overwrite it. Please use a different title."
+
+    draft_text = f"# {title}\n\n{content}\n"
+    path.write_text(draft_text, encoding="utf-8")
+
+    return f"Draft created: {filename}"
+
+
+@mcp.resource("course://reflection-rules")
+def reflection_rules() -> str:
+    """Provide the fixed rules for writing a class reflection draft."""
+    return """
+Class reflection drafts must follow these rules:
+
+1. Do not finish the student's final assignment for them.
+2. The content should read like the student's own notes, not a formal paper.
+3. The draft must include three sections:
+   - What I understood
+   - Where I'm still stuck
+   - How I might apply this
+4. If the source material is thin, flag it to the user — do not fill in gaps.
+5. Before creating a draft, tell the user which file will be written.
+""".strip()
+
+
+@mcp.prompt()
+def draft_reflection(topic: str, filename: str) -> str:
+    """Fixed flow for producing a class reflection draft."""
+    return f"""
+Please help me produce a reflection draft based on a class note.
+
+Topic: {topic}
+Note: {filename}
+
+Follow this flow:
+
+1. Use read_note to read the chosen note first.
+2. Pull out the points relevant to the topic.
+3. Consult the rules at course://reflection-rules.
+4. Show me the draft for confirmation before writing anything.
+5. Only after I agree, use create_reflection_draft to create the file.
+""".strip()
+
+
+if __name__ == "__main__":
+    mcp.run()
+`;
+
+const aiAgentBasicsMd = `# AI Agent Basics
+
+## What this note is about
+
+This note is for people who are just starting out with AI agents.
+
+We're not rushing into code or hooking up a bunch of tools yet.
+First, let's get a few basic roles straight:
+
+- AI is the part doing the understanding and reasoning
+- CLI is where we work with the AI
+- MCP is the shared protocol for letting AI use tools
+- API is how we actually talk to external services
+
+Once these roles are clear, learning Gemini CLI, MCP servers, Notion, Google Drive, or any other tool gets a lot less tangled.
+
+---
+
+## AI is more than a chatbot
+
+Most people first meet AI through chat.
+
+For example:
+
+- Summarize an article
+- Rewrite a paragraph
+- Brainstorm a report topic
+- Pull out the key points
+
+These are all useful, but an AI agent is trying to go one step further.
+
+An AI agent doesn't just answer you — it can use tools to get a task done.
+
+For example:
+
+- Read a note
+- Search a folder
+- Create a draft
+- Compile a class reflection
+- Call an external service's API
+
+In other words, an AI agent is more like an "AI work partner that knows how to use tools."
+
+---
+
+## The LLM understands your intent
+
+Think of the large language model as the AI's brain.
+
+It understands what you said, figures out what you're trying to accomplish, and decides what to do next.
+
+For example, if you say:
+
+> Please put together a class reflection draft based on my Week 1 notes.
+
+The AI needs to understand a few things:
+
+1. You want a class reflection
+2. You're pointing at the Week 1 notes
+3. You want a draft, not a final version
+4. It probably needs to read the notes first, then organize them
+
+But the LLM itself can't always read your files directly.
+
+If you want it to actually pull data from a local folder, a Notion page, or a Google Drive document, it needs tools.
+
+---
+
+## Gemini CLI is where you and the AI work together
+
+CLI stands for Command Line Interface — think of it as a "text-based workspace."
+
+Gemini CLI is the tool that lets you work with Gemini in a terminal.
+
+You type tasks in, and the AI helps you analyze, organize, read files, or call tools.
+
+It's less like a chat app and more like a workbench.
+
+In that workbench, you can give the AI access to project data and connect more tools through MCP.
+
+So the role of Gemini CLI is:
+
+> The shared workspace where you and the AI collaborate.
+
+---
+
+## MCP is the shared protocol for AI tooling
+
+MCP stands for Model Context Protocol.
+
+You can think of it as:
+
+> A shared protocol for AI to talk to tools.
+
+Without a shared protocol, every tool would have to be wired up its own way — chaos.
+
+The idea behind MCP is:
+
+Tool providers package their capabilities as an MCP server.
+Tools like Gemini CLI act as MCP clients.
+Through this protocol, the AI knows what tools are available, what each tool needs as input, and what it returns.
+
+Put simply:
+
+- MCP server: the tool provider
+- MCP client: the connector
+- AI: the one deciding when to use a tool
+
+---
+
+## API is how we actually do things to external services
+
+Think of an API as "an external service's operation entry point."
+
+Services like Notion, Google Drive, GitHub, and Slack typically expose APIs.
+
+Through an API, code can:
+
+- Look up data
+- Create pages
+- Update content
+- Read files
+- Add records
+
+The relationship between MCP and API is:
+
+The API is what the service itself exposes.
+An MCP server can wrap an API into something AI can use comfortably.
+Gemini CLI then lets the AI call those wrapped tools through the MCP server.
+
+So API is the underlying capability; MCP is the wrapping and protocol layer.
+
+---
+
+## More tools isn't always better
+
+A common early thought is:
+
+If AI can use tools, isn't more tools always better?
+
+Not really.
+
+More tools means more reach, but also more risk.
+
+For example:
+
+- It might read data it shouldn't
+- It might modify content it shouldn't touch
+- It might pick the wrong tool for the task
+- It might act in the wrong place
+
+So when designing an AI agent, don't just turn everything on. Ask first:
+
+> Which tools does this task actually need?
+
+Smaller is better. Clearer is better.
+
+---
+
+## Read first, write later
+
+A practical principle when designing AI workflows:
+
+> Read first, write later.
+
+Meaning: don't let the AI modify, delete, or publish things from the start.
+
+A safer flow looks like:
+
+1. Let the AI read the data first
+2. Let it organize what it understood
+3. Let a human confirm
+4. Then create a new draft
+5. Only then consider updating the real content
+
+The benefit: the human stays in the loop.
+
+The AI helps, but the final judgment and responsibility still sit with you.
+
+---
+
+## AI agents aren't about full automation
+
+"AI agent" sounds like "fully automated assistant."
+
+But in learning and teaching contexts, full automation isn't necessarily the goal.
+
+What matters more:
+
+- Was the task broken down small enough?
+- Do the tools have clear boundaries?
+- Is there room for human confirmation?
+- Can it stop when something goes wrong?
+- Can the result be reviewed?
+
+A good AI agent isn't one that does everything by itself.
+
+A good AI agent knows when to act, when to ask, and when to stop.
+
+---
+
+## Takeaways
+
+The main concepts to internalize:
+
+AI isn't just chat — it can use tools to complete tasks.
+Gemini CLI is where we work with the AI.
+MCP is the shared protocol that lets AI use tools.
+API is what an external service actually exposes.
+More tools isn't better — think through the task and the boundaries first.
+For your first AI workflow, read data and create new drafts; don't modify originals.
+
+When you build your own MCP server next, these concepts turn into actual tools.
+
+For example:
+
+- List class notes
+- Read a specific note
+- Create a reflection draft
+- Provide fixed reflection rules
+- Let Gemini CLI call all of these
+`;
+
+const mcpPrimitivesMd = `# Roles of Tools, Resources, and Prompts
+
+## What this note is about
+
+When building an MCP server, a question comes up fast:
+
+Should this thing be a tool, a resource, or a prompt?
+
+All three are part of MCP, but they play different roles.
+
+A one-line summary:
+
+- Tool is a capability that does something
+- Resource is reference content
+- Prompt is a reusable workflow
+
+If these three roles get mixed up, the MCP server gets messy fast.
+
+---
+
+## Tool: actually does something
+
+A tool is the most "tool-like" thing.
+
+It runs an action.
+
+For example:
+
+- List the notes in a folder
+- Read a specific note
+- Create a reflection draft
+- Call an API for data
+- Add a row of data
+- Generate a file
+
+If the thing changes state, reads external data, or performs a clear action, it's probably best as a tool.
+
+In the class-notes helper:
+
+\`\`\`python
+@mcp.tool()
+def list_notes() -> str:
+    """List the class notes inside the class_notes folder."""
+    ...
+\`\`\`
+
+\`list_notes\` is a tool because it goes to the folder and looks at what's there.
+
+---
+
+## Keep tools small — don't be greedy
+
+A common mistake when designing tools:
+
+Stuffing too much into one tool.
+
+For example, designing a tool called:
+
+\`\`\`text
+manage_notes
+\`\`\`
+
+It sounds convenient, but it could mean any of:
+
+- List notes
+- Read a note
+- Modify a note
+- Delete a note
+- Create a draft
+- Organize content
+
+That's too big.
+
+When the AI sees a tool like that, it has trouble figuring out what's safe to do.
+
+A better approach is to split it up:
+
+- \`list_notes\`
+- \`read_note\`
+- \`create_reflection_draft\`
+
+Each tool does one clear thing.
+
+Easier to understand, easier to gate.
+
+---
+
+## Resource: fixed reference content
+
+A resource is more like "data" or "reference content."
+
+It's not for performing actions.
+
+It's the background material the AI can read.
+
+For example:
+
+- Class reflection format
+- Course rules
+- Writing examples
+- Project description
+- Database field reference
+- FAQ list
+
+In the class-notes helper, a resource looks like:
+
+\`\`\`text
+course://reflection-rules
+\`\`\`
+
+It holds the fixed rules for writing a reflection draft.
+
+For example:
+
+1. Must include "what I understood"
+2. Must include "where I'm still stuck"
+3. Must include "how I might apply this"
+4. Don't finish the student's final assignment
+5. Flag thin source material to the user
+
+This kind of content is best as a resource.
+
+It's not an action — it's fixed reference material.
+
+---
+
+## Don't turn fixed rules into tools
+
+If you only need the AI to see a set of rules, you don't need a tool.
+
+For example:
+
+\`\`\`text
+get_reflection_rules
+\`\`\`
+
+The name reads like a tool, but if all it does is return fixed rules, it should be a resource.
+
+Why:
+
+A tool reads as "I'm going to do something."
+A resource reads as "here's reference material to consult."
+
+Putting fixed rules in a resource makes the MCP server clearer.
+
+The AI can also tell:
+
+This isn't an action to perform — it's content to consult while doing the task.
+
+---
+
+## Prompt: a reusable workflow
+
+A prompt is a reusable task template.
+
+It's not the tool itself, and it's not the data itself.
+
+It's more like a job description.
+
+The class-notes helper might have a prompt like:
+
+\`\`\`text
+draft_reflection
+\`\`\`
+
+It tells the AI:
+
+1. Read the chosen note first
+2. Pull out the points relevant to the topic
+3. Consult the reflection rules
+4. Show the user the draft for confirmation first
+5. Only create the file after the user agrees
+
+That's exactly what a prompt is good for.
+
+It captures a common workflow so the user doesn't have to describe it from scratch every time.
+
+---
+
+## Prompt is not the same as a tool
+
+Prompts and tools get conflated easily.
+
+A way to separate them:
+
+If it's saying "how to do something," it's more like a prompt.
+If it's actually "performing an action," it's more like a tool.
+
+For example:
+
+\`\`\`text
+Produce a class reflection draft based on the chosen note
+\`\`\`
+
+This is more like a prompt — it describes a workflow.
+
+But:
+
+\`\`\`text
+Create a new draft file
+\`\`\`
+
+This is more like a tool — it actually writes a file.
+
+So in the class-notes helper:
+
+- \`draft_reflection\` is a prompt
+- \`create_reflection_draft\` is a tool
+
+They work together, but they're not the same thing.
+
+---
+
+## The three work together
+
+Tools, resources, and prompts aren't competing — they form one clean workflow.
+
+For example, a user says:
+
+> Based on \`week1.md\`, with "my understanding of MCP" as the topic, please produce a reflection draft.
+
+The AI can:
+
+1. Use the prompt \`draft_reflection\` to understand the flow
+2. Use the tool \`read_note\` to read \`week1.md\`
+3. Consult the resource \`course://reflection-rules\`
+4. Produce the draft content
+5. Wait for the user's confirmation
+6. Use the tool \`create_reflection_draft\` to create the file
+
+Each piece has its own role.
+
+Prompt handles the flow.
+Resource handles the data.
+Tool handles the action.
+
+---
+
+## A simple test
+
+If you're not sure where a thing belongs, ask three questions.
+
+First:
+
+> Does it actually do something?
+
+If yes — read a file, write a file, hit an API — it's probably a tool.
+
+Second:
+
+> Does it just provide reference material to the AI?
+
+If yes — class rules, format guides, project descriptions — it's probably a resource.
+
+Third:
+
+> Is it describing a fixed workflow?
+
+If yes — "first read, then summarize, then ask the user" — it's probably a prompt.
+
+This isn't a perfect rule, but for beginners it's plenty.
+
+---
+
+## How the class-notes helper splits the roles
+
+If we're building a "class-notes helper," it splits like this:
+
+### Tools
+
+\`\`\`text
+hello
+list_notes
+read_note
+create_reflection_draft
+\`\`\`
+
+These are action-performing tools.
+
+\`hello\` confirms the MCP server is running.
+\`list_notes\` lists the notes.
+\`read_note\` reads a note.
+\`create_reflection_draft\` creates a draft.
+
+### Resource
+
+\`\`\`text
+course://reflection-rules
+\`\`\`
+
+This is the fixed reflection rules.
+
+It's not an action — it's content the AI consults while drafting.
+
+### Prompt
+
+\`\`\`text
+draft_reflection
+\`\`\`
+
+This is the reflection-drafting workflow.
+
+It reminds the AI to read the note, organize key points, consult the rules, get human confirmation, and only then create the draft.
+
+---
+
+## Why this split is safer
+
+A few benefits.
+
+First: clearer boundaries.
+You know which things actually do work, which just provide data, and which describe flows.
+
+Second: easier permission control.
+For instance, you can expose only:
+
+\`\`\`text
+list_notes
+read_note
+create_reflection_draft
+\`\`\`
+
+without offering a delete tool.
+
+Third: easier debugging.
+If the AI ignores a rule, the resource or prompt may be unclear.
+If a file isn't created, the tool likely has a problem.
+If the order is off, the prompt needs tuning.
+
+Fourth: easier for students to follow.
+Each piece has a clear role; it doesn't all blur together.
+
+---
+
+## Common mistakes
+
+### Mistake 1: Making everything a tool
+
+Some people end up making everything a tool.
+
+Class rules become a tool, fixed instructions become a tool, the workflow becomes a tool.
+
+The tool list gets messy.
+
+The AI also has a harder time telling which tools actually act vs. just return data.
+
+### Mistake 2: Tools that try to do too much
+
+For example, a single \`manage_course\` that "does everything."
+
+It looks convenient, but it's hard to control.
+
+Better: split it into several smaller tools.
+
+### Mistake 3: Asking the prompt to do something no tool supports
+
+For example, a prompt that says:
+
+\`\`\`text
+Read everything from Google Drive
+\`\`\`
+
+But you never provided a Google Drive tool.
+
+Now the AI either guesses or fails.
+
+So prompts can't be wishful.
+
+A prompt has to align with the tools you've actually exposed.
+
+---
+
+### Mistake 4: Overstuffed resources
+
+A resource is reference material, not a junk drawer.
+
+If you cram unrelated content in, the AI has a harder time finding what matters.
+
+A good resource is short, clear, and on-topic.
+
+---
+
+## Takeaways
+
+Tools, resources, and prompts have different roles.
+
+Tool is a capability that does something.
+Resource is fixed reference content.
+Prompt is a reusable workflow.
+
+When designing an MCP server, don't try to build a lot of features upfront.
+
+Ask:
+
+- Which actions does this task need?
+- Which fixed reference material should the AI have?
+- Which workflows can be packaged as prompts?
+- Which capabilities should not be exposed?
+- Which actions need human confirmation first?
+
+When these questions are answered, the MCP server is much less likely to turn into a messy tool box.
+
+A good MCP server isn't the one with the most tools.
+
+A good MCP server is one where every tool, every piece of reference material, and every workflow has a clear purpose.
+`;
+---
+
+<BaseLayout
+  title="Building Your Own MCP Server: Implementation Steps — AI Agent Puzzle"
+  description="Turn the previous page's design into runnable code: create the project folder, install uv, write a minimal server.py, hook it up to Gemini CLI, add the full toolset, and run a complete reflection-draft flow. Each step ships with full commands and safety boundaries."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-impl">
+      <a class="back-link" href="/learning/ai-agent/custom-server/concepts">&larr; Back to Concepts & Design</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Building Your Own MCP Server: Implementation Steps</h1>
+        <p class="detail-subtitle">
+          On the previous page we sketched out the tool surface: four tools, one resource, one prompt. This page <strong>builds it</strong>. Each step ships with full commands. If a step doesn't pass, stop and fix it before moving on.
+        </p>
+      </header>
+
+      <!-- ============ Part 1: Get a minimal version running ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">Get a Minimal Version Running</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Create a Project Folder in VS Code</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Create a folder somewhere convenient, named <code>my-first-mcp-server</code>. Then open VS Code and choose <strong>File → Open Folder</strong>, and pick the folder you just created.
+      </p>
+
+      <p class="detail-paragraph">
+        Once it's open, create the following folders and files in the file explorer:
+      </p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
+├─ server.py
+├─ class_notes/
+│  ├─ ai_agent_basics.md
+│  └─ mcp_tools_resources_prompts.md
+└─ drafts/</code></pre>
+
+      <ul class="check-list">
+        <li><code>server.py</code> — our MCP server program</li>
+        <li><code>class_notes/</code> — holds the original class notes</li>
+        <li><code>drafts/</code> — holds reflection drafts the AI creates</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point: <strong>scope what the AI can touch to this folder.</strong> Don't let it read your whole machine on day one, and don't point it at anything important right away.
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Install the MCP Package</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Time to install the MCP Python SDK. Two options.
+      </p>
+
+      <h3 class="sub-heading">Option 1: Install with uv (recommended)</h3>
+      <p class="detail-paragraph">
+        With uv, first make sure VS Code has <code>my-first-mcp-server</code> open. Then in VS Code's integrated terminal, run:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv init</code></pre>
+
+      <p class="detail-paragraph">
+        The first command is uv's official Windows installer. The second <strong>initializes the current folder as a uv project</strong>.
+      </p>
+
+      <p class="detail-paragraph">Then run:</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">uv add "mcp[cli]"</code></pre>
+
+      <p class="detail-paragraph">
+        This adds the MCP packages to the project.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Two reasons to use uv: (1) it keeps the project's environment together, so when Gemini CLI starts the MCP server it can do so via <code>uv run</code>; (2) it makes <strong>package and virtual-env management cleaner and more consistent</strong>, so different projects don't clobber each other.
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Option 2: Install with pip</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            With pip, in VS Code's integrated terminal:
+          </p>
+          <pre class="code-block" is:raw><code class="lang-shell">python -m venv .venv</code></pre>
+          <p class="detail-paragraph">
+            This creates a <code>.venv</code> virtual environment in the project. Then activate it.
+          </p>
+          <p class="detail-paragraph">On Windows PowerShell:</p>
+          <pre class="code-block" is:raw><code class="lang-shell">.venv\Scripts\Activate.ps1</code></pre>
+          <p class="detail-paragraph">On macOS or Linux:</p>
+          <pre class="code-block" is:raw><code class="lang-shell">source .venv/bin/activate</code></pre>
+          <p class="detail-paragraph">Once activated, install MCP:</p>
+          <pre class="code-block" is:raw><code class="lang-shell">python -m pip install "mcp[cli]"</code></pre>
+          <p class="detail-paragraph">
+            What this means: <strong>use the current Python</strong> to run pip install. Avoid plain <code>pip install "mcp[cli]"</code> — sometimes there are multiple Pythons on a machine and bare <code>pip</code> may install into an environment you didn't expect.
+          </p>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This guide <strong>uses Option 1</strong> because it teaches a useful habit: a dedicated virtual environment per project. Every step below assumes Option 1.
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Write a Minimal MCP Server First</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Open <code>server.py</code> and drop this in:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Course Notes Assistant")
+
+
+@mcp.tool()
+def hello() -> str:
+    """Confirm the class-notes MCP server is up."""
+    return "Class-notes MCP server is running."
+
+
+if __name__ == "__main__":
+    mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        This program has <strong>one tool</strong>, <code>hello</code>. It doesn't read files. It doesn't create drafts. It just returns one line.
+      </p>
+
+      <p class="detail-paragraph">
+        Small, but important. We need to confirm three things first:
+      </p>
+      <ul class="check-list">
+        <li>Python runs</li>
+        <li>The MCP server starts</li>
+        <li>Gemini CLI can find this server</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Once this passes, <strong>adding features afterward is much less likely to send you down a rabbit hole.</strong>
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Connect the MCP Server to Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Now Gemini CLI needs to know where this MCP server lives. In VS Code's file explorer, create a <code>.gemini</code> folder, then create <code>settings.json</code> inside it:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "course-notes": {
+      "command": "uv",
+      "args": ["run", "python", "server.py"],
+      "cwd": "Replace with the full path to your project folder",
+      "timeout": 30000,
+      "trust": false,
+      "includeTools": ["hello"]
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        What this says: in the folder pointed to by <code>cwd</code>, run <code>uv run python server.py</code>. That is, <strong>start the MCP server using uv's project environment</strong>.
+      </p>
+
+      <p class="detail-paragraph">
+        <code>cwd</code> examples:
+      </p>
+      <ul class="check-list">
+        <li>Windows: <code>"cwd": "C:/Users/your-name/Desktop/my-first-mcp-server"</code></li>
+        <li>macOS: <code>"cwd": "/Users/your-name/Desktop/my-first-mcp-server"</code></li>
+      </ul>
+
+      <p class="detail-paragraph">The final layout looks at least like this:</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
+├─ .gemini/
+│  └─ settings.json
+├─ server.py
+├─ class_notes/
+└─ drafts/</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Gemini CLI finds MCP servers via the <code>mcpServers</code> entry in <code>settings.json</code>. For stdio, it uses <code>command</code>, <code>args</code>, <code>cwd</code>, and similar fields.
+        </p>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="case-header">
+        <p class="case-label">STEP 5</p>
+        <h2 class="case-title">Verify the MCP Server Connected</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        With the config in place, start Gemini CLI from VS Code's integrated terminal:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
+
+      <p class="detail-paragraph">Once inside Gemini CLI, type:</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
+
+      <p class="detail-paragraph">
+        If <code>course-notes</code> shows up as connected, ask Gemini to try the tool:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please call the hello tool from course-notes.
+      </blockquote>
+
+      <p class="detail-paragraph">If it replies:</p>
+
+      <blockquote class="prompt-example">
+        Class-notes MCP server is running.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          That's the first step done.<br/>
+          <strong>The minimal version runs inside Gemini CLI.</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: Add the real tools ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Add the Real Tools</span>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">Upgrade server.py to the Full Version</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        With <code>hello</code> working, we can start adding tools that do real work. Replace <code>server.py</code> with this version:
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Full server.py</span>
+          <span class="details-card__hint">Click to expand the code</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        This version does several things:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><code>list_notes</code> lists which notes can be read</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><code>read_note</code> reads a specific note</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><code>create_reflection_draft</code> creates a new draft</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><code>course://reflection-rules</code> provides the fixed reflection rules</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text"><code>draft_reflection</code> provides a fixed reflection workflow</span></li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          With this, we're not just shipping a tool —<br/>
+          we're shipping a small MCP server with <strong>tools, a resource, and a prompt</strong>.
+        </p>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="case-header">
+        <p class="case-label">STEP 7</p>
+        <h2 class="case-title">Update Gemini CLI's Allowed-Tools List</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Earlier, <code>settings.json</code> only exposed <code>hello</code>. Now we have more tools, so update <code>includeTools</code> to:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">"includeTools": [
+  "hello",
+  "list_notes",
+  "read_note",
+  "create_reflection_draft"
+]</code></pre>
+
+      <p class="detail-paragraph">
+        We're keeping <code>includeTools</code>. The reason:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Even if you wrote the MCP server yourself,<br/>
+          <strong>don't get into the habit of "expose everything."</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Expose only what's needed right now. When you add riskier tools later (delete a file, modify the originals, hit an external API), this discipline matters even more.
+      </p>
+
+      <!-- STEP 8 -->
+      <div class="case-header">
+        <p class="case-label">STEP 8</p>
+        <h2 class="case-title">Drop In Two Sample Notes</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        For <code>list_notes</code> and <code>read_note</code> to have something to work with, we put two sample notes inside <code>class_notes/</code>.
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">ai_agent_basics.md sample content</span>
+          <span class="details-card__hint">Click to expand (copy as a whole)</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
+        </div>
+      </details>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">mcp_tools_resources_prompts.md sample content</span>
+          <span class="details-card__hint">Click to expand (copy as a whole)</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
+        </div>
+      </details>
+
+      <!-- STEP 9 -->
+      <div class="case-header">
+        <p class="case-label">STEP 9</p>
+        <h2 class="case-title">Run Your First Full Flow</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Test it inside Gemini CLI. Start with:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please list the class notes I currently have.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        If it works, Gemini calls <code>list_notes</code> and shows the <code>.md</code> files inside <code>class_notes</code>. Next:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please read ai_agent_basics.md and pull out three key points.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Now Gemini calls <code>read_note</code>, reads the chosen note, and organizes the content. Then:
+      </p>
+
+      <blockquote class="prompt-example">
+        Based on ai_agent_basics.md, with "my understanding of MCP" as the topic, please draft a class reflection for me.<br/>
+        <strong>Don't create the file yet — show me the draft so I can confirm.</strong>
+      </blockquote>
+
+      <p class="detail-paragraph">
+        The important part: <strong>"Don't create the file yet — show me the draft so I can confirm."</strong> That keeps a human in the loop. The AI can read, organize, and draft; whether to actually write the file should still get a human checkpoint.
+      </p>
+
+      <p class="detail-paragraph">
+        Once the draft looks good:
+      </p>
+
+      <blockquote class="prompt-example">
+        Looks good. Please save it as a reflection draft titled "My Understanding of MCP."
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Now Gemini can call <code>create_reflection_draft</code>.
+      </p>
+
+      <!-- ============ Part 3: Boundaries and debugging ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">Boundaries and Debugging</span>
+      </div>
+
+      <!-- Why creating new files is safer than modifying old ones -->
+      <h2 class="detail-heading">Why Creating New Files Is Safer Than Modifying Old Ones</h2>
+      <p class="detail-paragraph">
+        You might wonder: since the AI can already create drafts, why not let it modify the originals directly? Technically, sure — but <strong>not in version one</strong>. Modifying existing files carries more risk.
+      </p>
+
+      <ul class="cross-list">
+        <li>If the AI gets it wrong, you might <strong>lose the original content</strong></li>
+        <li>If the AI picks the wrong file, recovery is <strong>hard</strong></li>
+        <li>If the student isn't familiar with the flow yet, it's <strong>harder to tell where things broke</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So here we let the AI create new drafts only — never modify the originals.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The first time you wire up writes,<br/>
+          <strong>create new things — don't overwrite old ones.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        That's why we keep originals in <code>class_notes/</code> and outputs in <code>drafts/</code>. <strong>Two folders, one workflow — much easier to follow.</strong>
+      </p>
+
+      <!-- Safety boundaries in the code -->
+      <h2 class="detail-heading">Safety Boundaries in the Code</h2>
+      <p class="detail-paragraph">
+        The program is short, but it already has a few boundaries.
+      </p>
+
+      <h3 class="sub-heading">Boundary 1: Block weird paths</h3>
+      <pre class="code-block" is:raw><code class="lang-python">name = Path(filename).name</code></pre>
+      <p class="detail-paragraph">
+        Stops users from passing things like <code>../secret.txt</code>. We don't want the AI reading anything outside the designated folder.
+      </p>
+
+      <h3 class="sub-heading">Boundary 2: .md only</h3>
+      <pre class="code-block" is:raw><code class="lang-python">if path.suffix != ".md":
+    raise ValueError("Only .md notes are allowed for now.")</code></pre>
+      <p class="detail-paragraph">
+        Restricts reads to Markdown notes.
+      </p>
+
+      <h3 class="sub-heading">Boundary 3: Don't overwrite</h3>
+      <pre class="code-block" is:raw><code class="lang-python">if path.exists():
+    return f"Draft already exists: {filename}. I did not overwrite it. Please use a different title."</code></pre>
+      <p class="detail-paragraph">
+        If the draft already exists, <strong>don't overwrite it</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          These look small, but together they make the agent <strong>much less likely to go off the rails</strong>.
+        </p>
+      </div>
+
+      <!-- Common errors -->
+      <h2 class="detail-heading">Common Errors</h2>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">1. Gemini CLI can't find my MCP server</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Check that <code>settings.json</code> is in the right place. For project-level config, it should live at:
+          </p>
+          <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/.gemini/settings.json</code></pre>
+          <p class="detail-paragraph">
+            Then check that <code>cwd</code> points to your actual project folder. <strong>Often the code isn't wrong — Gemini CLI just doesn't know where to launch server.py from.</strong>
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">2. I installed via uv, but Gemini CLI can't find mcp</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Make sure <code>settings.json</code> is using the uv version:
+          </p>
+          <pre class="code-block" is:raw><code class="lang-json">"command": "uv",
+"args": ["run", "python", "server.py"]</code></pre>
+          <p class="detail-paragraph">
+            That way Gemini CLI launches the server through uv's project environment. Also confirm <code>cwd</code> points to the right folder — uv needs to find the project config there.
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">3. Tools show up but fail when called</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            First confirm there are actual <code>.md</code> files inside <code>class_notes</code>. You can also try:
+          </p>
+          <blockquote class="prompt-example">
+            Please use the hello tool to confirm the server is running.
+          </blockquote>
+          <p class="detail-paragraph">
+            If <code>hello</code> works but <code>list_notes</code> fails, <strong>it's usually a folder or file path issue</strong>.
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">4. The draft wasn't created</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Check that the <code>drafts</code> folder exists. The program creates it on demand, but if it lacks permission, it can still fail.
+          </p>
+          <p class="detail-paragraph">
+            Also check that the title doesn't collide with an existing draft. If it does, the program stops and won't overwrite.
+          </p>
+          <div class="callout-card">
+            <p class="callout-text">
+              That's <strong>not a bug</strong> — it's a deliberate safety boundary.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- How this resembles the Claude Code workflow -->
+      <h2 class="detail-heading">How This Mirrors the Claude Code Workflow</h2>
+      <p class="detail-paragraph">
+        We didn't use Claude Code here, but we already practiced a very similar way of working.
+      </p>
+
+      <ul class="check-list">
+        <li>We <strong>collaborate with the AI in a CLI</strong></li>
+        <li>We let the AI <strong>read project data</strong></li>
+        <li>We let the AI <strong>call tools based on the task</strong></li>
+        <li>We <strong>govern tool boundaries through a config file</strong></li>
+        <li>We <strong>break tasks down</strong>, so the AI never does too much at once</li>
+        <li>We <strong>preserve human confirmation</strong> instead of letting the AI run free</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So this isn't really about copying any one tool's look. The real lesson is the way of working underneath:
+      </p>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          Bring the AI into your workspace —<br/>
+          <strong>but only with the tools and boundaries it actually needs.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-impl {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Part divider */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  /* Case header */
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.numbered-list__text) code,
+  :global(.prompt-example) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Numbered list */
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .prompt-example strong {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .code-block--in-details {
+    margin: 0;
+    border: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
+
+  .code-block--md {
+    max-height: 32rem;
+    overflow-y: auto;
+  }
+
+  /* Details card */
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-2);
+  }
+
+  .details-card__body--flush {
+    padding: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+
+    .code-block--md {
+      max-height: 24rem;
+    }
+  }
+</style>

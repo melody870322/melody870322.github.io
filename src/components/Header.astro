@@ -48,8 +48,30 @@ const navItems: NavItem[] = [
           { label: i.nav.ai_agent_security, href: navPath('/learning/ai-agent/security') },
           { label: i.nav.ai_agent_primitives, href: navPath('/learning/ai-agent/primitives') },
           { label: i.nav.ai_agent_classroom_tools, href: navPath('/learning/ai-agent/classroom-tools') },
-          { label: i.nav.ai_agent_python_prep, href: navPath('/learning/ai-agent/python-prep') },
-          { label: i.nav.ai_agent_custom_server, href: navPath('/learning/ai-agent/custom-server') },
+          {
+            label: i.nav.ai_agent_python_prep,
+            href: '#',
+            children: [
+              { label: i.nav.ai_agent_python_basics_1, href: navPath('/learning/ai-agent/python-prep/basics-1') },
+              { label: i.nav.ai_agent_python_basics_2, href: navPath('/learning/ai-agent/python-prep/basics-2') },
+            ],
+          },
+          {
+            label: i.nav.ai_agent_custom_server,
+            href: '#',
+            children: [
+              { label: i.nav.ai_agent_custom_server_concepts, href: navPath('/learning/ai-agent/custom-server/concepts') },
+              { label: i.nav.ai_agent_custom_server_implementation, href: navPath('/learning/ai-agent/custom-server/implementation') },
+            ],
+          },
+          {
+            label: i.nav.ai_agent_api_server,
+            href: '#',
+            children: [
+              { label: i.nav.ai_agent_api_server_external, href: navPath('/learning/ai-agent/api-server/external') },
+              { label: i.nav.ai_agent_api_server_keys, href: navPath('/learning/ai-agent/api-server/keys') },
+            ],
+          },
         ],
       },
       {

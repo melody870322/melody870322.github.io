@@ -4,7 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Classroom-Style Tool Design on Off-the-Shelf MCP — AI Agent Puzzle"
-  description="Use a classroom scenario to learn how to shape a sensible tool surface on top of an off-the-shelf MCP."
+  description="Don't hand the whole MCP system to AI — narrow the task first, then define the tool surface. A 5-step design template (who's using it → what does it do → what can't it do → minimum tool set → what if it goes wrong) for reshaping off-the-shelf MCPs into smaller versions that fit your scenario."
   lang="en"
 >
   <section class="section">
@@ -12,11 +12,437 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/">&larr; Back to Home</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">Classroom-Style Tool Design on Off-the-Shelf MCP</h1>
+        <h1 class="detail-title">Don't Hand the Whole System Over to AI</h1>
         <p class="detail-subtitle">
-          Page under construction...
+          Over the past few pages, we've been laying down the path step by step: install Gemini CLI and connect your first off-the-shelf MCP; see Notion actually run through a full workflow; learn that more tools isn't better, and not every capability should be a tool. This page tackles the <strong>next important question</strong>.
         </p>
       </header>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          Even if I've already connected an off-the-shelf MCP,<br/>
+          <strong>that doesn't mean I should hand the whole system to AI as-is.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Often, the genuinely useful and safer approach <strong>isn't to use the off-the-shelf tool directly — it's to reshape it into a classroom-style tool surface first</strong>. That is, not "I'll hand over whatever this MCP has," but <strong>"in my current situation, what exactly do I need it to do?"</strong>
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Real safety isn't just tweaking settings — it's <strong>rewriting the task first, then defining the tool surface</strong>.
+        </p>
+      </div>
+
+      <!-- Section: What is classroom-version tool surface -->
+      <h2 class="detail-heading">What "Classroom-Style Tool Surface" Means</h2>
+      <p class="detail-paragraph">
+        You can think of a "classroom-style tool surface" as a very simple idea:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Take a big, complete, general-purpose tool capability and shrink it down to a smaller version that fits your context.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        This smaller version isn't necessarily more powerful — it's often simpler. But it has a few major upsides:
+      </p>
+      <ul class="check-list">
+        <li>Easier to understand</li>
+        <li>Easier to observe</li>
+        <li>Less likely to cause trouble</li>
+        <li>Closer to the actual task</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So "classroom-style" here is more like: <strong>I'm drawing a boundary around this tool first, so it only does what this task and these users genuinely need.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Why "manage entire Notion" doesn't work -->
+      <h2 class="detail-heading">Why "Let AI Manage My Entire Notion" Doesn't Work</h2>
+      <p class="detail-paragraph">
+        That kind of phrasing sounds natural, but it's actually too broad. The biggest issue isn't that AI can't do it — it's that:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The boundary is too vague.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        The moment you don't shrink the task first, a pile of questions follows:
+      </p>
+      <ul class="cross-list">
+        <li>Which pages are okay to touch?</li>
+        <li>Which pages aren't?</li>
+        <li>Can it create new content?</li>
+        <li>Can it modify existing content?</li>
+        <li>Is it just organizing, or making decisions for you?</li>
+        <li>Where should it stop when something goes wrong?</li>
+      </ul>
+      <p class="detail-paragraph">
+        So the mature approach isn't asking "what can this MCP do" — it's asking: <strong>which small slice of work do I actually need it to do right now?</strong>
+      </p>
+
+      <!-- Section: Key sentence -->
+      <h2 class="detail-heading">The Key Sentence: Narrow the Task First, Then Define the Tool Surface</h2>
+      <p class="detail-paragraph">
+        Many people assume that the heart of safety configuration is editing <code>includeTools</code> or <code>excludeTools</code>. Those matter, of course, but <strong>they aren't usually the first step</strong>.
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          The first step should be:<br/>
+          <strong>Make the task itself smaller.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Because if the task itself is large and vague, no amount of tool restriction afterward will fully eliminate the gray areas. Think of it this way:
+      </p>
+
+      <div class="analogy-grid">
+        <article class="analogy-card analogy-card--bad">
+          <p class="analogy-card__label">×</p>
+          <p class="analogy-card__text">Don't first ask "<strong>which knives do I have?</strong>"</p>
+        </article>
+        <article class="analogy-card analogy-card--good">
+          <p class="analogy-card__label">✓</p>
+          <p class="analogy-card__text">Ask first: "<strong>am I slicing fruit, carving, or just peeling?</strong>"</p>
+        </article>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>If the task isn't clear, no matter how refined the tools are, things will still get messy. Once the task is clear, only then can the tool surface be designed well.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Practical rewrite -->
+      <h2 class="detail-heading">A Practical Rewrite: Turn a Big Task into a Small One</h2>
+
+      <div class="rewrite-grid">
+        <article class="rewrite-card rewrite-card--bad">
+          <p class="rewrite-card__label">Too big</p>
+          <p class="rewrite-card__text">Let AI manage my entire Notion.</p>
+        </article>
+        <div class="rewrite-arrow" aria-hidden="true">↓</div>
+        <article class="rewrite-card rewrite-card--good">
+          <p class="rewrite-card__label">Better version</p>
+          <p class="rewrite-card__text">
+            Only allow AI to create "Class Reflection Pages" inside the designated classroom database, with content following a fixed format. <strong>Don't modify existing pages.</strong>
+          </p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        You'll notice that after rewriting, everything suddenly becomes much clearer:
+      </p>
+
+      <ul class="dimension-list">
+        <li class="dimension-item">
+          <span class="dimension-key">Scope</span>
+          <span class="dimension-value">A specific database</span>
+        </li>
+        <li class="dimension-item">
+          <span class="dimension-key">Allowed</span>
+          <span class="dimension-value">Create pages</span>
+        </li>
+        <li class="dimension-item">
+          <span class="dimension-key">Forbidden</span>
+          <span class="dimension-value">Modify existing pages</span>
+        </li>
+        <li class="dimension-item">
+          <span class="dimension-key">Format</span>
+          <span class="dimension-value">Fixed format</span>
+        </li>
+        <li class="dimension-item">
+          <span class="dimension-key">Purpose</span>
+          <span class="dimension-value">Class reflection</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          That looks much more like a <strong>teachable, manageable, verifiable</strong> agent.
+        </p>
+      </div>
+
+      <!-- Section: Design template -->
+      <h2 class="detail-heading">A 5-Step Design Template Anyone Can Use</h2>
+      <p class="detail-paragraph">
+        To reshape an off-the-shelf MCP into a classroom-style tool surface, walk through these 5 steps:
+      </p>
+
+      <ol class="template-list">
+        <li class="template-item">
+          <span class="template-num">1</span>
+          <div class="template-body">
+            <h3 class="template-title">Who is the user</h3>
+            <p class="template-desc">
+              The first thing to think about isn't tools — it's: <strong>who is this tool surface for?</strong> Different users need very different capabilities.
+            </p>
+            <ul class="check-list check-list--inset">
+              <li>For <strong>students</strong>, the needs are usually search, read, and draft creation</li>
+              <li>For <strong>teaching assistants</strong>, you may also need organizing, classifying, format checking</li>
+              <li>For <strong>instructors</strong>, you may also need overview, aggregation, review</li>
+            </ul>
+            <p class="template-desc">
+              If this step gets skipped, scope tends to creep larger and larger.
+            </p>
+          </div>
+        </li>
+
+        <li class="template-item">
+          <span class="template-num">2</span>
+          <div class="template-body">
+            <h3 class="template-title">What task does it actually need to complete</h3>
+            <p class="template-desc">
+              Note: it's "<strong>which kind of task</strong>," not "everything possible." Better task wordings might look like:
+            </p>
+            <ul class="check-list check-list--inset">
+              <li>Help a student turn existing material into a one-page <strong>class reflection draft</strong></li>
+              <li>Help a project group turn topics into a <strong>weekly progress summary</strong></li>
+              <li>Help a user <strong>classify documents in a specified folder into three categories</strong></li>
+              <li>Help a reader rewrite a page into <strong>slide-style key points</strong></li>
+            </ul>
+            <p class="template-desc">
+              These tasks share one trait: <strong>clear scope, with a clear input and output</strong>. Tool surfaces designed around tasks like these tend to be much steadier.
+            </p>
+          </div>
+        </li>
+
+        <li class="template-item">
+          <span class="template-num">3</span>
+          <div class="template-body">
+            <h3 class="template-title">What it can't do</h3>
+            <p class="template-desc">
+              This one is <strong>extremely important and often overlooked</strong>. Many people only write what it can do, what it will do, and what it's suited for. But to design a real classroom-style tool surface, you should also write <strong>what it can't do</strong>. For example:
+            </p>
+            <ul class="cross-list cross-list--inset">
+              <li>Don't modify existing class announcements</li>
+              <li>Don't delete any pages</li>
+              <li>Don't touch databases outside the course</li>
+              <li>Don't finalize a draft on the student's behalf</li>
+              <li>Don't publish content on its own</li>
+            </ul>
+            <p class="template-desc">
+              The moment those restrictions are written down, <strong>the boundary of your whole tool surface becomes much clearer</strong>.
+            </p>
+          </div>
+        </li>
+
+        <li class="template-item">
+          <span class="template-num">4</span>
+          <div class="template-body">
+            <h3 class="template-title">What is the minimum tool set</h3>
+            <p class="template-desc">
+              Once the first three things are clear, the fourth step is to come back and ask: <strong>what's the minimum set of tools needed to complete this task?</strong>
+            </p>
+            <p class="template-desc">
+              For example, if you're designing a "Notion Class Reflection Assistant" whose task is just to search topic-related pages, read content, and create a reflection page in a fixed format, the minimum tool set might be:
+            </p>
+            <ul class="check-list check-list--inset">
+              <li>Search pages</li>
+              <li>Read pages</li>
+              <li>Create pages</li>
+            </ul>
+            <p class="template-desc">
+              In that case, "update page" can simply stay off. <strong>Not because it's never needed — but because this version of the task doesn't need it yet.</strong>
+            </p>
+            <div class="callout-card callout-card--inset">
+              <p class="callout-text">
+                This is exactly where the previous page and this page meet. The previous page said "<strong>don't open all the tools</strong>," and this page says "<strong>here's why only these few are needed</strong>."
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="template-item">
+          <span class="template-num">5</span>
+          <div class="template-body">
+            <h3 class="template-title">If something goes wrong, how should it respond</h3>
+            <p class="template-desc">
+              People most often skip this. A good classroom-style tool surface needs to know not only how to behave when things go right, but also: <strong>what to do when data can't be found, permissions are insufficient, or the format is wrong</strong>.
+            </p>
+
+            <div class="response-grid">
+              <article class="response-card response-card--bad">
+                <p class="response-card__label">Don't</p>
+                <ul class="response-list response-list--bad">
+                  <li>Push through anyway</li>
+                  <li>Guess an answer</li>
+                  <li>Fill in the blanks itself</li>
+                </ul>
+              </article>
+              <article class="response-card response-card--good">
+                <p class="response-card__label">Do</p>
+                <ul class="response-list response-list--good">
+                  <li>Explain what's missing</li>
+                  <li>Stop at the current step</li>
+                  <li>Ask the user to confirm the next step</li>
+                  <li>Leave room for human decisions</li>
+                </ul>
+              </article>
+            </div>
+
+            <p class="template-desc">
+              That feels much closer to a professional workflow. Because you aren't building a machine that charges ahead — you're building <strong>an agent that knows when to stop</strong>.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Example 1: Notion -->
+      <div class="case-header">
+        <p class="case-label">EXAMPLE 1</p>
+        <h2 class="case-title">Reshape Notion into a "Class Reflection Assistant"</h2>
+      </div>
+
+      <dl class="case-spec">
+        <div class="case-spec__row">
+          <dt class="case-spec__key">Who's the user</dt>
+          <dd class="case-spec__value">Students enrolled in this course</dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">What's the task</dt>
+          <dd class="case-spec__value">Given a topic and existing classroom materials, create a one-page class reflection draft</dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">What it can't do</dt>
+          <dd class="case-spec__value">
+            <ul class="cross-list cross-list--inset">
+              <li>Don't modify existing pages</li>
+              <li>Don't delete pages</li>
+              <li>Don't touch databases outside the course</li>
+              <li>Don't finalize the draft for the student</li>
+            </ul>
+          </dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">Minimum tool set</dt>
+          <dd class="case-spec__value">
+            <ul class="check-list check-list--inset">
+              <li>Search pages</li>
+              <li>Read pages</li>
+              <li>Create pages</li>
+            </ul>
+          </dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">On error</dt>
+          <dd class="case-spec__value">
+            <ul class="check-list check-list--inset">
+              <li>If <strong>relevant material can't be found</strong>, say so and ask the user to refine the topic</li>
+              <li>If <strong>permission is insufficient</strong>, stop — don't silently switch to a different page</li>
+            </ul>
+          </dd>
+        </div>
+      </dl>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Once it's written out like this, it's no longer "<strong>let AI manage all of Notion</strong>" — it's a clearly defined classroom-style agent.
+        </p>
+      </div>
+
+      <!-- Example 2: Google Drive -->
+      <div class="case-header">
+        <p class="case-label">EXAMPLE 2</p>
+        <h2 class="case-title">Reshape Google Drive into a "Document Organizer"</h2>
+      </div>
+
+      <dl class="case-spec">
+        <div class="case-spec__row">
+          <dt class="case-spec__key">Who's the user</dt>
+          <dd class="case-spec__value">Anyone needing to organize course materials or project documents</dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">What's the task</dt>
+          <dd class="case-spec__value">Read titles and content summaries of files in a specified folder, and group them into a few topic clusters</dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">What it can't do</dt>
+          <dd class="case-spec__value">
+            <ul class="cross-list cross-list--inset">
+              <li>Don't delete the original files</li>
+              <li>Don't move the original files</li>
+              <li>Don't rename files</li>
+              <li>Don't touch anything outside the specified folder</li>
+            </ul>
+          </dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">Minimum tool set</dt>
+          <dd class="case-spec__value">
+            <ul class="check-list check-list--inset">
+              <li>List files</li>
+              <li>Read file contents</li>
+              <li>Create a result page with the organized output</li>
+            </ul>
+          </dd>
+        </div>
+        <div class="case-spec__row">
+          <dt class="case-spec__key">On error</dt>
+          <dd class="case-spec__value">
+            <ul class="check-list check-list--inset">
+              <li>If the <strong>folder can't be read</strong>, stop and explain</li>
+              <li>If <strong>some files lack permission</strong>, mark which ones weren't included</li>
+            </ul>
+          </dd>
+        </div>
+      </dl>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The point of a classroom-style tool surface has never been the system itself, but <strong>whether the task is written clearly enough</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Closing - design habit -->
+      <h2 class="detail-heading">This Page Isn't Really About Configuration — It's About Design</h2>
+      <p class="detail-paragraph">
+        On the surface, this page seems to be about how to limit tools, how to rewrite tasks, how to design an agent. But more fundamentally, this page is teaching a <strong>design habit</strong>:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>Don't grab an off-the-shelf system and run with it. Reshape it into a smaller version that fits your scenario first.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        This habit really matters. <strong>Because it doesn't just apply to this course — it applies to any AI tool you'll meet later.</strong> If you remember to ask these 5 questions first, you usually won't drift too far off track:
+      </p>
+
+      <ol class="closing-list">
+        <li class="closing-item">
+          <span class="closing-num">1</span>
+          <span class="closing-text">Who's using it?</span>
+        </li>
+        <li class="closing-item">
+          <span class="closing-num">2</span>
+          <span class="closing-text">What does it do?</span>
+        </li>
+        <li class="closing-item">
+          <span class="closing-num">3</span>
+          <span class="closing-text">What can't it do?</span>
+        </li>
+        <li class="closing-item">
+          <span class="closing-num">4</span>
+          <span class="closing-text">What's the minimum set of tools?</span>
+        </li>
+        <li class="closing-item">
+          <span class="closing-num">5</span>
+          <span class="closing-text">What if something goes wrong?</span>
+        </li>
+      </ol>
 
     </div>
   </section>
@@ -39,6 +465,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     text-decoration: underline;
   }
 
+  /* Header */
   .detail-header {
     margin-bottom: var(--space-12);
     padding-bottom: var(--space-6);
@@ -57,5 +484,655 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.template-desc) code,
+  :global(.case-spec__value) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .check-list--inset {
+    margin: var(--space-3) 0 var(--space-3);
+  }
+
+  .check-list--inset li {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    margin-bottom: var(--space-1);
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list--inset {
+    margin: var(--space-3) 0 var(--space-3);
+  }
+
+  .cross-list--inset li {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    margin-bottom: var(--space-1);
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--inset {
+    margin: var(--space-4) 0 var(--space-2);
+    padding: var(--space-3) var(--space-6);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    padding: var(--space-6) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Analogy grid (knife metaphor) */
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .analogy-card {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .analogy-card--bad {
+    opacity: 0.85;
+  }
+
+  .analogy-card--good {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    background-color: var(--color-tag-bg);
+  }
+
+  .analogy-card__label {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: var(--text-base);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .analogy-card--bad .analogy-card__label {
+    background-color: var(--color-text-muted);
+    color: #fff;
+  }
+
+  .analogy-card--good .analogy-card__label {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .analogy-card__text {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .analogy-card__text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Rewrite grid (before / after task wording) */
+  .rewrite-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .rewrite-card {
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+  }
+
+  .rewrite-card--bad {
+    background-color: var(--color-bg-secondary);
+    border-left: 4px solid var(--color-text-muted);
+    opacity: 0.85;
+  }
+
+  .rewrite-card--good {
+    background-color: var(--color-tag-bg);
+    border: 2px solid var(--color-accent);
+  }
+
+  .rewrite-card__label {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+  }
+
+  .rewrite-card--good .rewrite-card__label {
+    color: var(--color-accent);
+  }
+
+  .rewrite-card__text {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.8;
+  }
+
+  .rewrite-card__text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .rewrite-arrow {
+    text-align: center;
+    color: var(--color-accent);
+    font-size: var(--text-xl);
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  /* Dimension list (5 dimensions key:value) */
+  .dimension-list {
+    list-style: none;
+    padding: var(--space-5) var(--space-6);
+    margin: var(--space-4) 0 var(--space-6);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .dimension-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  .dimension-key {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    text-align: center;
+  }
+
+  .dimension-value {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    font-weight: 500;
+    line-height: 1.7;
+  }
+
+  /* Template list (5 numbered design steps) */
+  .template-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .template-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .template-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .template-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    margin-top: 0.1rem;
+  }
+
+  .template-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .template-title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+    line-height: 1.4;
+  }
+
+  .template-desc {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .template-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  .template-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Response grid (Step 5: bad vs good error responses) */
+  .response-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin: var(--space-3) 0 var(--space-3);
+  }
+
+  .response-card {
+    padding: var(--space-3);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .response-card--bad {
+    background-color: var(--color-bg);
+    opacity: 0.85;
+  }
+
+  .response-card--good {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+  }
+
+  .response-card__label {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .response-card--bad .response-card__label {
+    color: var(--color-text-secondary);
+  }
+
+  .response-card--good .response-card__label {
+    color: var(--color-accent);
+  }
+
+  .response-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .response-list li {
+    font-size: var(--text-xs);
+    line-height: 1.8;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-1);
+  }
+
+  .response-list--bad li {
+    color: var(--color-text-secondary);
+  }
+
+  .response-list--bad li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-muted);
+    font-weight: 700;
+  }
+
+  .response-list--good li {
+    color: var(--color-text);
+  }
+
+  .response-list--good li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Case header (Example 1 / Example 2) */
+  .case-header {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+  }
+
+  .case-label {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Case spec (definition list) */
+  .case-spec {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: 0;
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    overflow: hidden;
+  }
+
+  .case-spec__row {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .case-spec__row:last-child {
+    border-bottom: none;
+  }
+
+  .case-spec__key {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .case-spec__value {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .case-spec__value strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .case-spec__value .check-list,
+  .case-spec__value .cross-list {
+    margin: 0;
+  }
+
+  /* Closing list (5 design questions) */
+  .closing-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .closing-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .closing-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .closing-text {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-heading);
+    line-height: 1.6;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .analogy-grid,
+    .response-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-card--strong {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .template-item {
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    .template-num {
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: var(--text-xs);
+    }
+
+    .case-spec__row {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .dimension-list {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .dimension-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .dimension-key {
+      min-width: auto;
+    }
+
+    .rewrite-card {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .closing-item {
+      padding: var(--space-4) var(--space-5);
+      gap: var(--space-4);
+    }
   }
 </style>

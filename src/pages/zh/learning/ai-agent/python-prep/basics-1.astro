@@ -1,0 +1,846 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="基礎一 — Python 基礎：為自製 MCP Server 做準備"
+  description="不學一整套 Python，只學自製 MCP Server 真的會用到的那一小塊：變數、字串、if、list、for、函式、return。看完之後就能讀懂第一個 MCP server 的 Python 程式碼。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container python-basics">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">做 MCP 前，你只需要這些 Python</h1>
+        <p class="detail-subtitle">
+          前面我們已經一路走到這裡了：你看過現成 MCP 怎麼接，也看過怎麼把工具面縮小，現在正準備要做自己的第一個 MCP server。但這時很多人會遇到同一個問題。
+        </p>
+      </header>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          MCP 我大概懂了，<strong>可是 Python 我不熟。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這很正常。尤其如果平常不是在寫程式的人，看到 <code>def</code>、<code>return</code>、<code>Path("notes")</code>、<code>@mcp.tool()</code> 這些東西時，心裡很容易先卡一下。
+      </p>
+      <p class="detail-paragraph">
+        所以這裡的目的，<strong>不是要把你變成 Python 工程師</strong>。只做一件事：
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>幫你補上剛好夠看懂「第一個自製 MCP server」的 Python 基礎。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        也就是說，我們不學一整套 Python，<strong>只學你接下來真的會用到的那一小塊</strong>。
+      </p>
+
+      <!-- Section: What is Python -->
+      <h2 class="detail-heading">Python 是什麼</h2>
+      <p class="detail-paragraph">
+        Python 是一種程式語言。你可以把程式語言想成<strong>「跟電腦說話的方法」</strong>，而 Python 算是相對好讀、好上手的一種。它常被拿來做很多事情，例如：
+      </p>
+      <ul class="check-list">
+        <li>自動化小工具</li>
+        <li>資料處理</li>
+        <li>網頁後端</li>
+        <li>AI 與機器學習</li>
+        <li>寫腳本</li>
+        <li>快速做原型</li>
+      </ul>
+      <p class="detail-paragraph">
+        你現在要做的 MCP server，就很適合用 Python。<strong>不是因為它最炫，而是因為它通常比較接近人話、比較好讀、比較適合做第一個版本</strong>。例如下面這一行：
+      </p>
+
+      <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+
+      <p class="detail-paragraph">
+        意思很簡單，就是把 <code>Hello Python</code> 印出來。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以 Python 不是主角，它比較像材料。<strong>你之後要做 MCP server，Python 就是你手上的那把工具。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Install Python in VS Code -->
+      <h2 class="detail-heading">在 VS Code 裡安裝 Python</h2>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">打開 <strong>VS Code</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <p class="setup-text">點左側的 <strong>Extensions</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <p class="setup-text">搜尋 <strong>Python</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">4</span>
+          <p class="setup-text">安裝 <strong>Microsoft 出的 Python 擴充套件</strong></p>
+        </li>
+      </ol>
+
+      <!-- Section: Create first Python file -->
+      <h2 class="detail-heading">建立第一個 Python 檔案</h2>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <div class="setup-body">
+            <p class="setup-text">在你習慣的位置建立一個檔案，名稱可以叫做：</p>
+            <pre class="code-block code-block--py"><code>hello.py</code></pre>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <div class="setup-body">
+            <p class="setup-text">在 <code>hello.py</code> 裡貼上：</p>
+            <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">打開 VS Code 的終端機。從上方選單點：</p>
+            <pre class="code-block code-block--py"><code>Terminal → New Terminal</code></pre>
+            <p class="setup-text">中文介面可能會顯示成「終端機 → 新增終端機」。</p>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">4</span>
+          <p class="setup-text">在 VS Code 打開一個資料夾或一個 <code>.py</code> 檔。這裡的範例做法為打開 <code>hello.py</code>。</p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">5</span>
+          <p class="setup-text">按 <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>（macOS 是 <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>）打開 <strong>Command Palette</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">6</span>
+          <p class="setup-text">輸入並選擇 <code>Python: Select Interpreter</code></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">7</span>
+          <div class="setup-body">
+            <p class="setup-text">從列表裡選一個你要用的 Python 版本。</p>
+            <p class="setup-text setup-text--muted">如果你現在還不確定選哪一個，也不用太緊張，<strong>先選推薦的版本即可</strong>。</p>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">8</span>
+          <div class="setup-body">
+            <p class="setup-text">在終端機中輸入：</p>
+            <pre class="code-block code-block--py"><code>python hello.py</code></pre>
+            <p class="setup-text">如果你是 macOS，而且 <code>python</code> 沒有反應，可以試試：</p>
+            <pre class="code-block code-block--py"><code>python3 hello.py</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        如果畫面出現：
+      </p>
+      <pre class="code-block code-block--py"><code>Hello Python</code></pre>
+      <p class="detail-paragraph">
+        就代表你的第一個 Python 程式成功跑起來了。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這一步很重要。因為之後我們做 MCP Server，<strong>其實也是在寫一個 Python 檔案，然後讓 Gemini CLI 去啟動它。</strong>
+        </p>
+      </div>
+
+      <!-- Concept: 變數 -->
+      <div class="concept-header">
+        <p class="concept-label">概念 01</p>
+        <h2 class="concept-title">變數：先把資料取一個名字</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來我們會開始看到一些像這樣的寫法：
+      </p>
+
+      <pre class="code-block code-block--py"><code>course_name = "AI 工具與應用"</code></pre>
+
+      <p class="detail-paragraph">
+        <code>course_name</code> 這叫做<strong>變數</strong>。你可以先把變數想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>幫一個資料取名字。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">例如：</p>
+      <pre class="code-block code-block--py"><code>course_name = "AI 工具與應用"
+print(course_name)</code></pre>
+
+      <p class="detail-paragraph">
+        這段程式的意思是：先把 <code>"AI 工具與應用"</code> 這段文字放進 <code>course_name</code> 裡，接著用 <code>print(course_name)</code> 把它顯示出來。
+      </p>
+      <p class="detail-paragraph">
+        變數的好處是，<strong>如果某個資料會重複使用，我們不用每次都重新打一遍</strong>。之後你會看到這樣的程式：
+      </p>
+
+      <pre class="code-block code-block--py"><code>BASE_DIR = Path(__file__).parent
+NOTES_DIR = BASE_DIR / "class_notes"
+DRAFTS_DIR = BASE_DIR / "drafts"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          先不用害怕。<code>BASE_DIR</code>、<code>NOTES_DIR</code>、<code>DRAFTS_DIR</code> 也是變數，<strong>只是這些變數裡面放的不是課程名稱，而是資料夾位置</strong>。
+        </p>
+      </div>
+
+      <!-- Concept: 字串 -->
+      <div class="concept-header">
+        <p class="concept-label">概念 02</p>
+        <h2 class="concept-title">字串：Python 裡的文字</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        在 Python 裡，用引號包起來的文字，通常叫做<strong>字串</strong>。例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>title = "我對 MCP 的理解"
+filename = "ai_agent_basics.md"</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的 <code>"我對 MCP 的理解"</code> 是一段文字，<code>"ai_agent_basics.md"</code> 也是一段文字。之後我們做 MCP Server 時，會常常處理這類文字，例如<strong>筆記檔名、草稿標題、錯誤訊息</strong>。
+      </p>
+
+      <h3 class="sub-heading">f-string：把變數放進文字裡</h3>
+      <p class="detail-paragraph">
+        Python 還有一種很常用的寫法，叫做 <strong>f-string</strong>。例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>{`filename = "week1.md"
+message = f"找不到 {filename}。請先確認檔名。"
+print(message)`}</code></pre>
+
+      <p class="detail-paragraph">它會顯示：</p>
+      <pre class="code-block code-block--py"><code>找不到 week1.md。請先確認檔名。</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          你可以先把 f-string 理解成：<strong>把變數放進一段文字裡。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        看到 <code>{`{filename}`}</code> 的時候，可以把它想成：<strong>把 <code>filename</code> 這個變數裡面的內容放到這裡</strong>。
+      </p>
+
+      <!-- Concept: if -->
+      <div class="concept-header">
+        <p class="concept-label">概念 03</p>
+        <h2 class="concept-title">if：遇到不同情況，要做不同反應</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>if</code> 是用來判斷情況的。<strong>如果某件事成立，就做某件事；不成立，就做別的事。</strong>例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>score = 80
+
+if score &gt;= 60:
+    print("及格")
+else:
+    print("需要再努力")</code></pre>
+
+      <p class="detail-paragraph">
+        這段程式的意思是：如果 <code>score</code> 大於等於 60，就顯示「及格」。否則就顯示「需要再努力」。
+      </p>
+      <p class="detail-paragraph">
+        之後我們做 MCP Server 時，也會用 <code>if</code> 來做很多<strong>安全檢查</strong>。例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>if not notes:
+    return "目前沒有任何筆記。"</code></pre>
+
+      <p class="detail-paragraph">
+        這句話可以理解成：<strong>如果沒有找到任何筆記，就回傳「目前沒有任何筆記」</strong>。這裡有一個很重要的觀念：
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>好的工具不是永遠成功，而是失敗時也要說清楚。</strong>
+        </p>
+      </div>
+
+      <ul class="check-list">
+        <li>如果<strong>找不到資料</strong>，就不要亂猜</li>
+        <li>如果<strong>權限不夠</strong>，就不要硬做</li>
+        <li>如果<strong>檔案不存在</strong>，就要清楚告訴使用者</li>
+      </ul>
+
+      <!-- Concept: list -->
+      <div class="concept-header">
+        <p class="concept-label">概念 04</p>
+        <h2 class="concept-title">list：把很多東西放在一起</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>list</code> 是一種可以放很多資料的東西。例如，我們可以把很多課堂筆記檔名放在一起：
+      </p>
+
+      <pre class="code-block code-block--py"><code>notes = ["week1.md", "week2.md", "week3.md"]
+print(notes)</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的 <code>notes</code> 裡面有三個檔名。<code>list</code> 適合用來放<strong>「很多個同一類的東西」</strong>。例如：
+      </p>
+      <ul class="check-list">
+        <li>很多份筆記</li>
+        <li>很多個標題</li>
+        <li>很多個檔名</li>
+        <li>很多筆搜尋結果</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          之後我們做 <code>list_notes</code> 這個 tool 時，就會需要<strong>列出資料夾裡有哪些 .md 筆記</strong>。
+        </p>
+      </div>
+
+      <!-- Concept: for -->
+      <div class="concept-header">
+        <p class="concept-label">概念 05</p>
+        <h2 class="concept-title">for：一個一個處理</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        如果我們有一串資料，想要一個一個拿出來處理，就可以用 <code>for</code>。例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>notes = ["week1.md", "week2.md", "week3.md"]
+
+for note in notes:
+    print(note)</code></pre>
+
+      <p class="detail-paragraph">這段程式會依序顯示：</p>
+
+      <pre class="code-block code-block--py"><code>week1.md
+week2.md
+week3.md</code></pre>
+
+      <p class="detail-paragraph">你可以把它想成：</p>
+      <ul class="check-list">
+        <li>第一次，<code>note</code> 是 <code>"week1.md"</code></li>
+        <li>第二次，<code>note</code> 是 <code>"week2.md"</code></li>
+        <li>第三次，<code>note</code> 是 <code>"week3.md"</code></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        之後你可能會看到類似這樣的寫法：
+      </p>
+
+      <pre class="code-block code-block--py"><code>for path in NOTES_DIR.glob("*.md"):
+    print(path.name)</code></pre>
+
+      <p class="detail-paragraph">
+        它的意思也是一樣：<strong>把找到的 .md 檔案一個一個拿出來處理</strong>。
+      </p>
+
+      <!-- Concept: 函式 -->
+      <div class="concept-header">
+        <p class="concept-label">概念 06</p>
+        <h2 class="concept-title">函式：把一段工作包起來</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來這個觀念很重要，因為 <strong>MCP Server 裡的 tools，通常就是用函式寫出來的</strong>。函式就是：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>把一段工作包起來，給它一個名字。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">例如：</p>
+
+      <pre class="code-block code-block--py"><code>def say_hello():
+    return "你好，Python"</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的 <code>def</code> 是在<strong>定義一個函式</strong>，<code>say_hello</code> 是函式名稱，<code>return</code> 是<strong>把結果傳回去</strong>。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          要注意的是，<strong>函式裡面的程式碼前面會有縮排</strong>。<code>return "你好，Python"</code> 前面有空格，代表它屬於 <code>say_hello</code> 這個函式。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">讓函式接收一個輸入</h3>
+      <p class="detail-paragraph">
+        我們也可以讓函式接收一個輸入。例如：
+      </p>
+
+      <pre class="code-block code-block--py"><code>{`def greet(name):
+    return f"你好，{name}"`}</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的 <code>name</code> 是<strong>傳進函式的資料</strong>。如果 <code>name</code> 是 <code>"小美"</code>，結果就會是：
+      </p>
+
+      <pre class="code-block code-block--py"><code>你好，小美</code></pre>
+
+      <h3 class="sub-heading">之後會看到的進階寫法</h3>
+      <p class="detail-paragraph">
+        之後你看到這種寫法：
+      </p>
+
+      <pre class="code-block code-block--py"><code>def read_note(filename: str) -&gt; str:</code></pre>
+
+      <p class="detail-paragraph">可以先把它理解成：</p>
+
+      <ul class="check-list">
+        <li>這是一個叫做 <code>read_note</code> 的函式</li>
+        <li>它需要一個<strong>檔名</strong></li>
+        <li>它最後會<strong>回傳一段文字</strong></li>
+      </ul>
+
+      <!-- Concept: return -->
+      <div class="concept-header">
+        <p class="concept-label">概念 07</p>
+        <h2 class="concept-title">return：不是印出來，而是把結果傳回去</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        很多人剛開始會分不清楚 <code>print</code> 和 <code>return</code>。
+      </p>
+
+      <div class="diff-grid">
+        <article class="diff-card">
+          <p class="diff-card__name"><code>print</code></p>
+          <p class="diff-card__desc">把東西<strong>顯示在畫面上</strong>。</p>
+        </article>
+        <article class="diff-card diff-card--primary">
+          <p class="diff-card__name"><code>return</code></p>
+          <p class="diff-card__desc">把結果<strong>交回給呼叫它的人</strong>。</p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">例如：</p>
+
+      <pre class="code-block code-block--py"><code>def get_message():
+    return "這是要交回去的結果"</code></pre>
+
+      <p class="detail-paragraph">
+        在一般練習裡，我們常常用 <code>print</code> 看結果。但在 MCP Server 裡，我們會更常看到 <code>return</code>。原因是：
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>MCP tool 的結果要交回給 Gemini CLI，而不是只印在自己的終端機裡。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        所以之後你看到 MCP tool 裡面最後寫：
+      </p>
+
+      <pre class="code-block code-block--py"><code>return "已建立草稿"</code></pre>
+
+      <p class="detail-paragraph">
+        可以把它理解成：<strong>這個工具把執行結果交回給 AI</strong>。
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .python-basics {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Concept header (concept blocks: 變數 / 字串 / if / list / for / 函式 / return) */
+  .concept-header {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .concept-label {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.setup-text) code,
+  :global(.diff-card__desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block (Python) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Keyboard shortcut */
+  .kbd {
+    display: inline-block;
+    padding: 0.05em 0.5em;
+    margin: 0 0.1em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: var(--color-heading);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    padding: var(--space-4) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Setup list (numbered steps) */
+  .setup-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .setup-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .setup-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .setup-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .setup-text {
+    flex: 1;
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .setup-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .setup-text--muted {
+    color: var(--color-text-secondary);
+  }
+
+  .setup-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .setup-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .setup-body .code-block {
+    margin: var(--space-2) 0;
+  }
+
+  /* Diff grid (print vs return) */
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .diff-card {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .diff-card--primary {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    background-color: var(--color-tag-bg);
+  }
+
+  .diff-card__name {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .diff-card__name code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .diff-card__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .diff-card__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .diff-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-card--strong {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .setup-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .diff-card {
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

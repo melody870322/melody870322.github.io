@@ -1,0 +1,1818 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+
+const fullServerPy = String.raw`from pathlib import Path
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Course Notes Assistant")
+
+BASE_DIR = Path(__file__).parent
+NOTES_DIR = BASE_DIR / "class_notes"
+DRAFTS_DIR = BASE_DIR / "drafts"
+
+
+def safe_note_path(filename: str) -> Path:
+    """確認 AI 只能讀 class_notes 裡的 .md 檔案。"""
+    name = Path(filename).name
+
+    if name != filename:
+        raise ValueError("請只輸入檔名，不要輸入資料夾路徑。")
+
+    path = NOTES_DIR / name
+
+    if path.suffix != ".md":
+        raise ValueError("目前只允許讀取 .md 筆記檔。")
+
+    return path
+
+
+def safe_draft_filename(title: str) -> str:
+    """把標題轉成比較安全的檔名。"""
+    safe_title = "".join(
+        ch for ch in title
+        if ch.isalnum() or ch in (" ", "-", "_")
+    ).strip()
+
+    safe_title = safe_title.replace(" ", "_")
+
+    if not safe_title:
+        safe_title = "reflection_draft"
+
+    return f"{safe_title}.md"
+
+
+@mcp.tool()
+def hello() -> str:
+    """確認課堂筆記 MCP Server 已經啟動。"""
+    return "課堂筆記 MCP Server 已經啟動。"
+
+
+@mcp.tool()
+def list_notes() -> str:
+    """列出 class_notes 資料夾中的課堂筆記。"""
+    if not NOTES_DIR.exists():
+        return "找不到 class_notes 資料夾，請先建立這個資料夾。"
+
+    notes = sorted(path.name for path in NOTES_DIR.glob("*.md"))
+
+    if not notes:
+        return "class_notes 資料夾裡目前沒有 .md 筆記。"
+
+    return "目前可以讀取的課堂筆記：\n" + "\n".join(notes)
+
+
+@mcp.tool()
+def read_note(filename: str) -> str:
+    """讀取 class_notes 資料夾中的一份課堂筆記。"""
+    try:
+        path = safe_note_path(filename)
+    except ValueError as error:
+        return str(error)
+
+    if not path.exists():
+        return f"找不到 {filename}。請先用 list_notes 確認檔名。"
+
+    return path.read_text(encoding="utf-8")
+
+
+@mcp.tool()
+def create_reflection_draft(title: str, content: str) -> str:
+    """在 drafts 資料夾建立一份新的反思草稿，不覆蓋既有檔案。"""
+    DRAFTS_DIR.mkdir(exist_ok=True)
+
+    filename = safe_draft_filename(title)
+    path = DRAFTS_DIR / filename
+
+    if path.exists():
+        return f"草稿已存在：{filename}。我沒有覆蓋它，請換一個標題。"
+
+    draft_text = f"# {title}\n\n{content}\n"
+    path.write_text(draft_text, encoding="utf-8")
+
+    return f"已建立草稿：{filename}"
+
+
+@mcp.resource("course://reflection-rules")
+def reflection_rules() -> str:
+    """提供課堂反思草稿的固定規則。"""
+    return """
+課堂反思草稿請遵守以下規則：
+
+1. 不要直接替學生完成最後作業。
+2. 內容要像學生自己的整理，不要寫得像正式論文。
+3. 草稿需要包含三段：
+   - 我理解了什麼
+   - 我還卡在哪裡
+   - 我可以怎麼應用
+4. 如果資料不足，請先提醒使用者，不要自己亂補。
+5. 建立草稿前，請先讓使用者知道會寫入哪個檔案。
+""".strip()
+
+
+@mcp.prompt()
+def draft_reflection(topic: str, filename: str) -> str:
+    """產生課堂反思草稿的固定流程。"""
+    return f"""
+請協助我根據課堂筆記產生一份反思草稿。
+
+主題：{topic}
+指定筆記：{filename}
+
+請依照這個流程進行：
+
+1. 先使用 read_note 讀取指定筆記。
+2. 找出和主題有關的重點。
+3. 參考 course://reflection-rules 的規則。
+4. 先產生草稿內容給我確認。
+5. 只有在我同意後，才使用 create_reflection_draft 建立草稿檔案。
+""".strip()
+
+
+if __name__ == "__main__":
+    mcp.run()
+`;
+
+const aiAgentBasicsMd = `# AI Agent 基礎觀念
+
+## 這份筆記在講什麼
+
+這份筆記是給剛開始接觸 AI Agent 的人看的。
+
+我們先不急著寫程式，也不急著串接很多工具。
+先把幾個基本角色搞清楚：
+
+- AI 是負責理解和推理的人
+- CLI 是我們和 AI 一起工作的地方
+- MCP 是讓 AI 接工具的共同規則
+- API 是真正和外部服務溝通的方式
+
+只要先把這幾個角色分清楚，後面學 Gemini CLI、MCP Server、Notion、Google Drive 或其他工具時，就比較不會混在一起。
+
+---
+
+## AI 不只是聊天機器人
+
+很多人一開始使用 AI，是從聊天開始的。
+
+例如：
+
+- 幫我摘要一篇文章
+- 幫我改寫一段文字
+- 幫我想報告題目
+- 幫我整理重點
+
+這些都很有用，但 AI Agent 想做的是更進一步的事。
+
+AI Agent 不只是回答你，它還可以根據任務去使用工具。
+
+例如：
+
+- 讀取一份筆記
+- 搜尋某個資料夾
+- 建立一份草稿
+- 整理一份課堂反思
+- 呼叫外部服務的 API
+
+也就是說，AI Agent 比較像一個「會使用工具的 AI 工作夥伴」。
+
+---
+
+## 大語言模型負責理解需求
+
+大語言模型可以先想成 AI 的大腦。
+
+它負責理解你說的話，判斷你想完成什麼事情，再決定接下來要怎麼做。
+
+例如你說：
+
+> 請幫我根據第一週筆記，整理一份課堂反思草稿。
+
+AI 需要理解幾件事：
+
+1. 你要的是課堂反思
+2. 你指定的是第一週筆記
+3. 你想要的是草稿，不是最後定稿
+4. 它可能需要先讀取筆記，再整理內容
+
+但是大語言模型本身不一定能直接讀你的檔案。
+
+如果你要它真的讀取本機資料夾、Notion 頁面或 Google Drive 文件，就需要工具。
+
+---
+
+## Gemini CLI 是和 AI 一起工作的地方
+
+CLI 是 Command Line Interface 的縮寫，可以先理解成「文字版的工作介面」。
+
+Gemini CLI 就是讓你在終端機裡和 Gemini 一起工作的工具。
+
+你可以在裡面輸入任務，讓 AI 幫你分析、整理、讀檔案或呼叫工具。
+
+它不像一般聊天視窗那麼像聊天軟體，而是比較像工作台。
+
+在這個工作台裡，你可以讓 AI 接觸專案資料，也可以透過 MCP 接上更多工具。
+
+所以 Gemini CLI 的角色是：
+
+> 讓你和 AI 在同一個工作環境裡合作。
+
+---
+
+## MCP 是讓 AI 接工具的共同規則
+
+MCP 是 Model Context Protocol 的縮寫。
+
+你可以先把它想成：
+
+> 一套讓 AI 和工具溝通的共同規則。
+
+如果沒有共同規則，每一種工具都要用自己的方式接，會很混亂。
+
+MCP 的想法是：
+
+工具提供者把能力整理成 MCP Server。
+Gemini CLI 這類工具可以當 MCP Client。
+AI 就可以透過這個規則知道有哪些工具能用、工具需要什麼輸入、工具會回傳什麼結果。
+
+簡單說：
+
+- MCP Server：提供工具的人
+- MCP Client：連接工具的人
+- AI：決定什麼時候該用工具的人
+
+---
+
+## API 是真正對外部服務做事的方式
+
+API 可以先想成「外部服務提供的操作入口」。
+
+例如 Notion、Google Drive、GitHub、Slack 這些服務，通常都有 API。
+
+透過 API，程式可以做一些事情：
+
+- 查資料
+- 建立頁面
+- 更新內容
+- 讀取檔案
+- 新增資料
+
+MCP 和 API 的關係可以這樣理解：
+
+API 是服務本身提供的操作方式。
+MCP Server 可以把 API 包裝成 AI 比較容易使用的工具。
+Gemini CLI 再透過 MCP Server 讓 AI 呼叫這些工具。
+
+所以 API 比較像底層能力，MCP 比較像工具包裝和溝通規則。
+
+---
+
+## 工具不是越多越好
+
+很多人剛開始會想：
+
+既然 AI 可以用工具，那是不是工具越多越好？
+
+其實不一定。
+
+工具越多，AI 可以做的事越多，但風險也越多。
+
+例如：
+
+- 它可能讀到不該讀的資料
+- 它可能修改不該修改的內容
+- 它可能搞不清楚哪個工具才適合目前任務
+- 它可能在錯誤的地方執行動作
+
+所以設計 AI Agent 時，不是把所有能力都打開，而是先問：
+
+> 這個任務真的需要哪些工具？
+
+能少就少，能清楚就清楚。
+
+---
+
+## 先讀，再寫
+
+在設計 AI 工作流時，有一個很實用的原則：
+
+> 先讀，再寫。
+
+意思是，不要一開始就讓 AI 直接改資料、刪資料或發布內容。
+
+比較安全的流程是：
+
+1. 先讓 AI 讀取資料
+2. 讓 AI 整理它理解到的內容
+3. 讓人確認
+4. 確認後再建立新草稿
+5. 最後才考慮是否更新正式內容
+
+這樣做的好處是，人還在流程裡。
+
+AI 可以幫忙，但最後的判斷和責任仍然由人來做。
+
+---
+
+## AI Agent 的重點不是全自動
+
+AI Agent 聽起來很像「全自動幫你做事」。
+
+但在學習和教學場景裡，重點不一定是全自動。
+
+更重要的是：
+
+- 任務有沒有被拆小
+- 工具有沒有清楚邊界
+- 人有沒有確認空間
+- 出錯時能不能停下來
+- 結果能不能被檢查
+
+一個好的 AI Agent，不是什麼都自己做完。
+
+一個好的 AI Agent，應該知道什麼時候該做、什麼時候該問、什麼時候該停。
+
+---
+
+## 這份筆記的重點
+
+這份筆記最重要的是先建立幾個觀念：
+
+AI 不只是聊天，它可以透過工具完成任務。
+Gemini CLI 是我們和 AI 一起工作的地方。
+MCP 是讓 AI 接工具的共同規則。
+API 是外部服務真正提供能力的地方。
+工具不是越多越好，任務和邊界要先想清楚。
+第一次做 AI 工作流時，建議先讀取資料，再建立新草稿，不要直接修改原始資料。
+
+接下來如果要自己做 MCP Server，就會把這些觀念變成實際工具。
+
+例如：
+
+- 列出課堂筆記
+- 讀取指定筆記
+- 建立反思草稿
+- 提供固定反思規則
+- 讓 Gemini CLI 呼叫這些工具
+`;
+
+const mcpPrimitivesMd = `# Tools、Resources 與 Prompts 的分工
+
+## 這份筆記在講什麼
+
+做 MCP Server 時，很容易遇到一個問題：
+
+我到底應該把東西做成 tool、resource，還是 prompt？
+
+這三個東西都和 MCP 有關，但角色不一樣。
+
+可以先用一句話分開：
+
+- Tool 是會動手做事的能力
+- Resource 是提供參考資料的內容
+- Prompt 是可以重複使用的工作流程
+
+如果這三個角色分不清楚，MCP Server 就很容易變得混亂。
+
+---
+
+## Tool：真的會動手做事
+
+Tool 是最像「工具」的東西。
+
+它會真的執行某個動作。
+
+例如：
+
+- 列出資料夾裡有哪些筆記
+- 讀取某一份筆記
+- 建立一份反思草稿
+- 呼叫 API 查資料
+- 新增一筆資料
+- 產生一個檔案
+
+只要這件事會改變狀態、讀取外部資料，或執行某個明確動作，就很可能適合做成 tool。
+
+例如在課堂筆記助理裡：
+
+\`\`\`python
+@mcp.tool()
+def list_notes() -> str:
+    """列出 class_notes 資料夾中的課堂筆記。"""
+    ...
+\`\`\`
+
+這個 \`list_notes\` 是 tool，因為它會去資料夾裡查看有哪些筆記。
+
+---
+
+## Tool 要小，不要貪心
+
+設計 tool 時，很容易犯一個錯誤：
+
+把太多事情塞進同一個 tool。
+
+例如設計一個叫做：
+
+\`\`\`text
+manage_notes
+\`\`\`
+
+聽起來很方便，但它可能包含很多事情：
+
+- 列出筆記
+- 讀取筆記
+- 修改筆記
+- 刪除筆記
+- 建立草稿
+- 整理內容
+
+這樣的 tool 太大了。
+
+AI 看到這種工具時，也比較難判斷它到底可以安全地做什麼。
+
+比較好的做法是拆小：
+
+- \`list_notes\`
+- \`read_note\`
+- \`create_reflection_draft\`
+
+每個 tool 只做一件清楚的事。
+
+這樣比較好理解，也比較好控制權限。
+
+---
+
+## Resource：提供固定參考資料
+
+Resource 比較像「資料」或「參考內容」。
+
+它不是拿來執行動作的。
+
+它比較像是提供 AI 可以閱讀的背景資料。
+
+例如：
+
+- 課堂反思格式
+- 課程規則
+- 寫作範例
+- 專案說明
+- 資料庫欄位說明
+- 常見問題清單
+
+在課堂筆記助理裡，可以設計一個 resource：
+
+\`\`\`text
+course://reflection-rules
+\`\`\`
+
+裡面放課堂反思草稿的規則。
+
+例如：
+
+1. 要包含「我理解了什麼」
+2. 要包含「我還卡在哪裡」
+3. 要包含「我可以怎麼應用」
+4. 不要直接替學生完成最後作業
+5. 如果資料不足，要提醒使用者
+
+這種內容比較適合做成 resource。
+
+因為它不是一個動作，而是一份固定參考資料。
+
+---
+
+## 不要把固定規則都做成 tool
+
+如果只是要讓 AI 看到一份規則，不一定要做成 tool。
+
+例如：
+
+\`\`\`text
+get_reflection_rules
+\`\`\`
+
+這個名字看起來像 tool，但如果它只是回傳固定規則，其實更適合做成 resource。
+
+原因是：
+
+tool 比較像「我要做一件事」。
+resource 比較像「這裡有一份資料可以參考」。
+
+當我們把固定規則放成 resource，整個 MCP Server 會比較清楚。
+
+AI 也比較容易知道：
+
+這不是要執行的操作，而是任務時可以參考的內容。
+
+---
+
+## Prompt：可以重複使用的工作流程
+
+Prompt 是可以重複使用的任務模板。
+
+它不是工具本身，也不是資料本身。
+
+它比較像一份工作說明書。
+
+例如課堂筆記助理可以有一個 prompt：
+
+\`\`\`text
+draft_reflection
+\`\`\`
+
+它可以告訴 AI：
+
+1. 先讀取指定筆記
+2. 找出和主題有關的重點
+3. 參考反思規則
+4. 先產生草稿內容給使用者確認
+5. 使用者同意後，才建立草稿檔案
+
+這就是 prompt 很適合做的事。
+
+它把一個常用流程整理好，讓使用者不用每次都從零描述。
+
+---
+
+## Prompt 不等於 tool
+
+Prompt 和 tool 很容易混在一起。
+
+可以這樣分：
+
+如果它是在說「要怎麼做」，比較像 prompt。
+如果它是真的去「執行一個動作」，比較像 tool。
+
+例如：
+
+\`\`\`text
+請根據指定筆記產生課堂反思草稿
+\`\`\`
+
+這比較像 prompt，因為它是在描述工作流程。
+
+但：
+
+\`\`\`text
+建立一個新的草稿檔案
+\`\`\`
+
+這比較像 tool，因為它會真的寫入檔案。
+
+所以在課堂筆記助理裡：
+
+- \`draft_reflection\` 是 prompt
+- \`create_reflection_draft\` 是 tool
+
+兩者可以配合，但不要混成同一件事。
+
+---
+
+## 三者可以一起工作
+
+Tools、Resources 和 Prompts 不是彼此競爭的關係。
+
+它們可以一起組成一個清楚的工作流。
+
+例如使用者說：
+
+> 請根據 \`week1.md\`，以「我對 MCP 的理解」為主題，產生一份反思草稿。
+
+AI 可以這樣工作：
+
+1. 使用 prompt \`draft_reflection\` 理解流程
+2. 使用 tool \`read_note\` 讀取 \`week1.md\`
+3. 參考 resource \`course://reflection-rules\`
+4. 先產生草稿內容
+5. 等使用者確認
+6. 再使用 tool \`create_reflection_draft\` 建立草稿
+
+這樣每個東西都有自己的角色。
+
+Prompt 負責流程。
+Resource 負責資料。
+Tool 負責動作。
+
+---
+
+## 一個簡單判斷方式
+
+如果你不知道某個東西應該放在哪裡，可以問自己三個問題。
+
+第一個問題：
+
+> 它會真的做事嗎？
+
+如果會，例如讀檔案、寫檔案、查 API，就比較像 tool。
+
+第二個問題：
+
+> 它只是提供資料給 AI 看嗎？
+
+如果是，例如課堂規則、反思格式、專案說明，就比較像 resource。
+
+第三個問題：
+
+> 它是在描述一個固定工作流程嗎？
+
+如果是，例如「先讀資料，再摘要，再請使用者確認」，就比較像 prompt。
+
+這個判斷方式不一定百分之百完美，但對初學者很夠用了。
+
+---
+
+## 課堂筆記助理的分工範例
+
+如果我們要做一個「課堂筆記助理」，可以這樣分工：
+
+### Tools
+
+\`\`\`text
+hello
+list_notes
+read_note
+create_reflection_draft
+\`\`\`
+
+這些是會執行動作的工具。
+
+\`hello\` 用來確認 MCP Server 是否啟動。
+\`list_notes\` 用來列出筆記。
+\`read_note\` 用來讀取筆記。
+\`create_reflection_draft\` 用來建立草稿。
+
+### Resource
+
+\`\`\`text
+course://reflection-rules
+\`\`\`
+
+這是固定的反思規則。
+
+它不是動作，而是 AI 在產生草稿時可以參考的內容。
+
+### Prompt
+
+\`\`\`text
+draft_reflection
+\`\`\`
+
+這是反思草稿的工作流程。
+
+它會提醒 AI 先讀筆記、整理重點、參考規則、先讓人確認，再建立草稿。
+
+---
+
+## 為什麼這樣分比較安全
+
+這樣分工有幾個好處。
+
+第一，邊界比較清楚。
+你會知道哪些東西會真的動手做事，哪些只是提供資料，哪些只是流程說明。
+
+第二，權限比較好控制。
+例如你可以只開放：
+
+\`\`\`text
+list_notes
+read_note
+create_reflection_draft
+\`\`\`
+
+但不提供刪除檔案的 tool。
+
+第三，出錯時比較好查。
+如果 AI 沒照規則寫，可能是 resource 或 prompt 不清楚。
+如果檔案沒有建立，可能是 tool 出問題。
+如果流程順序怪怪的，可能是 prompt 要調整。
+
+第四，學生比較容易理解。
+因為每個東西都有清楚角色，不會全部混在一起。
+
+---
+
+## 常見錯誤
+
+### 錯誤一：什麼都做成 tool
+
+有些人會把所有東西都做成 tool。
+
+例如課堂規則也做成 tool，固定說明也做成 tool，工作流程也做成 tool。
+
+這樣會讓工具列表變得很亂。
+
+AI 也比較難判斷哪些工具真的會動作，哪些只是拿資料。
+
+### 錯誤二：tool 做得太大
+
+例如做一個 \`manage_course\`，裡面什麼都能做。
+
+這看起來方便，但其實不好控制。
+
+比較好的做法是把它拆成幾個小 tool。
+
+### 錯誤三：prompt 裡要求 AI 做它沒有工具能做的事
+
+例如 prompt 裡寫：
+
+\`\`\`text
+請讀取 Google Drive 裡的所有資料
+\`\`\`
+
+但你根本沒有提供讀取 Google Drive 的 tool。
+
+這時 AI 就只能猜，或是做不到。
+
+所以 prompt 不能亂寫。
+
+Prompt 要配合實際開放的 tools。
+
+### 錯誤四：resource 裡放太多無關內容
+
+Resource 是參考資料，不是資料垃圾桶。
+
+如果把太多無關內容都塞進 resource，AI 反而比較難抓到重點。
+
+好的 resource 應該清楚、短一點、和任務有關。
+
+---
+
+## 這份筆記的重點
+
+Tools、Resources 和 Prompts 的角色不同。
+
+Tool 是會動手做事的能力。
+Resource 是提供固定參考資料。
+Prompt 是可以重複使用的工作流程。
+
+設計 MCP Server 時，不要一開始就想做很多功能。
+
+先問：
+
+- 這個任務需要哪些動作？
+- 哪些固定資料要提供給 AI？
+- 哪些流程可以整理成 prompt？
+- 哪些能力不應該開放？
+- 哪些事情需要先讓人確認？
+
+當這些問題想清楚，MCP Server 就比較不容易變成一團混亂的工具箱。
+
+好的 MCP Server，不是工具越多越好。
+
+好的 MCP Server，是每個工具、每份資料、每個流程都有清楚的用途。
+`;
+---
+
+<BaseLayout
+  title="自製 MCP Server：實作步驟 — AI Agent 拼圖"
+  description="把上一頁的觀念變成可以跑的程式：建專案資料夾、裝 uv、寫最小 server.py、接上 Gemini CLI、加上完整工具、跑一輪反思草稿流程。每一步都附上完整指令與安全邊界說明。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-impl">
+      <a class="back-link" href="/zh/learning/ai-agent/custom-server/concepts">&larr; 回觀念設計頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">自製 MCP Server：實作步驟</h1>
+        <p class="detail-subtitle">
+          上一頁我們把工具面想清楚了：四個 tools、一個 resource、一個 prompt。這一頁開始<strong>動手把它做出來</strong>。每一步都會附上完整指令；如果中途某一步沒過，先停下來把它修好，再往下走。
+        </p>
+      </header>
+
+      <!-- ============ Part 1: 先做一個能跑的最小版本 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">先做一個能跑的最小版本</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">在 VS Code 建立專案資料夾</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        先在你習慣的位置建立一個資料夾，名稱叫做 <code>my-first-mcp-server</code>。接著打開 VS Code，選擇 <strong>File → Open Folder</strong>（中文介面：檔案 → 開啟資料夾），然後選剛剛建立的資料夾。
+      </p>
+
+      <p class="detail-paragraph">
+        打開之後，請在 VS Code 左側檔案總管中建立下面這些資料夾和檔案：
+      </p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
+├─ server.py
+├─ class_notes/
+│  ├─ ai_agent_basics.md
+│  └─ mcp_tools_resources_prompts.md
+└─ drafts/</code></pre>
+
+      <ul class="check-list">
+        <li><code>server.py</code> 是我們的 MCP Server 程式</li>
+        <li><code>class_notes/</code> 放原始課堂筆記</li>
+        <li><code>drafts/</code> 放 AI 幫我們建立的反思草稿</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這裡的重點是：<strong>先把 AI 能碰的範圍縮在這個資料夾裡。</strong>不要一開始就讓它讀整台電腦，也不要一開始就讓它碰很重要的資料。
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">安裝 MCP 需要的套件</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來要安裝 MCP Python SDK。這裡提供兩種做法。
+      </p>
+
+      <h3 class="sub-heading">做法一：使用 uv 安裝（推薦）</h3>
+      <p class="detail-paragraph">
+        如果你使用 uv，請先確認 VS Code 已經打開 <code>my-first-mcp-server</code> 這個資料夾。然後在 VS Code 內建終端機中執行：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv init</code></pre>
+
+      <p class="detail-paragraph">
+        第一個指令是 uv 官方文件提供的 Windows 安裝方式。第二個指令會把目前資料夾<strong>初始化成一個 uv 專案</strong>。
+      </p>
+
+      <p class="detail-paragraph">接著執行：</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">uv add "mcp[cli]"</code></pre>
+
+      <p class="detail-paragraph">
+        這個指令會把 MCP 需要的套件加到專案裡。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          使用 uv 的好處是：第一，它會把專案環境整理在一起，之後 Gemini CLI 啟動 MCP Server 時，可以透過 <code>uv run</code> 執行；第二，讓 Python 專案的<strong>套件與虛擬環境管理更乾淨、更一致</strong>，避免不同專案之間的套件版本互相影響。
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">做法二：使用 pip 安裝</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            如果你使用 pip，請在 VS Code 內建終端機中執行：
+          </p>
+          <pre class="code-block" is:raw><code class="lang-shell">python -m venv .venv</code></pre>
+          <p class="detail-paragraph">
+            這會在專案資料夾裡建立一個 <code>.venv</code> 虛擬環境。接著啟動它。
+          </p>
+          <p class="detail-paragraph">如果你是 Windows PowerShell：</p>
+          <pre class="code-block" is:raw><code class="lang-shell">.venv\Scripts\Activate.ps1</code></pre>
+          <p class="detail-paragraph">如果你是 macOS 或 Linux：</p>
+          <pre class="code-block" is:raw><code class="lang-shell">source .venv/bin/activate</code></pre>
+          <p class="detail-paragraph">啟動後，再安裝 MCP：</p>
+          <pre class="code-block" is:raw><code class="lang-shell">python -m pip install "mcp[cli]"</code></pre>
+          <p class="detail-paragraph">
+            它的意思是：請用<strong>目前這個 Python</strong> 來執行 pip 安裝。這裡不建議只寫 <code>pip install "mcp[cli]"</code>，因為有時候電腦裡會有很多個 Python，單純使用 <code>pip</code> 可能會裝到你沒有預期的環境。
+          </p>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這份教學<strong>選擇做法一</strong>，因為可以幫助使用者建立一個重要觀念：為每個專案建立專屬的虛擬環境。後面所有步驟都基於做法一接續做。
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">先寫一個最小 MCP Server</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        打開 <code>server.py</code>，先放入下面這段程式：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Course Notes Assistant")
+
+
+@mcp.tool()
+def hello() -> str:
+    """確認課堂筆記 MCP Server 已經啟動。"""
+    return "課堂筆記 MCP Server 已經啟動。"
+
+
+if __name__ == "__main__":
+    mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        這段程式只有<strong>一個 tool</strong>，叫做 <code>hello</code>。它沒有讀檔案，也沒有建立草稿。它只回傳一句話。
+      </p>
+
+      <p class="detail-paragraph">
+        這一步看起來很小，但很重要。因為我們要先確認三件事：
+      </p>
+      <ul class="check-list">
+        <li>Python 可以執行</li>
+        <li>MCP Server 可以啟動</li>
+        <li>Gemini CLI 找得到這個 server</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          等這一步成功，<strong>再往下加功能，才比較不容易迷路。</strong>
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">把 MCP Server 接到 Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來要讓 Gemini CLI 知道這個 MCP Server 在哪裡。在 VS Code 左側檔案總管中，建立 <code>.gemini</code> 資料夾，然後在裡面建立 <code>settings.json</code>：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "course-notes": {
+      "command": "uv",
+      "args": ["run", "python", "server.py"],
+      "cwd": "請改成你的專案資料夾完整路徑",
+      "timeout": 30000,
+      "trust": false,
+      "includeTools": ["hello"]
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的意思是：請 Gemini CLI 在 <code>cwd</code> 指定的資料夾中，執行 <code>uv run python server.py</code>，也就是<strong>用 uv 管理的專案環境來啟動 MCP Server</strong>。
+      </p>
+
+      <p class="detail-paragraph">
+        <code>cwd</code> 範例：
+      </p>
+      <ul class="check-list">
+        <li>Windows：<code>"cwd": "C:/Users/你的名字/Desktop/my-first-mcp-server"</code></li>
+        <li>macOS：<code>"cwd": "/Users/你的名字/Desktop/my-first-mcp-server"</code></li>
+      </ul>
+
+      <p class="detail-paragraph">最後位置至少會長這樣：</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
+├─ .gemini/
+│  └─ settings.json
+├─ server.py
+├─ class_notes/
+└─ drafts/</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Gemini CLI 會透過 <code>settings.json</code> 裡的 <code>mcpServers</code> 設定來找到 MCP Server；stdio 的設定會使用 <code>command</code>、<code>args</code>、<code>cwd</code> 這類欄位。
+        </p>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="case-header">
+        <p class="case-label">STEP 5</p>
+        <h2 class="case-title">檢查 MCP Server 有沒有接成功</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        設定完成後，請在 VS Code 內建終端機中啟動 Gemini CLI：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
+
+      <p class="detail-paragraph">進入 Gemini CLI 之後，輸入：</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
+
+      <p class="detail-paragraph">
+        如果你看到 <code>course-notes</code> 有成功連上，就可以請 Gemini 試試看：
+      </p>
+
+      <blockquote class="prompt-example">
+        請使用 course-notes 的 hello 工具。
+      </blockquote>
+
+      <p class="detail-paragraph">如果它回覆：</p>
+
+      <blockquote class="prompt-example">
+        課堂筆記 MCP Server 已經啟動。
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          代表第一步成功。<br/>
+          <strong>最小版本已經能在 Gemini CLI 裡跑了。</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: 加上真正的工具 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">加上真正的工具</span>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">把 server.py 改成完整版</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        確認 <code>hello</code> 成功之後，我們可以開始加入真正有用的工具。請把 <code>server.py</code> 改成下面這個版本：
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">完整版 server.py</span>
+          <span class="details-card__hint">點擊展開程式碼</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        這一版做了幾件事：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">用 <code>list_notes</code> 列出可以讀的筆記</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">用 <code>read_note</code> 讀取指定筆記</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">用 <code>create_reflection_draft</code> 建立新的草稿</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">用 <code>course://reflection-rules</code> 提供固定的反思規則</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">用 <code>draft_reflection</code> 提供固定的反思工作流程</span></li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣一來，我們就不只是做出一個 tool，<br/>
+          而是做出一個有 <strong>tools、resource、prompt</strong> 的小型 MCP Server。
+        </p>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="case-header">
+        <p class="case-label">STEP 7</p>
+        <h2 class="case-title">更新 Gemini CLI 的工具開放清單</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        剛剛的 <code>settings.json</code> 只開放了 <code>hello</code>。現在我們有更多工具，可以把 <code>includeTools</code> 改成：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">"includeTools": [
+  "hello",
+  "list_notes",
+  "read_note",
+  "create_reflection_draft"
+]</code></pre>
+
+      <p class="detail-paragraph">
+        這裡我們仍然保留 <code>includeTools</code>。原因是：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          就算這個 MCP Server 是自己寫的，<br/>
+          <strong>也不要養成「全部開放」的習慣。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        現在需要哪些工具，就開哪些工具。以後如果新增更危險的工具（例如刪除檔案、修改原始筆記、呼叫外部 API），就更需要小心控制。
+      </p>
+
+      <!-- STEP 8 -->
+      <div class="case-header">
+        <p class="case-label">STEP 8</p>
+        <h2 class="case-title">製作兩份範本筆記</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        為了讓 <code>list_notes</code>、<code>read_note</code> 真的有東西可以讀，我們先在 <code>class_notes/</code> 放兩份範本筆記。
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">ai_agent_basics.md 範本內容</span>
+          <span class="details-card__hint">點擊展開（可整段複製）</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
+        </div>
+      </details>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">mcp_tools_resources_prompts.md 範本內容</span>
+          <span class="details-card__hint">點擊展開（可整段複製）</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
+        </div>
+      </details>
+
+      <!-- STEP 9 -->
+      <div class="case-header">
+        <p class="case-label">STEP 9</p>
+        <h2 class="case-title">試跑第一個完整流程</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來在 Gemini CLI 裡測試。先問：
+      </p>
+
+      <blockquote class="prompt-example">
+        請列出目前有哪些課堂筆記。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        如果成功，Gemini 應該會呼叫 <code>list_notes</code>，然後列出 <code>class_notes</code> 裡面的 <code>.md</code> 檔案。接著問：
+      </p>
+
+      <blockquote class="prompt-example">
+        請讀取 ai_agent_basics.md，整理出三個重點。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這時 Gemini 應該會呼叫 <code>read_note</code>，讀取指定筆記，再根據內容整理。再來可以問：
+      </p>
+
+      <blockquote class="prompt-example">
+        請根據 ai_agent_basics.md，以「我對 MCP 的理解」為主題，先幫我產生一份課堂反思草稿。<br/>
+        <strong>不要直接建立檔案，先讓我確認內容。</strong>
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這句話裡有一個很重要的地方：<strong>「不要直接建立檔案，先讓我確認內容。」</strong>這表示人還會在流程裡。AI 可以幫你讀資料、整理內容、產生草稿；但要不要寫入檔案，最好還是先讓人確認。
+      </p>
+
+      <p class="detail-paragraph">
+        確認草稿內容可以之後，再說：
+      </p>
+
+      <blockquote class="prompt-example">
+        可以，請把這份內容建立成反思草稿，標題是「我對 MCP 的理解」。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這時 Gemini 才適合呼叫 <code>create_reflection_draft</code>。
+      </p>
+
+      <!-- ============ Part 3: 安全邊界與除錯 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">安全邊界與除錯</span>
+      </div>
+
+      <!-- 為什麼建立新檔比修改舊檔安全 -->
+      <h2 class="detail-heading">為什麼建立新檔比修改舊檔安全</h2>
+      <p class="detail-paragraph">
+        你可能會想問：既然 AI 已經可以建立草稿，那可不可以讓它直接修改原始筆記？技術上可以，但<strong>第一個版本不建議這樣做</strong>。因為修改舊檔的風險比較高。
+      </p>
+
+      <ul class="cross-list">
+        <li>如果 AI 改錯了，你可能會<strong>失去原本的內容</strong></li>
+        <li>如果 AI 誤判了檔案，你可能會<strong>很難還原</strong></li>
+        <li>如果學生還不熟悉流程，也會<strong>更難理解到底是哪一步出問題</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        所以這裡我們只讓 AI 建立新草稿，不讓它修改原始筆記。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          第一次做寫入功能時，<br/>
+          <strong>先建立新東西，不要直接覆蓋舊東西。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這也是為什麼我們把原始資料放在 <code>class_notes/</code>，把產生結果放在 <code>drafts/</code>。<strong>兩個資料夾分開，工作流會清楚很多。</strong>
+      </p>
+
+      <!-- 程式裡的安全邊界 -->
+      <h2 class="detail-heading">程式裡有哪些安全邊界</h2>
+      <p class="detail-paragraph">
+        這份程式雖然很短，但已經放了幾個邊界。
+      </p>
+
+      <h3 class="sub-heading">第一個邊界：擋掉奇怪的路徑</h3>
+      <pre class="code-block" is:raw><code class="lang-python">name = Path(filename).name</code></pre>
+      <p class="detail-paragraph">
+        這是為了避免使用者輸入像 <code>../secret.txt</code> 這種奇怪的路徑。我們不希望 AI 透過這種方式去讀資料夾外面的檔案。
+      </p>
+
+      <h3 class="sub-heading">第二個邊界：只允許 .md</h3>
+      <pre class="code-block" is:raw><code class="lang-python">if path.suffix != ".md":
+    raise ValueError("目前只允許讀取 .md 筆記檔。")</code></pre>
+      <p class="detail-paragraph">
+        代表目前只允許讀 Markdown 筆記。
+      </p>
+
+      <h3 class="sub-heading">第三個邊界：不覆蓋既有檔案</h3>
+      <pre class="code-block" is:raw><code class="lang-python">if path.exists():
+    return f"草稿已存在：{filename}。我沒有覆蓋它，請換一個標題。"</code></pre>
+      <p class="detail-paragraph">
+        代表如果草稿已經存在，就<strong>不要覆蓋</strong>。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這些設計看起來都很小，但它們會讓整個 agent <strong>比較不容易亂衝</strong>。
+        </p>
+      </div>
+
+      <!-- 常見錯誤 -->
+      <h2 class="detail-heading">常見錯誤</h2>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">1. Gemini CLI 找不到我的 MCP Server</span>
+          <span class="details-card__hint">點擊查看排查步驟</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            先檢查 <code>settings.json</code> 的位置是否正確。如果是專案設定，應該放在：
+          </p>
+          <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/.gemini/settings.json</code></pre>
+          <p class="detail-paragraph">
+            再檢查 <code>cwd</code> 有沒有改成自己的專案資料夾路徑。<strong>很多時候不是程式錯，而是 Gemini CLI 不知道要去哪個資料夾啟動 server.py。</strong>
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">2. 我用 uv 安裝，但 Gemini CLI 找不到 mcp</span>
+          <span class="details-card__hint">點擊查看排查步驟</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            請確認 <code>settings.json</code> 使用的是 uv 版本：
+          </p>
+          <pre class="code-block" is:raw><code class="lang-json">"command": "uv",
+"args": ["run", "python", "server.py"]</code></pre>
+          <p class="detail-paragraph">
+            這樣 Gemini CLI 才會透過 uv 的專案環境啟動 server。也請確認 <code>cwd</code> 指向正確的專案資料夾，因為 uv 需要在這個資料夾裡找到專案設定。
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">3. 工具有出現，但呼叫時失敗</span>
+          <span class="details-card__hint">點擊查看排查步驟</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            先確認你在 <code>class_notes</code> 裡真的有放 <code>.md</code> 檔案。也可以先問：
+          </p>
+          <blockquote class="prompt-example">
+            請使用 hello 工具確認 server 是否啟動。
+          </blockquote>
+          <p class="detail-paragraph">
+            如果 <code>hello</code> 成功，但 <code>list_notes</code> 失敗，<strong>通常表示資料夾或檔案路徑有問題</strong>。
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">4. 草稿沒有建立</span>
+          <span class="details-card__hint">點擊查看排查步驟</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            先確認有沒有 <code>drafts</code> 資料夾。這份程式會在需要時自動建立 <code>drafts</code>，但如果權限不足，還是可能失敗。
+          </p>
+          <p class="detail-paragraph">
+            也要確認標題不要和既有草稿重複。如果標題重複，這份程式會停止，不會覆蓋舊檔。
+          </p>
+          <div class="callout-card">
+            <p class="callout-text">
+              這<strong>不是錯誤</strong>，而是刻意設計的安全邊界。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- 這和 Claude Code 的工作流程像在哪裡 -->
+      <h2 class="detail-heading">這和 Claude Code 的工作流程像在哪裡</h2>
+      <p class="detail-paragraph">
+        雖然這裡沒有使用 Claude Code，但我們其實已經練到類似的工作方式。
+      </p>
+
+      <ul class="check-list">
+        <li>我們在 <strong>CLI 裡和 AI 合作</strong></li>
+        <li>我們讓 AI <strong>讀取專案裡的資料</strong></li>
+        <li>我們讓 AI <strong>根據任務呼叫工具</strong></li>
+        <li>我們用<strong>設定檔管理工具邊界</strong></li>
+        <li>我們把任務<strong>拆小</strong>，不讓 AI 一次做太多</li>
+        <li>我們<strong>保留人工確認</strong>，而不是讓 AI 全自動亂跑</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        所以這裡不是在模仿某一個工具的外觀。真正要學的是它背後的工作方式：
+      </p>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          讓 AI 進入你的工作環境，<br/>
+          <strong>但只給它剛好需要的工具和邊界。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-impl {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Part divider (PART 1 / PART 2 / PART 3) */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  /* Case header (STEP 1 / STEP 2 / ...) */
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.numbered-list__text) code,
+  :global(.prompt-example) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Numbered list (1, 2, 3, ... with circles) */
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Prompt example (italic blockquote) */
+  .prompt-example {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .prompt-example strong {
+    color: var(--color-accent);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  /* Multi-line code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .code-block--in-details {
+    margin: 0;
+    border: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
+
+  .code-block--md {
+    max-height: 32rem;
+    overflow-y: auto;
+  }
+
+  /* Details card (collapsible) */
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-2);
+  }
+
+  .details-card__body--flush {
+    padding: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+
+    .code-block--md {
+      max-height: 24rem;
+    }
+  }
+</style>

@@ -1,0 +1,845 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Basics 1 — Python Basics: Preparing to Build Your Own MCP Server"
+  description="Skip a full Python course — only learn the small slice you'll actually use to build your own MCP Server: variables, strings, if, list, for, functions, return. Just enough to read the Python code in your first MCP server."
+  lang="en"
+>
+  <section class="section">
+    <div class="container python-basics">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">The Only Python You Need Before Building an MCP</h1>
+        <p class="detail-subtitle">
+          We've come a long way: you've seen how to plug in off-the-shelf MCPs, how to shrink the tool surface, and now you're getting ready to build your own first MCP server. But this is when many people hit the same problem.
+        </p>
+      </header>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          I roughly get MCP, <strong>but I'm not familiar with Python.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        That's totally normal. Especially if you don't usually write code, seeing things like <code>def</code>, <code>return</code>, <code>Path("notes")</code>, or <code>@mcp.tool()</code> can make you stop and pause.
+      </p>
+      <p class="detail-paragraph">
+        So the goal here <strong>isn't to turn you into a Python engineer</strong>. It's just one thing:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>Get you just enough Python to read your "first self-built MCP server."</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        In other words, we won't learn an entire Python course — <strong>only the small slice you'll actually use next</strong>.
+      </p>
+
+      <!-- Section: What is Python -->
+      <h2 class="detail-heading">What Is Python</h2>
+      <p class="detail-paragraph">
+        Python is a programming language. You can think of a programming language as <strong>"a way to talk to the computer"</strong>, and Python is one of the more readable, beginner-friendly options. People use it for many things, such as:
+      </p>
+      <ul class="check-list">
+        <li>Small automation tools</li>
+        <li>Data processing</li>
+        <li>Web backends</li>
+        <li>AI and machine learning</li>
+        <li>Writing scripts</li>
+        <li>Quick prototyping</li>
+      </ul>
+      <p class="detail-paragraph">
+        The MCP server you're about to build is a great fit for Python. <strong>Not because it's the flashiest language, but because it tends to read closer to plain English and is well-suited for a first version.</strong> For example, this one line:
+      </p>
+
+      <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+
+      <p class="detail-paragraph">
+        Just means "print out <code>Hello Python</code>."
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So Python isn't really the main character here — it's more like material. <strong>When you build an MCP server, Python is the tool in your hand.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Install Python in VS Code -->
+      <h2 class="detail-heading">Install Python in VS Code</h2>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">Open <strong>VS Code</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <p class="setup-text">Click <strong>Extensions</strong> on the left sidebar</p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <p class="setup-text">Search for <strong>Python</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">4</span>
+          <p class="setup-text">Install the <strong>Python extension by Microsoft</strong></p>
+        </li>
+      </ol>
+
+      <!-- Section: Create first Python file -->
+      <h2 class="detail-heading">Create Your First Python File</h2>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <div class="setup-body">
+            <p class="setup-text">Create a file in a location you like. Name it something like:</p>
+            <pre class="code-block code-block--py"><code>hello.py</code></pre>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <div class="setup-body">
+            <p class="setup-text">Paste this into <code>hello.py</code>:</p>
+            <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">Open VS Code's terminal. From the top menu:</p>
+            <pre class="code-block code-block--py"><code>Terminal → New Terminal</code></pre>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">4</span>
+          <p class="setup-text">In VS Code, open a folder or a <code>.py</code> file. For this example, just open <code>hello.py</code>.</p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">5</span>
+          <p class="setup-text">Press <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd> (on macOS, <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>) to open the <strong>Command Palette</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">6</span>
+          <p class="setup-text">Type and select <code>Python: Select Interpreter</code></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">7</span>
+          <div class="setup-body">
+            <p class="setup-text">Pick a Python version from the list.</p>
+            <p class="setup-text setup-text--muted">If you aren't sure which to choose yet, don't worry — <strong>just pick the recommended one</strong>.</p>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">8</span>
+          <div class="setup-body">
+            <p class="setup-text">In the terminal, type:</p>
+            <pre class="code-block code-block--py"><code>python hello.py</code></pre>
+            <p class="setup-text">If you're on macOS and <code>python</code> doesn't respond, try:</p>
+            <pre class="code-block code-block--py"><code>python3 hello.py</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <p class="detail-paragraph">
+        If the screen shows:
+      </p>
+      <pre class="code-block code-block--py"><code>Hello Python</code></pre>
+      <p class="detail-paragraph">
+        That means your first Python program ran successfully.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This step matters. Because when we build an MCP Server later, <strong>we'll really just be writing a Python file and letting Gemini CLI launch it.</strong>
+        </p>
+      </div>
+
+      <!-- Concept: Variables -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 01</p>
+        <h2 class="concept-title">Variables: Give Data a Name</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        From here on, you'll start seeing things written like:
+      </p>
+
+      <pre class="code-block code-block--py"><code>course_name = "AI Tools and Applications"</code></pre>
+
+      <p class="detail-paragraph">
+        <code>course_name</code> here is what's called a <strong>variable</strong>. You can think of a variable as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A name you give to a piece of data.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">For example:</p>
+      <pre class="code-block code-block--py"><code>course_name = "AI Tools and Applications"
+print(course_name)</code></pre>
+
+      <p class="detail-paragraph">
+        This means: first, store the text <code>"AI Tools and Applications"</code> in <code>course_name</code>; then use <code>print(course_name)</code> to display it.
+      </p>
+      <p class="detail-paragraph">
+        The benefit of variables is that <strong>if a piece of data gets reused, you don't have to retype it every time</strong>. Later, you'll see code like this:
+      </p>
+
+      <pre class="code-block code-block--py"><code>BASE_DIR = Path(__file__).parent
+NOTES_DIR = BASE_DIR / "class_notes"
+DRAFTS_DIR = BASE_DIR / "drafts"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Don't be intimidated. <code>BASE_DIR</code>, <code>NOTES_DIR</code>, and <code>DRAFTS_DIR</code> are also variables — <strong>they just hold folder locations instead of a course name</strong>.
+        </p>
+      </div>
+
+      <!-- Concept: Strings -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 02</p>
+        <h2 class="concept-title">Strings: Text in Python</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        In Python, text wrapped in quotes is usually called a <strong>string</strong>. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>title = "My understanding of MCP"
+filename = "ai_agent_basics.md"</code></pre>
+
+      <p class="detail-paragraph">
+        Here, <code>"My understanding of MCP"</code> is a piece of text, and so is <code>"ai_agent_basics.md"</code>. When building an MCP Server later, you'll handle this kind of text often — things like <strong>note filenames, draft titles, and error messages</strong>.
+      </p>
+
+      <h3 class="sub-heading">f-string: drop a variable into a piece of text</h3>
+      <p class="detail-paragraph">
+        Python also has a very common pattern called an <strong>f-string</strong>. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>{`filename = "week1.md"
+message = f"Can't find {filename}. Please check the filename first."
+print(message)`}</code></pre>
+
+      <p class="detail-paragraph">It will display:</p>
+      <pre class="code-block code-block--py"><code>Can't find week1.md. Please check the filename first.</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          You can think of an f-string as: <strong>dropping a variable into a piece of text.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        When you see <code>{`{filename}`}</code>, read it as: <strong>take the contents of the <code>filename</code> variable and put them right here</strong>.
+      </p>
+
+      <!-- Concept: if -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 03</p>
+        <h2 class="concept-title">if: Different Reactions for Different Situations</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>if</code> is used to make decisions. <strong>If something is true, do one thing; if not, do another.</strong> For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>score = 80
+
+if score &gt;= 60:
+    print("Pass")
+else:
+    print("Needs more work")</code></pre>
+
+      <p class="detail-paragraph">
+        This means: if <code>score</code> is greater than or equal to 60, show "Pass." Otherwise, show "Needs more work."
+      </p>
+      <p class="detail-paragraph">
+        Later, when building an MCP Server, you'll also use <code>if</code> for many <strong>safety checks</strong>. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>if not notes:
+    return "No notes yet."</code></pre>
+
+      <p class="detail-paragraph">
+        This can be read as: <strong>if no notes were found, return "No notes yet."</strong> There's an important idea behind this:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>A good tool isn't one that always succeeds — it's one that explains itself when it fails.</strong>
+        </p>
+      </div>
+
+      <ul class="check-list">
+        <li>If you <strong>can't find the data</strong>, don't guess</li>
+        <li>If <strong>permission is insufficient</strong>, don't push through</li>
+        <li>If a <strong>file doesn't exist</strong>, tell the user clearly</li>
+      </ul>
+
+      <!-- Concept: list -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 04</p>
+        <h2 class="concept-title">list: Put Many Things Together</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        A <code>list</code> is a way to hold lots of items. For example, we can put many class note filenames together:
+      </p>
+
+      <pre class="code-block code-block--py"><code>notes = ["week1.md", "week2.md", "week3.md"]
+print(notes)</code></pre>
+
+      <p class="detail-paragraph">
+        Here, <code>notes</code> contains three filenames. A <code>list</code> is good for holding <strong>"many of the same kind of thing."</strong> For example:
+      </p>
+      <ul class="check-list">
+        <li>Many notes</li>
+        <li>Many titles</li>
+        <li>Many filenames</li>
+        <li>Many search results</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          When we build the <code>list_notes</code> tool later, we'll need exactly this — <strong>list out all the .md notes inside a folder</strong>.
+        </p>
+      </div>
+
+      <!-- Concept: for -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 05</p>
+        <h2 class="concept-title">for: Handle Things One at a Time</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        If you have a sequence of data and want to handle each item one at a time, use <code>for</code>. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>notes = ["week1.md", "week2.md", "week3.md"]
+
+for note in notes:
+    print(note)</code></pre>
+
+      <p class="detail-paragraph">This program will display, in order:</p>
+
+      <pre class="code-block code-block--py"><code>week1.md
+week2.md
+week3.md</code></pre>
+
+      <p class="detail-paragraph">You can think of it like:</p>
+      <ul class="check-list">
+        <li>The first time, <code>note</code> is <code>"week1.md"</code></li>
+        <li>The second time, <code>note</code> is <code>"week2.md"</code></li>
+        <li>The third time, <code>note</code> is <code>"week3.md"</code></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Later, you might see something like this:
+      </p>
+
+      <pre class="code-block code-block--py"><code>for path in NOTES_DIR.glob("*.md"):
+    print(path.name)</code></pre>
+
+      <p class="detail-paragraph">
+        It means the same thing: <strong>handle each .md file you find, one at a time</strong>.
+      </p>
+
+      <!-- Concept: Functions -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 06</p>
+        <h2 class="concept-title">Functions: Wrap Up a Piece of Work</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        This next concept is important, because <strong>tools inside an MCP Server are usually written as functions</strong>. A function is:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Wrap up a piece of work and give it a name.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <pre class="code-block code-block--py"><code>def say_hello():
+    return "Hello, Python"</code></pre>
+
+      <p class="detail-paragraph">
+        Here <code>def</code> <strong>defines a function</strong>, <code>say_hello</code> is the function's name, and <code>return</code> <strong>hands the result back</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          One thing to note: <strong>code inside a function is indented</strong>. The spaces in front of <code>return "Hello, Python"</code> mean it belongs to the <code>say_hello</code> function.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Letting a function take an input</h3>
+      <p class="detail-paragraph">
+        Functions can also take inputs. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>{`def greet(name):
+    return f"Hello, {name}"`}</code></pre>
+
+      <p class="detail-paragraph">
+        Here <code>name</code> is <strong>the data passed into the function</strong>. If <code>name</code> is <code>"Mei"</code>, the result will be:
+      </p>
+
+      <pre class="code-block code-block--py"><code>Hello, Mei</code></pre>
+
+      <h3 class="sub-heading">A more advanced form you'll see later</h3>
+      <p class="detail-paragraph">
+        Later, you'll see something like:
+      </p>
+
+      <pre class="code-block code-block--py"><code>def read_note(filename: str) -&gt; str:</code></pre>
+
+      <p class="detail-paragraph">You can read it as:</p>
+
+      <ul class="check-list">
+        <li>This is a function called <code>read_note</code></li>
+        <li>It takes a <strong>filename</strong></li>
+        <li>It will <strong>return a piece of text</strong></li>
+      </ul>
+
+      <!-- Concept: return -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 07</p>
+        <h2 class="concept-title">return: Not Printing, But Handing the Result Back</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Many people have trouble distinguishing <code>print</code> from <code>return</code> at first.
+      </p>
+
+      <div class="diff-grid">
+        <article class="diff-card">
+          <p class="diff-card__name"><code>print</code></p>
+          <p class="diff-card__desc"><strong>Displays</strong> something on the screen.</p>
+        </article>
+        <article class="diff-card diff-card--primary">
+          <p class="diff-card__name"><code>return</code></p>
+          <p class="diff-card__desc"><strong>Hands the result back</strong> to whoever called it.</p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <pre class="code-block code-block--py"><code>def get_message():
+    return "This is the result to hand back."</code></pre>
+
+      <p class="detail-paragraph">
+        In casual practice, we often use <code>print</code> to inspect results. But inside an MCP Server, you'll see <code>return</code> much more often. The reason:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>The result of an MCP tool needs to be handed back to Gemini CLI — not just printed in your own terminal.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So when you see this at the end of an MCP tool later:
+      </p>
+
+      <pre class="code-block code-block--py"><code>return "Draft created."</code></pre>
+
+      <p class="detail-paragraph">
+        You can read it as: <strong>this tool hands its execution result back to AI</strong>.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .python-basics {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Concept header */
+  .concept-header {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .concept-label {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.setup-text) code,
+  :global(.diff-card__desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block (Python) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Keyboard shortcut */
+  .kbd {
+    display: inline-block;
+    padding: 0.05em 0.5em;
+    margin: 0 0.1em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: var(--color-heading);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    padding: var(--space-4) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Setup list */
+  .setup-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .setup-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .setup-item:hover {
+    border-color: var(--color-accent);
+  }
+
+  .setup-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.15rem;
+  }
+
+  .setup-text {
+    flex: 1;
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .setup-text:last-child {
+    margin-bottom: 0;
+  }
+
+  .setup-text--muted {
+    color: var(--color-text-secondary);
+  }
+
+  .setup-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .setup-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .setup-body .code-block {
+    margin: var(--space-2) 0;
+  }
+
+  /* Diff grid (print vs return) */
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .diff-card {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .diff-card--primary {
+    border-color: var(--color-accent);
+    border-width: 2px;
+    background-color: var(--color-tag-bg);
+  }
+
+  .diff-card__name {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .diff-card__name code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .diff-card__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .diff-card__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .diff-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-card--strong {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .setup-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .diff-card {
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

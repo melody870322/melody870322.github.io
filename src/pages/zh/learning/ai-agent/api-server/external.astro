@@ -1,0 +1,1077 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="讓 MCP Server 連到外部資料 — AI Agent 拼圖"
+  description="本機 MCP Server 只能在指定資料夾裡活動，但很多時候資料不在電腦裡 —— 它在天氣服務、Notion、Google Sheets、政府開放資料這些外部服務裡。這一頁解釋 API 是什麼、MCP Server 怎麼變成中間的橋，以及第一次練習應該從哪裡開始。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-external">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">讓 AI 走出資料夾：MCP Server 怎麼連到外部資料</h1>
+        <p class="detail-subtitle">
+          前面我們做過一個本機版 MCP Server。它可以讀取 <code>class_notes</code> 資料夾的筆記、列出檔案、建立反思草稿到 <code>drafts</code>。這已經是一個很好的開始 —— 因為我們不是一開始就讓 AI 亂碰整台電腦，<strong>而是先把範圍縮小在一個指定資料夾裡</strong>。但接下來會遇到一個新問題。
+        </p>
+      </header>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          如果我想讓 AI 看的資料，<br/>
+          <strong>不在我的電腦資料夾裡呢？</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        例如：
+      </p>
+      <ul class="check-list">
+        <li>天氣資料</li>
+        <li>政府開放資料</li>
+        <li>Notion 頁面</li>
+        <li>Google Sheets 表格</li>
+        <li>學校系統資料</li>
+        <li>新聞資料</li>
+        <li>GitHub 專案資料</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這些資料通常不會乖乖放在你的 <code>class_notes</code> 資料夾裡。它們在外部服務裡。這時候，我們就會遇到一個很重要的東西：<strong>API</strong>。
+      </p>
+
+      <!-- Section: API as a window -->
+      <h2 class="detail-heading">API 可以先想成「外部服務開給程式的窗口」</h2>
+      <p class="detail-paragraph">
+        API 這個詞聽起來很技術，但你可以先用一個很生活化的方式理解：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          API 就像是<strong>外部服務開給程式使用的窗口</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        你不是直接跑進別人的系統裡亂翻資料。你是照著對方提供的規則，向它<strong>提出請求</strong>，然後拿回結果。有點像去櫃台辦事情 —— 你不能自己走進櫃台後面翻資料夾，你要跟櫃台說：
+      </p>
+
+      <ul class="check-list">
+        <li>我想<strong>查這個資料</strong></li>
+        <li>我需要<strong>這個格式</strong></li>
+        <li>這是我的<strong>身分或授權</strong></li>
+        <li>請<strong>回傳結果</strong>給我</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          API 做的事情也很像這樣。它讓程式可以<strong>用一套固定方式和外部服務溝通</strong>。
+        </p>
+      </div>
+
+      <!-- Section: From local to API -->
+      <h2 class="detail-heading">為什麼 MCP Server 下一步會遇到 API</h2>
+      <p class="detail-paragraph">
+        前面我們的 MCP Server 流程是這樣：
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Gemini CLI</div>
+        <div class="flow-arrow">↓ 呼叫 tool</div>
+        <div class="flow-step flow-step--accent">本機 MCP Server</div>
+        <div class="flow-arrow">↓ 讀取</div>
+        <div class="flow-step">本機資料夾</div>
+      </div>
+
+      <p class="detail-paragraph">
+        例如 Gemini CLI 呼叫 <code>read_note</code>，MCP Server 就去讀 <code>class_notes</code> 裡的筆記。但<strong>如果資料在外部服務裡，流程就會變成</strong>：
+      </p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">Gemini CLI</div>
+        <div class="flow-arrow">↓ 呼叫 tool</div>
+        <div class="flow-step flow-step--accent">MCP Server</div>
+        <div class="flow-arrow">↓ 呼叫 API</div>
+        <div class="flow-step">外部服務</div>
+        <div class="flow-arrow">↓ 回傳資料</div>
+        <div class="flow-step flow-step--accent">MCP Server</div>
+        <div class="flow-arrow">↓ 整理結果</div>
+        <div class="flow-step">Gemini CLI / AI</div>
+      </div>
+
+      <p class="detail-paragraph">
+        也就是說，<strong>MCP Server 變成中間的橋</strong>。一邊是 Gemini CLI 和 AI，另一邊是外部 API。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          AI 不需要自己直接理解每個外部服務的細節。我們可以在 MCP Server 裡，<strong>把 API 包裝成比較清楚的 tool</strong>。這樣 AI 看到的就不是一大堆複雜的 API 規則，而是一個比較容易理解的工具。例如「查詢某個城市的天氣」、「查詢指定資料庫裡的課堂頁面」、「讀取某個表格裡的回饋資料」。
+        </p>
+      </div>
+
+      <!-- Section: API and MCP relationship -->
+      <h2 class="detail-heading">API 和 MCP 的關係</h2>
+      <p class="detail-paragraph">
+        API 和 MCP 很容易被混在一起，所以這裡先分清楚：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">API</span>
+          <span class="role-item__desc">外部服務本來就有的能力</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">MCP Server</span>
+          <span class="role-item__desc">把這些能力整理成 AI 可以使用的工具</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Gemini CLI</span>
+          <span class="role-item__desc">讓 AI 呼叫這些工具的工作環境</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        例如 Notion 有自己的 API。透過 Notion API，程式可以查資料庫、讀頁面、建立頁面。但<strong>AI 不一定適合直接面對完整的 Notion API</strong>。所以我們可以做一個 MCP Server，把 Notion API 包成幾個比較小、比較安全的 tools：
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool</p>
+        <p class="tool-box__name"><code>search_course_pages</code></p>
+        <p class="tool-box__desc">只搜尋課程相關的頁面</p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool</p>
+        <p class="tool-box__name"><code>read_course_page</code></p>
+        <p class="tool-box__desc">讀取一份指定的課程頁面</p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool</p>
+        <p class="tool-box__name"><code>create_reflection_page</code></p>
+        <p class="tool-box__desc">建立一份新的反思頁面</p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣 AI 不是在「管理整個 Notion」，<br/>
+          它只是在使用<strong>我們設計好的幾個課堂版工具</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這和前面說過的「<strong>課堂版工具面</strong>」其實是同一個精神。
+      </p>
+
+      <!-- Section: Read API vs Write API -->
+      <h2 class="detail-heading">API 不一定是寫資料，也可以只是查資料</h2>
+      <p class="detail-paragraph">
+        很多人一聽到 API，會覺得它很危險。其實 API 有很多種用法。
+      </p>
+
+      <div class="boundary-grid">
+        <div class="boundary-col boundary-col--can">
+          <p class="boundary-label">讀取型 API</p>
+          <ul class="check-list boundary-list">
+            <li>查天氣</li>
+            <li>查公開資料</li>
+            <li>查某個代碼的說明</li>
+            <li>查目前有哪些頁面</li>
+            <li>讀取某一筆資料</li>
+          </ul>
+        </div>
+        <div class="boundary-col boundary-col--cant">
+          <p class="boundary-label">會改變資料的 API</p>
+          <ul class="cross-list boundary-list">
+            <li>建立頁面</li>
+            <li>更新內容</li>
+            <li>新增資料</li>
+            <li>刪除資料</li>
+            <li>送出訊息</li>
+            <li>發布文章</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="detail-paragraph">
+        第一次學 API 型 MCP Server，<strong>不要一開始就做刪除或大量修改</strong>。比較好的順序是：
+      </p>
+
+      <ol class="reflect-list reflect-list--single">
+        <li class="reflect-item">
+          <span class="reflect-num">1</span>
+          <span class="reflect-text">先做<strong>查詢</strong></span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">2</span>
+          <span class="reflect-text">再做<strong>建立草稿</strong></span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">3</span>
+          <span class="reflect-text">最後才考慮<strong>更新正式資料</strong></span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">4</span>
+          <span class="reflect-text"><strong>刪除功能</strong>通常先不要開</span>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這跟前面本機 MCP Server 的原則一樣：<br/>
+          <strong>先讀，再寫。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Start from read-only tools -->
+      <h2 class="detail-heading">第一次練習 API，建議先從「查詢型工具」開始</h2>
+      <p class="detail-paragraph">
+        這裡不是要你馬上接很複雜的服務。第一次練習 API，最適合做的是<strong>查詢型 tool</strong>：查詢一筆公開資料、根據關鍵字查資料、查某個地點的天氣、查一個資料代碼代表什麼意思。
+      </p>
+
+      <p class="detail-paragraph">這些任務有幾個好處：</p>
+
+      <ul class="check-list">
+        <li><strong>比較安全</strong>：只是查資料，不會改壞外部系統</li>
+        <li><strong>比較容易觀察</strong>：你可以清楚看到輸入是什麼，回傳是什麼</li>
+        <li><strong>比較適合初學者</strong>：不用一開始就處理複雜的授權、寫入、刪除和資料同步</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        所以第一個 API MCP tool，<strong>最好不要叫做這些</strong>：
+      </p>
+
+      <ul class="cross-list">
+        <li><code>manage_everything</code></li>
+        <li><code>delete_page</code></li>
+        <li><code>update_database</code></li>
+        <li><code>send_email</code></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        比較適合先做這些：
+      </p>
+
+      <ul class="check-list">
+        <li><code>search_data</code></li>
+        <li><code>get_weather</code></li>
+        <li><code>lookup_item</code></li>
+        <li><code>read_public_info</code></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          先讓你知道 <strong>API 怎麼被呼叫、資料怎麼被回傳、AI 怎麼整理結果</strong>。這幾件事弄清楚之後，要不要做寫入型工具，再慢慢加上去。
+        </p>
+      </div>
+
+      <!-- Section: API responses are not pretty articles -->
+      <h2 class="detail-heading">API 回來的資料通常不是漂亮文章</h2>
+      <p class="detail-paragraph">
+        一般人看網頁，看到的是整理好的畫面。但程式呼叫 API 時，拿到的常常不是漂亮文章，<strong>而是比較像資料包</strong>。很常見的一種格式叫做 <code>JSON</code>。你現在不用把 JSON 學得很完整，可以先把它想成：<strong>一種程式比較容易讀的資料格式</strong>。
+      </p>
+
+      <p class="detail-paragraph">它可能長得像這樣：</p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "city": "Taipei",
+  "weather": "cloudy",
+  "temperature": 24
+}</code></pre>
+
+      <p class="detail-paragraph">
+        對人來說，這看起來不像一篇自然的說明。但對程式來說，它很清楚 —— 城市是 Taipei、天氣是 cloudy、溫度是 24。MCP Server 可以幫忙把這份資料一層一層整理成更好讀的內容：
+      </p>
+
+      <div class="layer-stack">
+        <div class="layer-card layer-card--raw">
+          <p class="layer-card__label">API 回傳</p>
+          <p class="layer-card__content">
+            <code is:raw>{ "city": "Taipei", "weather": "cloudy", "temperature": 24 }</code>
+          </p>
+        </div>
+        <div class="layer-arrow">↓ MCP Server 整理</div>
+        <div class="layer-card">
+          <p class="layer-card__label">MCP Server 整理</p>
+          <p class="layer-card__content">
+            台北目前天氣為 cloudy，氣溫約 24 度。
+          </p>
+        </div>
+        <div class="layer-arrow">↓ AI 轉述</div>
+        <div class="layer-card layer-card--ai">
+          <p class="layer-card__label">AI 自然語句</p>
+          <p class="layer-card__content">
+            台北目前天氣偏多雲，氣溫約 24 度，適合一般外出，但可以留意天氣變化。
+          </p>
+        </div>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以這三者各有角色：<strong>API 提供資料、AI 擅長理解整理轉述、MCP Server 是中間的橋</strong>。
+        </p>
+      </div>
+
+      <!-- Section: Don't dump raw API to AI -->
+      <h2 class="detail-heading">不要把整包 API 原始資料都丟給 AI</h2>
+      <p class="detail-paragraph">
+        第一次接 API 時，有些人會直接把 API 回傳的所有資料都丟給 AI。<strong>這樣不一定好</strong>。因為 API 回傳的資料可能很長，也可能有很多目前任務用不到的欄位。如果全部丟回去，可能會造成幾個問題：
+      </p>
+
+      <ul class="cross-list">
+        <li>AI 比較<strong>難抓重點</strong></li>
+        <li>回傳內容太長，<strong>不容易閱讀</strong></li>
+        <li>可能把<strong>不需要的資料</strong>也暴露出來</li>
+        <li>之後<strong>除錯時比較混亂</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        比較好的做法是：MCP tool <strong>先整理一次</strong>、<strong>只回傳這個任務需要的欄位</strong>。例如查天氣時，可能只需要：
+      </p>
+
+      <ul class="check-list">
+        <li>城市</li>
+        <li>天氣狀況</li>
+        <li>溫度</li>
+        <li>更新時間</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        不一定需要把整包原始資料都給 AI。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          MCP tool <strong>不只是把資料搬來搬去</strong>，<br/>
+          也可以先幫資料整理成適合 AI 使用的樣子。
+        </p>
+      </div>
+
+      <!-- Section: Basic workflow of API-based MCP Server -->
+      <h2 class="detail-heading">API 型 MCP Server 的基本工作流程</h2>
+      <p class="detail-paragraph">
+        之後我們會慢慢把 API 包成 MCP tool。但在寫程式前，可以先看懂整個流程。一個簡單的 API 型 MCP Server，大概會這樣工作：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">使用者在 Gemini CLI <strong>輸入需求</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">AI <strong>判斷</strong>需要使用某個 tool</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Gemini CLI <strong>呼叫</strong> MCP Server 裡的 tool</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">MCP Server <strong>呼叫外部 API</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">外部 API <strong>回傳資料</strong></span></li>
+        <li><span class="numbered-list__num">6</span><span class="numbered-list__text">MCP Server <strong>整理資料</strong></span></li>
+        <li><span class="numbered-list__num">7</span><span class="numbered-list__text">tool 把結果<strong>回傳給 Gemini CLI</strong></span></li>
+        <li><span class="numbered-list__num">8</span><span class="numbered-list__text">AI 根據結果<strong>回答使用者</strong></span></li>
+      </ol>
+
+      <p class="detail-paragraph">
+        舉個例子。使用者問：
+      </p>
+
+      <blockquote class="prompt-example">
+        請查詢台北目前天氣，並用適合學生閱讀的方式整理。
+      </blockquote>
+
+      <p class="detail-paragraph">流程可能是這樣：</p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">Gemini CLI</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">AI 決定呼叫 get_weather</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">MCP Server 呼叫天氣 API</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">天氣 API 回傳資料</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">MCP Server 整理城市、氣溫、天氣</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">AI 把資料寫成自然語句</div>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣就<strong>不是 AI 憑空回答</strong>。<br/>
+          而是 AI 透過工具取得資料，再整理成你看得懂的內容。
+        </p>
+      </div>
+
+      <!-- Section: API Key is next page -->
+      <h2 class="detail-heading">API Key 是下一頁才會處理的問題</h2>
+      <p class="detail-paragraph">
+        很多 API 不是誰都能直接用，它可能需要 <strong>API Key</strong>。API Key 可以先想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>使用外部服務的鑰匙。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">有些服務會用 API Key 來確認：</p>
+
+      <ul class="check-list">
+        <li>你<strong>是誰</strong></li>
+        <li>你<strong>能不能使用</strong>這個服務</li>
+        <li>你一天<strong>可以查幾次</strong></li>
+        <li>你有沒有權限<strong>讀取某些資料</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        不過這裡先不急著處理 API Key。因為 API Key 牽涉到<strong>安全習慣</strong>。例如：
+      </p>
+
+      <ul class="cross-list">
+        <li>不要把 API Key <strong>寫死在程式裡</strong></li>
+        <li>不要<strong>貼到聊天室</strong></li>
+        <li>不要<strong>上傳到 GitHub</strong></li>
+        <li>不要<strong>放在公開網站上</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以這件事會放到下一頁。這一頁只要先記住三件事：<strong>有些 API 需要鑰匙、鑰匙不能亂放、真正開始使用需要金鑰的 API 前，要先學會怎麼保護它。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Not every external service should be exposed -->
+      <h2 class="detail-heading">不是每個外部服務都適合直接接進來</h2>
+      <p class="detail-paragraph">
+        API 很方便，但不代表什麼都應該接進 AI。例如下面這些資料，<strong>都不應該隨便接給 AI 處理</strong>：
+      </p>
+
+      <ul class="cross-list">
+        <li>學生<strong>個資</strong></li>
+        <li>未公開<strong>作業</strong></li>
+        <li><strong>成績</strong>資料</li>
+        <li>私人<strong>信件</strong></li>
+        <li>未授權的<strong>訪談內容</strong></li>
+        <li>課程以外的<strong>敏感資料</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        所以在設計 API 型 MCP Server 前，還是要先問幾個問題：
+      </p>
+
+      <ol class="reflect-list">
+        <li class="reflect-item">
+          <span class="reflect-num">1</span>
+          <span class="reflect-text">這個資料是<strong>公開的</strong>，還是<strong>私人</strong>資料？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">2</span>
+          <span class="reflect-text">這個 API 只是<strong>讀資料</strong>，還是會<strong>修改資料</strong>？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">3</span>
+          <span class="reflect-text">學生是否有<strong>權限</strong>使用這些資料？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">4</span>
+          <span class="reflect-text">AI 是否真的需要<strong>看到全部</strong>內容？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">5</span>
+          <span class="reflect-text">可不可以只提供<strong>摘要或部分欄位</strong>？</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">6</span>
+          <span class="reflect-text">出錯時會不會造成<strong>資料被改掉或外洩</strong>？</span>
+        </li>
+      </ol>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          這些問題不是阻止你使用 API，<br/>
+          <strong>而是幫你把工具做得更安全、更適合初學者。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-external {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.boundary-list) code,
+  :global(.reflect-text) code,
+  :global(.numbered-list__text) code,
+  :global(.layer-card__content) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Flow card */
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-card--tall {
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  /* Role list (3 stacked role cards: API / MCP / Gemini CLI) */
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 7rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  /* Boundary grid */
+  .boundary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .boundary-col {
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .boundary-col--can {
+    border-top: 3px solid var(--color-accent);
+  }
+
+  .boundary-col--cant {
+    border-top: 3px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .boundary-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .boundary-list {
+    margin-bottom: 0;
+  }
+
+  .boundary-list li {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+  }
+
+  /* Tool box */
+  .tool-box {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  /* Reflect list */
+  .reflect-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .reflect-list--single {
+    grid-template-columns: 1fr;
+  }
+
+  .reflect-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .reflect-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .reflect-text {
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .reflect-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Numbered list (8-step API flow) */
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Code block (JSON example) */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* Layer stack (raw → MCP organized → AI natural) */
+  .layer-stack {
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .layer-card {
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .layer-card--raw {
+    background-color: #1e1e2e;
+    border-color: #1e1e2e;
+  }
+
+  .layer-card--raw .layer-card__label {
+    color: #94a3b8;
+  }
+
+  .layer-card--raw .layer-card__content {
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .layer-card--raw .layer-card__content code {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #e4e4e7;
+  }
+
+  .layer-card--ai {
+    border-color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+  }
+
+  .layer-card__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+  }
+
+  .layer-card__content {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .layer-arrow {
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+    padding: var(--space-1) 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .boundary-grid,
+    .reflect-list {
+      grid-template-columns: 1fr;
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .flow-card {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .reflect-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

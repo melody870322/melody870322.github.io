@@ -1,0 +1,1043 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="鑰匙不要貼在門上：API Key 要放在哪裡 — AI Agent 拼圖"
+  description="一旦開始用需要金鑰的 API，就會遇到一個問題：API Key 不能直接寫進程式。這一頁說明 API Key 是什麼、為什麼要保護它，以及如何用 .env、.gitignore、.env.example 把它放在程式外面。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-keys">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">鑰匙不要貼在門上：API Key 要放在哪裡</h1>
+        <p class="detail-subtitle">
+          前面我們已經知道，MCP Server 不只能讀取本機資料夾，也可以透過 API 連到外部資料。但只要開始使用 API，很快就會遇到一個問題 ——<strong>有些 API 不是任何人都能直接用</strong>。它會要求你提供一把「鑰匙」，這把鑰匙通常就叫做 <code>API Key</code>。
+        </p>
+      </header>
+
+      <!-- Section: What is API Key -->
+      <h2 class="detail-heading">API Key 是什麼</h2>
+      <p class="detail-paragraph">
+        API Key 可以先想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>使用外部服務的鑰匙。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">有些服務會用 API Key 來確認幾件事：</p>
+
+      <ul class="check-list">
+        <li>你<strong>是誰</strong></li>
+        <li>你<strong>能不能使用</strong>這個服務</li>
+        <li>你一天<strong>可以查幾次</strong></li>
+        <li>你有沒有<strong>權限</strong>使用某些資料</li>
+        <li>這次請求要<strong>算在誰的帳號上</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以 API Key 很像一把鑰匙。拿到鑰匙的人，<strong>就可能可以使用你的額度、你的服務，甚至存取你有權限看的資料</strong>。它不是普通文字，是需要保護的東西。
+        </p>
+      </div>
+
+      <!-- Section: Why not hardcode -->
+      <h2 class="detail-heading">為什麼不要把 API Key 直接寫進程式</h2>
+      <p class="detail-paragraph">
+        有些初學者第一次接 API，會很自然寫出這種程式：
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">api_key = "sk-xxxxxxxxxxxxxxxx"</code></pre>
+
+      <p class="detail-paragraph">
+        這樣雖然看起來最簡單，但<strong>不建議這樣做</strong>。原因是：
+      </p>
+
+      <ul class="cross-list">
+        <li>程式可能會被你<strong>交出去</strong></li>
+        <li>程式可能會被你<strong>傳給同學</strong></li>
+        <li>程式可能會被你<strong>上傳到 GitHub</strong></li>
+        <li>程式可能會出現在<strong>教學截圖</strong>裡</li>
+        <li>程式可能會被 <strong>AI 或其他工具</strong>讀到</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        一旦 API Key 被別人看到，它就可能被拿去使用。<strong>這就像把家門鑰匙直接貼在門上</strong> —— 你可能只是想方便自己開門，但別人也看得到。
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          所以這裡最重要的一句話是：<br/>
+          <strong>API Key 不要直接寫進程式。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Where to put it -->
+      <h2 class="detail-heading">那 API Key 要放哪裡</h2>
+      <p class="detail-paragraph">
+        比較好的做法是：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>把 API Key 放在程式外面。</strong><br/>
+          程式需要用的時候，再去讀它。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">這樣做有幾個好處：</p>
+
+      <ul class="check-list">
+        <li><strong>程式碼比較乾淨</strong></li>
+        <li>金鑰<strong>比較不容易被一起分享出去</strong></li>
+        <li><strong>換金鑰時不用改程式</strong></li>
+        <li>不同人的電腦可以用<strong>自己的金鑰</strong></li>
+        <li>比較接近<strong>正式工作時的做法</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        在 Python 裡，常見的兩種做法是：
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">做法一</p>
+        <p class="tool-box__name"><code>環境變數</code></p>
+        <p class="tool-box__desc">放在電腦或執行環境裡</p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">做法二</p>
+        <p class="tool-box__name"><code>.env 檔案</code></p>
+        <p class="tool-box__desc">放在專案資料夾裡的小設定檔</p>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來我們先用最容易理解的方式來做。
+      </p>
+
+      <!-- Section: What is environment variable -->
+      <h2 class="detail-heading">環境變數是什麼</h2>
+      <p class="detail-paragraph">
+        環境變數可以先想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>放在電腦或執行環境裡的小設定。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        例如你可以有一個環境變數叫做 <code>WEATHER_API_KEY</code>，裡面放真正的 API Key。你的 Python 程式不要直接寫金鑰，而是這樣讀：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+
+api_key = os.getenv("WEATHER_API_KEY")</code></pre>
+
+      <p class="detail-paragraph">
+        這段程式的意思是：請幫我從環境裡找一個叫做 <code>WEATHER_API_KEY</code> 的設定，<strong>找得到就把它放進 <code>api_key</code></strong>。這樣程式裡就不會出現真正的 API Key。
+      </p>
+
+      <!-- Section: What is .env -->
+      <h2 class="detail-heading">.env 是什麼</h2>
+      <p class="detail-paragraph">
+        對初學者來說，直接設定整台電腦的環境變數，有時候會有點麻煩。所以我們常用一個比較方便的做法：<strong>建立一個 <code>.env</code> 檔案</strong>。.env 可以先想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>專門放秘密設定的小紙條。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">例如你的專案資料夾可以長這樣：</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <p class="detail-paragraph">.env 裡面可以放：</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=abc123456789</code></pre>
+
+      <p class="detail-paragraph">
+        注意，這裡<strong>不要加引號也可以</strong>。之後 Python 程式就可以去讀 .env 裡的設定。
+      </p>
+
+      <!-- Sub: .env is not a vault -->
+      <h3 class="sub-heading">.env 不是保險箱</h3>
+      <p class="detail-paragraph">
+        這裡要特別提醒：<strong>.env 不是保險箱</strong>。它只是把秘密設定從程式碼裡移出去。如果你把 .env 傳給別人，別人一樣看得到裡面的 API Key。如果你把 .env 上傳到 GitHub，API Key 一樣會外洩。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以 .env 的重點是：<strong>它應該留在你自己的電腦裡，不要公開。</strong>
+        </p>
+      </div>
+
+      <!-- Sub: .gitignore -->
+      <h3 class="sub-heading">.gitignore 是什麼</h3>
+      <p class="detail-paragraph">
+        如果你之後會用 Git 或 GitHub，就一定要知道 <code>.gitignore</code>。.gitignore 可以先想成：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>提醒 Git 不要把某些檔案一起上傳的清單。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        例如我們不希望 .env 被上傳，就可以在專案裡建立 .gitignore，然後在裡面寫：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env</code></pre>
+
+      <p class="detail-paragraph">
+        意思是：<strong>請不要把 .env 放進版本紀錄裡</strong>。之後如果有虛擬環境，也可以一起忽略：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env
+.venv/
+__pycache__/</code></pre>
+
+      <p class="detail-paragraph">這樣比較安全，也比較乾淨。</p>
+
+      <!-- Section: .env.example -->
+      <h2 class="detail-heading">可以放 .env.example 給別人看</h2>
+      <p class="detail-paragraph">
+        雖然 .env 不應該分享，但有時候別人需要知道這個專案需要哪些設定。這時可以建立一個 <code>.env.example</code>，<strong>裡面放範例，不放真的金鑰</strong>。例如：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=請填入你自己的 API Key</code></pre>
+
+      <p class="detail-paragraph">
+        這樣別人看到 .env.example 就知道：<strong>這個專案需要一個 WEATHER_API_KEY，但真正的金鑰不會被公開</strong>。
+      </p>
+
+      <p class="detail-paragraph">所以比較好的做法是：</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+├─ .env.example
+└─ .gitignore</code></pre>
+
+      <ul class="check-list">
+        <li><code>.env</code>：放<strong>真的金鑰</strong>，不上傳</li>
+        <li><code>.env.example</code>：放<strong>範例</strong>，可以分享</li>
+        <li><code>.gitignore</code>：記得<strong>排除 .env</strong></li>
+      </ul>
+
+      <!-- Section: Reading .env in Python -->
+      <h2 class="detail-heading">在 Python 裡讀取 .env</h2>
+      <p class="detail-paragraph">
+        Python 本身可以用 <code>os.getenv()</code> 讀取環境變數。但如果我們想<strong>從 .env 檔案讀取設定</strong>，通常會使用一個套件：<code>python-dotenv</code>。它可以幫我們把 .env 裡的內容載入到環境變數裡。
+      </p>
+
+      <p class="detail-paragraph">
+        如果你是用 uv 管理專案，可以在 VS Code 終端機中執行：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">uv add python-dotenv</code></pre>
+
+      <p class="detail-paragraph">
+        如果你是用 pip 和 .venv，可以執行：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">python -m pip install python-dotenv</code></pre>
+
+      <p class="detail-paragraph">
+        接著在 Python 程式裡可以這樣寫：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("WEATHER_API_KEY")
+
+print(api_key)</code></pre>
+
+      <p class="detail-paragraph">
+        意思是：先用 <code>load_dotenv()</code> 讀取 .env，再用 <code>os.getenv("WEATHER_API_KEY")</code> 拿到 API Key，最後暫時用 <code>print</code> 看看有沒有讀到。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          但<strong>正式寫程式時，不建議把 API Key 印出來</strong>。因為一印出來，它就可能出現在終端機、截圖或紀錄裡。
+        </p>
+      </div>
+
+      <!-- Section: Stop if no API Key -->
+      <h2 class="detail-heading">如果讀不到 API Key，要停下來</h2>
+      <p class="detail-paragraph">
+        在正式的 MCP Server 裡，<strong>不應該假裝 API Key 存在</strong>。如果讀不到，就要清楚告訴使用者：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv("WEATHER_API_KEY")
+
+if not api_key:
+    raise ValueError("找不到 WEATHER_API_KEY，請確認 .env 是否已經設定。")</code></pre>
+
+      <p class="detail-paragraph">
+        意思是：如果沒有讀到 <code>WEATHER_API_KEY</code>，就<strong>不要繼續往下做</strong>。因為沒有鑰匙，就無法正常使用 API。這比讓程式後面出現一大串看不懂的錯誤更好。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          可以把它理解成：<br/>
+          <strong>缺少重要設定時，要早點停下來，並說清楚缺什麼。</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: 實際測試 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">使用 Gemini CLI 進行實際測試</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">在 VS Code 裡建立 .env</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        假設你的專案叫做 <code>my-api-mcp-server</code>。請在 VS Code 左側檔案總管建立一個檔案 <code>.env</code>，在裡面放：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=請換成你自己的 API Key</code></pre>
+
+      <p class="detail-paragraph">例如：</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=abc123456789</code></pre>
+
+      <p class="detail-paragraph">再建立一個 <code>.env.example</code>，裡面放：</p>
+
+      <pre class="code-block" is:raw><code class="lang-env">WEATHER_API_KEY=請填入你自己的 API Key</code></pre>
+
+      <p class="detail-paragraph">最後建立或打開 <code>.gitignore</code>，放入：</p>
+
+      <pre class="code-block" is:raw><code class="lang-gitignore">.env
+.venv/
+__pycache__/</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這樣你的專案就<strong>比較安全了</strong>。.env 不會跟著 Git 上傳，但 .env.example 還在，別人知道這個專案需要哪些設定。
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">在 MCP Server 裡使用 API Key</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        在 <code>my-api-mcp-server</code> 專案中建立 <code>server.py</code>，並放入：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+
+load_dotenv()
+
+mcp = FastMCP("API Demo Server")
+
+API_KEY = os.getenv("WEATHER_API_KEY")
+
+
+@mcp.tool()
+def check_api_key() -> str:
+    """檢查 API Key 是否有設定，不顯示真正內容。"""
+    if not API_KEY:
+        return "找不到 WEATHER_API_KEY，請確認 .env 是否已經設定。"
+
+    return "已讀取到 WEATHER_API_KEY，但不會顯示真正內容。"
+
+
+if __name__ == "__main__":
+    mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        這裡有一個<strong>重要細節</strong>：我們可以檢查 API Key 有沒有設定，但<strong>不要把真正的 API Key 回傳給 AI</strong>。所以不要寫：
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">return API_KEY</code></pre>
+
+      <p class="detail-paragraph">
+        因為這樣等於把鑰匙直接交出去。比較好的做法是回傳一句確認訊息：
+      </p>
+
+      <blockquote class="prompt-example">
+        已讀取到 API Key，但不會顯示真正內容。
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這樣可以<strong>確認設定成功</strong>，<br/>
+          又<strong>不會洩漏金鑰</strong>。
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">把 MCP Server 接到 Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        前面我們做本機 MCP Server 時，Gemini CLI 會透過 <code>settings.json</code> 啟動你的 Python 程式。在 <code>.gemini/settings.json</code> 中放入：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "api-demo": {
+      "command": "uv",
+      "args": ["run", "python", "server.py"],
+      "cwd": "請改成你的專案資料夾完整路徑",
+      "timeout": 30000,
+      "trust": false
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        這裡的 <code>cwd</code> 很重要。<code>cwd</code> 是告訴 Gemini CLI：<strong>請在哪一個資料夾裡啟動這個 server</strong>。如果你的 .env 放在專案資料夾裡，cwd 就應該指向這個專案資料夾。最後位置至少會長這樣：
+      </p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-api-mcp-server/
+├─ server.py
+├─ .env
+├─ .env.example
+├─ .gitignore
+└─ .gemini/
+   └─ settings.json</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          如果 <code>cwd</code> 指錯地方，Python 可能就<strong>讀不到 .env</strong>。所以如果你發現明明有 .env，但程式還是說找不到 API Key，第一個可以檢查：<strong>cwd 有沒有指到正確的專案資料夾？</strong>
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">檢查 MCP Server 有沒有接成功</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        設定完成後，請在 VS Code 內建終端機中啟動 Gemini CLI：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
+
+      <p class="detail-paragraph">進入 Gemini CLI 之後，輸入：</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
+
+      <p class="detail-paragraph">
+        如果你看到 <code>api-demo</code> 有成功連上，就可以請 Gemini 試試看：
+      </p>
+
+      <blockquote class="prompt-example">
+        請使用 api-demo 的 check_api_key 工具。
+      </blockquote>
+
+      <p class="detail-paragraph">如果它回覆：</p>
+
+      <blockquote class="prompt-example">
+        已讀取到 WEATHER_API_KEY，但不會顯示真正內容。
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          代表<strong>成功了</strong>。<br/>
+          .env、.gitignore、python-dotenv 都對接好了。
+        </p>
+      </div>
+
+      <!-- ============ Part 3: 補充 ============ -->
+
+      <!-- Section: If leaked -->
+      <h2 class="detail-heading">如果 API Key 不小心外洩怎麼辦</h2>
+      <p class="detail-paragraph">
+        如果你不小心把 API Key 貼出去、上傳到 GitHub，或放進公開網頁，<strong>請不要只把檔案刪掉就算了</strong>。比較安全的做法是：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">到服務平台<strong>把那把 API Key 停用</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>重新產生一把新的 API Key</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">更新自己的 <code>.env</code></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">確認 <code>.gitignore</code> 已經排除 .env</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">檢查之後不要再把<strong>金鑰寫進程式</strong></span></li>
+      </ol>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>只刪掉檔案，不代表別人沒有看過或複製過</strong>。如果鑰匙已經外洩，最好的做法通常是換一把新的。
+        </p>
+      </div>
+
+      <!-- Section: Checklist -->
+      <h2 class="detail-heading">一個簡單的檢查清單</h2>
+      <p class="detail-paragraph">
+        開始接 API 前，可以先檢查這幾件事：
+      </p>
+
+      <ul class="checklist">
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我有沒有把 API Key <strong>直接寫在程式裡</strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我有沒有<strong>建立 <code>.env</code></strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我有沒有把 <code>.env</code> <strong>加進 <code>.gitignore</code></strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我有沒有<strong>建立 <code>.env.example</code></strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我的 Python 程式是不是用 <code>os.getenv()</code> <strong>讀取金鑰</strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">我的程式會不會<strong>把 API Key 印出來</strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">Gemini CLI 的 <code>cwd</code> 有沒有<strong>指到正確專案資料夾</strong>？</span>
+        </li>
+        <li class="checklist-item">
+          <span class="checklist-box" aria-hidden="true"></span>
+          <span class="checklist-text">如果金鑰不存在，程式有沒有<strong>清楚提醒</strong>？</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          如果這些都有做到，<br/>
+          就<strong>比一開始直接把金鑰寫進程式安全很多</strong>。
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-keys {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Part divider */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  /* Case header (STEP) */
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.numbered-list__text) code,
+  :global(.checklist-text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    border-width: 2px;
+    padding: var(--space-5) var(--space-8);
+    margin: var(--space-6) 0 var(--space-8);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Tool box */
+  .tool-box {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  /* Numbered list */
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .code-block--bad {
+    border: 1px solid #d97706;
+    border-left: 4px solid #d97706;
+    position: relative;
+  }
+
+  .code-block--bad::before {
+    content: '✗ 不建議';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.6rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: #d97706;
+    border-bottom-left-radius: var(--border-radius);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* Checklist (with empty boxes) */
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition);
+  }
+
+  .checklist-item:last-child {
+    border-bottom: none;
+  }
+
+  .checklist-item:hover {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .checklist-box {
+    flex-shrink: 0;
+    font-size: var(--text-lg);
+    color: var(--color-accent);
+    font-weight: 700;
+    line-height: 1.5;
+    user-select: none;
+  }
+
+  .checklist-text {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .checklist-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .code-block--bad::before {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .checklist-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>
