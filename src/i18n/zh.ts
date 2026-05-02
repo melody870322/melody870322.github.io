@@ -50,6 +50,8 @@ export default {
     ai_agent_api_server: 'API 基礎：自製 MCP Server',
     ai_agent_api_server_external: '讓 MCP Server 連到外部資料',
     ai_agent_api_server_keys: 'API Key 與環境變數',
+    ai_agent_api_server_wrapping: '工具封裝：將外部服務整合為 MCP Tool',
+    ai_agent_api_server_stability: 'MCP Tool 穩定化：輸入驗證、錯誤處理與回覆格式設計',
     nb_intro_apps: '介紹與應用',
     nb_principles: '運作原理與使用觀念',
     nb_tutorials: '應用教學',

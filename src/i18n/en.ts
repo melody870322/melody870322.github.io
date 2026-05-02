@@ -50,6 +50,8 @@ export default {
     ai_agent_api_server: 'API-Based: Building Your Own MCP Server',
     ai_agent_api_server_external: 'Connecting Your MCP Server to External Data',
     ai_agent_api_server_keys: 'API Keys & Environment Variables',
+    ai_agent_api_server_wrapping: 'Tool Wrapping: Turning External Services into MCP Tools',
+    ai_agent_api_server_stability: 'Stabilizing MCP Tools: Input Validation, Error Handling & Response Format',
     nb_intro_apps: 'Introduction & Applications',
     nb_principles: 'Principles & Usage Concepts',
     nb_tutorials: 'Application Tutorials',

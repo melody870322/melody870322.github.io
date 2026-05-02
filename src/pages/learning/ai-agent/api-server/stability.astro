@@ -1,0 +1,1206 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+
+const helpersCode = String.raw`def success_response(
+    city: str,
+    update_time: str,
+    temperature: float,
+    wind_speed: float,
+) -> str:
+    return (
+        "Status: success\n"
+        f"City: {city}\n"
+        f"Updated: {update_time}\n"
+        f"Temperature: ~{temperature} °C\n"
+        f"Wind speed: ~{wind_speed} km/h\n"
+        "Note: live data from an external weather API. "
+        "Conditions may still vary by exact location and time."
+    )
+
+
+def error_response(reason: str, suggestion: str) -> str:
+    return (
+        "Status: failed\n"
+        f"Reason: {reason}\n"
+        f"Suggestion: {suggestion}"
+    )
+`;
+
+const fullServerPy = String.raw`from typing import Any
+
+import httpx
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Stable Weather API Assistant")
+
+OPEN_METEO_API_URL = "https://api.open-meteo.com/v1/forecast"
+
+CITY_LOCATIONS = {
+    "Taipei": {
+        "latitude": 25.0330,
+        "longitude": 121.5654,
+    },
+    "Taichung": {
+        "latitude": 24.1477,
+        "longitude": 120.6736,
+    },
+    "Kaohsiung": {
+        "latitude": 22.6273,
+        "longitude": 120.3014,
+    },
+    "Tamsui": {
+        "latitude": 25.1676,
+        "longitude": 121.4458,
+    },
+}
+
+CITY_ALIASES = {
+    "taipei": "Taipei",
+    "TAIPEI": "Taipei",
+    "Taipei City": "Taipei",
+    "taichung": "Taichung",
+    "Taichung City": "Taichung",
+    "kaohsiung": "Kaohsiung",
+    "Kaohsiung City": "Kaohsiung",
+    "tamsui": "Tamsui",
+}
+
+
+def success_response(
+    city: str,
+    update_time: str,
+    temperature: float,
+    wind_speed: float,
+) -> str:
+    return (
+        "Status: success\n"
+        f"City: {city}\n"
+        f"Updated: {update_time}\n"
+        f"Temperature: ~{temperature} °C\n"
+        f"Wind speed: ~{wind_speed} km/h\n"
+        "Note: live data from an external weather API. "
+        "Conditions may still vary by exact location and time."
+    )
+
+
+def error_response(reason: str, suggestion: str) -> str:
+    return (
+        "Status: failed\n"
+        f"Reason: {reason}\n"
+        f"Suggestion: {suggestion}"
+    )
+
+
+def normalize_city_name(city: str) -> str:
+    city = city.strip()
+    return CITY_ALIASES.get(city, city)
+
+
+@mcp.tool()
+def hello() -> str:
+    """Confirm the stable weather API MCP server is up."""
+    return "Stable Weather API MCP server is running."
+
+
+@mcp.tool()
+def list_supported_cities() -> str:
+    """List the cities currently supported."""
+    cities = ", ".join(CITY_LOCATIONS.keys())
+    return f"Supported cities: {cities}"
+
+
+@mcp.tool()
+def get_current_weather(city: str) -> str:
+    """Look up current weather for a city, with a fixed response format."""
+    city = normalize_city_name(city)
+
+    if not city:
+        return error_response(
+            reason="No city name provided.",
+            suggestion="Please pass a city name, e.g. Taipei, Taichung, Kaohsiung, Tamsui.",
+        )
+
+    if city not in CITY_LOCATIONS:
+        supported_cities = ", ".join(CITY_LOCATIONS.keys())
+        return error_response(
+            reason=f"\"{city}\" is not supported.",
+            suggestion=f"Try one of these instead: {supported_cities}.",
+        )
+
+    location = CITY_LOCATIONS[city]
+
+    params = {
+        "latitude": location["latitude"],
+        "longitude": location["longitude"],
+        "current": "temperature_2m,wind_speed_10m",
+        "timezone": "Asia/Taipei",
+    }
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            response = client.get(OPEN_METEO_API_URL, params=params)
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+    except httpx.TimeoutException:
+        return error_response(
+            reason="The weather API took too long to respond.",
+            suggestion="Please try again later, or check your network.",
+        )
+    except httpx.HTTPStatusError as error:
+        return error_response(
+            reason=f"The weather API returned an error. Status code: {error.response.status_code}.",
+            suggestion="Please try again later. If it keeps failing, the API may be temporarily down.",
+        )
+    except httpx.RequestError:
+        return error_response(
+            reason="Couldn't reach the weather API.",
+            suggestion="Please check your network, or verify the API URL is correct.",
+        )
+
+    current = data.get("current", {})
+
+    temperature = current.get("temperature_2m")
+    wind_speed = current.get("wind_speed_10m")
+    update_time = current.get("time")
+
+    if temperature is None or wind_speed is None or update_time is None:
+        return error_response(
+            reason="The API responded, but a required field is missing.",
+            suggestion="Please try again later. If this persists, the API doc may have changed.",
+        )
+
+    return success_response(
+        city=city,
+        update_time=update_time,
+        temperature=temperature,
+        wind_speed=wind_speed,
+    )
+
+
+if __name__ == "__main__":
+    mcp.run()
+`;
+---
+
+<BaseLayout
+  title="Stabilizing MCP Tools: Input Validation, Error Handling & Response Format — AI Agent Puzzle"
+  description="A first-pass MCP tool only handles the case where 'the input is just right and the API is fine.' This page walks through input validation, error handling, and response format to take a tool from 'works' to 'reliable.' The goal isn't more capability — it's knowing how to fail well."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-stability">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Don't Just Succeed — Fail Well: Making MCP Tools More Stable</h1>
+        <p class="detail-subtitle">
+          We've already wrapped an external API into an MCP tool so the AI can query data through it. But the first pass usually only handles the case where "the input is just right and the API is fine." <strong>The real world isn't that polite.</strong>
+        </p>
+      </header>
+
+      <p class="detail-paragraph">Users might type:</p>
+
+      <ul class="cross-list">
+        <li>Taipei City</li>
+        <li>taipei</li>
+        <li>TAIPEI</li>
+        <li>What's the weather in Taipei today?</li>
+        <li>Blank input</li>
+        <li>A city that doesn't exist</li>
+      </ul>
+
+      <p class="detail-paragraph">External APIs can also run into:</p>
+
+      <ul class="cross-list">
+        <li>Slow networks</li>
+        <li>API temporarily broken</li>
+        <li>Response format changes</li>
+        <li>Missing fields in the response</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So the goal here <strong>isn't to make the MCP tool more powerful — it's to make it more stable</strong>. "More stable" means:
+      </p>
+
+      <ul class="check-list">
+        <li>Weird input <strong>doesn't break it</strong></li>
+        <li>If the external API fails, <strong>the tool says clearly what happened</strong></li>
+        <li>The AI can <strong>understand and organize the result more easily</strong></li>
+      </ul>
+
+      <!-- Section: stability is about failing well -->
+      <h2 class="detail-heading">The Short Version: A Stable Tool Isn't One That Always Succeeds — It's One That Knows How to Fail</h2>
+      <p class="detail-paragraph">
+        Many people only test the happy path. "Look up the weather in Taipei." If it works, the tool feels done. But <strong>a tool meant for an AI workflow can't just handle the happy path</strong>. It also has to know:
+      </p>
+
+      <ul class="check-list">
+        <li>What if the input is <strong>incomplete</strong></li>
+        <li>What if the input is <strong>unsupported</strong></li>
+        <li>What if the external API <strong>fails</strong></li>
+        <li>What if the response comes back but <strong>looks wrong</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So we'll structure this page around three areas:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Input</span>
+          <span class="role-item__desc">Validate what the user passes in</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Errors</span>
+          <span class="role-item__desc">Don't just blow up when something goes wrong</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Response</span>
+          <span class="role-item__desc">Make results readable for both AI and humans</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Get these three right<br/>
+          and an MCP tool moves from "works" toward <strong>"reliable."</strong>
+        </p>
+      </div>
+
+      <!-- Section: Why limit input -->
+      <h2 class="detail-heading">Why Limit the Input?</h2>
+      <p class="detail-paragraph">
+        A reasonable question: if the AI is smart, why bother restricting input?
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The AI is great at understanding text,<br/>
+          but it <strong>doesn't necessarily know what your tool can actually handle</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Our weather tool only supports <strong>Taipei, Taichung, Kaohsiung, Tamsui</strong>. But a user might ask:
+      </p>
+
+      <blockquote class="prompt-example">
+        Will it rain in Tokyo tomorrow?
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Without restrictions, the tool might pass "Will it rain in Tokyo tomorrow" straight into the API. The result could be:
+      </p>
+
+      <ul class="cross-list">
+        <li>Nothing found</li>
+        <li>Wrong place</li>
+        <li>API error</li>
+        <li>The AI <strong>guesses an answer</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So <strong>input validation isn't dumbing the AI down — it's drawing a clear sandbox</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Picture an MCP tool as a <strong>classroom TA</strong>. The TA can look up info, but the teacher has to be clear: which info you can look up, which you can't, and how to respond when a student asks about the wrong thing.
+        </p>
+      </div>
+
+      <!-- Section: Input validation -->
+      <h2 class="detail-heading">Input Validation</h2>
+
+      <h3 class="sub-heading">1. Don't Accept Empty Input</h3>
+      <p class="detail-paragraph">
+        Start with the simplest case. If the user types nothing, or the AI passes an empty string for <code>city</code>, the tool shouldn't continue to the API call:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
+
+if not city:
+    return "Please provide a city name, e.g. Taipei, Taichung, Kaohsiung, Tamsui."</code></pre>
+
+      <p class="detail-paragraph">
+        <code>strip()</code> <strong>trims surrounding whitespace</strong>. <code>" Taipei "</code> becomes <code>"Taipei"</code>. Tiny detail, big impact — many "errors" are just stray whitespace tripping the tool up.
+      </p>
+
+      <h3 class="sub-heading">2. Only Accept Supported Cities</h3>
+      <p class="detail-paragraph">
+        Next, restrict the tool to <strong>only the cities we explicitly support</strong>. Suppose:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">CITY_LOCATIONS = {
+    "Taipei":    {"latitude": 25.0330, "longitude": 121.5654},
+    "Taichung":  {"latitude": 24.1477, "longitude": 120.6736},
+    "Kaohsiung": {"latitude": 22.6273, "longitude": 120.3014},
+    "Tamsui":    {"latitude": 25.1676, "longitude": 121.4458},
+}</code></pre>
+
+      <p class="detail-paragraph">The check looks like:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">if city not in CITY_LOCATIONS:
+    supported_cities = ", ".join(CITY_LOCATIONS.keys())
+    return f"\"{city}\" is not supported. Try: {supported_cities}"</code></pre>
+
+      <p class="detail-paragraph">
+        Now if the user types "Tokyo," the tool doesn't pretend or crash — it just says clearly:
+      </p>
+
+      <pre class="code-block" is:raw><code>"Tokyo" is not supported. Try: Taipei, Taichung, Kaohsiung, Tamsui</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          That's the basic posture of a stable tool:<br/>
+          do what you can, <strong>say so clearly when you can't, and don't guess</strong>.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">3. Handle Common Aliases</h3>
+      <p class="detail-paragraph">
+        Users won't always type "Taipei" exactly. They might type:
+      </p>
+
+      <ul class="check-list">
+        <li>Taipei City</li>
+        <li>taipei</li>
+        <li>TAIPEI</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        To make the tool friendlier, build an <strong>alias table</strong>:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">CITY_ALIASES = {
+    "taipei": "Taipei",
+    "TAIPEI": "Taipei",
+    "Taipei City": "Taipei",
+    "taichung": "Taichung",
+    "Taichung City": "Taichung",
+    "kaohsiung": "Kaohsiung",
+    "Kaohsiung City": "Kaohsiung",
+}</code></pre>
+
+      <p class="detail-paragraph">Then normalize before the lookup:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
+city = CITY_ALIASES.get(city, city)</code></pre>
+
+      <p class="detail-paragraph">
+        Meaning: <strong>if the input is in the alias table, swap to the canonical name; otherwise, leave it alone</strong>. So <code>taipei → Taipei</code>, <code>Kaohsiung City → Kaohsiung</code>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Aliases are great, but <strong>don't add them without limit</strong>. Same principle: stay narrow, stay controllable, stay testable.
+        </p>
+      </div>
+
+      <!-- Section: Error handling -->
+      <h2 class="detail-heading">Error Handling</h2>
+
+      <h3 class="sub-heading">1. Don't Dump Raw Stack Traces on the User</h3>
+      <p class="detail-paragraph">
+        When programs fail, they often spit out a wall of English exception text. To users, that <strong>isn't help — it's stress</strong>. If the API is unreachable and we expose the underlying error, the user just sees gibberish.
+      </p>
+
+      <p class="detail-paragraph">
+        Better: <strong>the tool internally knows what went wrong, but the message back to the user is human-readable</strong>:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">except httpx.TimeoutException:
+    return "Timed out while fetching the weather. Please try again."</code></pre>
+
+      <p class="detail-paragraph">
+        The user doesn't need to know what <code>TimeoutException</code> is. They just need to know: <strong>the external service or network is slow — it's probably not your code</strong>.
+      </p>
+
+      <h3 class="sub-heading">2. The API Returned an Error Status</h3>
+      <p class="detail-paragraph">
+        Sometimes the API responds, but the response itself is an error. For example:
+      </p>
+
+      <ul class="check-list">
+        <li><code>404</code>: not found</li>
+        <li><code>500</code>: server error on their side</li>
+        <li><code>429</code>: too many requests</li>
+      </ul>
+
+      <p class="detail-paragraph">We can check with:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">response.raise_for_status()</code></pre>
+
+      <p class="detail-paragraph">If the API returned an error status, this branch fires:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">except httpx.HTTPStatusError as error:
+    return f"Weather API returned an error. Status code: {error.response.status_code}"</code></pre>
+
+      <p class="detail-paragraph">
+        Now the user at least knows: <strong>the program reached the API, but the API didn't return success</strong>. That's a different problem from "no internet."
+      </p>
+
+      <h3 class="sub-heading">3. Couldn't Connect at All</h3>
+      <p class="detail-paragraph">
+        If the network is down, or the API URL is mistyped, this branch fires:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">except httpx.RequestError:
+    return "Couldn't reach the weather API. Please check your connection."</code></pre>
+
+      <p class="detail-paragraph">
+        Simple, but useful. It points at the <strong>network, the API URL, or the external service</strong> — instead of leaving the user wondering whether their Gemini prompt was wrong.
+      </p>
+
+      <h3 class="sub-heading">4. The API Responded, But Fields Are Missing</h3>
+      <p class="detail-paragraph">
+        One case people overlook: <strong>the API responded successfully, but the field we wanted isn't in the response</strong>. We want <code>temperature_2m</code>, <code>wind_speed_10m</code>, <code>time</code> — but one of them isn't there.
+      </p>
+
+      <p class="detail-paragraph">Don't just silently move on. Check:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">temperature = current.get("temperature_2m")
+wind_speed = current.get("wind_speed_10m")
+update_time = current.get("time")
+
+if temperature is None or wind_speed is None or update_time is None:
+    return "The API responded, but a required field is missing. Please try again later."</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This check matters because <strong>we don't control the external API</strong>. It's fine today, but doesn't have to stay that way. An MCP tool needs a little "shock absorbing."
+        </p>
+      </div>
+
+      <!-- Section: Response format -->
+      <h2 class="detail-heading">Response Format</h2>
+
+      <h3 class="sub-heading">1. Don't Vary the Format Every Time</h3>
+      <p class="detail-paragraph">
+        If the tool's response format changes every time, <strong>the AI has a harder time organizing it, and humans have a harder time inspecting it</strong>. Sometimes it returns:
+      </p>
+
+      <pre class="code-block" is:raw><code>Taipei 28°, wind 10.</code></pre>
+
+      <p class="detail-paragraph">Sometimes it returns:</p>
+
+      <pre class="code-block" is:raw><code>Success! Taipei is 28°C with wind around 10 km/h.</code></pre>
+
+      <p class="detail-paragraph">And sometimes:</p>
+
+      <pre class="code-block" is:raw><code>{"temperature": 28, "wind": 10}</code></pre>
+
+      <p class="detail-paragraph">
+        It's all "usable" — but messy. Better: <strong>commit to one format</strong>. On success, always return:
+      </p>
+
+      <pre class="code-block" is:raw><code>Status: success
+City: Taipei
+Updated: 2025-01-01T10:00
+Temperature: ~28 °C
+Wind speed: ~10 km/h
+Note: live data from an external weather API. Conditions may still vary by exact location and time.</code></pre>
+
+      <p class="detail-paragraph">On failure, always return:</p>
+
+      <pre class="code-block" is:raw><code>Status: failed
+Reason: "Tokyo" is not supported.
+Suggestion: Try Taipei, Taichung, Kaohsiung, Tamsui.</code></pre>
+
+      <p class="detail-paragraph">
+        Now the AI can read it easily: <strong>on success, organize the data; on failure, tell the user what happened and what to do next</strong>.
+      </p>
+
+      <h3 class="sub-heading">2. Use "Status / Reason / Suggestion" for Failures</h3>
+      <p class="detail-paragraph">
+        Failure messages shouldn't be just "error" — too thin. And don't dump system errors directly. The user-friendly shape:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Status</span>
+          <span class="role-item__desc">failed</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Reason</span>
+          <span class="role-item__desc">What happened</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Suggestion</span>
+          <span class="role-item__desc">What the user can try next</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <pre class="code-block" is:raw><code>Status: failed
+Reason: "Tokyo" is not supported.
+Suggestion: Try one of these: Taipei, Taichung, Kaohsiung, Tamsui.</code></pre>
+
+      <p class="detail-paragraph">Or:</p>
+
+      <pre class="code-block" is:raw><code>Status: failed
+Reason: The weather API took too long to respond.
+Suggestion: Please try again later, or check your network.</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This format is friendly to the AI too.<br/>
+          With a clean structure, the AI can <strong>explain the failure to the user reliably, instead of guessing the cause</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Part 2: Hands-on ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Hands-on</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Refactor: Extract the Response Format Into Helpers</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        To keep the code tidy, write two small helper functions:
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">success_response and error_response</span>
+          <span class="details-card__hint">Click to expand the code</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details"><code class="lang-python">{helpersCode}</code></pre>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">Why bother:</p>
+
+      <ul class="check-list">
+        <li>Successful responses <strong>look identical</strong></li>
+        <li>Failure responses <strong>look identical</strong></li>
+        <li>The main tool function is <strong>easier to read</strong></li>
+        <li>Changing the format later is <strong>a one-place edit</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Not for show — <strong>just for maintainability</strong>.
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Full Refactored Version: A More Stable Weather MCP Tool</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Here's a more complete version. It does three things:
+      </p>
+
+      <ul class="check-list">
+        <li><strong>Validates input</strong></li>
+        <li><strong>Handles errors</strong></li>
+        <li><strong>Locks in a fixed response format</strong></li>
+      </ul>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Full refactored server.py</span>
+          <span class="details-card__hint">Click to expand the code</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        It's not necessarily "more capable" than the previous version — but it makes <strong>where each concern lives</strong> obvious:
+      </p>
+
+      <ul class="check-list">
+        <li>Where the <strong>input is processed</strong></li>
+        <li>Where the <strong>API is called</strong></li>
+        <li>Where <strong>errors are handled</strong></li>
+        <li>Where the <strong>response is shaped</strong></li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Much clearer than packing it all into one block of code.</strong>
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Test the Happy Path in Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">After launching Gemini CLI, start with:</p>
+
+      <blockquote class="prompt-example">
+        Please call the hello tool from weather-api.
+      </blockquote>
+
+      <p class="detail-paragraph">Then try:</p>
+
+      <blockquote class="prompt-example">
+        Please look up the current weather in Taipei.
+      </blockquote>
+
+      <p class="detail-paragraph">If it succeeds, you should see something like:</p>
+
+      <pre class="code-block" is:raw><code>Status: success
+City: Taipei
+Updated: <some time>
+Temperature: ~<some value> °C
+Wind speed: ~<some value> km/h
+Note: live data from an external weather API. Conditions may still vary by exact location and time.</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          What this means: the AI's natural-language answer <strong>isn't made up</strong>.<br/>
+          It called the MCP tool, got data from the external API, and rephrased it.
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Don't Just Test Success — Test Failure Too</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        The single most important practice here: <strong>don't only test the happy path</strong>. Try these scenarios.
+      </p>
+
+      <h3 class="sub-heading">Case 1: An Unsupported City</h3>
+      <blockquote class="prompt-example">
+        Please look up the current weather in Tokyo.
+      </blockquote>
+      <p class="detail-paragraph">
+        You should see the tool <strong>explain that Tokyo isn't supported</strong> and suggest the cities that are.
+      </p>
+
+      <h3 class="sub-heading">Case 2: An Alias</h3>
+      <blockquote class="prompt-example">
+        Please look up the current weather in Taipei City.
+      </blockquote>
+      <p class="detail-paragraph">
+        If the alias table is set up, the tool should <strong>normalize this to "Taipei"</strong> and succeed.
+      </p>
+
+      <h3 class="sub-heading">Case 3: Different Casing</h3>
+      <blockquote class="prompt-example">
+        Please look up the current weather in taipei.
+      </blockquote>
+      <p class="detail-paragraph">
+        With the alias table covering this case, <strong>the lookup should still succeed</strong>.
+      </p>
+
+      <h3 class="sub-heading">Case 4: Empty or Incomplete Input</h3>
+      <blockquote class="prompt-example">
+        Please look up the current weather.
+      </blockquote>
+      <p class="detail-paragraph">
+        This depends on whether the AI fills in the missing city. If it doesn't, the tool should respond:
+      </p>
+
+      <pre class="code-block" is:raw><code>Status: failed
+Reason: No city name provided.
+Suggestion: Please pass a city name, e.g. Taipei, Taichung, Kaohsiung, Tamsui.</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          These tests teach the real lesson:<br/>
+          a tool's stability <strong>isn't proven by one successful run</strong>.<br/>
+          It's built up through <strong>handling weird situations gracefully</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Key takeaway -->
+      <h2 class="detail-heading">The Big Takeaway</h2>
+      <p class="detail-paragraph">
+        The point isn't to make the weather tool look fancy. It's to internalize that <strong>any MCP tool meant for an AI workflow needs to think about three things</strong>:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Input</span>
+          <span class="role-item__desc">Don't accept everything blindly</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Errors</span>
+          <span class="role-item__desc">When something breaks, say so clearly</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Response</span>
+          <span class="role-item__desc">Stable, readable, easy to act on</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          A good MCP tool doesn't just do work —<br/>
+          <strong>it follows rules, explains itself, and fails well.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        The more stable the tool, the less the AI workflow falls over.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-stability {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--in-details {
+    margin: 0;
+    border: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-5);
+  }
+
+  .details-card__body--flush {
+    padding: 0;
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

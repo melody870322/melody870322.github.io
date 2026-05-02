@@ -1,0 +1,1305 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+
+const fullServerPy = String.raw`from typing import Any
+
+import httpx
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Weather API Assistant")
+
+OPEN_METEO_API_URL = "https://api.open-meteo.com/v1/forecast"
+
+CITY_LOCATIONS = {
+    "Taipei": {
+        "latitude": 25.0330,
+        "longitude": 121.5654,
+    },
+    "Taichung": {
+        "latitude": 24.1477,
+        "longitude": 120.6736,
+    },
+    "Kaohsiung": {
+        "latitude": 22.6273,
+        "longitude": 120.3014,
+    },
+    "Tamsui": {
+        "latitude": 25.1676,
+        "longitude": 121.4458,
+    },
+}
+
+
+@mcp.tool()
+def hello() -> str:
+    """Confirm the weather API MCP server is up."""
+    return "Weather API MCP server is running."
+
+
+@mcp.tool()
+def list_supported_cities() -> str:
+    """List the cities currently supported."""
+    cities = ", ".join(CITY_LOCATIONS.keys())
+    return f"Supported cities: {cities}"
+
+
+@mcp.tool()
+def get_current_weather(city: str) -> str:
+    """Look up the current weather for a supported city."""
+    city = city.strip()
+
+    if city not in CITY_LOCATIONS:
+        supported_cities = ", ".join(CITY_LOCATIONS.keys())
+        return (
+            f"\"{city}\" is not supported. "
+            f"Try one of these: {supported_cities}"
+        )
+
+    location = CITY_LOCATIONS[city]
+
+    params = {
+        "latitude": location["latitude"],
+        "longitude": location["longitude"],
+        "current": "temperature_2m,wind_speed_10m",
+        "timezone": "Asia/Taipei",
+    }
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            response = client.get(OPEN_METEO_API_URL, params=params)
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+    except httpx.TimeoutException:
+        return "Timed out while fetching the weather. Please try again."
+    except httpx.HTTPStatusError as error:
+        return f"Weather API returned an error. Status code: {error.response.status_code}"
+    except httpx.RequestError:
+        return "Couldn't reach the weather API. Please check your connection."
+
+    current = data.get("current", {})
+
+    temperature = current.get("temperature_2m")
+    wind_speed = current.get("wind_speed_10m")
+    update_time = current.get("time")
+
+    if temperature is None or wind_speed is None:
+        return "The weather API responded, but the temperature or wind fields are missing."
+
+    return (
+        f"Current weather for {city}:\n"
+        f"- Updated: {update_time}\n"
+        f"- Temperature: ~{temperature} °C\n"
+        f"- Wind speed: ~{wind_speed} km/h\n\n"
+        f"Note: this is live data from an external weather API. "
+        f"Conditions may still vary by exact location and time."
+    )
+
+
+if __name__ == "__main__":
+    mcp.run()
+`;
+---
+
+<BaseLayout
+  title="Tool Wrapping: Turning External Services into MCP Tools — AI Agent Puzzle"
+  description="Wrap an external API into an MCP tool the AI can actually use. The AI shouldn't have to read the whole API doc — it just needs a tool name and an input. The MCP Server handles city validation, lat/lon conversion, the API call, and shaping the response. Walked through with the Open-Meteo public API."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-wrapping">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Don't Make the AI Read the API: Build a Tool For It</h1>
+        <p class="detail-subtitle">
+          We already know an MCP Server can act as the bridge between AI and external data. The AI doesn't barge into the external service — it works through tools we've already designed inside our MCP Server. The job for this page is simple: <strong>wrap an external API into an MCP tool the AI can use</strong>.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        Without wrapping, code has to handle URLs, parameters, response data, and error messages. With wrapping, we tidy those details up so the AI sees something simple, like:
+      </p>
+
+      <blockquote class="prompt-example">
+        Look up the current weather for a given city.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        The AI doesn't have to understand the API doc or build URLs. <strong>It just needs to know: when weather is needed, call the <code>get_current_weather</code> tool.</strong>
+      </p>
+
+      <!-- Section: API vs MCP Tool -->
+      <h2 class="detail-heading">The Short Version: API Is Raw Material, MCP Tool Is for the AI</h2>
+      <p class="detail-paragraph">
+        Separating the two:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">API</span>
+          <span class="role-item__desc">The entry point the external service originally exposes</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">MCP Tool</span>
+          <span class="role-item__desc">The packaged version we shape for the AI</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        For example, an external weather API might want all of these inputs:
+      </p>
+
+      <ul class="check-list">
+        <li>Latitude</li>
+        <li>Longitude</li>
+        <li>Which weather fields to fetch</li>
+        <li>Response format</li>
+        <li>Timezone</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        That's a lot for a beginner — and not necessarily the safest or most stable thing to expose to the AI. So we wrap it as a single MCP tool:
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">MCP Tool</p>
+        <p class="tool-box__name"><code>get_current_weather(city)</code></p>
+        <p class="tool-box__desc">The AI just supplies a city name; the MCP Server handles the rest</p>
+      </div>
+
+      <p class="detail-paragraph">When the AI passes a city name, the MCP Server takes over:</p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">Validate the city name</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Look up latitude / longitude</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">Call the external weather API</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Shape the response</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Return a clean, readable result</div>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          That's the heart of "wrap an API as an MCP tool":<br/>
+          don't pass the API through raw — <strong>shape it into a tool that's easy for the AI and inspectable for humans</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Use no-key API -->
+      <h2 class="detail-heading">Practice First With a No-Key API</h2>
+      <p class="detail-paragraph">
+        We'll demo with <strong>Open-Meteo</strong>, a public weather API that doesn't require an API key. Open-Meteo's documentation notes that its API is free for non-commercial use and needs no key.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The win: we don't get stuck on <strong>account signup, key application, or pasting the wrong key</strong> on day one. We can focus on "how does an API become a tool" first.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Once that flow is clear, switching to a key-protected service is one extra step — <strong>read the API key from an environment variable</strong>. We covered that on the previous page, so this page focuses on tool wrapping.
+      </p>
+
+      <!-- Section: Design tool first -->
+      <h2 class="detail-heading">Design the Tool First, Don't Rush to Code</h2>
+      <p class="detail-paragraph">
+        First-time MCP tool authors often jump straight into <code>server.py</code>. Better:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Decide first how the AI is supposed to use this tool.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">The tool we're designing here:</p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">This page's tool</p>
+        <p class="tool-box__name"><code>get_current_weather</code></p>
+        <p class="tool-box__desc">Look up the current weather for a given city</p>
+      </div>
+
+      <h3 class="sub-heading">Input</h3>
+      <ul class="check-list">
+        <li><code>city</code>: the city name</li>
+      </ul>
+
+      <h3 class="sub-heading">What it returns</h3>
+      <ul class="check-list">
+        <li>City</li>
+        <li>Update time</li>
+        <li>Current temperature</li>
+        <li>Current wind speed</li>
+        <li>A short reminder note</li>
+      </ul>
+
+      <h3 class="sub-heading">What it does NOT do</h3>
+      <ul class="cross-list">
+        <li>Doesn't look up <strong>student personal data</strong></li>
+        <li>Doesn't <strong>write</strong> data</li>
+        <li>Doesn't <strong>delete</strong> data</li>
+        <li>Doesn't let the AI pass <strong>arbitrary API URLs</strong></li>
+        <li>Doesn't let the AI choose <strong>which external site to hit</strong></li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          We're not building a "look-up-anything" mega-tool —<br/>
+          <strong>just a small "look-up-weather-for-this-city" tool.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Small tools are <strong>easier to teach, easier to test, and safer</strong>.
+      </p>
+
+      <!-- ============ Part 2: Hands-on ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Hands-on</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Create the Project Folder</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Create a fresh project folder, like:
+      </p>
+
+      <pre class="code-block code-block--tree" is:raw><code>my-weather-mcp-server/
+├─ server.py
+└─ .gemini/
+   └─ settings.json</code></pre>
+
+      <ul class="check-list">
+        <li><code>server.py</code> is our MCP Server program</li>
+        <li><code>.gemini/settings.json</code> tells Gemini CLI <strong>how to launch the MCP Server</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>No .env yet</strong> — this weather API doesn't require a key. If we later switch to a key-protected service, that's when .env and .gitignore get added back in.
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Install the Packages</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        If you've already used uv, run this from the project folder:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">uv init
+uv add "mcp[cli]" httpx</code></pre>
+
+      <p class="detail-paragraph">
+        We add one extra package: <code>httpx</code>. <strong>httpx is a common Python library for making HTTP requests</strong> — basically, it's how our Python program calls external APIs. The flow now becomes:
+      </p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">Gemini CLI</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">MCP Tool</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Python uses httpx to call the weather API</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">API returns data</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">MCP Tool shapes it and hands it back to Gemini</div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Write a Weather-Capable MCP Server</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Open <code>server.py</code> and drop in the following code:
+      </p>
+
+      <details class="details-card details-card--code">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Full server.py</span>
+          <span class="details-card__hint">Click to expand the code</span>
+        </summary>
+        <div class="details-card__body details-card__body--flush">
+          <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        That's a basic API-style MCP Server. It exposes three tools:
+      </p>
+
+      <ul class="check-list">
+        <li><code>hello</code> — <strong>confirms the server started</strong></li>
+        <li><code>list_supported_cities</code> — <strong>lists the cities supported right now</strong></li>
+        <li><code>get_current_weather</code> — the one that <strong>actually calls the external API</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The MCP Python SDK lets you build a server with <code>FastMCP</code>, and uses Python functions, type hints, and docstrings to derive tool definitions. That's why our code uses <code>@mcp.tool()</code> to turn an ordinary function into an MCP tool.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Want to dig into the internals? Expand the three sections below:
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title"> What this code is doing</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">First, this line:</p>
+          <pre class="code-block" is:raw><code class="lang-python">mcp = FastMCP("Weather API Assistant")</code></pre>
+          <p class="detail-paragraph">
+            We're creating an MCP Server named <strong>Weather API Assistant</strong>. The name signals to the system: "this server is a weather API assistant."
+          </p>
+
+          <p class="detail-paragraph">Then this:</p>
+          <pre class="code-block" is:raw><code class="lang-python">CITY_LOCATIONS = {
+    "Taipei": {
+        "latitude": 25.0330,
+        "longitude": 121.5654,
+    },
+    ...
+}</code></pre>
+          <p class="detail-paragraph">
+            We <strong>hard-code the supported cities</strong>. Why not let the AI pass any city? <strong>Because we're beginners</strong>. Starting with a smaller scope is easier to observe and less prone to surprises.
+          </p>
+
+          <p class="detail-paragraph">If a student types "Taipei," the program already knows the lat/lon. If a student types "Mars," the program responds:</p>
+          <blockquote class="prompt-example">
+            "Mars" is not supported.
+          </blockquote>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              That's <strong>input restriction</strong> — not to make life hard, but to <strong>make the tool more stable</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title"> Where the API actually gets called</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            The most important section of this tool:
+          </p>
+          <pre class="code-block" is:raw><code class="lang-python">with httpx.Client(timeout=10.0) as client:
+    response = client.get(OPEN_METEO_API_URL, params=params)
+    response.raise_for_status()
+    data: dict[str, Any] = response.json()</code></pre>
+
+          <p class="detail-paragraph">
+            Picture it as: <strong>Python knocking on the external API's door</strong>.
+          </p>
+
+          <ul class="check-list">
+            <li><code>client.get(...)</code> <strong>sends the request</strong></li>
+            <li><code>params=params</code> <strong>passes the query parameters</strong></li>
+            <li><code>response.raise_for_status()</code> <strong>checks for an error response</strong></li>
+            <li><code>response.json()</code> <strong>turns the API's JSON into a Python-friendly structure</strong></li>
+          </ul>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              API responses usually aren't pretty articles —<br/>
+              <strong>they're more like a packet of data.</strong>
+            </p>
+          </div>
+
+          <p class="detail-paragraph">
+            So the MCP tool's job is <strong>to shape that packet first, then hand it to the AI</strong>.
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title"> Why not dump the whole API response into the AI</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            One question: if the API returns a lot of data, why not just hand it all to the AI? <strong>Not necessarily a good idea</strong>. A few problems:
+          </p>
+
+          <ul class="cross-list">
+            <li>The data is <strong>too long</strong></li>
+            <li>The AI <strong>misses what matters</strong></li>
+            <li><strong>Users can't read it</strong></li>
+            <li>Fields you don't need <strong>get exposed anyway</strong></li>
+            <li>Debugging gets <strong>harder to trace</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            So inside the tool, we <strong>pick only the fields this task needs</strong>:
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">temperature = current.get("temperature_2m")
+wind_speed = current.get("wind_speed_10m")
+update_time = current.get("time")</code></pre>
+
+          <p class="detail-paragraph">Then format them into something readable:</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">return (
+    f"Current weather for {city}:\n"
+    f"- Updated: {update_time}\n"
+    f"- Temperature: ~{temperature} °C\n"
+    f"- Wind speed: ~{wind_speed} km/h\n\n"
+    f"Note: this is live data from an external weather API. "
+    f"Conditions may still vary by exact location and time."
+)</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              That's a key MCP tool responsibility:<br/>
+              <strong>not just shuffling API data, but pre-shaping it into something both AI and humans can read.</strong>
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Connect the MCP Server to Gemini CLI</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Inside the project, your <code>.gemini/settings.json</code> can look like:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "weather-api": {
+      "command": "uv",
+      "args": ["run", "python", "server.py"],
+      "cwd": "Replace with the full path to your project folder",
+      "timeout": 30000,
+      "trust": false,
+      "includeTools": [
+        "hello",
+        "list_supported_cities",
+        "get_current_weather"
+      ]
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        Remember to set <code>cwd</code> to your actual project folder. We're keeping <code>includeTools</code> here too. The reason:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Even if you wrote the MCP Server yourself,<br/>
+          <strong>don't get into the habit of "expose everything."</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Right now we only need three tools, so only three are exposed.
+      </p>
+
+      <!-- STEP 5 -->
+      <div class="case-header">
+        <p class="case-label">STEP 5</p>
+        <h2 class="case-title">Verify the Tool Works</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Launch Gemini CLI from VS Code's integrated terminal:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
+
+      <p class="detail-paragraph">Inside Gemini CLI, type:</p>
+
+      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
+
+      <p class="detail-paragraph">
+        If you see <code>weather-api</code> connected, Gemini CLI found the MCP Server. Try:
+      </p>
+
+      <blockquote class="prompt-example">
+        Please call the hello tool from weather-api.
+      </blockquote>
+
+      <p class="detail-paragraph">If it replies "Weather API MCP server is running.", that's the first checkpoint passed. Then try:</p>
+
+      <blockquote class="prompt-example">
+        Please list the cities I can look up.
+      </blockquote>
+
+      <p class="detail-paragraph">And:</p>
+
+      <blockquote class="prompt-example">
+        Please look up the current weather in Taipei and present it in a way that's easy for college students to read.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          At this point the AI <strong>isn't answering out of thin air</strong>.<br/>
+          It's actually <strong>going through an MCP tool to query an external API</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Part 3: Safety + Advanced ============ -->
+
+      <!-- Section: Three layers of protection -->
+      <h2 class="detail-heading">This Tool Quietly Has Three Layers of Protection</h2>
+      <p class="detail-paragraph">
+        It looks like a weather lookup, but it actually demonstrates an important <strong>safety mindset</strong>.
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Layer 1</span>
+          <span class="role-item__desc"><strong>Supports a fixed list of cities only.</strong> The AI can't pass arbitrary locations or modify the API query scope.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Layer 2</span>
+          <span class="role-item__desc"><strong>Returns only the current weather.</strong> The tool isn't a "weather Swiss-army knife" — it does one thing.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Layer 3</span>
+          <span class="role-item__desc"><strong>Returns only the fields we need.</strong> The full API response never reaches the AI; the tool selects and formats first.</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Together, these three things are the <strong>design mindset</strong> this MCP tool tries to convey:
+      </p>
+
+      <ul class="check-list">
+        <li>A bit <strong>smaller</strong> in scope</li>
+        <li>A bit <strong>clearer</strong> in range</li>
+        <li>A bit <strong>cleaner</strong> in output</li>
+      </ul>
+
+      <!-- Section: API Key version -->
+      <h2 class="detail-heading">If the API Later Needs an API Key, How to Adjust</h2>
+      <p class="detail-paragraph">
+        Our API doesn't need a key. But many external services do. If you switch to a key-protected API, <strong>don't write</strong>:
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">api_key = "your-real-api-key"</code></pre>
+
+      <p class="detail-paragraph">
+        That hard-codes the key in the source — <strong>not safe</strong>. The better way:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">import os
+
+api_key = os.getenv("WEATHER_API_KEY")
+
+if not api_key:
+    return "WEATHER_API_KEY not found. Please set the environment variable first."</code></pre>
+
+      <p class="detail-paragraph">
+        If the API expects the key in a header:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-python">headers = {
+    "Authorization": f"Bearer {api_key}"
+}</code></pre>
+
+      <p class="detail-paragraph">And pass it when calling the API:</p>
+
+      <pre class="code-block" is:raw><code class="lang-python">response = client.get(API_URL, params=params, headers=headers)</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Don't rush to implement this yet. The single thing to remember: <strong>API keys are keys — don't hard-code them</strong>. Full setup is on the previous page: "<a href="/learning/ai-agent/api-server/keys">API Keys & Environment Variables</a>".
+        </p>
+      </div>
+
+      <!-- Section: Common errors -->
+      <h2 class="detail-heading">Common Errors</h2>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">1. Gemini can't find the MCP Server</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            If <code>weather-api</code> doesn't show up under <code>/mcp list</code>, check:
+          </p>
+          <ul class="check-list">
+            <li>Is <code>settings.json</code> inside the <code>.gemini</code> folder?</li>
+            <li>Is <code>cwd</code> set to the <strong>correct path</strong>?</li>
+            <li>Is the <code>server.py</code> filename spelled correctly?</li>
+            <li>Did <code>uv</code> <strong>install successfully</strong>?</li>
+          </ul>
+
+          <p class="detail-paragraph">Quick test in the terminal:</p>
+          <pre class="code-block" is:raw><code class="lang-shell">uv run python server.py</code></pre>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              If even that fails, <strong>the issue is in Python or package installation, not Gemini CLI</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">2. httpx not found</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">If you see something like:</p>
+          <pre class="code-block" is:raw><code class="lang-shell">ModuleNotFoundError: No module named 'httpx'</code></pre>
+          <p class="detail-paragraph">
+            <code>httpx</code> isn't installed yet. From the project folder:
+          </p>
+          <pre class="code-block" is:raw><code class="lang-shell">uv add httpx</code></pre>
+          <p class="detail-paragraph">
+            Then <strong>relaunch Gemini CLI</strong>.
+          </p>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">3. The API takes too long to respond</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">There's this line in the program:</p>
+          <pre class="code-block" is:raw><code class="lang-python">with httpx.Client(timeout=10.0) as client:</code></pre>
+          <p class="detail-paragraph">
+            That means <strong>wait at most 10 seconds</strong>. If the external API or the network is slow, you'll see:
+          </p>
+          <blockquote class="prompt-example">
+            Timed out while fetching the weather. Please try again.
+          </blockquote>
+          <p class="detail-paragraph">
+            This kind of error <strong>doesn't necessarily mean buggy code</strong>. Sometimes the network or the API is just temporarily flaky.
+          </p>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              The point: a tool should <strong>state the failure clearly</strong>, instead of dropping a wall of English exception text on the user.
+            </p>
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-wrapping {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-paragraph a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  /* Sub heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Part divider */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  /* Case header (STEP) */
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-text a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Flow card */
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-card--tall {
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  /* Role list */
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Tool box */
+  .tool-box {
+    margin: var(--space-4) 0;
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    text-align: center;
+  }
+
+  /* Prompt example */
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--tree {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .code-block--in-details {
+    margin: 0;
+    border: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+  }
+
+  .code-block--bad {
+    border: 1px solid #d97706;
+    border-left: 4px solid #d97706;
+    position: relative;
+  }
+
+  .code-block--bad::before {
+    content: '✗ Avoid';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.11rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: #d97706;
+    border-bottom-left-radius: var(--border-radius);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* Details card */
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  .details-card__body--flush {
+    padding: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .flow-card {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .code-block--bad::before {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

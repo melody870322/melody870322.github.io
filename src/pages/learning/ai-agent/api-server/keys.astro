@@ -504,35 +504,35 @@ if __name__ == "__main__":
 
       <ul class="checklist">
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Did I avoid putting the API key <strong>directly in the code</strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Did I <strong>create a <code>.env</code></strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Did I <strong>add <code>.env</code> to <code>.gitignore</code></strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Did I <strong>create a <code>.env.example</code></strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Does my Python code <strong>read the key via <code>os.getenv()</code></strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Does my code <strong>avoid printing the API key</strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">Does Gemini CLI's <code>cwd</code> <strong>point to the right project folder</strong>?</span>
         </li>
         <li class="checklist-item">
-          <span class="checklist-box" aria-hidden="true">☐</span>
+          <span class="checklist-box" aria-hidden="true"></span>
           <span class="checklist-text">If the key is missing, does the code <strong>flag it clearly</strong>?</span>
         </li>
       </ul>
@@ -959,7 +959,7 @@ if __name__ == "__main__":
     letter-spacing: 0.05em;
   }
 
-  /* Checklist */
+  /* Checklist (numbered circles) */
   .checklist {
     list-style: none;
     padding: 0;
@@ -968,6 +968,7 @@ if __name__ == "__main__":
     border-radius: var(--border-radius);
     background-color: var(--color-bg);
     overflow: hidden;
+    counter-reset: checklist-counter;
   }
 
   .checklist-item {
@@ -977,6 +978,7 @@ if __name__ == "__main__":
     padding: var(--space-4) var(--space-6);
     border-bottom: 1px solid var(--color-border);
     transition: background-color var(--transition);
+    counter-increment: checklist-counter;
   }
 
   .checklist-item:last-child {
@@ -989,11 +991,22 @@ if __name__ == "__main__":
 
   .checklist-box {
     flex-shrink: 0;
-    font-size: var(--text-lg);
-    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
     font-weight: 700;
-    line-height: 1.5;
+    margin-top: 0.2rem;
     user-select: none;
+  }
+
+  .checklist-box::before {
+    content: counter(checklist-counter);
   }
 
   .checklist-text {

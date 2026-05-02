@@ -959,7 +959,7 @@ if __name__ == "__main__":
     letter-spacing: 0.05em;
   }
 
-  /* Checklist (with empty boxes) */
+  /* Checklist (numbered circles) */
   .checklist {
     list-style: none;
     padding: 0;
@@ -968,6 +968,7 @@ if __name__ == "__main__":
     border-radius: var(--border-radius);
     background-color: var(--color-bg);
     overflow: hidden;
+    counter-reset: checklist-counter;
   }
 
   .checklist-item {
@@ -977,6 +978,7 @@ if __name__ == "__main__":
     padding: var(--space-4) var(--space-6);
     border-bottom: 1px solid var(--color-border);
     transition: background-color var(--transition);
+    counter-increment: checklist-counter;
   }
 
   .checklist-item:last-child {
@@ -989,11 +991,22 @@ if __name__ == "__main__":
 
   .checklist-box {
     flex-shrink: 0;
-    font-size: var(--text-lg);
-    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
     font-weight: 700;
-    line-height: 1.5;
+    margin-top: 0.2rem;
     user-select: none;
+  }
+
+  .checklist-box::before {
+    content: counter(checklist-counter);
   }
 
   .checklist-text {
