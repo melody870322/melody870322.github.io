@@ -1,0 +1,1409 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Reading & Writing Workflow: From Understanding to Draft Revision — Using AI Agents for Real Tasks"
+  description="Apply an AI agent to a reading and writing workflow: read the article → take notes → plan the outline → draft → check and revise. A step-by-step exercise that keeps the AI as an assistant, never the final decision-maker."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-reading">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Make AI an Assistant in Your Reading & Writing Flow — Not the Writer</h1>
+        <p class="detail-subtitle">
+          We've already practiced having AI organize CSV data and used the Notion API to create and update tasks. Next, we'll apply an AI agent to another very common task: <strong>reading articles, organizing key points, planning a report outline, and checking drafts</strong>. This kind of task isn't database operations or table cleanup, but it's still a great fit for a workflow.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        Because writing is usually <strong>not done in one step</strong>. It typically goes through several stages:
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Read the material</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Organize key points</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Identify the core question</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Plan the outline</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Write the draft</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">Check whether it's clear and on topic</div>
+      </div>
+
+      <p class="detail-paragraph">
+        Just telling an AI "<strong>write me a report</strong>" tends to go wrong. The AI may invent data, draw its own conclusions, or produce content that <strong>looks complete but isn't grounded</strong>.
+      </p>
+
+      <p class="detail-paragraph">
+        A better approach is: let the AI become an <strong>assistant</strong> in the reading and writing flow. It can help organize, remind, check, and suggest changes. But <strong>final judgment, opinion, and the official content still belong to a human</strong>.
+      </p>
+
+      <h2 class="detail-heading">The workflow we'll practice</h2>
+      <p class="detail-paragraph">
+        We'll practice a complete small workflow, from reading an article all the way to draft revision:
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Read article</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Organize reading notes</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Generate report outline</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Check the draft</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">Suggest revisions</div>
+      </div>
+
+      <p class="detail-paragraph">
+        We'll use three files: a <strong>practice article</strong>, the <strong>report assignment</strong>, and a <strong>sample draft</strong>.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The article here is a <strong>fictional practice example</strong>, not a real published article or academic source. Its purpose is to let us practice an AI workflow — <strong>not to be cited as a real source</strong>.
+        </p>
+      </div>
+
+      <!-- ============ PART 1 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">Prepare the practice files</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Create the project folder</h2>
+      </div>
+      <p class="detail-paragraph">
+        In VS Code, create a new project folder called <code>reading-writing-agent</code>. The structure can start as:
+      </p>
+
+      <pre class="code-block" is:raw><code>reading-writing-agent
+└─ data
+   ├─ article.txt
+   ├─ assignment.txt
+   └─ draft_v1.txt</code></pre>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Sample file 1: practice article</h2>
+      </div>
+      <p class="detail-paragraph">
+        Put the following into <code>article.txt</code>. The article is in Chinese — keep it as-is so later prompts can reference the original wording:
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">article.txt — "社群媒體與公共討論" (Social media &amp; public discourse)</span>
+          <span class="details-card__hint">Click to expand the practice article</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <h4 class="prose-card__title">社群媒體與公共討論</h4>
+            <p>近年來，社群媒體已經成為許多人獲取資訊、表達意見和參與公共討論的重要空間。和傳統媒體相比，社群媒體的門檻較低，使用者可以快速發布訊息，也可以即時回應他人的看法。這讓公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。</p>
+            <p>然而，社群媒體也帶來一些新的問題。首先，資訊傳播速度很快，但查證速度不一定跟得上。當一則未經確認的消息被大量轉發時，錯誤資訊可能在短時間內擴散。其次，平台演算法常常會根據使用者過去的點擊、停留時間和互動紀錄，推薦相似的內容。這可能讓使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。</p>
+            <p>此外，社群媒體上的討論容易受到情緒影響。簡短、強烈、容易引起反應的內容，往往比細緻、複雜、需要花時間理解的內容更容易被看見。這不代表所有社群媒體討論都是不好的，而是提醒我們，在使用社群媒體參與公共議題時，需要更注意資訊來源、表達方式與討論品質。</p>
+            <p>如果使用得當，社群媒體仍然可以成為公共參與的重要工具。例如，一些社會議題可以透過社群媒體被更多人看見，弱勢群體也可能透過網路平台發聲。問題不在於社群媒體本身一定好或壞，而在於使用者、平台和社會如何共同建立更好的資訊判斷方式與討論規則。</p>
+            <p>因此，面對社群媒體上的公共討論，我們不應只問「要不要使用社群媒體」，而應該進一步思考：如何判斷資訊是否可靠？如何避免只接觸單一觀點？如何在快速回應的環境中保留思考空間？這些問題，會影響我們能否把社群媒體變成更有品質的公共討論場域。</p>
+          </article>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        This article is a good fit for practicing several things:
+      </p>
+
+      <ul class="check-list">
+        <li>Identify the <strong>article's topic</strong></li>
+        <li>Organize the <strong>main arguments</strong></li>
+        <li>Distinguish <strong>strengths and problems</strong></li>
+        <li>Pose <strong>follow-up questions</strong></li>
+        <li>Turn <strong>reading notes into a report outline</strong></li>
+      </ul>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Sample file 2: assignment requirements</h2>
+      </div>
+      <p class="detail-paragraph">
+        Put the following into <code>assignment.txt</code>:
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">assignment.txt — report requirements</span>
+          <span class="details-card__hint">Click to expand the assignment</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <p><strong>Task</strong>: Based on the given article, write a short reading report.</p>
+            <p><strong>Length</strong>: about 800 to 1200 characters.</p>
+
+            <p><strong>The report must contain:</strong></p>
+            <ol class="prose-list">
+              <li><strong>Article topic introduction</strong> — what does the article mainly discuss?</li>
+              <li><strong>Key-point summary</strong> — organize the main arguments; no need for paragraph-by-paragraph summary.</li>
+              <li><strong>Personal viewpoint</strong> — where you agree, disagree, or want to discuss further.</li>
+              <li><strong>Follow-up questions</strong> — propose 1 to 2 questions worth thinking about.</li>
+            </ol>
+
+            <p><strong>Notes:</strong></p>
+            <ol class="prose-list">
+              <li>Don't simply copy the article.</li>
+              <li>Don't take AI-generated content as the final version.</li>
+              <li>If you use the article's wording, confirm it actually came from the article.</li>
+              <li>The report should have clear paragraphs.</li>
+              <li>Don't end abruptly — the conclusion should circle back to the discussion.</li>
+            </ol>
+          </article>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This file tells the AI: <strong>this isn't free-form writing</strong>. It needs to organize against the requirements above. <strong>The outline and draft check should both reference this file</strong>.
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Sample file 3: a draft to check</h2>
+      </div>
+      <p class="detail-paragraph">
+        Put the following into <code>draft_v1.txt</code>:
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">draft_v1.txt — sample draft</span>
+          <span class="details-card__hint">Click to expand the draft</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <p>社群媒體現在很重要，很多人都會用社群媒體看新聞和表達自己的想法。這篇文章主要是在說社群媒體對公共討論有很大的影響。</p>
+            <p>我覺得社群媒體有好處也有壞處。好處是大家都可以發表意見，不一定只有記者或專家可以說話。這樣很多議題就可以被更多人看到。可是壞處是網路上也有很多假消息，而且大家常常只看自己想看的東西，這樣可能會讓討論變得不理性。</p>
+            <p>文章也提到演算法會推薦使用者喜歡看的內容，所以人們可能一直看到差不多的觀點。我覺得這是一個問題，因為如果大家都只看自己同意的東西，就不容易理解其他人的想法。</p>
+            <p>總之，社群媒體是一個有用的工具，但是也有很多問題。我們應該要小心使用，不要亂相信網路上的資訊，也要多看不同的觀點。</p>
+          </article>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        This draft is <strong>deliberately written in a simple way</strong>. It isn't wrong, but there's plenty to improve, for example:
+      </p>
+
+      <ul class="check-list">
+        <li>The key-point section could be <strong>more layered</strong></li>
+        <li>The personal viewpoint could be <strong>more specific</strong></li>
+        <li>Paragraphs could <strong>connect more clearly</strong></li>
+        <li>The conclusion could <strong>circle back to the report's topic</strong></li>
+        <li>The <strong>follow-up questions</strong> haven't been written yet</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        We'll ask the AI to help review this draft later.
+      </p>
+
+      <!-- ============ Section: read files ============ -->
+      <h2 class="detail-heading">Read the files via Gemini CLI in VS Code</h2>
+      <p class="detail-paragraph">
+        The exercise is <strong>not</strong> to paste articles into the prompt — it's to let Gemini CLI read local files. Open <code>reading-writing-agent</code> in VS Code, open a terminal (<strong>Terminal → New Terminal</strong>), and run:
+      </p>
+      <pre class="code-block" is:raw><code>gemini</code></pre>
+      <p class="detail-paragraph">
+        Once Gemini CLI is up, the exercises below will use these file paths:
+      </p>
+      <ul class="check-list">
+        <li><code>@./data/article.txt</code></li>
+        <li><code>@./data/assignment.txt</code></li>
+        <li><code>@./data/draft_v1.txt</code></li>
+      </ul>
+
+      <!-- ============ PART 2 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Prompt Exercises</span>
+      </div>
+
+      <p class="detail-paragraph">
+        The five exercises below form one continuous workflow. Run them in order: at each step, <strong>verify the AI's response is on track</strong> before moving on.
+      </p>
+
+      <!-- Exercise 1 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 1</p>
+        <h2 class="case-title">Organize reading notes first</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to have the AI understand the article first. <strong>Don't rush to write the report yet</strong>. First ask the AI to organize:
+      </p>
+
+      <ul class="check-list">
+        <li>The <strong>topic</strong></li>
+        <li>The <strong>core question</strong></li>
+        <li>The <strong>main arguments</strong></li>
+        <li>The <strong>strengths and risks</strong> raised</li>
+        <li>Possible <strong>follow-up questions</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Doing this gives the later outline a stronger grounding.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/article.txt.<br/><br/>
+            Don't write the report yet, and don't add any examples that aren't in the article.<br/><br/>
+            Please organize reading notes in this format:<br/><br/>
+            　Article topic:<br/>
+            　Core question:<br/>
+            　Key points:<br/>
+            　1.<br/>
+            　2.<br/>
+            　3.<br/>
+            　Strengths the article raises:<br/>
+            　Problems the article raises:<br/>
+            　Possible follow-up questions:<br/><br/>
+            Use only what the article says.<br/>
+            If something is your inference, mark it as "inferred from the article."
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">Article topic</h4>
+          <p class="detail-paragraph">Social media and public discourse.</p>
+
+          <h4 class="example-heading">Core question</h4>
+          <p class="detail-paragraph">(Inferred from the article) What changes and challenges does social media bring to public discourse, and how should we respond to improve the quality of public participation on social media?</p>
+
+          <h4 class="example-heading">Key points</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Social media <strong>lowers the threshold of public discussion</strong>, making information transmission faster and participation broader.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Information flow and platform algorithms can lead to <strong>spread of misinformation</strong> and <strong>narrowing of viewpoints</strong> (echo-chamber effect).</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Discussions are <strong>easily emotion-driven</strong>; short, strong content tends to get more attention than nuanced, complex arguments.</span></li>
+          </ol>
+
+          <h4 class="example-heading">Strengths the article raises</h4>
+          <ul class="check-list">
+            <li><strong>Lower threshold</strong> for accessing information and expressing views</li>
+            <li><strong>Real-time, fast</strong> publishing and response</li>
+            <li>More people can engage with otherwise hard-to-reach issues</li>
+            <li>Helps social issues become visible to a wider public</li>
+            <li>Provides <strong>a channel for marginalized groups to be heard</strong></li>
+          </ul>
+
+          <h4 class="example-heading">Problems the article raises</h4>
+          <ul class="check-list">
+            <li>Verification can't keep up with transmission speed; <strong>misinformation spreads quickly</strong></li>
+            <li>Algorithms recommend similar content, reducing exposure to different viewpoints</li>
+            <li>Discussion is easily affected by emotion</li>
+            <li>Nuanced, complex content that takes time to digest is less visible</li>
+          </ul>
+
+          <h4 class="example-heading">Possible follow-up questions</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">How do we <strong>judge whether information is reliable</strong>?</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">How do we <strong>avoid only ever encountering one perspective</strong>?</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">How do we <strong>preserve room to think</strong> in a fast-response environment?</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point of this exercise is: <strong>organize first, don't rush into producing the report</strong>.
+        </p>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 2</p>
+        <h2 class="case-title">Generate an outline against the assignment</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to connect the <strong>article</strong> with the <strong>assignment</strong>. The AI should look at both — that way the outline isn't just a generic summary, but <strong>matches the structure the report needs</strong>.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/article.txt and @./data/assignment.txt.<br/><br/>
+            Based on the assignment, design a reading-report outline.<br/><br/>
+            Notes:<br/>
+            1. Don't write the full report.<br/>
+            2. Don't add information not in the article.<br/>
+            3. The outline should cover topic, key points, personal viewpoint, follow-up questions.<br/>
+            4. Mark each section's writing purpose.<br/>
+            5. For "personal viewpoint", offer optional directions only — don't decide my final stance.<br/><br/>
+            Please answer in this format:<br/><br/>
+            　Suggested titles:<br/>
+            　Overall direction:<br/>
+            　Section outline:<br/>
+            　Section 1:<br/>
+            　- Purpose:<br/>
+            　- Possible content:<br/>
+            　……<br/>
+            　Items I still need to verify or supplement:
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">Suggested titles</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Public dialogue in the digital age: opportunities and challenges of social media</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Algorithms, emotion, and participation: a reflection on social media as a public-discussion space</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Protecting discussion quality in fast-spreading channels: the future of social media and public participation</span></li>
+          </ol>
+
+          <h4 class="example-heading">Overall direction</h4>
+          <p class="detail-paragraph">
+            Take "<strong>the two-sided impact of a tool</strong>" as the central thread. Analyze how social media reshapes public discussion, and discuss how individuals and society can build judgment and rules around its use.
+          </p>
+
+          <h4 class="example-heading">Section 1: Article topic introduction</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Set the stage; describe social media's role in modern public life.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Possible content</span>
+              <span class="role-item__desc">Describe how social media has become the primary space where the public gets information and expresses views; state the article's core question: how do social-media traits affect public participation?</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Section 2: Key-point summary</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Distill the article's observations on social media's discussion dynamics.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Possible content</span>
+              <span class="role-item__desc"><strong>Strengths</strong>: lower threshold, real-time response, voice for marginalized groups. <strong>Problems</strong>: verification lag, algorithmic narrowing, short and emotional content crowding out nuance. <strong>Wrap-up</strong>: social media is neither inherently good nor bad — it depends on how it's used.</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Section 3: Personal viewpoint (optional directions)</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Engage with the article's points or take a stance.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Direction A</span>
+              <span class="role-item__desc">Discuss the limits of "algorithms" on information intake — does "only seeing what you want to see" undermine the foundation of public discussion?</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Direction B</span>
+              <span class="role-item__desc">Discuss the tension between "emotion vs. content quality" — does "stronger content gets seen more" help or hurt public participation?</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Direction C</span>
+              <span class="role-item__desc">Discuss shared responsibility among "users, platforms, and society" — whose role matters most when building discussion norms?</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Section 4: Conclusion and follow-up</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Sum up the argument and pose a question worth pursuing.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Possible content</span>
+              <span class="role-item__desc">Echo the article's closing: don't only debate "use it or not" — instead learn "how to use it with quality"; close with a follow-up question.</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Items I still need to verify or supplement</h4>
+          <ul class="check-list">
+            <li><strong>Word-count budget</strong>: the assignment asks for 800–1200; since the article is fairly compact, you'll need to expand the "personal viewpoint" section.</li>
+            <li><strong>Section transitions</strong>: pay attention to how Section 3 (viewpoint) flows back into Section 4 (conclusion).</li>
+            <li><strong>Source check</strong>: the article never names specific platforms (Facebook, Twitter, etc.) — keep references generic to stay faithful to it.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point of this exercise: <strong>AI can help build the structure, but shouldn't decide the final viewpoint for the writer</strong>.
+        </p>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 3</p>
+        <h2 class="case-title">Turn the outline into a paragraph draft</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to have the AI demonstrate how to expand an outline into paragraphs. Important: <strong>the AI is producing a draft, not a final version</strong>. The writer should check whether the content matches their own thinking, and avoid handing in an AI draft as-is.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/article.txt and @./data/assignment.txt.<br/><br/>
+            Based on the article and the assignment, demonstrate a "first-pass report draft."<br/><br/>
+            Rules:<br/>
+            1. This is a draft only, not the final version.<br/>
+            2. Use only the article — no outside data.<br/>
+            3. Keep the personal viewpoint conservative; don't make strong conclusions for me.<br/>
+            4. At the end, list "items I should revise myself."<br/>
+            5. Keep it under 900 characters.<br/><br/>
+            Please answer in this format:<br/><br/>
+            　Report draft (first pass):<br/>
+            　Items I should revise myself:
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Length is around 750 characters, leaving room to expand toward the assignment's 800–1200 target.
+          </p>
+
+          <h4 class="example-heading">Report draft (first pass)</h4>
+          <article class="prose-card">
+            <p><strong>Title</strong>: Public dialogue in the digital age — on social media's impact and the reflections it demands</p>
+
+            <p><strong>1. Topic introduction</strong></p>
+            <p>This article examines the role social media plays in modern public discussion and the shifts it has produced. As technology has advanced, social media has moved beyond a social tool to become a primary space where the public obtains information, expresses opinions, and participates in public issues. The article centers on how social media's low threshold and high efficiency reshape discussion, while pointing out the challenges hidden behind these traits.</p>
+
+            <p><strong>2. Key-point summary</strong></p>
+            <p>According to the article, social media's contribution to public discussion lies mainly in "accessibility" and "immediacy." Compared with traditional media, social media lowers the bar to participation, lets users publish and respond quickly, makes once-obscure issues more visible, and even gives marginalized groups a channel to be heard.</p>
+            <p>Yet these traits come with serious problems: a "verification gap" lets misinformation spread fast; "algorithmic limits" reduce exposure to diverse views; and discussion that's "driven by emotion" — short, strong, reactive content — tends to outperform nuanced argument, dragging on overall quality.</p>
+
+            <p><strong>3. Personal viewpoint</strong></p>
+            <p>Among the article's points, I think "quality of use" is the most worth focusing on right now. The article's framing — that social media's traits aren't absolute good or bad — is pragmatic. On information flow, I agree that the verification risk is real; on algorithm-driven narrowing, I do see public conversation collapsing into echo-chamber comfort. I'd add that <strong>"building rules and judgment" shouldn't be only the user's job — platforms and society also need to set norms</strong>.</p>
+
+            <p><strong>4. Conclusion and follow-up</strong></p>
+            <p>In short, social media offers a fast, democratic space for participation, but raises serious questions about information judgment and discussion quality. We should work on "how to judge reliability," "how to break through single perspectives," and "how to preserve thinking time in a fast environment" — together turning social media into a space of better-quality public discussion.</p>
+          </article>
+
+          <h4 class="example-heading">Items I should revise myself</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Length expansion</strong>: currently around 750 characters; still short of the 800–1200 target. Expand the "personal viewpoint" section.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Style polish</strong>: the draft's tone is fairly neutral. Adjust phrasing to match your own writing voice.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Transitions</strong>: add bridging sentences between paragraphs so the flow reads more naturally.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Citation check</strong>: before finalizing, verify that everything marked "according to the article" actually matches the original.</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          What this exercise shows: <strong>going from article to draft isn't a single jump</strong> — it should pass through reading notes and an outline.
+        </p>
+      </div>
+
+      <!-- Exercise 4 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 4</p>
+        <h2 class="case-title">Check whether the draft meets the requirements</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is for the AI to act as a <strong>draft-review assistant</strong> — not to rewrite the whole thing, but to first check:
+      </p>
+
+      <ul class="check-list">
+        <li>Whether the draft <strong>meets the assignment</strong></li>
+        <li>Whether <strong>important parts are missing</strong></li>
+        <li>Where it's <strong>too vague</strong></li>
+        <li>Where the <strong>writer's view</strong> needs to come in</li>
+        <li>Where things need <strong>reorganizing</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        This step belongs <strong>before any formal rewriting</strong>.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/assignment.txt and @./data/draft_v1.txt.<br/><br/>
+            Check whether this draft meets the assignment requirements.<br/><br/>
+            Notes:<br/>
+            1. Don't rewrite the whole thing for me.<br/>
+            2. Start with strengths.<br/>
+            3. Then list what needs revising.<br/>
+            4. Group issues into "structural", "content", and "expression".<br/>
+            5. End with a suggested revision order.<br/><br/>
+            Please answer in this format:<br/><br/>
+            　Strengths:<br/>
+            　Structural issues:<br/>
+            　Content issues:<br/>
+            　Expression issues:<br/>
+            　Suggested revision order:
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">Strengths</h4>
+          <ul class="check-list">
+            <li><strong>Clear topic</strong>: identifies social media's impact on public discussion as the core</li>
+            <li><strong>Balanced framing</strong>: notes both upsides and downsides, in line with the article</li>
+            <li><strong>Partial coverage</strong>: includes a personal viewpoint (on misinformation and algorithms)</li>
+          </ul>
+
+          <h4 class="example-heading">Structural issues</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Incomplete sections</strong>: the assignment requires four parts, but the draft mixes "key-point summary" with "personal viewpoint" and is <strong>missing the follow-up questions</strong>.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Weak conclusion link</strong>: the conclusion arrives abruptly and doesn't recap the specific issues raised earlier.</span></li>
+          </ol>
+
+          <h4 class="example-heading">Content issues</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Far too short</strong>: assignment asks for 800–1200; the draft is around 250.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Key points lack specificity</strong>: details like "lower discussion threshold", "voice for marginalized groups", and "emotional content crowding out nuance" are not fully captured.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Personal viewpoint is too thin</strong>: takes a stance but doesn't show the "why" behind agreeing or disagreeing.</span></li>
+          </ol>
+
+          <h4 class="example-heading">Expression issues</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Too colloquial</strong>: phrases like "very important", "many people use it", "has good and bad sides" should shift to more formal wording (e.g. "plays a key role", "potential strengths and emerging challenges").</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Repetitive sentence shapes</strong>: "…is…" / "I think…" / "the article also mentions…" recur too often.</span></li>
+          </ol>
+
+          <h4 class="example-heading">Suggested revision order</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Fix the structure</strong>: split into the four required sections and add the missing "follow-up questions."</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Expand content</strong>: re-read the article and pull more specific points into the "key-point summary" section — this also closes the length gap.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Deepen the viewpoint</strong>: pick one point (algorithms or misinformation) and explain why it's the most important challenge.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Polish the prose</strong>: convert colloquial phrasing into more formal wording.</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point of this exercise: <strong>diagnose first, revise second. Don't ask the AI to rewrite the whole thing on the first try</strong>.
+        </p>
+      </div>
+
+      <!-- Exercise 5 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 5</p>
+        <h2 class="case-title">Produce a revision based on the review</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to have the AI assist in producing a revision based on the previous review. Here we can practice "revising," but <strong>the target of the revision is the draft, not the original article</strong>.
+      </p>
+
+      <ul class="check-list">
+        <li>The <strong>original article</strong> mustn't be changed</li>
+        <li>The <strong>assignment</strong> mustn't be changed</li>
+        <li>The <strong>draft</strong> can be revised</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        That's an important <strong>safety boundary</strong> in the reading-and-writing flow.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/article.txt, @./data/assignment.txt, and @./data/draft_v1.txt.<br/><br/>
+            Based on the assignment, help revise draft_v1 into draft_v2.<br/><br/>
+            Rules:<br/>
+            1. Don't change the meaning of the original article.<br/>
+            2. Don't add outside data.<br/>
+            3. Keep the draft's main ideas, but make the structure clearer.<br/>
+            4. Add 1 to 2 follow-up questions.<br/>
+            5. Use a tone more suitable for a formal report.<br/>
+            6. At the end, list what you changed.<br/><br/>
+            Please answer in this format:<br/><br/>
+            　Revised draft:<br/>
+            　Summary of changes:<br/>
+            　Items still needing human verification:
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Here's the revised <code>draft_v2</code>. Colloquial phrasing was converted to formal report language; the structure now matches the assignment, and the article's internal logic was reused — without adding outside data — to lengthen the draft.
+          </p>
+
+          <h4 class="example-heading">Revised draft</h4>
+          <article class="prose-card">
+            <p><strong>Title</strong>: Social media and public dialogue — on the opportunities and challenges of information transmission</p>
+
+            <p><strong>1. Topic introduction</strong></p>
+            <p>This article examines how social media reshapes contemporary public discussion. As technology has advanced, social media has become the primary space where the public gets information and expresses views. The article centers on how its traits — low threshold, real-time response — both broaden public participation and pose serious challenges to discussion quality, information accuracy, and the diversity of viewpoints.</p>
+
+            <p><strong>2. Key-point summary</strong></p>
+            <p>Social media has clear positive value for public participation. Its low-threshold quality lets more people publish and respond quickly, brings hard-to-reach issues into the public eye, and gives marginalized groups a channel to be heard.</p>
+            <p>The article also names several attendant problems: a "verification gap" that lets misinformation spread fast; an "algorithmic constraint" that nudges users into narrower information sets; and a "shift in discussion quality," where strong, emotional content tends to dominate while nuanced argument is pushed to the edge.</p>
+
+            <p><strong>3. Personal viewpoint</strong></p>
+            <p>I think "preserving room to think in a fast environment" is the most critical task for digital citizens. I strongly agree with the article that the question isn't "use it or not" but how we respond. On algorithms in particular, when we get used to information that matches our stance, our capacity to understand and tolerate different views drops. Building transparent, quality-improving "rules" <strong>isn't only the user's responsibility — it's a structural problem that platforms and the broader society have to face together</strong>.</p>
+
+            <p><strong>4. Conclusion and follow-up</strong></p>
+            <p>In sum, social media has lowered the threshold for participation and amplified marginal voices, but without solid information judgment and healthy discussion mechanisms, the harm to public space cannot be ignored. We should move from passive recipients toward more deliberate digital citizens.</p>
+            <p>Two follow-up questions worth pursuing:</p>
+            <ol class="prose-list">
+              <li>Under platform mechanisms that chase real-time and reach, how should we design or build discussion rules that better surface "nuanced, complex content"?</li>
+              <li>Beyond personal discipline, what mechanisms can society and platforms use to reduce the negative impact of "single-perspective recommendation" caused by algorithms?</li>
+            </ol>
+          </article>
+
+          <h4 class="example-heading">Summary of changes</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Restructured</strong>: rearranged strictly into the assignment's four sections (intro, key-point summary, personal viewpoint, follow-up questions).</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Formalized tone</strong>: "very important" → "primary space / key role"; "good and bad sides" → "clear positive value… also attendant problems."</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Expanded content (no outside data)</strong>: reused the article's keywords (algorithm, threshold, emotional impact) to extend the internal argument.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Added missing section</strong>: the "follow-up questions" section that v1 lacked.</span></li>
+          </ol>
+
+          <h4 class="example-heading">Items still needing human verification</h4>
+          <ul class="check-list">
+            <li><strong>Length check</strong>: v2 is around 650–700 characters, still short of 800–1200. Expand "personal viewpoint" with one or two more passes.</li>
+            <li><strong>Stance check</strong>: "personal viewpoint" leans on "agree", "key", etc. If you disagree with the article anywhere, swap those passages out.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This exercise lets the AI participate in revision,<br/>
+          but <strong>it doesn't make every judgment for you</strong>.<br/>
+          Its job: keep the original ideas, improve structure, flag gaps, produce a version you can revise further.
+        </p>
+      </div>
+
+      <!-- ============ Section: why we can revise ============ -->
+      <h2 class="detail-heading">Why is revision OK here?</h2>
+      <p class="detail-paragraph">
+        When we cleaned up CSV data earlier, we recommended <strong>not</strong> letting the AI modify the original file directly. Source files are often <strong>sign-up sheets, survey results, rosters, or other records</strong>, and a wrong AI edit can have real-world consequences. Revision is OK here because:
+      </p>
+
+      <ul class="check-list">
+        <li>What's being revised is a <strong>draft</strong>, not the source article</li>
+        <li>What's being revised is <strong>phrasing and structure</strong> — not facts being invented out of thin air</li>
+        <li>The result still <strong>needs human verification</strong></li>
+        <li>The original files remain in place, <strong>so we can compare back</strong></li>
+      </ul>
+
+      <!-- ============ Section: what NOT to let AI do ============ -->
+      <h2 class="detail-heading">Things the AI shouldn't decide on its own</h2>
+      <p class="detail-paragraph">
+        In a reading-and-writing workflow, a few things shouldn't be handed to the AI:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">1.</span>
+          <span class="role-item__desc"><strong>Don't let the AI pretend it's read material you didn't provide.</strong> If the file isn't there, don't let the AI fill it in.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">2.</span>
+          <span class="role-item__desc"><strong>Don't let the AI fabricate citations.</strong> If you're citing a real article, book, or website, verify it yourself.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">3.</span>
+          <span class="role-item__desc"><strong>Don't let the AI decide your stance.</strong> It can offer angles to consider, but the final view is yours.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">4.</span>
+          <span class="role-item__desc"><strong>Don't let the AI rewrite the original into a different meaning.</strong> The source article is a reference, not a draft.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">5.</span>
+          <span class="role-item__desc"><strong>Don't take the AI's output as final.</strong> Always do a check before any formal use.</span>
+        </li>
+      </ul>
+
+      <!-- ============ Section: prompt checklist ============ -->
+      <h2 class="detail-heading">A small checklist for designing prompts</h2>
+      <p class="detail-paragraph">
+        Before writing reading-and-writing prompts, ask yourself a few questions:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Which <strong>article</strong> should the AI read?</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Are there any <strong>assignment requirements or writing rules</strong>?</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Is this step about <strong>organizing, planning, drafting, or checking</strong>?</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Can the AI <strong>add outside information</strong>?</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">What content needs to <strong>preserve original meaning</strong>?</span></li>
+        <li><span class="numbered-list__num">6</span><span class="numbered-list__text">Where can it only <strong>suggest, not decide</strong>?</span></li>
+        <li><span class="numbered-list__num">7</span><span class="numbered-list__text">Should the output be <strong>notes, an outline, a draft, or a list of revisions</strong>?</span></li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          When these are answered ahead of time, <strong>the AI's responses tend to be much steadier</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">The most important idea on this page</h2>
+      <p class="detail-paragraph">
+        A reading-and-writing flow is <strong>not "hand the article to the AI and ask for the whole report."</strong> A more reliable approach is:
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Read the article</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Take notes</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Match against the assignment</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Build the outline</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Produce a draft</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">Check and revise</div>
+      </div>
+
+      <p class="detail-paragraph">
+        AI is good at organizing, reminding, checking, and rewriting drafts. But <strong>it shouldn't replace the reading itself, and it shouldn't decide your viewpoint</strong>.
+      </p>
+
+      <ul class="check-list">
+        <li>The <strong>article</strong> is the source</li>
+        <li>The <strong>outline</strong> is the route</li>
+        <li>The <strong>draft</strong> can be revised</li>
+        <li>The <strong>final version</strong> is yours to confirm</li>
+        <li>The <strong>important calls</strong> shouldn't be left to the AI</li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          The AI is the assistant,<br/>
+          not the writer.<br/>
+          <strong>You still do the reading, the writing, and the judging.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-reading {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code,
+  :global(.prose-card) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-list--compact {
+    gap: var(--space-2);
+    margin: var(--space-4) 0;
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-list--compact .role-item {
+    padding: var(--space-3);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 7rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__label--ord {
+    min-width: 6rem;
+    font-size: var(--text-base);
+  }
+
+  .role-list--compact .role-item__label--ord {
+    min-width: 7rem;
+    font-size: var(--text-sm);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .prose-card {
+    padding: var(--space-5) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: 2;
+  }
+
+  .prose-card__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    text-align: center;
+  }
+
+  .prose-card p {
+    margin: 0 0 var(--space-3);
+  }
+
+  .prose-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .prose-card strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .prose-list {
+    padding-left: 1.4em;
+    margin: 0 0 var(--space-3);
+  }
+
+  .prose-list li {
+    margin-bottom: var(--space-2);
+    line-height: 1.9;
+  }
+
+  .prose-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-item__label--ord {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+    }
+
+    .prose-card {
+      padding: var(--space-4);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

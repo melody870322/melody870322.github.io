@@ -1,0 +1,1411 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="閱讀寫作工作流：從文章理解到草稿修訂 — 把 AI Agent 用在真實任務"
+  description="把 AI Agent 用在閱讀與寫作流程上：先讀文章 → 整理筆記 → 規劃大綱 → 寫成草稿 → 檢查與修訂。一步一步走過實際工作流，讓 AI 變成助理，而不是替使用者做最後判斷的人。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-reading">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">把 AI 變成閱讀與寫作流程裡的助理，不是寫作者本身</h1>
+        <p class="detail-subtitle">
+          前面我們已經練習過 AI 整理 CSV，也透過 Notion API 建立和更新任務。接下來要把 AI Agent 用在另一種很常見的任務：<strong>閱讀文章、整理重點、規劃報告大綱、檢查草稿</strong>。這類任務看起來不像操作資料庫，也不像整理表格，但其實很適合用工作流來處理。
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        因為寫作通常<strong>不是一步完成的</strong>。通常會經過幾個階段：
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">先讀材料</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">整理重點</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">找出問題意識</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">規劃大綱</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">寫成草稿</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">檢查內容是否清楚、有沒有偏離題目</div>
+      </div>
+
+      <p class="detail-paragraph">
+        如果只對 AI 說「<strong>幫我寫一篇報告</strong>」，這樣很容易出問題。因為 AI 可能會自己補資料、自己下結論，也可能寫出<strong>看起來完整、但其實沒有根據</strong>的內容。
+      </p>
+
+      <p class="detail-paragraph">
+        比較好的方式是：讓 AI 變成閱讀與寫作流程中的<strong>助理</strong>。它可以幫忙整理、提醒、檢查、提出修改建議。但<strong>最後的判斷、觀點和正式內容，仍然要由人確認</strong>。
+      </p>
+
+      <h2 class="detail-heading">這次要練習的工作流</h2>
+      <p class="detail-paragraph">
+        我們要練習一個完整的小型工作流，從讀文章開始，一路到草稿修訂：
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">讀取文章</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">整理閱讀筆記</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">產生報告大綱</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">檢查草稿</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">提出修改建議</div>
+      </div>
+
+      <p class="detail-paragraph">
+        會用到三份檔案：<strong>練習用文章</strong>、<strong>報告要求</strong>、<strong>草稿範例</strong>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          這裡的文章是<strong>練習用的虛構範例</strong>，不是真實出版文章，也不是學術資料。它的用途是讓我們練習 AI 工作流，<strong>不是拿來當成正式引用來源</strong>。
+        </p>
+      </div>
+
+      <!-- ============ PART 1 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">先準備練習資料</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">建立專案資料夾</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 VS Code 裡建立一個新的專案資料夾 <code>reading-writing-agent</code>，資料夾結構可以先長這樣：
+      </p>
+
+      <pre class="code-block" is:raw><code>reading-writing-agent
+└─ data
+   ├─ article.txt
+   ├─ assignment.txt
+   └─ draft_v1.txt</code></pre>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">範例資料一：練習用文章</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 <code>article.txt</code> 裡放入以下內容：
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">article.txt — 「社群媒體與公共討論」全文</span>
+          <span class="details-card__hint">點擊展開練習用文章</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <h4 class="prose-card__title">社群媒體與公共討論</h4>
+            <p>近年來，社群媒體已經成為許多人獲取資訊、表達意見和參與公共討論的重要空間。和傳統媒體相比，社群媒體的門檻較低，使用者可以快速發布訊息，也可以即時回應他人的看法。這讓公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。</p>
+            <p>然而，社群媒體也帶來一些新的問題。首先，資訊傳播速度很快，但查證速度不一定跟得上。當一則未經確認的消息被大量轉發時，錯誤資訊可能在短時間內擴散。其次，平台演算法常常會根據使用者過去的點擊、停留時間和互動紀錄，推薦相似的內容。這可能讓使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。</p>
+            <p>此外，社群媒體上的討論容易受到情緒影響。簡短、強烈、容易引起反應的內容，往往比細緻、複雜、需要花時間理解的內容更容易被看見。這不代表所有社群媒體討論都是不好的，而是提醒我們，在使用社群媒體參與公共議題時，需要更注意資訊來源、表達方式與討論品質。</p>
+            <p>如果使用得當，社群媒體仍然可以成為公共參與的重要工具。例如，一些社會議題可以透過社群媒體被更多人看見，弱勢群體也可能透過網路平台發聲。問題不在於社群媒體本身一定好或壞，而在於使用者、平台和社會如何共同建立更好的資訊判斷方式與討論規則。</p>
+            <p>因此，面對社群媒體上的公共討論，我們不應只問「要不要使用社群媒體」，而應該進一步思考：如何判斷資訊是否可靠？如何避免只接觸單一觀點？如何在快速回應的環境中保留思考空間？這些問題，會影響我們能否把社群媒體變成更有品質的公共討論場域。</p>
+          </article>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        這篇文章適合練習幾件事：
+      </p>
+
+      <ul class="check-list">
+        <li>找出<strong>文章主題</strong></li>
+        <li>整理<strong>主要觀點</strong></li>
+        <li>分辨<strong>優點與問題</strong></li>
+        <li>提出<strong>延伸思考問題</strong></li>
+        <li>把<strong>閱讀筆記轉成報告大綱</strong></li>
+      </ul>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">範例資料二：報告要求</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 <code>assignment.txt</code> 裡放入以下內容：
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">assignment.txt — 報告要求</span>
+          <span class="details-card__hint">點擊展開報告要求</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <p><strong>報告任務</strong>：根據指定文章，撰寫一份短篇閱讀報告。</p>
+            <p><strong>報告長度</strong>：約 800 到 1200 字。</p>
+
+            <p><strong>報告需要包含：</strong></p>
+            <ol class="prose-list">
+              <li><strong>文章主題簡介</strong>：說明文章主要討論什麼問題。</li>
+              <li><strong>文章重點整理</strong>：整理文章中的主要觀點，不需要逐段摘要。</li>
+              <li><strong>個人觀點</strong>：說明你同意、不同意，或想進一步討論的地方。</li>
+              <li><strong>延伸問題</strong>：提出 1 到 2 個可以繼續思考的問題。</li>
+            </ol>
+
+            <p><strong>注意事項：</strong></p>
+            <ol class="prose-list">
+              <li>不要只複製文章內容。</li>
+              <li>不要把 AI 產生的內容直接當成最後版本。</li>
+              <li>如果使用文章中的說法，要確認是否真的來自文章。</li>
+              <li>報告要有清楚段落。</li>
+              <li>結論不要太突然，要回到前面的討論。</li>
+            </ol>
+          </article>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這份檔案的作用是告訴 AI：<strong>這次不是自由寫作</strong>，它要根據指定要求來幫忙整理。<strong>大綱和草稿檢查都要對照這份要求</strong>。
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">範例資料三：草稿範例</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 <code>draft_v1.txt</code> 裡放入以下內容：
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">draft_v1.txt — 草稿範例</span>
+          <span class="details-card__hint">點擊展開草稿內容</span>
+        </summary>
+        <div class="details-card__body">
+          <article class="prose-card">
+            <p>社群媒體現在很重要，很多人都會用社群媒體看新聞和表達自己的想法。這篇文章主要是在說社群媒體對公共討論有很大的影響。</p>
+            <p>我覺得社群媒體有好處也有壞處。好處是大家都可以發表意見，不一定只有記者或專家可以說話。這樣很多議題就可以被更多人看到。可是壞處是網路上也有很多假消息，而且大家常常只看自己想看的東西，這樣可能會讓討論變得不理性。</p>
+            <p>文章也提到演算法會推薦使用者喜歡看的內容，所以人們可能一直看到差不多的觀點。我覺得這是一個問題，因為如果大家都只看自己同意的東西，就不容易理解其他人的想法。</p>
+            <p>總之，社群媒體是一個有用的工具，但是也有很多問題。我們應該要小心使用，不要亂相信網路上的資訊，也要多看不同的觀點。</p>
+          </article>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        這是一份<strong>故意寫得比較簡單</strong>的草稿。它不是錯的，但還有很多可以改進的地方，例如：
+      </p>
+
+      <ul class="check-list">
+        <li>文章重點可以<strong>更有層次</strong></li>
+        <li>個人觀點可以<strong>更具體</strong></li>
+        <li>段落之間可以<strong>連接得更清楚</strong></li>
+        <li>結論可以<strong>再回到報告主題</strong></li>
+        <li><strong>延伸問題</strong>還沒有寫出來</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        後面會請 AI 幫忙檢查這份草稿。
+      </p>
+
+      <!-- ============ Section: read files ============ -->
+      <h2 class="detail-heading">在 VS Code 裡用 Gemini CLI 讀取檔案</h2>
+      <p class="detail-paragraph">
+        這裡的練習<strong>不是把文章直接貼進指令裡</strong>，而是讓 Gemini CLI 讀取本機檔案。請先用 VS Code 開啟 <code>reading-writing-agent</code>，接著開啟終端機（<strong>Terminal → New Terminal</strong>），輸入：
+      </p>
+      <pre class="code-block" is:raw><code>gemini</code></pre>
+      <p class="detail-paragraph">
+        進入 Gemini CLI 後，後面的練習會用這些檔案路徑：
+      </p>
+      <ul class="check-list">
+        <li><code>@./data/article.txt</code></li>
+        <li><code>@./data/assignment.txt</code></li>
+        <li><code>@./data/draft_v1.txt</code></li>
+      </ul>
+
+      <!-- ============ PART 2: 指令練習 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">指令練習</span>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來的五個練習是一條完整的工作流。請按順序進行：每一步先<strong>確認 AI 的回覆有沒有偏離</strong>，再進到下一步。
+      </p>
+
+      <!-- 練習 1 -->
+      <div class="case-header">
+        <p class="case-label">練習 1</p>
+        <h2 class="case-title">先整理閱讀筆記</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 先幫忙看懂文章。<strong>這一步不要急著寫報告</strong>，先請 AI 整理：
+      </p>
+
+      <ul class="check-list">
+        <li>文章<strong>主題</strong></li>
+        <li><strong>主要問題</strong></li>
+        <li><strong>主要觀點</strong></li>
+        <li>文章提到的<strong>優點與風險</strong></li>
+        <li>可以<strong>延伸思考的問題</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這樣做的好處是，後面產生大綱時，會比較有根據。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/article.txt。<br/><br/>
+            請先不要寫報告，也不要加入文章沒有提到的例子。<br/><br/>
+            請幫我整理成閱讀筆記，格式如下：<br/><br/>
+            　文章主題：<br/>
+            　主要問題：<br/>
+            　文章重點：<br/>
+            　1.<br/>
+            　2.<br/>
+            　3.<br/>
+            　文章提到的好處：<br/>
+            　文章提到的問題：<br/>
+            　可以延伸思考的問題：<br/><br/>
+            請只根據文章內容整理。<br/>
+            如果是你的歸納，請標示為「根據文章內容歸納」。
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">文章主題</h4>
+          <p class="detail-paragraph">社群媒體與公共討論</p>
+
+          <h4 class="example-heading">主要問題</h4>
+          <p class="detail-paragraph">（根據文章內容歸納）社群媒體對公共討論帶來哪些轉變與挑戰？我們該如何因應，以提升社群媒體上的公共參與品質？</p>
+
+          <h4 class="example-heading">文章重點</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">社群媒體<strong>降低了公共討論的門檻</strong>，讓資訊傳遞更快速，參與者也更廣泛。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">社群媒體的資訊傳播與平台演算法，可能導致<strong>錯誤資訊擴散</strong>及<strong>觀點單一化</strong>（迴聲室效應）。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">社群媒體上的討論容易受<strong>情緒影響</strong>，簡短、強烈的內容往往比細緻複雜的論述更容易獲得關注。</span></li>
+          </ol>
+
+          <h4 class="example-heading">文章提到的好處</h4>
+          <ul class="check-list">
+            <li>獲取資訊與表達意見的<strong>門檻較低</strong></li>
+            <li>資訊發布與回應十分<strong>即時、快速</strong></li>
+            <li>讓更多人有機會參與原本不易接近的議題</li>
+            <li>有利於社會議題被大眾看見</li>
+            <li>提供<strong>弱勢群體發聲的管道</strong></li>
+          </ul>
+
+          <h4 class="example-heading">文章提到的問題</h4>
+          <ul class="check-list">
+            <li>資訊查證速度跟不上傳播速度，<strong>錯誤資訊容易快速擴散</strong></li>
+            <li>平台演算法推薦相似內容，導致使用者較少接觸不同觀點</li>
+            <li>討論容易受到情緒影響</li>
+            <li>細緻、複雜且需時理解的內容較不易被看見</li>
+          </ul>
+
+          <h4 class="example-heading">可以延伸思考的問題</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">如何<strong>判斷資訊是否可靠</strong>？</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">如何<strong>避免只接觸單一觀點</strong>？</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如何在快速回應的環境中<strong>保留思考空間</strong>？</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習的重點是：<strong>先整理資料，不急著產生報告</strong>。
+        </p>
+      </div>
+
+      <!-- 練習 2 -->
+      <div class="case-header">
+        <p class="case-label">練習 2</p>
+        <h2 class="case-title">根據報告要求產生大綱</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是把<strong>文章內容</strong>和<strong>報告要求</strong>接起來。AI 不只要看文章，也要看報告要求。這樣產生的大綱才不會變成一般摘要，而是<strong>更接近報告需要的結構</strong>。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/article.txt 和 @./data/assignment.txt。<br/><br/>
+            請根據報告要求，幫我設計一份閱讀報告大綱。<br/><br/>
+            請注意：<br/>
+            1. 不要直接寫完整報告。<br/>
+            2. 不要加入文章沒有提到的資料。<br/>
+            3. 大綱要包含文章主題、重點整理、個人觀點、延伸問題。<br/>
+            4. 請標示每一段的寫作目的。<br/>
+            5. 個人觀點部分請只提供可選方向，不要替我決定最後立場。<br/><br/>
+            請用以下格式回答：<br/><br/>
+            　報告題目建議：<br/>
+            　整體寫作方向：<br/>
+            　段落大綱：<br/>
+            　第一段：<br/>
+            　- 寫作目的：<br/>
+            　- 可以寫的內容：<br/>
+            　……<br/>
+            　還需要自己補充或確認的地方：
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">報告題目建議</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">數位時代的公共對話：社群媒體對公共討論的機遇與挑戰</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">演算法、情緒與參與：社群媒體作為公共討論場域的反思</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如何在快速傳播中守護討論品質？論社群媒體與公共參與的未來</span></li>
+          </ol>
+
+          <h4 class="example-heading">整體寫作方向</h4>
+          <p class="detail-paragraph">
+            以「<strong>工具的正反面影響</strong>」為核心，分析社群媒體如何改變公共討論的型態，並探討在使用該工具時，個人與社會應如何建立判斷準則與規則。
+          </p>
+
+          <h4 class="example-heading">第一段：文章主題簡介</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">引出討論背景，說明社群媒體在現代公共生活中的角色。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">可以寫的內容</span>
+              <span class="role-item__desc">描述社群媒體已成為大眾獲取資訊、表達意見的主要空間；指出文章探討的核心問題：社群媒體的特性如何影響公共參與？</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">第二段：文章重點整理</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">歸納文章對社群媒體公共討論特性的觀察。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">可以寫的內容</span>
+              <span class="role-item__desc"><strong>優點</strong>：門檻降低、即時回應、弱勢群體的發聲機會。<strong>問題</strong>：資訊查證滯後、演算法導致的單一觀點推薦、情緒化內容排擠細緻論述。<strong>小結</strong>：社群媒體本質非絕對好壞，端看如何運用。</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">第三段：個人觀點（可選方向）</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">針對文章提出的論點進行深入探討或表達立場。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">方向 A</span>
+              <span class="role-item__desc">進一步討論「演算法」對資訊接收的限制 —— 「只看見自己想看見的」是否正削弱公共討論的基礎？</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">方向 B</span>
+              <span class="role-item__desc">討論「情緒與內容品質」的矛盾 —— 「強烈內容更容易被看見」對公共參與是助力還是阻力？</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">方向 C</span>
+              <span class="role-item__desc">討論「使用者、平台與社會」的共同責任 —— 在建立討論規則的過程中，哪一方角色最為關鍵？</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">第四段：結論與延伸思考</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">總結全文論點，並提出能引發後續思考的問題。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">可以寫的內容</span>
+              <span class="role-item__desc">回應文章結語：不應只討論「要不要用」，而應學習「如何有品質地使用」；提出延伸問題收束。</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">還需要自己補充或確認的地方</h4>
+          <ul class="check-list">
+            <li><strong>字數分配</strong>：報告要求 800–1200 字，由於文章內容較精簡，需要在「個人觀點」段落多論述。</li>
+            <li><strong>段落銜接</strong>：第三段（個人觀點）如何順暢地銜接回第四段（結論），須特別注意。</li>
+            <li><strong>確認內容來源</strong>：文章未提及具體平台名稱（如 Facebook、Twitter），撰寫時應避免使用具體案例。</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習的重點是：<strong>AI 可以幫忙搭架構，但不要替使用者決定最後觀點</strong>。
+        </p>
+      </div>
+
+      <!-- 練習 3 -->
+      <div class="case-header">
+        <p class="case-label">練習 3</p>
+        <h2 class="case-title">把大綱變成段落草稿</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 幫忙示範如何把大綱發展成段落。但這裡要注意：<strong>AI 產生的是草稿，不是最後版本</strong>。寫作者應該檢查內容是否符合自己的想法，也要避免直接把 AI 草稿當成正式報告。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/article.txt 和 @./data/assignment.txt。<br/><br/>
+            請根據文章內容和報告要求，示範產生一份「報告草稿初版」。<br/><br/>
+            請遵守以下規則：<br/>
+            1. 這只是草稿，不是最後版本。<br/>
+            2. 只能根據文章內容整理，不要加入外部資料。<br/>
+            3. 個人觀點請寫得保守一點，不要替我做太強烈的結論。<br/>
+            4. 請在最後列出「需要自己修改的地方」。<br/>
+            5. 請不要寫超過 900 字。<br/><br/>
+            請用以下格式回答：<br/><br/>
+            　報告草稿初版：<br/>
+            　需要自己修改的地方：
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            字數控制在約 750 字，預留空間供您後續擴充以符合報告任務要求的 800–1200 字範圍。
+          </p>
+
+          <h4 class="example-heading">報告草稿初版</h4>
+          <article class="prose-card">
+            <p><strong>題目</strong>：數位時代的公共對話：論社群媒體對公共參與的影響與省思</p>
+
+            <p><strong>一、文章主題簡介</strong></p>
+            <p>本文主要探討社群媒體在現代公共討論中所扮演的角色及其帶來的轉變。隨著資訊科技的發展，社群媒體已不再僅是社交工具，更成為大眾獲取資訊、表達意見與參與公共議題的重要場域。文章核心在於分析社群媒體如何透過其低門檻與高效率的特性改變討論型態，並同時指出這些特性背後隱藏的挑戰。</p>
+
+            <p><strong>二、文章重點整理</strong></p>
+            <p>根據文章所述，社群媒體對公共討論的貢獻主要體現在「近用性」與「即時性」。相較於傳統媒體，社群媒體降低了參與門檻，讓使用者能快速發布並回應訊息，使許多原本難以接近的議題能被更多人看見，甚至為弱勢群體提供了發聲的管道。</p>
+            <p>然而，這些特性也伴隨了顯著的問題：「查證與速度的落差」使錯誤資訊可能短時間擴散；「演算法的限制」使使用者較少接觸多元觀點；社群媒體上的討論「容易受情緒驅動」，簡短強烈的內容往往比細緻論述更容易獲得關注，這可能影響整體的討論品質。</p>
+
+            <p><strong>三、個人觀點</strong></p>
+            <p>針對文章提出的論點，我認為「使用品質」確實是當前公共參與中最值得關注的環節。文章提到，社群媒體的特性並非絕對的好與壞，這種觀點相對務實。在「資訊傳播」方面，我認同文章所說的查證風險；關於演算法造成的觀點單一化，這確實可能讓公共對話演變成同溫層內的取暖。我也進一步思考，<strong>「建立討論規則與判斷方式」不應只是使用者的責任，平台方與社會整體的規範也同樣關鍵</strong>。</p>
+
+            <p><strong>四、結論與延伸問題</strong></p>
+            <p>總結而言，社群媒體提供了一個快速且民主的參與空間，但也對資訊的判斷力與討論的品質提出了嚴峻挑戰。我們應從「如何判斷資訊可靠性」、「如何突破單一觀點」以及「如何在快速環境中保留思考」等面向著手，共同將社群媒體轉化為更有品質的公共場域。</p>
+          </article>
+
+          <h4 class="example-heading">需要自己修改的地方</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>字數擴充</strong>：目前約 750 字，距離 800–1200 字仍有差距。建議在「個人觀點」段落加入更多您的思考。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>文字修飾</strong>：草稿語氣較中規中矩。可依照自己的寫作風格調整語句修飾。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>銜接與轉折</strong>：可增加更多承上啟下的過渡句，讓文章讀起來更自然。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>確認引用</strong>：定稿前請再次核對草稿中標註「根據文章所述」的部分是否與原文相符。</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習可以讓人看到：<strong>從文章到草稿，不是一步跳過去</strong>，中間應該經過閱讀筆記和大綱。
+        </p>
+      </div>
+
+      <!-- 練習 4 -->
+      <div class="case-header">
+        <p class="case-label">練習 4</p>
+        <h2 class="case-title">檢查草稿是否符合要求</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 扮演<strong>草稿檢查助理</strong>。它不是直接重寫整篇文章，而是要先檢查：
+      </p>
+
+      <ul class="check-list">
+        <li>草稿有沒有<strong>符合報告要求</strong></li>
+        <li>有沒有<strong>漏掉重要部分</strong></li>
+        <li>哪裡<strong>太籠統</strong></li>
+        <li>哪裡需要<strong>補上自己的觀點</strong></li>
+        <li>哪裡需要<strong>重新組織</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這一步很適合放在<strong>正式修改前</strong>。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/assignment.txt 和 @./data/draft_v1.txt。<br/><br/>
+            請幫我檢查這份草稿是否符合報告要求。<br/><br/>
+            請注意：<br/>
+            1. 不要直接幫我重寫整篇。<br/>
+            2. 請先指出優點。<br/>
+            3. 再指出需要修改的地方。<br/>
+            4. 請把問題分成「結構問題」「內容問題」「表達問題」。<br/>
+            5. 最後請給我一份修改順序建議。<br/><br/>
+            請用以下格式回答：<br/><br/>
+            　草稿優點：<br/>
+            　結構問題：<br/>
+            　內容問題：<br/>
+            　表達問題：<br/>
+            　建議修改順序：
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">草稿優點</h4>
+          <ul class="check-list">
+            <li><strong>主題明確</strong>：清晰指出文章核心是社群媒體對公共討論的影響</li>
+            <li><strong>立場平衡</strong>：注意到「好處與壞處」的雙面性，符合文章基本觀點</li>
+            <li><strong>符合部分要求</strong>：包含個人觀點（針對假消息、演算法的看法）</li>
+          </ul>
+
+          <h4 class="example-heading">結構問題</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>段落不完整</strong>：報告要求四個部分，但草稿將「重點整理」與「個人觀點」混在一起，且<strong>缺少「延伸問題」</strong>。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>結論銜接感不足</strong>：結論略顯匆促，沒有深入總結前面提到的具體問題。</span></li>
+          </ol>
+
+          <h4 class="example-heading">內容問題</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>字數嚴重不足</strong>：報告要求 800–1200 字，目前約 250 字。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>重點整理不夠具體</strong>：「討論門檻降低」、「弱勢群體發聲」、「情緒化內容排擠細緻論述」等細節未被充分整理。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>個人觀點過於淺白</strong>：缺乏具體的「為什麼同意/不同意」邏輯推導。</span></li>
+          </ol>
+
+          <h4 class="example-heading">表達問題</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>口語化過重</strong>：「很重要」「很多人都會用」「有好處也有壞處」等較口語的表達。建議改為：「扮演關鍵角色」、「潛在優勢與衍生的挑戰」。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>句式重複</strong>：「…是…」、「我覺得…」、「…也提到…」結構單一。</span></li>
+          </ol>
+
+          <h4 class="example-heading">建議修改順序</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>補齊架構</strong>：先依照要求分出四個段落，補上「延伸問題」。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>擴展內容</strong>：把文章中的具體觀點補進「重點整理」段落，這會快速增加字數。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>深化觀點</strong>：選定一個點（如演算法或假消息），寫出為什麼是當前最重要的挑戰。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>精煉文字</strong>：把口語的語句改寫成正式的書面語。</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習的重點是：<strong>先診斷，再修改。不要一開始就叫 AI 重寫整篇</strong>。
+        </p>
+      </div>
+
+      <!-- 練習 5 -->
+      <div class="case-header">
+        <p class="case-label">練習 5</p>
+        <h2 class="case-title">根據檢查結果產生修訂版</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 根據前面的檢查方向，協助產生修訂版。這裡可以練習「修改」這個動作，但<strong>修改的對象是草稿，不是原始文章</strong>。
+      </p>
+
+      <ul class="check-list">
+        <li><strong>原始文章</strong>不能亂改</li>
+        <li><strong>報告要求</strong>不能亂改</li>
+        <li><strong>草稿</strong>可以修訂</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這是閱讀與寫作流程裡<strong>很重要的安全邊界</strong>。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/article.txt、@./data/assignment.txt 和 @./data/draft_v1.txt。<br/><br/>
+            請根據報告要求，協助把 draft_v1 修改成 draft_v2。<br/><br/>
+            請遵守以下規則：<br/>
+            1. 不要修改原始文章的意思。<br/>
+            2. 不要加入外部資料。<br/>
+            3. 請保留原草稿的主要想法，但讓結構更清楚。<br/>
+            4. 請補上 1 到 2 個延伸問題。<br/>
+            5. 請讓語氣比原草稿更適合正式報告。<br/>
+            6. 最後請列出你修改了哪些地方。<br/><br/>
+            請用以下格式回答：<br/><br/>
+            　修訂版草稿：<br/>
+            　主要修改說明：<br/>
+            　仍需要人工確認的地方：
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            這是修改後的 <code>draft_v2</code>，將原本較為口語的表達轉換為正式的報告語氣，並依任務要求補齊結構，同時在不加入外部資料的前提下深化文章內部的邏輯。
+          </p>
+
+          <h4 class="example-heading">修訂版草稿</h4>
+          <article class="prose-card">
+            <p><strong>題目</strong>：社群媒體與公共對話：論資訊傳播的機遇與挑戰</p>
+
+            <p><strong>一、文章主題簡介</strong></p>
+            <p>本文旨在探討社群媒體如何改變當代公共討論的型態。隨著科技發展，社群媒體已成為大眾獲取資訊、表達個人見解的主要空間。文章核心在於分析社群媒體相較於傳統媒體的特性 —— 如低參與門檻、即時回應性等 —— 如何一方面促進了公共參與的廣度，另一方面卻也對討論品質、資訊真偽及觀點多樣性提出了嚴峻的挑戰。</p>
+
+            <p><strong>二、文章重點整理</strong></p>
+            <p>社群媒體對公共參與具有顯著的正面意義。其「門檻較低」的特性，使更多人能快速發布訊息並即時回應他人觀點，讓原本不易接近的社會議題獲得曝光，並提供弱勢群體發聲的渠道。</p>
+            <p>然而，文章也指出伴隨而來的多重問題：「資訊查證的落差」使未經證實的錯誤資訊迅速擴散；「演算法的限制」使使用者陷入特定立場，減少接觸多元觀點的機會；「討論品質的質變」使強烈訴諸情緒的內容易被看見，而細緻具複雜度的論述容易被邊緣化。</p>
+
+            <p><strong>三、個人觀點</strong></p>
+            <p>我認為「在快速環境中保留思考空間」是數位公民最關鍵的課題。我非常認同文章所述，問題不在於「要不要使用」，而是我們如何應對。特別是在演算法的部分，當我們習慣於接收立場接近的資訊時，對於相異觀點的理解力與包容度便會隨之下降。建立一套透明且能提升討論品質的「規則」，<strong>不僅是使用者的責任，更是社群平台與整體社會必須共同面對的結構性問題</strong>。</p>
+
+            <p><strong>四、結論與延伸問題</strong></p>
+            <p>綜上所述，社群媒體雖然降低了參與門檻並促進了弱勢發聲，但若缺乏完善的資訊判斷力與良性的討論機制，其對公共領域的傷害亦不容忽視。我們應從被動的訊息接收者，轉向更具自覺的數位公民。</p>
+            <p>針對本文所引發的後續反思，提出兩個延伸問題：</p>
+            <ol class="prose-list">
+              <li>在追求即時性與流量的平台機制下，我們應如何設計或建立更有利於「細緻、複雜內容」被看見的討論規則？</li>
+              <li>除了個人自律，社會與平台方可以透過哪些機制，降低演算法導致的「單一觀點推薦」對公共討論造成的負面影響？</li>
+            </ol>
+          </article>
+
+          <h4 class="example-heading">主要修改說明</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>結構調整</strong>：嚴格依照任務要求的四個段落（簡介、重點整理、個人觀點、延伸問題）重新排列。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>語氣正式化</strong>：「很重要」→「扮演主要空間/關鍵角色」、「有好處也有壞處」→「具有正面意義…也伴隨多重問題」。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>內容擴充（不加外部資料）</strong>：透過重複利用文章中的關鍵字進行內部的邏輯延伸。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>補齊缺項</strong>：新增原本缺少的「延伸問題」段落。</span></li>
+          </ol>
+
+          <h4 class="example-heading">仍需要人工確認的地方</h4>
+          <ul class="check-list">
+            <li><strong>字數確認</strong>：修訂後約 650–700 字，仍未達 800–1200 字。建議在「個人觀點」中針對你同意或不同意的部分多寫一至兩段。</li>
+            <li><strong>立場確認</strong>：「個人觀點」中使用了較多「認同」「關鍵」等詞彙。如果有其他不同意文章的地方，請替換。</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這個練習可以讓 AI 參與修訂，<br/>
+          但<strong>它不是替人完成所有判斷</strong>。<br/>
+          它做的是：保留原本想法、改善結構、提醒缺漏、產生可以再修改的版本。
+        </p>
+      </div>
+
+      <!-- ============ Section: why we can revise ============ -->
+      <h2 class="detail-heading">為什麼這裡可以練習修改？</h2>
+      <p class="detail-paragraph">
+        前面整理 CSV 時，我們不建議讓 AI 直接修改原始資料。因為原始資料可能是<strong>報名資料、問卷資料、名單或其他紀錄</strong>，AI 自己改錯可能會造成實際影響。但在這裡可以練習修改的原因是：
+      </p>
+
+      <ul class="check-list">
+        <li>修改的是<strong>草稿</strong>，不是原始文章</li>
+        <li>修改的是<strong>表達方式與段落結構</strong>，不是憑空改變資料</li>
+        <li>修改後仍然<strong>需要人工確認</strong></li>
+        <li>原始檔案仍然保留，<strong>可以回頭對照</strong></li>
+      </ul>
+
+      <!-- ============ Section: what NOT to let AI do ============ -->
+      <h2 class="detail-heading">不要讓 AI 做的事</h2>
+      <p class="detail-paragraph">
+        閱讀與寫作流程裡，有幾件事不適合交給 AI 直接決定：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第一</span>
+          <span class="role-item__desc"><strong>不要讓 AI 假裝讀過沒有提供的資料。</strong>如果資料沒有放進檔案，就不要叫 AI 自己補。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第二</span>
+          <span class="role-item__desc"><strong>不要讓 AI 編造引用。</strong>如果要引用真實文章、書籍或網站，需要自己查證來源。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第三</span>
+          <span class="role-item__desc"><strong>不要讓 AI 直接決定你的立場。</strong>它可以提供幾個思考方向，但最後觀點要自己確認。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第四</span>
+          <span class="role-item__desc"><strong>不要讓 AI 把原文改成不同意思。</strong>原始文章是資料來源，不是草稿。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第五</span>
+          <span class="role-item__desc"><strong>不要把 AI 產生的版本直接當成最後版本。</strong>正式使用前仍然需要檢查。</span>
+        </li>
+      </ul>
+
+      <!-- ============ Section: command checklist ============ -->
+      <h2 class="detail-heading">設計指令時的小清單</h2>
+      <p class="detail-paragraph">
+        設計閱讀與寫作指令時，可以先問自己幾個問題：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">AI 要讀<strong>哪一份文章</strong>？</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">有沒有<strong>報告要求或寫作規則</strong>？</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">這一步是<strong>整理、規劃、寫草稿，還是檢查</strong>？</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">AI 可不可以<strong>加入外部資料</strong>？</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">哪些內容需要<strong>保留原意</strong>？</span></li>
+        <li><span class="numbered-list__num">6</span><span class="numbered-list__text">哪些地方<strong>只能提出建議，不能直接決定</strong>？</span></li>
+        <li><span class="numbered-list__num">7</span><span class="numbered-list__text">最後要輸出成<strong>筆記、大綱、草稿，還是修改建議</strong>？</span></li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          如果這些問題先想清楚，<strong>AI 的回覆通常會穩定很多</strong>。
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">這裡最重要的觀念</h2>
+      <p class="detail-paragraph">
+        閱讀與寫作流程，<strong>不是把文章丟給 AI，然後叫它直接寫完整報告</strong>。比較好的做法是：
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">先讀文章</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">整理筆記</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">對照要求</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">建立大綱</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">產生草稿</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">檢查和修訂</div>
+      </div>
+
+      <p class="detail-paragraph">
+        AI 很適合幫忙整理、提醒、檢查和改寫草稿。但<strong>它不應該取代閱讀，也不應該替人決定觀點</strong>。
+      </p>
+
+      <ul class="check-list">
+        <li><strong>文章</strong>是資料來源</li>
+        <li><strong>大綱</strong>是寫作路線</li>
+        <li><strong>草稿</strong>可以修改</li>
+        <li><strong>正式版本</strong>要自己確認</li>
+        <li><strong>重要判斷</strong>不要交給 AI 自己決定</li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          AI 變成助理，<br/>
+          不是寫作者本身。<br/>
+          <strong>讀的還是你，寫的還是你，判斷的還是你。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-reading {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code,
+  :global(.prose-card) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-list--compact {
+    gap: var(--space-2);
+    margin: var(--space-4) 0;
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-list--compact .role-item {
+    padding: var(--space-3);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 7rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__label--ord {
+    min-width: 6rem;
+    font-size: var(--text-base);
+  }
+
+  .role-list--compact .role-item__label--ord {
+    min-width: 7rem;
+    font-size: var(--text-sm);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* Prose card for sample article / assignment / draft contents */
+  .prose-card {
+    padding: var(--space-5) var(--space-6);
+    border-left: 3px solid var(--color-border);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    line-height: 2;
+  }
+
+  .prose-card__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    text-align: center;
+  }
+
+  .prose-card p {
+    margin: 0 0 var(--space-3);
+  }
+
+  .prose-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .prose-card strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .prose-list {
+    padding-left: 1.4em;
+    margin: 0 0 var(--space-3);
+  }
+
+  .prose-list li {
+    margin-bottom: var(--space-2);
+    line-height: 1.9;
+  }
+
+  .prose-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-item__label--ord {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+    }
+
+    .prose-card {
+      padding: var(--space-4);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

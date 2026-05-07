@@ -1,0 +1,1130 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Organizing CSV & Tabular Data — Using AI Agents for Real Tasks"
+  description="Have AI help you read tables, organize them, check them, and produce summaries you can keep using. Starting from an event sign-up CSV, you'll practice using Gemini CLI to read local files, run basic statistics, surface data issues, and finally draft a reminder."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-csv">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Putting AI Agents to Work on a First Real Task: Tabular Data</h1>
+        <p class="detail-subtitle">
+          AI workflows aren't about letting the model run wild. They're about <strong>breaking the task into clear steps</strong> and letting AI help inside a safe, checkable boundary. This page applies AI agents to a very common task: <strong>organizing CSV and tabular data</strong>.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        Whether it's an event sign-up sheet, survey results, a course roster, a reading list, or interview notes — most data ends up in a table. <strong>It looks simple, but cleaning it up usually surfaces several problems</strong>:
+      </p>
+
+      <ul class="cross-list">
+        <li><strong>Inconsistent formatting</strong> across rows</li>
+        <li>Some columns are <strong>blank</strong></li>
+        <li>The same meaning is written in <strong>different ways</strong></li>
+        <li><strong>Column names are unclear</strong></li>
+        <li>You want to summarize but <strong>don't know where to start</strong></li>
+        <li>You want a digest, but worry the <strong>AI will just make things up</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        So what we're practicing here isn't deep data analysis. It's:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Letting AI <strong>read, organize, and check tables</strong>,<br/>
+          and produce <strong>summaries you can keep using</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Section: build practice data ============ -->
+      <h2 class="detail-heading">Build a CSV practice file first</h2>
+      <p class="detail-paragraph">
+        We'll prepare an "<strong>event sign-up</strong>" sheet. In VS Code, create a project folder called <code>csv-agent-practice</code>, then a <code>data</code> folder inside it, and place <code>activity_signup.csv</code> there. The folder structure looks like:
+      </p>
+
+      <pre class="code-block" is:raw><code>csv-agent-practice
+└─ data
+   └─ activity_signup.csv</code></pre>
+
+      <p class="detail-paragraph">
+        File contents (save as <strong>CSV UTF-8</strong>):
+      </p>
+
+      <pre class="code-block" is:raw><code>name,department,session,diet,needs_certificate,notes
+Wang Xiaoming,Chinese Y2,Morning,Meat,Yes,
+Li Jiaying,History Y3,Afternoon,Vegetarian,No,Wants front row
+Chen Boyu,Sociology Y1,Morning,,Yes,Diet not filled
+Lin Yijun,Foreign Lang Y4,Afternoon,Meat,Yes,
+Zhang Tingxuan,Psychology Y2,Morning,Vegetarian,Yes,Will be 10 min late
+Huang Zihao,Communication Y3,Afternoon,Meat,No,
+Wu Yating,Education Y1,Morning,Vegetarian,Yes,
+Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
+
+      <p class="detail-paragraph">
+        Viewed as a table, it looks like:
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Session</th>
+              <th>Diet</th>
+              <th>Needs Cert.</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Wang Xiaoming</td><td>Chinese Y2</td><td>Morning</td><td>Meat</td><td>Yes</td><td></td></tr>
+            <tr><td>Li Jiaying</td><td>History Y3</td><td>Afternoon</td><td>Vegetarian</td><td>No</td><td>Wants front row</td></tr>
+            <tr><td>Chen Boyu</td><td>Sociology Y1</td><td>Morning</td><td class="csv-empty">—</td><td>Yes</td><td>Diet not filled</td></tr>
+            <tr><td>Lin Yijun</td><td>Foreign Lang Y4</td><td>Afternoon</td><td>Meat</td><td>Yes</td><td></td></tr>
+            <tr><td>Zhang Tingxuan</td><td>Psychology Y2</td><td>Morning</td><td>Vegetarian</td><td>Yes</td><td>Will be 10 min late</td></tr>
+            <tr><td>Huang Zihao</td><td>Communication Y3</td><td>Afternoon</td><td>Meat</td><td>No</td><td></td></tr>
+            <tr><td>Wu Yating</td><td>Education Y1</td><td>Morning</td><td>Vegetarian</td><td>Yes</td><td></td></tr>
+            <tr><td>Zheng Yuxiang</td><td>Law Y2</td><td>Afternoon</td><td class="csv-empty">—</td><td>No</td><td>Diet not filled</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        It's a small dataset, but a good practice fit because it contains several common situations:
+      </p>
+
+      <ul class="check-list">
+        <li>Some people <strong>didn't fill in their diet</strong></li>
+        <li>The notes column is <strong>partly empty</strong>, partly contains <strong>extra requests</strong></li>
+        <li>You may want to know <strong>how many people are in each session</strong></li>
+        <li>You may want to list <strong>who needs an attendance certificate</strong></li>
+        <li>You may want AI to help <strong>check whether the data is complete</strong></li>
+      </ul>
+
+      <!-- ============ Section: read CSV file ============ -->
+      <h2 class="detail-heading">Let Gemini CLI read a local file</h2>
+      <p class="detail-paragraph">
+        The exercise is <strong>not</strong> to paste CSV content into the prompt — it's to let Gemini CLI read a local file. Gemini CLI can use <code>@file_path</code> to add a file or folder's contents to the prompt; given a single file path, it reads that file.
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text">Open the folder you just created — <code>csv-agent-practice</code> — in <strong>VS Code</strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text">Open a terminal (<strong>Terminal → New Terminal</strong>) and confirm the working directory is <code>csv-agent-practice</code>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text">Run <code>uv init</code> to <strong>initialize the project</strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">4</span>
+          <span class="numbered-list__text">Run <code>gemini</code> to <strong>start Gemini CLI</strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">5</span>
+          <span class="numbered-list__text">Each exercise below uses this file path: <code>@./data/activity_signup.csv</code>.</span>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>@./data/activity_signup.csv</code> means: please ask Gemini CLI to read <code>activity_signup.csv</code> in the <code>data</code> folder under the current project directory.
+        </p>
+      </div>
+
+      <!-- ============ Part: practice ============ -->
+      <div class="part-divider">
+        <span class="part-label">PRACTICE</span>
+        <span class="part-text">Prompt Exercises</span>
+      </div>
+
+      <p class="detail-paragraph">
+        Run the four exercises below in order. <strong>At each step, confirm the AI got it right</strong> before moving on. If something looks off, stop and fix it — don't rush ahead.
+      </p>
+
+      <!-- Exercise 1 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 1</p>
+        <h2 class="case-title">First, make sure the AI understands the data</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        The goal is to confirm whether the AI has actually understood the data. <strong>Don't rush into counting people or producing announcements yet.</strong> Confirm three things first:
+      </p>
+
+      <ul class="check-list">
+        <li>Did the AI <strong>read the right file</strong>?</li>
+        <li>Does it <strong>understand the column names</strong>?</li>
+        <li>Does it know <strong>what questions this dataset can answer</strong>?</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        If the AI misreads a column up front, every later step inherits that mistake.
+      </p>
+
+      <p class="prompt-label">Prompt example</p>
+      <blockquote class="prompt-example">
+        Please read @./data/activity_signup.csv.<br/><br/>
+        Don't analyze counts yet, and don't produce any announcement.<br/><br/>
+        Please summarize:<br/>
+        1. What columns does this file contain?<br/>
+        2. What does each column mean?<br/>
+        3. What kinds of questions is this data suitable for answering?<br/>
+        4. Where might human verification be needed?<br/><br/>
+        Answer based only on the file contents — don't invent data that isn't there.
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">1. What columns does this file contain?</h4>
+          <p class="detail-paragraph">The file contains 6 columns: name, department, session, diet, needs_certificate, notes.</p>
+
+          <h4 class="example-heading">2. What does each column mean?</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label">name</span>
+              <span class="role-item__desc">The participant's name</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">department</span>
+              <span class="role-item__desc">Department and year (e.g. Chinese Y2, History Y3)</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">session</span>
+              <span class="role-item__desc">Time slot they registered for (Morning or Afternoon)</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">diet</span>
+              <span class="role-item__desc">Dietary preference (Meat, Vegetarian, or blank)</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">needs_certificate</span>
+              <span class="role-item__desc">Whether they need an attendance certificate (Yes / No)</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">notes</span>
+              <span class="role-item__desc">Extra requests or context (e.g. wants front row, will be late, diet not filled)</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">3. What questions can this data answer?</h4>
+          <ul class="check-list">
+            <li>Who registered for the morning session, and who for the afternoon?</li>
+            <li>What department / year does a given participant belong to?</li>
+            <li>Who has a clearly filled-in dietary preference?</li>
+            <li>Who has additional requests in the notes column?</li>
+            <li>Who needs an attendance certificate?</li>
+          </ul>
+
+          <h4 class="example-heading">4. Where might human verification be needed?</h4>
+          <ul class="check-list">
+            <li>Chen Boyu and Zheng Yuxiang's <strong>diet column is blank</strong>; the notes column says "Diet not filled," but their actual preference still needs to be confirmed</li>
+            <li>Li Jiaying wants to <strong>sit in the front row</strong> — confirm whether the venue can accommodate this</li>
+            <li>Zhang Tingxuan said she <strong>will be 10 minutes late</strong> — confirm whether this affects check-in</li>
+            <li>The department format ("Department + Year") could be checked for consistency across rows</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point of this response isn't depth of analysis — it's <strong>confirming whether the AI has actually understood the data structure</strong>.
+        </p>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 2</p>
+        <h2 class="case-title">Run basic statistics</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        The goal is to have the AI run <strong>simple categorical counts</strong> on the CSV — how many people per session, how many vegetarians, who needs a certificate. This step turns one flat table into <strong>something easier to read at a glance</strong>.
+      </p>
+
+      <p class="prompt-label">Prompt example</p>
+      <blockquote class="prompt-example">
+        Please read @./data/activity_signup.csv and produce basic statistics from the file contents.<br/><br/>
+        Please answer:<br/>
+        1. How many people in the morning session? List names.<br/>
+        2. How many in the afternoon session? List names.<br/>
+        3. How many meat-eaters? List names.<br/>
+        4. How many vegetarians? List names.<br/>
+        5. How many people have a blank or missing diet? List names.<br/>
+        6. How many people need a certificate? List names.<br/><br/>
+        Please present the results in a table.<br/>
+        Use only the contents of the file — don't add anything or guess.
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">Basic statistics from the file:</p>
+
+          <div class="csv-table-wrapper">
+            <table class="csv-table csv-table--stat">
+              <thead>
+                <tr><th>Item</th><th>Count</th><th>Names</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Morning session</td><td class="csv-num">4</td><td>Wang Xiaoming, Chen Boyu, Zhang Tingxuan, Wu Yating</td></tr>
+                <tr><td>Afternoon session</td><td class="csv-num">4</td><td>Li Jiaying, Lin Yijun, Huang Zihao, Zheng Yuxiang</td></tr>
+                <tr><td>Meat</td><td class="csv-num">3</td><td>Wang Xiaoming, Lin Yijun, Huang Zihao</td></tr>
+                <tr><td>Vegetarian</td><td class="csv-num">3</td><td>Li Jiaying, Zhang Tingxuan, Wu Yating</td></tr>
+                <tr><td>Diet not filled</td><td class="csv-num">2</td><td>Chen Boyu, Zheng Yuxiang</td></tr>
+                <tr><td>Needs certificate</td><td class="csv-num">5</td><td>Wang Xiaoming, Chen Boyu, Lin Yijun, Zhang Tingxuan, Wu Yating</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 class="example-heading">Notes on the statistics</h4>
+          <ul class="check-list">
+            <li><strong>Session split</strong>: Morning and afternoon each have 4 people</li>
+            <li><strong>Diet</strong>: 3 meat-eaters, 3 vegetarians, 2 blanks</li>
+            <li><strong>Certificate</strong>: 5 people marked "Yes" under needs_certificate</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>AI is good at organizing, but a human still needs to check.</strong> The risk of miscounting grows with row count, so before any official use, verify with a spreadsheet or script as well.
+        </p>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 3</p>
+        <h2 class="case-title">Surface the data issues that need handling</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        The goal is to have the AI help <strong>check whether the data is complete</strong>. Cleaning up a table is rarely just about counting — it's also about finding:
+      </p>
+
+      <ul class="check-list">
+        <li>Where it's <strong>blank</strong></li>
+        <li>What needs to be <strong>verified</strong></li>
+        <li>Which fields will <strong>affect later arrangements</strong></li>
+        <li>Which gaps the <strong>AI must not fill in by itself</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        The point isn't to ask the AI to modify data — it's to <strong>have the AI flag issues so a human can verify them</strong>.
+      </p>
+
+      <p class="prompt-label">Prompt example</p>
+      <blockquote class="prompt-example">
+        Please read @./data/activity_signup.csv and check this dataset for anything that needs human verification.<br/><br/>
+        Please specifically check:<br/>
+        1. Which columns are blank?<br/>
+        2. Which entries could affect later arrangements?<br/>
+        3. Whose data needs to be re-confirmed?<br/>
+        4. Which gaps must NOT be filled in by AI?<br/><br/>
+        Please answer in this format:<br/><br/>
+        　Data issues:<br/>
+        　People to verify:<br/>
+        　Possible impact:<br/>
+        　Recommended next step:<br/><br/>
+        Don't modify the original file, and don't fill in answers for blank fields.
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">Data issues</h4>
+          <ol class="numbered-list">
+            <li>
+              <span class="numbered-list__num">1</span>
+              <span class="numbered-list__text"><strong>Blank columns</strong>: diet — Chen Boyu, Zheng Yuxiang; notes — Wang Xiaoming, Lin Yijun, Huang Zihao, Wu Yating.</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">2</span>
+              <span class="numbered-list__text"><strong>Special notes</strong>: Li Jiaying wants the front row; Zhang Tingxuan will be 10 minutes late.</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">3</span>
+              <span class="numbered-list__text"><strong>Gaps the AI shouldn't fill</strong>: diet is a personal health or belief preference — guessing wrong could create safety problems. Notes about seating or timing involve personal preferences and must be filled based on actual communication.</span>
+            </li>
+          </ol>
+
+          <h4 class="example-heading">People to verify</h4>
+          <ul class="check-list">
+            <li><strong>Chen Boyu, Zheng Yuxiang</strong>: confirm their actual diet</li>
+            <li><strong>Li Jiaying</strong>: confirm whether the venue can accommodate her seating request</li>
+            <li><strong>Zhang Tingxuan</strong>: confirm whether being 10 minutes late means missing key items (e.g. check-in materials)</li>
+          </ul>
+
+          <h4 class="example-heading">Possible impact</h4>
+          <ul class="check-list">
+            <li><strong>Catering</strong>: missing diet info could lead to wrong meal counts or types on the day</li>
+            <li><strong>Venue setup</strong>: an unconfirmed seating request can create on-site adjustment problems</li>
+            <li><strong>Check-in flow</strong>: a late arrival may slow the start or require extra staff to direct her</li>
+          </ul>
+
+          <h4 class="example-heading">Recommended next step</h4>
+          <ul class="check-list">
+            <li><strong>Reach out</strong> to Chen Boyu and Zheng Yuxiang to confirm diet, then update the data</li>
+            <li>Reply to Li Jiaying about her seat, and mark "arranged" or "depends on venue" in the list</li>
+            <li>Notify check-in staff that Zhang Tingxuan will be late, and reserve her materials</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The AI should <strong>not fill in blanks on its own</strong>.<br/>
+          It should <strong>flag the issues and remind the user to verify</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        This mirrors a workflow principle from earlier: <strong>when data is missing, stop. Don't guess</strong>.
+      </p>
+
+      <!-- Exercise 4 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 4</p>
+        <h2 class="case-title">Turn the data into a draft event reminder</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        The previous three exercises walked through "<strong>understand → count → flag</strong>." Now we can have the AI draft an event reminder from the data — but <strong>still not publish anything directly</strong>. The safer pattern is:
+      </p>
+
+      <ul class="check-list">
+        <li>Have the AI produce a <strong>draft</strong></li>
+        <li>Have the AI list a <strong>data summary</strong></li>
+        <li>Have the AI surface <strong>what still needs human verification</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Whether to publish remains a human decision.
+      </p>
+
+      <p class="prompt-label">Prompt example</p>
+      <blockquote class="prompt-example">
+        Please read @./data/activity_signup.csv and produce a pre-event reminder draft based on the file contents.<br/><br/>
+        Please follow these rules:<br/>
+        1. Use only data that appears in the CSV.<br/>
+        2. Don't publicly list every participant's name.<br/>
+        3. Remind participants to attend the session they registered for.<br/>
+        4. Remind people whose diet is blank to fill it in soon.<br/>
+        5. Remind people who need a certificate to follow the organizer's instructions afterward.<br/>
+        6. This is a draft only — don't publish it on my behalf.<br/>
+        7. At the end, list what still needs human verification.<br/><br/>
+        Please answer in this format:<br/><br/>
+        　Reminder draft:<br/>
+        　Data summary:<br/>
+        　Items needing human verification:
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">Reminder draft</h4>
+          <blockquote class="prompt-example">
+            [Pre-event Notice & Reminder]<br/><br/>
+            Hello everyone — the event is approaching. Please note the following:<br/><br/>
+            1. <strong>Session confirmation</strong>: please attend the session you registered for (morning or afternoon).<br/>
+            2. <strong>Diet info</strong>: a few participants haven't filled in the diet field yet. To ensure correct catering, please contact the organizer to update it.<br/>
+            3. <strong>Certificate pickup</strong>: those who selected "Needs certificate" can pick it up after the event according to on-site staff guidance.<br/>
+            4. <strong>Special notes</strong>: if you submitted a special request (seating, timing) at registration, the organizer has it on record. Please follow on-site arrangements on the day.
+          </blockquote>
+
+          <h4 class="example-heading">Data summary</h4>
+          <ul class="check-list">
+            <li>Total registrations: <strong>8</strong></li>
+            <li>Session split: 4 morning, 4 afternoon</li>
+            <li>Certificate: <strong>5</strong> need an attendance certificate</li>
+            <li>Diet: 3 meat, 3 vegetarian, 2 blank</li>
+            <li>Special requests: 1 seating request, 1 expected late arrival</li>
+          </ul>
+
+          <h4 class="example-heading">Items needing human verification</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Diet follow-up</strong>: contact "Chen B." and "Zheng Y." to confirm their preferences.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Seating reply</strong>: confirm front-row arrangement for "Li J." and tag the seating chart.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Check-in prep</strong>: notify check-in staff that "Zhang T." will be 10 minutes late so her materials are reserved.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Certificate prep</strong>: cross-check the 5 people needing certificates and prepare the documents in advance.</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This exercise has stepped into <strong>"draft-style workflows."</strong> The AI is no longer just counting — it's <strong>turning organized table data into usable text</strong>. The final review still belongs to a human.
+        </p>
+      </div>
+
+      <!-- ============ Section: troubleshoot ============ -->
+      <h2 class="detail-heading">If Gemini CLI can't find the file</h2>
+      <p class="detail-paragraph">
+        Sometimes Gemini CLI will report that it <strong>can't find the file</strong>. In that case, check a few things:
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text">Confirm the file <strong>actually exists</strong>: <code>csv-agent-practice/data/activity_signup.csv</code>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text">Confirm you <strong>started Gemini CLI from inside</strong> <code>csv-agent-practice</code>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text">Confirm the path in your prompt is <code>@./data/activity_signup.csv</code>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">4</span>
+          <span class="numbered-list__text">If the folder or filename <strong>contains spaces</strong>, avoid them, or escape the path according to the tool's rules.</span>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          When starting out, stick to <strong>letters, numbers, underscores, or hyphens</strong> for folder and file names — e.g. <code>data</code>, <code>activity_signup.csv</code>, <code>course_feedback.csv</code>, <code>reading_list.csv</code>. Fewer surprises that way.
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">The most important idea on this page</h2>
+      <p class="detail-paragraph">
+        Organizing CSV and tabular data is <strong>not "hand the data to AI and let it freestyle."</strong> A more reliable approach is:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">First, have the AI <strong>read the file</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Then, have it <strong>understand the columns</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Next, run <strong>basic statistics</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Then, <strong>flag the data issues</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Only at the end, produce a <strong>summary or draft</strong></span></li>
+      </ol>
+
+      <p class="detail-paragraph">
+        The benefit: <strong>every step is checkable</strong>. If column understanding is wrong at step 1, you stop right there. If counting goes sideways, you can roll back. When data is missing, don't let the AI guess.
+      </p>
+
+      <ul class="check-list">
+        <li>The table is the <strong>source of truth</strong></li>
+        <li>The AI is an <strong>organizing assistant</strong></li>
+        <li>Don't <strong>casually modify the original data</strong></li>
+        <li>The final call still belongs to <strong>a human</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          AI is good at helping organize tabular data,<br/>
+          but its job is to <strong>assist</strong>, not to <strong>replace</strong>.<br/>
+          The final decision still rests with <strong>a person</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-csv {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-list--compact {
+    gap: var(--space-2);
+    margin: var(--space-4) 0;
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-list--compact .role-item {
+    padding: var(--space-3);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-list--compact .role-item__label {
+    min-width: 9rem;
+    font-size: var(--text-sm);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 0;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-label {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 0.02em;
+  }
+
+  .prompt-label::before {
+    content: '✦ ';
+    color: var(--color-accent);
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* CSV preview table */
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .csv-empty {
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  .csv-num {
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-accent);
+    width: 4rem;
+  }
+
+  .csv-table--stat tbody td:first-child {
+    font-weight: 600;
+    color: var(--color-heading);
+    white-space: nowrap;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-list--compact .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block,
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

@@ -1,0 +1,1429 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="AI 工作流設計與執行檢核指南 — AI Agent 拼圖"
+  description="一份在動手前可以對照的 AI 工作流檢查表：任務目標、資料來源、步驟、工具、輸出格式、停止條件、人工確認、修改範圍、隱私安全、結果檢查。把任務拆清楚之後，AI 才能在安全、可檢查的範圍裡幫忙。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-checklist">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">動手前先對一次的 AI 工作流檢查表</h1>
+        <p class="detail-subtitle">
+          前面已經練習過幾種 AI 工作流：整理 CSV 與表格資料、用 Notion API 建立與更新任務、從文章整理閱讀筆記再產生報告大綱與草稿修訂。這些任務看起來不太一樣，但背後其實有一個共同原則：<strong>不要一開始就叫 AI 做完整件事</strong>。
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        比較好的做法是：
+      </p>
+
+      <ul class="check-list">
+        <li>先<strong>確認目標</strong></li>
+        <li>再<strong>確認資料來源</strong></li>
+        <li>接著<strong>拆成步驟</strong></li>
+        <li>然後決定<strong>哪些地方需要工具</strong></li>
+        <li>最後<strong>檢查結果</strong>，保留人工確認</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這一頁不是要再做新的工具，而是整理一份「<strong>AI 工作流使用檢查表</strong>」。以後不管你要請 AI 整理資料、寫草稿、操作 Notion、讀檔案、呼叫 API，都可以先用這份清單檢查一次。
+      </p>
+
+      <h2 class="detail-heading">為什麼需要檢查表？</h2>
+      <p class="detail-paragraph">
+        很多 AI 錯誤<strong>不一定是工具壞掉</strong>，而是因為一開始的任務沒有講清楚：
+      </p>
+
+      <ul class="cross-list">
+        <li>沒有說<strong>資料來源</strong></li>
+        <li>沒有說<strong>輸出格式</strong></li>
+        <li>沒有說<strong>哪些事不能做</strong></li>
+        <li>沒有說<strong>失敗時要停下來</strong></li>
+        <li>沒有說<strong>最後是否需要人工確認</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這時候 AI 可能會自己補空白。但 AI 補出來的內容，<strong>不一定是真的，也不一定符合我們要的結果</strong>。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          檢查表的目的，就是<strong>讓工作流更清楚、更安全，也更容易回頭檢查</strong>。
+        </p>
+      </div>
+
+      <!-- ============ Quick Checklist ============ -->
+      <h2 class="detail-heading">快速檢查表（時間很短時用這份）</h2>
+      <p class="detail-paragraph">
+        每次使用 AI 工作流前，先檢查這 8 件事：
+      </p>
+
+      <div class="checklist-group">
+        <ul class="checklist-group__list">
+          <li>我有沒有<strong>說清楚任務目標</strong>？</li>
+          <li>我有沒有<strong>提供資料來源</strong>？</li>
+          <li>我有沒有說 AI <strong>只能根據哪些資料回答</strong>？</li>
+          <li>我有沒有把<strong>任務拆成步驟</strong>？</li>
+          <li>我有沒有<strong>指定輸出格式</strong>？</li>
+          <li>我有沒有說明什麼情況下<strong>要停下來</strong>？</li>
+          <li>我有沒有說哪些動作<strong>需要人工確認</strong>？</li>
+          <li>我有沒有<strong>檢查最後結果</strong>？</li>
+        </ul>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          如果這 8 題裡有好幾題答不出來，代表這個任務<strong>還不適合直接交給 AI</strong>。先把任務講清楚，再開始操作，通常會比較穩。
+        </p>
+      </div>
+
+      <!-- ============ PART 1: 10 個檢查項目 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">10 個檢查項目（詳細版）</span>
+      </div>
+
+      <p class="detail-paragraph">
+        每一項都可以展開，看更詳細的說明、可以問自己的問題，以及範例指令。
+      </p>
+
+      <!-- Item 1 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">1</span>
+          <span class="details-card__title">任務目標是否清楚？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            第一個要檢查的是：<strong>這個工作流最後到底要完成什麼</strong>？不要只說「幫我處理這份資料」，這句話太模糊 —— AI 不知道你要它統計、摘要、檢查、分類，還是產生草稿。
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較清楚的說法</span>
+              <p>請根據這份 CSV，整理活動報名人數，找出飲食需求未填的人，最後產生一段活動提醒草稿。</p>
+            </div>
+          </div>
+
+          <p class="detail-paragraph">
+            這樣 AI 就知道最後要完成的是：<strong>整理人數 → 找出問題 → 產生提醒草稿</strong>。
+          </p>
+
+          <h4 class="example-heading">可以問自己的問題</h4>
+          <ul class="check-list">
+            <li>我想得到<strong>什麼結果</strong>？</li>
+            <li>這個結果是<strong>表格、清單、摘要，還是草稿</strong>？</li>
+            <li>這個任務是<strong>整理資料，還是執行動作</strong>？</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 2 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">2</span>
+          <span class="details-card__title">資料來源是否明確？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            AI 回答時，應該要知道<strong>自己根據什麼資料</strong>。資料來源可能是：
+          </p>
+
+          <ul class="check-list">
+            <li>CSV 檔案</li>
+            <li>Notion 資料庫</li>
+            <li>文章檔案</li>
+            <li>報告要求</li>
+            <li>API 回傳結果</li>
+            <li>使用者提供的一段文字</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            如果沒有說清楚資料來源，AI 可能會用自己的背景知識補內容。處理資料、報告、任務、公告時，這樣很容易出錯。
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--bad">
+              <span class="compare-pair__label">不夠清楚的寫法</span>
+              <p>幫我整理一下。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較清楚的寫法</span>
+              <p>請讀取 @./data/activity_signup.csv，只根據這個檔案內容整理，不要加入檔案外的資料。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請根據 Notion 工具回傳的任務資料整理，不要自行假設 Notion 裡還有其他任務。</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">可以問自己的問題</h4>
+          <ul class="check-list">
+            <li>AI 需要讀<strong>哪一份資料</strong>？</li>
+            <li>這份資料是否<strong>完整</strong>？</li>
+            <li>AI 可不可以<strong>使用外部資料</strong>？</li>
+            <li>如果<strong>資料不足</strong>，AI 應該怎麼做？</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 3 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">3</span>
+          <span class="details-card__title">任務是否已經拆成步驟？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            很多任務不是一步完成的。例如「<strong>產生一段活動提醒</strong>」其實可能包含：讀取報名資料、統計場次人數、找出未填資料、整理注意事項、產生草稿、列出需要人工確認的地方。
+          </p>
+
+          <p class="detail-paragraph">
+            如果直接說「<strong>幫我寫活動提醒</strong>」，AI 可能會跳過前面的檢查，直接寫出一段看起來合理的文字。但我們比較希望它<strong>一步一步做</strong>。
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較好的寫法</span>
+              <p>
+                請依照以下步驟完成：<br/>
+                1. 先讀取 CSV 資料。<br/>
+                2. 整理上午場與下午場人數。<br/>
+                3. 找出飲食需求未填的人。<br/>
+                4. 根據整理結果產生活動提醒草稿。<br/>
+                5. 最後列出需要人工確認的地方。<br/><br/>
+                如果前面資料不足，請先停止，不要直接寫草稿。
+              </p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">可以問自己的問題</h4>
+          <ul class="check-list">
+            <li>這件事可以拆成<strong>哪些小步驟</strong>？</li>
+            <li>哪一步<strong>需要先完成</strong>？</li>
+            <li>哪一步<strong>出錯時應該停下來</strong>？</li>
+            <li>哪些步驟<strong>只是整理</strong>，哪些步驟<strong>會改資料</strong>？</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 4 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">4</span>
+          <span class="details-card__title">哪些步驟需要工具？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            <strong>不是每一步都需要 MCP Tool</strong>。有些步驟只是整理文字，AI 可以直接完成。有些步驟才需要工具，例如：
+          </p>
+
+          <ul class="check-list">
+            <li>讀取 Notion 任務</li>
+            <li>建立 Notion 頁面</li>
+            <li>更新 Notion 狀態</li>
+            <li>查詢 API 資料</li>
+            <li>讀取本機檔案</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            <strong>工具不是越多越好</strong>。工具越多，風險也越高。
+          </p>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              需要外部資料時才用工具，<br/>
+              需要建立或更新資料時才用工具，<br/>
+              只是<strong>摘要、分類、檢查</strong>時，<strong>不一定要做成工具</strong>。
+            </p>
+          </div>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較好的指令寫法</span>
+              <p>請先使用 notion-classroom 工具讀取狀態為「待確認」的任務。讀取後先整理結果，<strong>不要直接更新任何任務</strong>。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請使用 weather-api 工具查詢天氣。如果查詢成功，再根據工具回傳資料產生提醒。<strong>如果查詢失敗，請停止，不要自己猜天氣</strong>。</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">可以問自己的問題</h4>
+          <ul class="check-list">
+            <li>這一步<strong>真的需要工具</strong>嗎？</li>
+            <li>AI 只是整理文字，還是需要<strong>讀取外部資料</strong>？</li>
+            <li>AI 會不會<strong>寫入或修改資料</strong>？</li>
+            <li>這個工具的<strong>權限是否太大</strong>？</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 5 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">5</span>
+          <span class="details-card__title">輸出格式是否固定？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            如果 AI 每次回覆格式都不一樣，後面就很難接下一步。有時候回一段文字、有時候回表格、有時候回很長的分析、有時候又省略資料來源。<strong>所以最好一開始就要求固定格式</strong>。
+          </p>
+
+          <h4 class="example-heading">範例一：資料整理格式</h4>
+          <blockquote class="prompt-example">
+            請用以下格式回答：<br/><br/>
+            　資料概況：<br/>
+            　資料問題：<br/>
+            　基本統計：<br/>
+            　需要人工確認的地方：
+          </blockquote>
+
+          <h4 class="example-heading">範例二：草稿檢查格式</h4>
+          <blockquote class="prompt-example">
+            請用以下格式回答：<br/><br/>
+            　草稿優點：<br/>
+            　結構問題：<br/>
+            　內容問題：<br/>
+            　表達問題：<br/>
+            　建議修改順序：
+          </blockquote>
+
+          <h4 class="example-heading">範例三：工具執行結果格式</h4>
+          <blockquote class="prompt-example">
+            請用以下格式回答：<br/><br/>
+            　執行狀態：<br/>
+            　使用的工具：<br/>
+            　工具回傳摘要：<br/>
+            　是否成功：<br/>
+            　下一步建議：
+          </blockquote>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              固定格式的好處：<strong>人比較容易看，AI 也比較容易接著處理；出了問題時，也比較容易知道是哪一步出錯</strong>。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 6 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">6</span>
+          <span class="details-card__title">有沒有設定停止條件？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            好的工作流，不是每次都硬做到底。有些情況應該停下來，例如：
+          </p>
+
+          <ul class="cross-list">
+            <li>資料<strong>沒有提供</strong></li>
+            <li>檔案<strong>讀不到</strong></li>
+            <li>API <strong>查詢失敗</strong></li>
+            <li>欄位內容<strong>不完整</strong></li>
+            <li>使用者沒有提供<strong>截止日</strong></li>
+            <li>任務牽涉<strong>發布、寄信、刪除、修改正式資料</strong></li>
+            <li>AI <strong>不確定應該使用哪個工具</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            這些時候，<strong>AI 不應該自己猜</strong>。可以加入這些句子：
+          </p>
+
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">如果<strong>資料不足</strong>，請先停止，並說明缺少什麼。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">如果<strong>工具回傳失敗</strong>，請不要補寫答案。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如果需要<strong>發布、寄信、刪除或修改資料</strong>，請先產生草稿，等我確認。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">如果你<strong>不確定要使用哪個工具</strong>，請先詢問，不要自行選擇。</span></li>
+          </ol>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              停止條件不是讓 AI 變慢，而是<strong>避免 AI 在資料不足時做出錯誤動作</strong>。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 7 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">7</span>
+          <span class="details-card__title">哪些地方需要人工確認？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            AI 可以幫忙整理很多東西。但有些地方還是應該<strong>由人確認</strong>：
+          </p>
+
+          <ul class="check-list">
+            <li>公告是否<strong>可以發布</strong></li>
+            <li>信件是否<strong>可以寄出</strong></li>
+            <li>Notion 狀態是否<strong>真的要更新</strong></li>
+            <li>資料缺漏是否<strong>要補</strong></li>
+            <li>報告立場是否<strong>符合自己的想法</strong></li>
+            <li>草稿是否<strong>可以當作正式版本</strong></li>
+            <li>是否涉及<strong>個資或不適合公開的內容</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            可以在指令最後加上一句很簡單但很有用的話：
+          </p>
+
+          <blockquote class="prompt-example">
+            最後請列出<strong>需要人工確認的地方</strong>。
+          </blockquote>
+
+          <p class="detail-paragraph">
+            它可以讓 AI <strong>不只是完成任務，也幫我們提醒風險</strong>。
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">範例</span>
+              <p>請產生活動提醒草稿，但<strong>不要替我發布</strong>。最後請列出公告前需要人工確認的地方。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請協助修改草稿，但<strong>不要改變原始文章的意思</strong>。最後請列出仍需要人工確認的地方。</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 8 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">8</span>
+          <span class="details-card__title">是否涉及修改或寫入？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            AI 工作流裡，<strong>最需要小心的是「修改」和「寫入」</strong>。因為這些動作會改變資料：新增 Notion 任務、更新任務狀態、修改草稿、建立頁面、更新欄位。這些不是不能做，但要先確認：
+          </p>
+
+          <ul class="check-list">
+            <li><strong>修改的是什麼</strong>？</li>
+            <li><strong>修改範圍有多大</strong>？</li>
+            <li><strong>能不能回復</strong>？</li>
+            <li>是否<strong>需要人工確認</strong>？</li>
+            <li>AI 是否<strong>只改指定欄位</strong>？</li>
+          </ul>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--bad">
+              <span class="compare-pair__label">不建議的寫法</span>
+              <p>幫我整理一下，順便把 Notion 裡的資料都更新好。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較安全的修改方式</span>
+              <p>只更新「狀態」欄位。<br/>不要修改任務名稱。<br/>不要修改截止日。<br/>不要修改備註。<br/>更新後請回覆結果。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請先列出你打算更新的項目。<strong>在我確認之前，不要執行更新</strong>。</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 9 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">9</span>
+          <span class="details-card__title">是否有個資或敏感資料？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            表格、問卷、報名資料、訪談紀錄、課程回饋裡，常常會有個人資料或敏感內容：
+          </p>
+
+          <ul class="check-list">
+            <li>姓名、Email、電話、學號</li>
+            <li>身分資訊</li>
+            <li><strong>健康或飲食需求</strong></li>
+            <li>私人意見</li>
+            <li>訪談內容</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            這些資料<strong>不適合隨便公開</strong>，也不適合讓 AI 產生公開公告時直接列出。
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">比較好的指令寫法</span>
+              <p>請整理統計結果，但<strong>不要在公開草稿中列出個別姓名</strong>。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>如果需要列出姓名，請只放在<strong>內部確認清單</strong>，不要放進公告草稿。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請檢查資料中是否有不適合公開的內容，並列出提醒。</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">可以問自己的問題</h4>
+          <ul class="check-list">
+            <li>這份資料裡<strong>有沒有個資</strong>？</li>
+            <li>最後輸出<strong>會不會被公開</strong>？</li>
+            <li>是否需要<strong>匿名化</strong>？</li>
+            <li>哪些內容<strong>只能內部使用</strong>？</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 10 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">10</span>
+          <span class="details-card__title">結果是否可回頭檢查？</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            好的 AI 工作流，應該要能<strong>回頭檢查</strong>。也就是說，我們要知道：
+          </p>
+
+          <ul class="check-list">
+            <li>AI <strong>用了哪些資料</strong></li>
+            <li>AI <strong>做了哪些步驟</strong></li>
+            <li>哪些地方是<strong>根據資料整理</strong></li>
+            <li>哪些地方是<strong>它的歸納</strong></li>
+            <li>哪些地方<strong>需要人工確認</strong></li>
+          </ul>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">可以加入這些要求</span>
+              <p>請<strong>標示哪些內容是根據資料整理</strong>，哪些內容是你的歸納。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>請不要只給結論，也請<strong>簡短說明你如何得到這個結果</strong>。</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">或者</span>
+              <p>如果有不確定的地方，請列在「<strong>需要確認</strong>」中。</p>
+            </div>
+          </div>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              這樣可以避免 AI 給出一個<strong>看似完整、但不知道從哪裡來的答案</strong>。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ============ PART 2: 完整版檢查表 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">完整版檢查表（10 大類別）</span>
+      </div>
+
+      <p class="detail-paragraph">
+        下面是一份比較完整的檢查表。之後每次設計 AI 工作流前，都可以拿來對照。
+      </p>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">一、任務目標</p>
+        <ul class="checklist-group__list">
+          <li>我知道這個工作流<strong>最後要完成什麼</strong>。</li>
+          <li>我知道<strong>最後結果要長什麼樣</strong>。</li>
+          <li>我沒有只用「幫我處理一下」這種<strong>模糊指令</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">二、資料來源</p>
+        <ul class="checklist-group__list">
+          <li>我有<strong>提供明確資料來源</strong>。</li>
+          <li>我有說明 AI 是否<strong>只能根據指定資料回答</strong>。</li>
+          <li>如果<strong>資料不足</strong>，我有要求 AI 停下來。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">三、步驟順序</p>
+        <ul class="checklist-group__list">
+          <li>我有把任務<strong>拆成幾個步驟</strong>。</li>
+          <li>我有說明<strong>哪一步要先做</strong>。</li>
+          <li>我有說明<strong>哪一步不能跳過</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">四、工具使用</p>
+        <ul class="checklist-group__list">
+          <li>我知道<strong>哪些步驟需要工具</strong>。</li>
+          <li>我知道哪些步驟只是<strong>整理文字</strong>，不需要工具。</li>
+          <li>我沒有讓 AI 使用<strong>不必要的工具</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">五、輸出格式</p>
+        <ul class="checklist-group__list">
+          <li>我有<strong>指定最後回覆格式</strong>。</li>
+          <li>我有要求 AI 用<strong>表格、清單或固定欄位</strong>整理。</li>
+          <li>我避免讓 AI <strong>每次用不同格式回覆</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">六、停止條件</p>
+        <ul class="checklist-group__list">
+          <li>我有說明<strong>工具失敗時要怎麼辦</strong>。</li>
+          <li>我有說明<strong>資料不足時要怎麼辦</strong>。</li>
+          <li>我有要求 AI <strong>不要自己猜缺少的資料</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">七、人工確認</p>
+        <ul class="checklist-group__list">
+          <li>我有說明<strong>哪些結果需要人工確認</strong>。</li>
+          <li>我沒有讓 AI <strong>直接發布重要內容</strong>。</li>
+          <li>我沒有讓 AI <strong>自行做高風險決定</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">八、修改與寫入</p>
+        <ul class="checklist-group__list">
+          <li>如果會修改資料，我有<strong>指定修改範圍</strong>。</li>
+          <li>我有要求 AI <strong>只修改指定欄位或草稿</strong>。</li>
+          <li>我有<strong>保留原始資料或原始草稿</strong>。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">九、隱私與安全</p>
+        <ul class="checklist-group__list">
+          <li>我檢查資料中<strong>是否有個資</strong>。</li>
+          <li>我有要求公開版本<strong>不要列出不必要的姓名或細節</strong>。</li>
+          <li>我沒有把 <strong>API Key、token 或密碼</strong>貼進公開內容。</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">十、結果檢查</p>
+        <ul class="checklist-group__list">
+          <li>我有檢查 AI 的回覆<strong>是否符合資料</strong>。</li>
+          <li>我有確認<strong>統計、名單、日期、狀態是否正確</strong>。</li>
+          <li>我有確認<strong>最後結果是否可以使用</strong>。</li>
+        </ul>
+      </div>
+
+      <!-- ============ PART 3: 指令模板 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">可以直接套用的指令模板</span>
+      </div>
+
+      <p class="detail-paragraph">
+        如果不知道怎麼開始，可以使用下面這個模板：
+      </p>
+
+      <blockquote class="prompt-example prompt-example--template">
+        請根據以下資料完成任務：<br/><br/>
+        <strong>資料來源：</strong><br/>
+        請讀取／使用 ＿＿＿＿＿＿。<br/><br/>
+        <strong>任務目標：</strong><br/>
+        我想要完成 ＿＿＿＿＿＿。<br/><br/>
+        <strong>工作步驟：</strong><br/>
+        1. 先 ＿＿＿＿＿＿。<br/>
+        2. 再 ＿＿＿＿＿＿。<br/>
+        3. 最後 ＿＿＿＿＿＿。<br/><br/>
+        <strong>限制：</strong><br/>
+        1. 只能根據指定資料回答。<br/>
+        2. 不要自行補充資料中沒有的內容。<br/>
+        3. 如果資料不足，請先停止並說明缺少什麼。<br/>
+        4. 如果需要修改、發布、寄出或更新資料，請先產生草稿，不要直接執行。<br/><br/>
+        <strong>輸出格式：</strong><br/>
+        請用以下格式回答：<br/><br/>
+        　執行結果：<br/>
+        　資料摘要：<br/>
+        　需要確認的地方：<br/>
+        　下一步建議：
+      </blockquote>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個模板可以用在很多地方 —— 整理 CSV、讀文章、檢查草稿、建立 Notion 任務，<strong>都可以從這個格式改</strong>。
+        </p>
+      </div>
+
+      <!-- 三個範例 (folded) -->
+      <h2 class="detail-heading">三個套用範例</h2>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">範例 1：整理 CSV 前的檢查指令</span>
+          <span class="details-card__hint">點擊展開完整指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/activity_signup.csv。<br/><br/>
+            <strong>任務目標：</strong><br/>
+            整理活動報名資料，找出需要人工確認的地方。<br/><br/>
+            <strong>工作步驟：</strong><br/>
+            1. 先確認欄位名稱。<br/>
+            2. 再統計上午場與下午場人數。<br/>
+            3. 接著找出飲食需求未填的人。<br/>
+            4. 最後產生內部確認清單。<br/><br/>
+            <strong>限制：</strong><br/>
+            1. 只能根據 CSV 檔案內容回答。<br/>
+            2. 不要替空白欄位補答案。<br/>
+            3. 不要修改原始 CSV。<br/>
+            4. 不要在公開文字中列出所有姓名。<br/><br/>
+            <strong>輸出格式：</strong><br/>
+            　資料概況：<br/>
+            　基本統計：<br/>
+            　資料問題：<br/>
+            　需要人工確認的地方：
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">範例 2：操作 Notion 前的檢查指令</span>
+          <span class="details-card__hint">點擊展開完整指令</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph"><strong>第一個指令：先讀取，不更新</strong></p>
+          <blockquote class="prompt-example">
+            請使用 notion-classroom 工具，列出狀態為「待確認」的任務。<br/><br/>
+            請先<strong>只讀取資料，不要新增或更新任何任務</strong>。<br/><br/>
+            請用以下格式回答：<br/><br/>
+            　讀取狀態：<br/>
+            　任務清單：<br/>
+            　優先處理建議：<br/>
+            　需要人工確認的地方：
+          </blockquote>
+
+          <p class="detail-paragraph"><strong>第二個指令：確認後才更新</strong></p>
+          <blockquote class="prompt-example">
+            請將指定 page_id 的任務狀態更新為「處理中」。<br/><br/>
+            <strong>限制：</strong><br/>
+            1. 只更新狀態。<br/>
+            2. 不要修改任務名稱。<br/>
+            3. 不要修改截止日。<br/>
+            4. 不要修改備註。<br/>
+            5. 更新後請回覆執行結果。
+          </blockquote>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              這樣可以把<strong>「讀取」和「修改」分開</strong>，比較安全，也比較容易檢查。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">範例 3：閱讀寫作前的檢查指令</span>
+          <span class="details-card__hint">點擊展開完整指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請讀取 @./data/article.txt 和 @./data/assignment.txt。<br/><br/>
+            <strong>任務目標：</strong><br/>
+            根據文章和報告要求，產生閱讀報告大綱。<br/><br/>
+            <strong>限制：</strong><br/>
+            1. 不要直接寫完整報告。<br/>
+            2. 不要加入文章沒有提到的資料。<br/>
+            3. 個人觀點部分只提供可選方向，不要替我決定立場。<br/>
+            4. 如果有需要自己補充的地方，請列出來。<br/><br/>
+            <strong>輸出格式：</strong><br/>
+            　報告題目建議：<br/>
+            　文章主題：<br/>
+            　段落大綱：<br/>
+            　可以選擇的個人觀點方向：<br/>
+            　需要自己確認的地方：
+          </blockquote>
+        </div>
+      </details>
+
+      <!-- ============ Section: 常見錯誤 ============ -->
+      <h2 class="detail-heading">常見錯誤</h2>
+      <p class="detail-paragraph">
+        使用 AI 工作流時，常見錯誤有幾種：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第一</span>
+          <span class="role-item__desc"><strong>任務太大。</strong>例如「幫我整理資料、寫報告、建立 Notion、更新狀態，全部弄好」—— 這樣太多步驟放在一起，中間一個地方錯，後面就可能全部錯。比較好的做法是拆開：先整理資料、再產生草稿、再人工確認、最後才更新 Notion。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第二</span>
+          <span class="role-item__desc"><strong>沒有指定資料來源。</strong>AI 可能會自己補內容，看起來很完整，但不一定是真的。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第三</span>
+          <span class="role-item__desc"><strong>沒有停止條件。</strong>資料不足時，AI 還是繼續寫下去，就會出現猜測。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第四</span>
+          <span class="role-item__desc"><strong>讓 AI 直接修改正式資料。</strong>沒有先確認就更新、發布、寄信或刪除，風險很高。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第五</span>
+          <span class="role-item__desc"><strong>沒有檢查結果。</strong>AI 的回覆看起來順，但<strong>數字、名單、日期、狀態</strong>仍然可能出錯。</span>
+        </li>
+      </ul>
+
+      <!-- ============ Section: 什麼時候可以讓 AI 繼續 ============ -->
+      <h2 class="detail-heading">什麼時候可以讓 AI 繼續下一步？</h2>
+      <p class="detail-paragraph">
+        可以用下面這個簡單判斷：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">整理 / 摘要</span>
+          <span class="role-item__desc">如果只是<strong>整理、摘要、分類</strong>，通常可以繼續。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">產生草稿</span>
+          <span class="role-item__desc">可以繼續，但要<strong>標示為草稿</strong>。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">修改資料</span>
+          <span class="role-item__desc">要<strong>先確認修改範圍</strong>。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">發布 / 寫入</span>
+          <span class="role-item__desc">如果要<strong>發布、寄出、刪除、更新正式資料</strong>，應該先<strong>人工確認</strong>。</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>整理可以快一點。</strong><br/>
+          <strong>草稿要確認。</strong><br/>
+          <strong>修改要限縮。</strong><br/>
+          <strong>發布要人工決定。</strong>
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">這裡最重要的觀念</h2>
+      <p class="detail-paragraph">
+        AI 工作流<strong>不是把所有事情交給 AI</strong>。而是把任務拆清楚，讓 AI 在<strong>清楚、安全、可檢查的範圍內</strong>幫忙。每次使用 AI 工作流前，請先確認：
+      </p>
+
+      <ul class="check-list">
+        <li><strong>目標</strong>是什麼</li>
+        <li>資料<strong>從哪裡來</strong></li>
+        <li>步驟<strong>怎麼走</strong></li>
+        <li>哪些地方<strong>要用工具</strong></li>
+        <li>失敗時<strong>要不要停下來</strong></li>
+        <li>哪些結果<strong>需要人工確認</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        AI 很適合幫忙處理<strong>重複、整理、檢查、草稿和初步建議</strong>。但<strong>重要判斷，仍然要由人確認</strong>。
+      </p>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          資料來源要清楚。工具權限要有限。<br/>
+          輸出格式要固定。失敗時要停下來。<br/>
+          <strong>重要動作要人工確認。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-checklist {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code,
+  :global(.compare-pair__item) code,
+  :global(.checklist-group__list) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.9;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 7rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__label--ord {
+    min-width: 4rem;
+    font-size: var(--text-base);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .prompt-example strong {
+    color: var(--color-accent);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .prompt-example--template {
+    border-left-width: 4px;
+    background-color: var(--color-tag-bg);
+  }
+
+  /* Compare pair (good vs bad / multiple alternatives) */
+  .compare-pair {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .compare-pair__item {
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .compare-pair__item--bad {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.05);
+  }
+
+  .compare-pair__item--good {
+    border-left-color: var(--color-accent);
+  }
+
+  .compare-pair__label {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+    padding: 0.1rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .compare-pair__item--bad .compare-pair__label {
+    background-color: #d97706;
+  }
+
+  .compare-pair__item p {
+    margin: 0;
+    font-style: italic;
+  }
+
+  .compare-pair__item p strong {
+    color: var(--color-heading);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  /* Checklist group with checkbox visual */
+  .checklist-group {
+    margin: var(--space-4) 0;
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .checklist-group__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin: 0 0 var(--space-3);
+  }
+
+  .checklist-group__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .checklist-group__list li {
+    position: relative;
+    padding-left: 1.8em;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .checklist-group__list li::before {
+    content: '\2610';
+    position: absolute;
+    left: 0;
+    top: -0.05em;
+    color: var(--color-accent);
+    font-size: 1.2em;
+  }
+
+  .checklist-group__list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Details card with item number badge */
+  .details-card {
+    margin: var(--space-3) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  @media (max-width: 720px) {
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-item__label--ord {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .checklist-group {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1.8rem + var(--space-3));
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

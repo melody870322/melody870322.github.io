@@ -1,0 +1,1089 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="AI Workflow Design: From Using Tools to Structuring Tasks — AI Agent Puzzle"
+  description="Once you can use a tool, the next step is connecting several small steps so the AI can complete a more meaningful task. This page walks through the difference between a single tool and a workflow, the four basic ingredients, when to stop, the three workflow tiers, and how prompts shape the AI's path."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-workflow">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Tools Are Working — Now Have the AI Walk Through the Whole Task</h1>
+        <p class="detail-subtitle">
+          We already have a fairly stable MCP tool. It can take input, call an external API, handle errors, and return a clean response that both AI and humans can read. That's a good place to be. But in real work or study, <strong>we usually want more than a single small action</strong>.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">For example:</p>
+
+      <ul class="cross-list">
+        <li>Looking up the weather once <strong>isn't a complete workflow</strong></li>
+        <li>Reading one article <strong>isn't a complete workflow</strong></li>
+        <li>Creating one Notion page <strong>still might not be a complete workflow</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        A useful AI workflow usually means <strong>chaining several small steps so the AI completes a more meaningful task</strong>. This page is about going from "single tool" to "AI workflow."
+      </p>
+
+      <!-- Section: tool vs workflow -->
+      <h2 class="detail-heading">A Single Tool Is a Button — A Workflow Is a Sequence</h2>
+      <p class="detail-paragraph">
+        Don't make "workflow" sound harder than it is. Think of a single tool as a button. The weather tool we built earlier:
+      </p>
+
+      <blockquote class="prompt-example">
+        Look up the current weather for a given city.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        It's simple: pass in a city, get back the weather. <strong>That's a single tool</strong>. But if we want the AI to help complete something closer to real life, there's more than one step. For example:
+      </p>
+
+      <blockquote class="prompt-example">
+        Based on today's Taipei weather, draft a short reminder suitable for class announcements.
+      </blockquote>
+
+      <p class="detail-paragraph">That involves at least:</p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Look up <strong>Taipei's weather</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Check whether the lookup <strong>succeeded</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Compose a reminder based on <strong>temperature and wind</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Use a <strong>tone appropriate for students</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">If the lookup failed, <strong>don't make things up — explain why</strong></span></li>
+      </ol>
+
+      <p class="detail-paragraph">That looks more like a workflow.</p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          A single tool: "<strong>do one action</strong>."<br/>
+          An AI workflow: "<strong>complete a task in order</strong>."
+        </p>
+      </div>
+
+      <!-- Section: not free-running -->
+      <h2 class="detail-heading">A Workflow Isn't "Let the AI Run Loose" — It's Routing It</h2>
+      <p class="detail-paragraph">
+        People hear "AI workflow" and assume <strong>"I just give the AI one sentence, and it figures out the rest."</strong> That's risky thinking. The AI is great at filling in blanks — but if it fills in too much, it starts guessing, mis-using tools, or doing things you never asked for.
+      </p>
+
+      <p class="detail-paragraph">
+        So designing an AI workflow <strong>isn't about letting the AI do whatever it wants — it's about routing it</strong>. We can write the task like this:
+      </p>
+
+      <blockquote class="prompt-example">
+        First, look up the current weather in Taipei.<br/>
+        If the lookup succeeds, use the tool's response to compose three short reminders for students.<br/>
+        If it fails, only state the failure reason and a suggested next step — don't guess the weather.
+      </blockquote>
+
+      <p class="detail-paragraph">That's already <strong>a simple workflow design</strong>. It tells the AI:</p>
+
+      <ul class="check-list">
+        <li>What the first step is</li>
+        <li>What to do on success</li>
+        <li>What to do on failure</li>
+        <li><strong>What it must not do</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        That's <strong>much more reliable</strong> than just "tell me if it's a good day to go out."
+      </p>
+
+      <!-- Section: 4 elements -->
+      <h2 class="detail-heading">A Simple Workflow Needs Four Things</h2>
+      <p class="detail-paragraph">
+        Don't make your first workflow complicated. Just nail four ingredients.
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Goal</span>
+          <span class="role-item__desc">What the workflow ultimately produces. e.g. <strong>a class reminder paragraph</strong>.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Source</span>
+          <span class="role-item__desc">What data the AI bases its decisions on. e.g. <strong>the weather MCP tool's response</strong>.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Order</span>
+          <span class="role-item__desc">What goes first, what goes next. e.g. <strong>look up first, then compose; not the other way around</strong>.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Format</span>
+          <span class="role-item__desc">What the final output looks like, e.g. <strong>"Reminder: 1. 2. 3." plus "Source"</strong>.</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Once these four are in place,<br/>
+          the workflow gets <strong>much clearer</strong>.
+        </p>
+      </div>
+
+      <!-- Section: build small first -->
+      <h2 class="detail-heading">Don't Build a Mega-Workflow on Day One</h2>
+      <p class="detail-paragraph">
+        Once people learn the tools, they often want to build something huge:
+      </p>
+
+      <blockquote class="prompt-example">
+        Organize all my course material, generate handouts, create Notion pages, send student reminders, create quiz questions, and tally feedback.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        It's not impossible — just <strong>not a good first project</strong>. With many steps, one wrong turn somewhere derails everything after, and it's hard to tell which step broke.
+      </p>
+
+      <p class="detail-paragraph">
+        Better to <strong>start small</strong> and grow:
+      </p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">Look up data → Summarize</div>
+        <div class="flow-arrow">↓ then evolve to</div>
+        <div class="flow-step flow-step--accent">Look up → Summarize → Turn into a reminder</div>
+        <div class="flow-arrow">↓ then evolve to</div>
+        <div class="flow-step">Look up → Summarize → Reminder → Notion draft</div>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Workflows should grow <strong>like Lego bricks, one block at a time</strong>.<br/>
+          <strong>Don't try to build a tower from scratch.</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: Prompt practice ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Prompt Practice</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Turn the Weather Tool Into a Class-Reminder Helper</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        We'll start with the weather tool from before. The original single tool was "look up the current weather for a given city." Now we wrap it as a small workflow: <strong>turn the lookup into a class reminder ready for posting</strong>.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the copyable prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please use the weather-api tool to look up the current weather in Taipei.<br/><br/>
+            Once it succeeds, organize the response into a short class reminder.<br/><br/>
+            Follow these rules:<br/>
+            1. Only summarize what the tool actually returned. Don't guess the weather.<br/>
+            2. If the lookup failed, don't write a reminder — only state the failure reason and a suggestion.<br/>
+            3. Use this fixed format:<br/>
+            　Status:<br/>
+            　Reminder:<br/>
+            　Notes:
+          </blockquote>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        That prompt is longer than a one-liner, but much more stable. You're not just saying "write me a reminder" — you're telling the AI <strong>look up first, write second; how to handle success; how to stop on failure</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          That's <strong>the first step from a single tool to a workflow</strong>.
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Lock the Output Into a Fixed Format</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        For a workflow to stay stable, <strong>output format matters</strong>. If the AI replies differently every time, the next step is hard to chain on. Sometimes you'd get:
+      </p>
+
+      <pre class="code-block" is:raw><code>Taipei is fine today, stay hydrated.</code></pre>
+
+      <p class="detail-paragraph">Sometimes:</p>
+
+      <pre class="code-block" is:raw><code>Based on the data, the temperature is 28°C and wind speed is 10 km/h, so students should...</code></pre>
+
+      <p class="detail-paragraph">
+        Sometimes a long paragraph. It's not unusable — but <strong>if you later route the result into Notion, an announcement, or another tool, this gets messy</strong>. So lock the format.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the copyable prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please use the weather-api tool to look up the current weather in Taipei.<br/><br/>
+            Once it succeeds, organize the response into a short class reminder.<br/><br/>
+            Follow these rules:<br/>
+            1. Only summarize what the tool actually returned. Don't guess the weather.<br/>
+            2. If the lookup failed, don't write a reminder — only state the failure reason and a suggestion.<br/>
+            3. Use this format:<br/><br/>
+            　Status:<br/>
+            　success or failed<br/><br/>
+            　Data summary:<br/>
+            　Two sentences summarizing the tool's response<br/><br/>
+            　Reminder:<br/>
+            　Three sentences students can read<br/><br/>
+            　Needs human review:<br/>
+            　Yes — this is data from an external API; the teacher should still verify before posting
+          </blockquote>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          One benefit of this format:<br/>
+          <strong>humans can read it, and the AI can pipe it into the next step easily.</strong>
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Add Human Review — Don't Let the AI Make the Final Call</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        At work, AI can speed things up — but <strong>that doesn't mean it should make every final decision for us</strong>. Especially for things touching students, classes, public announcements, grades, or personal data, keep a human checkpoint.
+      </p>
+
+      <p class="detail-paragraph">
+        Add an important step to the workflow:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Produce a draft — don't publish.</strong>
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the copyable prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please use the weather-api tool to look up the current weather in Taipei.<br/><br/>
+            Once it succeeds, draft a class reminder based on the tool's response.<br/><br/>
+            Follow these rules:<br/>
+            1. Only summarize what the tool actually returned. Don't guess the weather.<br/>
+            2. If the lookup failed, don't write a reminder — only state the failure reason and a suggestion.<br/>
+            3. Use this format:<br/><br/>
+            　Status:<br/>
+            　success or failed<br/><br/>
+            　Data summary:<br/>
+            　Two sentences summarizing the tool's response<br/><br/>
+            　Reminder:<br/>
+            　Three sentences students can read<br/><br/>
+            Notes:<br/>
+            1. Draft only.<br/>
+            2. Don't publish on my behalf.<br/>
+            3. At the end, list what the teacher needs to confirm.
+          </blockquote>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Now the AI behaves more like a <strong>TA</strong>. It can organize, draft, and check — but the publish decision stays with the human. We're not handing off judgment; we're <strong>handing off the repetitive, tedious organizing work</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Part 3: Safety + design ============ -->
+
+      <!-- Section: stop conditions -->
+      <h2 class="detail-heading">Workflows Need "When to Stop" Conditions</h2>
+      <p class="detail-paragraph">
+        A good workflow <strong>doesn't always plow through to the end</strong>. Some situations should trigger a stop:
+      </p>
+
+      <ul class="cross-list">
+        <li>The tool <strong>lookup failed</strong></li>
+        <li><strong>Insufficient data</strong></li>
+        <li>The user didn't provide required information</li>
+        <li>The AI <strong>isn't sure which tool to use</strong></li>
+        <li>The task involves <strong>delete, publish, send mail, change grades</strong> — high-risk actions</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        In those cases, the AI shouldn't guess or decide on its own. Better:
+      </p>
+
+      <blockquote class="prompt-example">
+        If data is insufficient, stop and tell me what's missing.<br/>
+        If a tool returns failure, don't fill in the answer yourself.<br/>
+        If a change or publish is needed, draft it and wait for my confirmation.
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          These few sentences are simple but important.<br/>
+          They make the workflow <strong>safer, and closer to how real-world work actually flows</strong>.
+        </p>
+      </div>
+
+      <!-- Section: 3 layers -->
+      <h2 class="detail-heading">Workflows Come in Three Tiers</h2>
+      <p class="detail-paragraph">
+        For a beginner, think of three tiers.
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Organize</span>
+          <span class="role-item__desc"><strong>Read → Summarize → Bullet points.</strong> Best for beginners; usually doesn't change data, so risk is low.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Draft</span>
+          <span class="role-item__desc"><strong>Look up → Organize → Produce a draft announcement.</strong> Generates new content but doesn't publish; great for class material, reports, admin text, interview notes.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Action</span>
+          <span class="role-item__desc"><strong>Look up → Create Notion page → Update field.</strong> Writes or modifies data — handle with care.</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Practice in this order. <strong>Don't let the AI modify data on day one.</strong>
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Example: a reading-notes assistant workflow</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Suppose we want to design a "<strong>reading-notes assistant</strong>." Its job isn't to write the report for the user — it's to <strong>turn an article into usable notes</strong>.
+          </p>
+
+          <h4 class="example-heading">Goal</h4>
+          <p class="detail-paragraph">Turn an article into reading notes.</p>
+
+          <h4 class="example-heading">Steps</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Read the <strong>article content</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Identify the article's <strong>main question</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Pull out <strong>3 to 5 key points</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Capture the author's <strong>main argument</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">List <strong>follow-up questions for further thinking</strong></span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">Remind students that <strong>this is a draft</strong> — they still need to judge and add to it</span></li>
+          </ol>
+
+          <h4 class="example-heading">Output format</h4>
+          <pre class="code-block" is:raw><code>Article topic:
+Main question:
+Key points:
+Author's argument:
+Follow-up questions:
+What needs human review:</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              It doesn't just hand back an answer —<br/>
+              it <strong>shows the user the process of organizing the material</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Example: an interview-notes assistant workflow</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            For <strong>qualitative research, interview analysis, or social-issue work</strong>, you can design an interview-notes workflow.
+          </p>
+
+          <h4 class="example-heading">Goal</h4>
+          <p class="detail-paragraph">Turn an interview transcript into <strong>preliminary thematic categories</strong>.</p>
+
+          <h4 class="example-heading">Steps</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Read the <strong>transcript</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Don't rewrite the interviewee's intent</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Identify <strong>recurring themes</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Add a <strong>short note for each theme</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">If quoting, <strong>quote only short fragments and remind the user to verify against the original</strong></span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">List <strong>spots that may need researcher judgment</strong></span></li>
+          </ol>
+
+          <h4 class="example-heading">Output format</h4>
+          <pre class="code-block" is:raw><code>Preliminary theme:
+Theme description:
+Related quotes (summary):
+What needs human review:
+Suggested next steps:</code></pre>
+
+          <div class="callout-card callout-card--warn">
+            <p class="callout-text">
+              This example is good at reminding the user: <strong>AI can help organize, but it can't replace researcher judgment</strong>. Interview data often involves context, emotion, background, and ethics — final calls stay with humans.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Section: design checklist -->
+      <h2 class="detail-heading">A Quick Checklist for Designing Workflows</h2>
+      <p class="detail-paragraph">
+        Before designing an AI workflow, ask yourself:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">What is this workflow <strong>ultimately producing</strong>?</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">What <strong>data does the AI need</strong>?</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Which steps go <strong>first</strong>, which go <strong>later</strong>?</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Which step <strong>uses an MCP tool</strong>?</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Which step is <strong>just text shaping</strong> with no tool needed?</span></li>
+        <li><span class="numbered-list__num">6</span><span class="numbered-list__text">When should the workflow <strong>stop</strong>?</span></li>
+        <li><span class="numbered-list__num">7</span><span class="numbered-list__text">Which results need <strong>human review</strong>?</span></li>
+        <li><span class="numbered-list__num">8</span><span class="numbered-list__text">What does the <strong>final output format</strong> look like?</span></li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          If you can answer all of these, the workflow is usually clear.<br/>
+          If you can't, <strong>the task is probably still too vague to hand off</strong>.
+        </p>
+      </div>
+
+      <!-- Section: don't make a mega-tool -->
+      <h2 class="detail-heading">Don't Wrap Everything Into One Mega-Tool</h2>
+      <p class="detail-paragraph">
+        Some people think: since I want a workflow, why not build one giant MCP tool that does it all? Like:
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">do_everything()</code></pre>
+
+      <p class="detail-paragraph">
+        It looks easy — but it's <strong>dangerous, because the bigger the tool, the harder it is to tell where things broke</strong>.
+      </p>
+
+      <p class="detail-paragraph">
+        Better: <strong>keep tools small and design the flow carefully</strong>.
+      </p>
+
+      <ul class="check-list">
+        <li><strong>Looking up data</strong> is a tool</li>
+        <li><strong>Creating a page</strong> is a tool</li>
+        <li><strong>Updating status</strong> is a tool</li>
+        <li><strong>Text shaping</strong> can stay in the AI prompt — not every step needs to be a tool</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Smaller tools are easier to test. Clearer flows are easier to control. That's the principle from earlier pages: <strong>not "let the AI do everything," but "give it a clear scope and walk it through, step by step"</strong>.
+        </p>
+      </div>
+
+      <!-- Section: takeaway -->
+      <h2 class="detail-heading">The Big Takeaway</h2>
+      <p class="detail-paragraph">
+        Going from a single tool to an AI workflow, <strong>the point isn't more tools — it's a clearer task flow</strong>. A single tool does one action; a workflow chains several actions in order.
+      </p>
+
+      <p class="detail-paragraph">
+        Some early-design principles to keep:
+      </p>
+
+      <ul class="check-list">
+        <li>Start with <strong>small flows</strong>, not big systems</li>
+        <li><strong>Read, organize, draft</strong> first — writes and updates later</li>
+        <li>Keep tools <strong>small</strong> and flows <strong>clear</strong></li>
+        <li>On success, know <strong>the next step</strong></li>
+        <li>On failure, know <strong>how to stop</strong></li>
+        <li>Big decisions stay with <strong>humans</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          The real value of an AI workflow isn't letting AI run wild.<br/>
+          It's letting <strong>humans decompose the task</strong>, then letting AI<br/>
+          do the <strong>repetitive parts faster and more reliably, inside a safe and reviewable scope</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-workflow {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-card--tall {
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--bad {
+    border: 1px solid #d97706;
+    border-left: 4px solid #d97706;
+    position: relative;
+  }
+
+  .code-block--bad::before {
+    content: '✗ Avoid';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.11rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: #d97706;
+    border-bottom-left-radius: var(--border-radius);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .flow-card {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .code-block--bad::before {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

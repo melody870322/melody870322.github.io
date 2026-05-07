@@ -1,0 +1,1093 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="AI 工作流設計：從工具使用到任務流程化 — AI Agent 拼圖"
+  description="工具會用了之後，下一步是把幾個小步驟接起來，讓 AI 完成一件比較完整的任務。這一頁從「單一工具 vs 工作流」的差別出發，介紹工作流的四個基本要素、停下來的條件、三種層次，以及怎麼用指令幫 AI 排好路線。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-workflow">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">工具會用了，接下來讓 AI 一步一步完成整件事</h1>
+        <p class="detail-subtitle">
+          前面我們已經做出一個比較穩的 MCP Tool。它可以接收輸入、呼叫外部 API、處理錯誤，最後把結果整理成 AI 和人都看得懂的格式。到這裡其實已經很不錯了。可是真正在工作或學習上，<strong>我們通常不是只想做一個小動作</strong>。
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        例如：
+      </p>
+
+      <ul class="cross-list">
+        <li>查一次天氣，<strong>不算完整工作流</strong></li>
+        <li>讀一篇文章，<strong>不算完整工作流</strong></li>
+        <li>建立一個 Notion 頁面，<strong>也還不一定算完整工作流</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        真正有用的 AI 工作流，通常是<strong>讓 AI 把幾個小步驟接起來，完成一件比較完整的任務</strong>。這一頁要學的，就是怎麼從「單一工具」走到「AI 工作流」。
+      </p>
+
+      <!-- Section: tool vs workflow -->
+      <h2 class="detail-heading">單一工具像一個按鈕，工作流像一串步驟</h2>
+      <p class="detail-paragraph">
+        我們先不要把「工作流」想得太難。你可以先把單一工具想成一個按鈕。例如我們前面做的天氣工具：
+      </p>
+
+      <blockquote class="prompt-example">
+        查詢指定城市目前的天氣。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這個工具很單純：你給它城市，它回你天氣。<strong>這就是一個單一工具</strong>。可是如果我們想讓 AI 幫忙完成一件更接近真實生活的任務，就不會只有這一步。例如：
+      </p>
+
+      <blockquote class="prompt-example">
+        幫我根據今天台北天氣，整理一段適合放進課堂提醒的文字。
+      </blockquote>
+
+      <p class="detail-paragraph">這件事其實至少包含幾個步驟：</p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">先<strong>查台北天氣</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">看查詢結果<strong>是否成功</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">根據氣溫與風速<strong>整理提醒</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">用<strong>適合學生看的語氣</strong>寫出來</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">如果資料查不到，<strong>就不要亂寫，要說明原因</strong></span></li>
+      </ol>
+
+      <p class="detail-paragraph">這就比較像工作流。</p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          單一工具是「<strong>做一個動作</strong>」。<br/>
+          AI 工作流是「<strong>照順序完成一件任務</strong>」。
+        </p>
+      </div>
+
+      <!-- Section: not free-running -->
+      <h2 class="detail-heading">工作流不是叫 AI 自己亂跑，而是幫它排好路線</h2>
+      <p class="detail-paragraph">
+        很多人一聽到 AI 工作流，會以為是<strong>「我只要給 AI 一句話，它就會自己想辦法全部完成」</strong>。這樣想很容易出問題 —— 因為 AI 真的很會補東西。可是補得太多，有時候就會變成亂猜、亂用工具，甚至做出我們沒有要求它做的事。
+      </p>
+
+      <p class="detail-paragraph">
+        所以設計 AI 工作流的重點，<strong>不是讓 AI 想做什麼就做什麼，而是幫它排好一條比較清楚的路線</strong>。例如我們可以把任務寫成這樣：
+      </p>
+
+      <blockquote class="prompt-example">
+        請先查詢台北目前的天氣。<br/>
+        如果查詢成功，請根據工具回傳資料，整理成 3 句適合學生看的提醒。<br/>
+        如果查詢失敗，請只說明失敗原因和下一步建議，不要自己猜天氣。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這段話其實已經是一個<strong>簡單的工作流設計</strong>。它告訴 AI：
+      </p>
+
+      <ul class="check-list">
+        <li>第一步要做什麼</li>
+        <li>成功時要怎麼做</li>
+        <li>失敗時要怎麼做</li>
+        <li><strong>不可以做什麼</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這比單純說「幫我看今天適不適合出門」<strong>穩定很多</strong>。
+      </p>
+
+      <!-- Section: 4 elements -->
+      <h2 class="detail-heading">一個簡單工作流，至少要有四個東西</h2>
+      <p class="detail-paragraph">
+        剛開始設計 AI 工作流，不需要一次做得很複雜。你只要先抓住四個東西就好。
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">目標</span>
+          <span class="role-item__desc">這個工作流最後要完成什麼。例：<strong>產生一段課堂提醒文字</strong>。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">資料來源</span>
+          <span class="role-item__desc">AI 要根據什麼資料來做判斷。例：<strong>根據天氣 MCP Tool 回傳的資料</strong>。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">步驟順序</span>
+          <span class="role-item__desc">AI 要先做什麼、再做什麼。例：<strong>先查詢天氣，再整理提醒，不要先寫提醒</strong>。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">輸出格式</span>
+          <span class="role-item__desc">最後結果要長什麼樣，例如<strong>「課堂提醒：1. 2. 3.」+「資料來源」</strong>。</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這四個東西有了，<br/>
+          AI 工作流就會<strong>清楚很多</strong>。
+        </p>
+      </div>
+
+      <!-- Section: build small first -->
+      <h2 class="detail-heading">不要一開始就做超大型工作流</h2>
+      <p class="detail-paragraph">
+        很多人在學會工具之後，很容易想做一個很大的工作流。例如：
+      </p>
+
+      <blockquote class="prompt-example">
+        幫我整理整門課資料、產生講義、建立 Notion 頁面、提醒學生、產生測驗題、整理回饋表。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        這不是不能做，而是<strong>不適合一開始就做</strong>。因為步驟太多時，只要中間一個地方出錯，後面就會全部歪掉。而且你會很難判斷到底是哪一步出問題。
+      </p>
+
+      <p class="detail-paragraph">
+        比較好的做法是<strong>先做小工作流</strong>，再慢慢加上去：
+      </p>
+
+      <div class="flow-card flow-card--tall">
+        <div class="flow-step">查資料 → 整理成摘要</div>
+        <div class="flow-arrow">↓ 慢慢變成</div>
+        <div class="flow-step flow-step--accent">查資料 → 整理成摘要 → 轉成課堂提醒</div>
+        <div class="flow-arrow">↓ 再慢慢變成</div>
+        <div class="flow-step">查資料 → 整理成摘要 → 轉成課堂提醒 → 寫進 Notion 草稿</div>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          工作流要像積木一樣<strong>，一塊一塊加上去</strong>。<br/>
+          <strong>不要一開始就蓋大樓。</strong>
+        </p>
+      </div>
+
+      <!-- ============ Part 2: 指令練習 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">指令練習</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">把天氣工具變成課堂提醒助理</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        我們先用前面做過的天氣工具來練習。原本的單一工具是「查詢指定城市目前的天氣」。現在我們要把它變成一個小工作流：<strong>根據查詢到的天氣資料，整理成適合課堂公告使用的提醒文字</strong>。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 weather-api 工具查詢台北目前的天氣。<br/><br/>
+            查詢成功後，請根據工具回傳資料，幫我整理成一段課堂提醒。<br/><br/>
+            請遵守以下規則：<br/>
+            1. 只能根據工具回傳的資料整理，不要自己猜天氣。<br/>
+            2. 如果查詢失敗，請不要寫提醒，只要說明失敗原因和建議。<br/>
+            3. 回覆格式請固定成：<br/>
+            　查詢狀態：<br/>
+            　課堂提醒：<br/>
+            　注意事項：
+          </blockquote>
+        </div>
+      </details>
+
+      <p class="detail-paragraph">
+        這段指令看起來比一句話長，但它會穩很多。因為你不是只叫 AI「幫我寫」，而是告訴它<strong>先查資料、再寫提醒；成功時怎麼寫；失敗時怎麼停</strong>。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這就是<strong>從單一工具走向工作流的第一步</strong>。
+        </p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">把查詢結果整理成固定格式</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        工作流要穩，<strong>輸出格式很重要</strong>。如果 AI 每次回覆都長得不一樣，你後面就很難接下一步。例如有時候它回：
+      </p>
+
+      <pre class="code-block" is:raw><code>台北今天還可以，注意補水。</code></pre>
+
+      <p class="detail-paragraph">有時候它回：</p>
+
+      <pre class="code-block" is:raw><code>根據資料顯示，目前氣溫為 28 度，風速 10 km/h，因此建議學生……</code></pre>
+
+      <p class="detail-paragraph">
+        有時候又回很長一篇。這樣不是完全不能用，但<strong>如果你之後要把結果放到 Notion、整理成公告、或交給下一個工具使用，就會比較亂</strong>。所以我們可以先要求固定格式。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 weather-api 工具查詢台北目前的天氣。<br/><br/>
+            查詢成功後，請根據工具回傳資料，幫我整理成一段課堂提醒。<br/><br/>
+            請遵守以下規則：<br/>
+            1. 只能根據工具回傳的資料整理，不要自己猜天氣。<br/>
+            2. 如果查詢失敗，請不要寫提醒，只要說明失敗原因和建議。<br/>
+            3. 請用以下格式回覆：<br/><br/>
+            　查詢狀態：<br/>
+            　成功或失敗<br/><br/>
+            　資料摘要：<br/>
+            　用 2 句話整理工具回傳的重點<br/><br/>
+            　課堂提醒：<br/>
+            　寫成適合學生看的 3 句提醒<br/><br/>
+            　是否需要人工確認：<br/>
+            　需要，因為這是外部 API 回傳資料，發布前老師仍應確認
+          </blockquote>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這個格式有一個好處：<br/>
+          <strong>人看得懂，AI 也比較好接著處理。</strong>
+        </p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">加上人工確認，不要讓 AI 直接做最後決定</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        在真實工作裡，AI 可以幫我們加速，但<strong>不代表每件事都要讓 AI 自己決定</strong>。尤其是會影響學生、課堂、公開公告、成績、個資的事情，更應該保留人工確認。
+      </p>
+
+      <p class="detail-paragraph">
+        所以在設計工作流時，可以加入一個很重要的步驟：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>先產生草稿，不要直接發布。</strong>
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 weather-api 工具查詢台北目前的天氣。<br/><br/>
+            查詢成功後，請根據工具回傳資料，幫我整理成一段課堂提醒草稿。<br/><br/>
+            請遵守以下規則：<br/>
+            1. 只能根據工具回傳的資料整理，不要自己猜天氣。<br/>
+            2. 如果查詢失敗，請不要寫提醒，只要說明失敗原因和建議。<br/>
+            3. 請用以下格式回覆：<br/><br/>
+            　查詢狀態：<br/>
+            　成功或失敗<br/><br/>
+            　資料摘要：<br/>
+            　用 2 句話整理工具回傳的重點<br/><br/>
+            　課堂提醒：<br/>
+            　寫成適合學生看的 3 句提醒<br/><br/>
+            注意：<br/>
+            1. 只產生草稿。<br/>
+            2. 不要替我發布。<br/>
+            3. 最後請列出「老師需要確認的地方」。
+          </blockquote>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這樣 AI 就比較像<strong>助教</strong>。它可以幫你整理、草擬、檢查，但最後要不要發布，還是由人決定。我們不是要把判斷交出去，而是<strong>把重複、瑣碎、整理性的工作交給 AI 幫忙</strong>。
+        </p>
+      </div>
+
+      <!-- ============ Part 3: 安全與設計 ============ -->
+
+      <!-- Section: stop conditions -->
+      <h2 class="detail-heading">工作流裡要有「停下來」的條件</h2>
+      <p class="detail-paragraph">
+        一個好的工作流，<strong>不是每次都硬做到底</strong>。有些情況應該停下來。例如：
+      </p>
+
+      <ul class="cross-list">
+        <li>工具<strong>查詢失敗</strong></li>
+        <li><strong>資料不足</strong></li>
+        <li>使用者沒有提供必要資訊</li>
+        <li>AI <strong>不確定要使用哪個工具</strong></li>
+        <li>任務牽涉到<strong>刪除、發布、寄信、改成績</strong>等高風險動作</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        如果遇到這些情況，AI 不應該硬猜，也不應該自己決定下一步。比較好的做法是：
+      </p>
+
+      <blockquote class="prompt-example">
+        如果資料不足，請先停止，並告訴我還缺什麼。<br/>
+        如果工具回傳失敗，請不要補寫答案。<br/>
+        如果需要修改或發布內容，請先產生草稿，等我確認。
+      </blockquote>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這幾句話很簡單，但很重要。<br/>
+          它可以讓 AI 工作流<strong>比較安全，也比較像真正在工作時會使用的流程</strong>。
+        </p>
+      </div>
+
+      <!-- Section: 3 layers -->
+      <h2 class="detail-heading">工作流可以分成三種層次</h2>
+      <p class="detail-paragraph">
+        剛開始學 AI 工作流，可以先分成三種層次。
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">整理型</span>
+          <span class="role-item__desc"><strong>讀取資料 → 摘要 → 條列重點。</strong>最適合初學者，通常不會直接改資料，風險比較低。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">草稿型</span>
+          <span class="role-item__desc"><strong>查詢資料 → 整理重點 → 產生公告草稿。</strong>會產生新內容，但還不直接發布；適合課堂、報告、行政文字、訪談整理。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">動作型</span>
+          <span class="role-item__desc"><strong>查詢資料 → 建立 Notion 頁面 → 更新欄位狀態。</strong>已經會寫入或修改資料，所以要特別小心。</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          建議按順序練習，<strong>不要一開始就讓 AI 直接改資料</strong>。
+        </p>
+      </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">範例：閱讀筆記助理的工作流</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            假設我們想設計一個「<strong>閱讀筆記助理</strong>」。它的任務不是直接幫使用者寫報告，而是<strong>幫使用者把文章整理成可用的筆記</strong>。
+          </p>
+
+          <h4 class="example-heading">任務目標</h4>
+          <p class="detail-paragraph">把一篇文章整理成閱讀筆記。</p>
+
+          <h4 class="example-heading">工作步驟</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">先<strong>讀取文章內容</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">整理文章的<strong>主要問題意識</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">找出 <strong>3 到 5 個重點</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">整理<strong>作者的主要觀點</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">列出學生可以<strong>延伸思考的問題</strong></span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">最後提醒學生：<strong>這只是筆記草稿</strong>，仍需要自己判斷與補充</span></li>
+          </ol>
+
+          <h4 class="example-heading">輸出格式</h4>
+          <pre class="code-block" is:raw><code>文章主題：
+主要問題：
+重點整理：
+作者觀點：
+可以延伸思考的問題：
+需要人工確認的地方：</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              它不是只產生答案，<br/>
+              而是<strong>幫使用者看見整理資料的過程</strong>。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">範例：訪談整理助理的工作流</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            如果是做<strong>質性研究、訪談整理、社會議題分析</strong>，也可以設計一個訪談整理工作流。
+          </p>
+
+          <h4 class="example-heading">任務目標</h4>
+          <p class="detail-paragraph">把訪談逐字稿整理成<strong>初步主題分類</strong>。</p>
+
+          <h4 class="example-heading">工作步驟</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">先<strong>閱讀逐字稿</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>不要改寫受訪者原意</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">找出<strong>反覆出現的主題</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">每個主題附上<strong>簡短說明</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">如果要引用原句，<strong>只能引用短句，並提醒需要回頭確認原文</strong></span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">最後列出<strong>可能需要研究者人工判斷的地方</strong></span></li>
+          </ol>
+
+          <h4 class="example-heading">輸出格式</h4>
+          <pre class="code-block" is:raw><code>初步主題：
+主題說明：
+相關語句摘要：
+需要人工確認的地方：
+下一步建議：</code></pre>
+
+          <div class="callout-card callout-card--warn">
+            <p class="callout-text">
+              這個例子很適合提醒使用者：<strong>AI 可以幫忙整理，但不能取代研究者的判斷</strong>。尤其是訪談資料常常牽涉語境、情緒、背景和倫理問題，最後還是要由人來確認。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Section: design checklist -->
+      <h2 class="detail-heading">工作流設計時，可以用這張小清單</h2>
+      <p class="detail-paragraph">
+        每次設計 AI 工作流前，可以先問自己幾個問題：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">這個工作流<strong>最後要完成什麼</strong>？</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">AI 需要<strong>使用哪些資料</strong>？</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">哪些步驟要<strong>先做</strong>？哪些步驟要<strong>後做</strong>？</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">哪一步需要<strong>使用 MCP Tool</strong>？</span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">哪一步只是<strong>整理文字</strong>，不需要工具？</span></li>
+        <li><span class="numbered-list__num">6</span><span class="numbered-list__text">什麼情況下<strong>應該停下來</strong>？</span></li>
+        <li><span class="numbered-list__num">7</span><span class="numbered-list__text">哪些結果<strong>需要人工確認</strong>？</span></li>
+        <li><span class="numbered-list__num">8</span><span class="numbered-list__text">最後<strong>輸出格式要長什麼樣</strong>？</span></li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          如果這些問題答得出來，工作流通常就會清楚很多。<br/>
+          如果答不出來，<strong>代表這個任務可能還太模糊，不適合直接交給 AI</strong>。
+        </p>
+      </div>
+
+      <!-- Section: don't make a mega-tool -->
+      <h2 class="detail-heading">不要把所有事情都包成一個超大工具</h2>
+      <p class="detail-paragraph">
+        有些人會想：既然我要做工作流，那我是不是乾脆做一個超大的 MCP Tool？例如：
+      </p>
+
+      <pre class="code-block code-block--bad" is:raw><code class="lang-python">do_everything()</code></pre>
+
+      <p class="detail-paragraph">
+        這個工具可以查資料、整理、寫入、更新、發布。聽起來很方便，但其實<strong>很危險 —— 因為功能越大，越難知道哪裡出錯</strong>。
+      </p>
+
+      <p class="detail-paragraph">
+        比較好的做法是<strong>把工具做小，把流程設計清楚</strong>：
+      </p>
+
+      <ul class="check-list">
+        <li><strong>查詢資料</strong>是一個工具</li>
+        <li><strong>建立頁面</strong>是一個工具</li>
+        <li><strong>更新狀態</strong>是一個工具</li>
+        <li><strong>整理文字</strong>可以先讓 AI 做，不一定要包成工具</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          工具越小，越容易測試。流程越清楚，越容易控制。這就是前面一直強調的原則：<strong>不是讓 AI 什麼都能做，而是讓它在清楚的範圍內，把事情一步一步做好</strong>。
+        </p>
+      </div>
+
+      <!-- Section: takeaway -->
+      <h2 class="detail-heading">這裡最重要的觀念</h2>
+      <p class="detail-paragraph">
+        從單一工具到 AI 工作流，<strong>重點不是把工具變多，而是把任務流程變清楚</strong>。單一工具負責一個動作；AI 工作流負責把幾個動作按照順序接起來。
+      </p>
+
+      <p class="detail-paragraph">
+        剛開始設計時，請記得幾個原則：
+      </p>
+
+      <ul class="check-list">
+        <li>先做<strong>小流程</strong>，不要一開始就做大系統</li>
+        <li>先<strong>讀取、整理、草稿</strong>，再考慮寫入和更新</li>
+        <li>工具要<strong>小</strong>，流程要<strong>清楚</strong></li>
+        <li>成功時要知道<strong>下一步</strong></li>
+        <li>失敗時要知道<strong>怎麼停下來</strong></li>
+        <li>重要決定要<strong>保留人工確認</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          AI 工作流真正有價值的地方，不是讓 AI 自己亂做事。<br/>
+          而是讓<strong>人把任務拆清楚</strong>，再讓 AI 在<strong>安全、可檢查的範圍內</strong>，<br/>
+          幫我們把重複的步驟做得更快、更穩。
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-workflow {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-card--tall {
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .code-block--bad {
+    border: 1px solid #d97706;
+    border-left: 4px solid #d97706;
+    position: relative;
+  }
+
+  .code-block--bad::before {
+    content: '✗ 不建議';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1.11rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: #fff;
+    background-color: #d97706;
+    border-bottom-left-radius: var(--border-radius);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .flow-card {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+      padding: var(--space-4);
+    }
+
+    .code-block--bad::before {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

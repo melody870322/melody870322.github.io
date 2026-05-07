@@ -1,0 +1,1130 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="CSV 與表格資料整理 — 把 AI Agent 用在真實任務"
+  description="讓 AI 幫我們看懂表格、整理表格、檢查表格，並產生可以繼續使用的資料摘要。從活動報名 CSV 開始，練習用 Gemini CLI 讀取本機檔案、做基本統計、找出資料問題，最後產生活動提醒草稿。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-csv">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">把 AI Agent 用在第一個真實任務：整理表格資料</h1>
+        <p class="detail-subtitle">
+          AI 工作流不是讓 AI 自己亂跑，而是把任務拆成清楚的步驟，再讓 AI 在<strong>安全、可檢查的範圍內</strong>幫忙完成。這一頁要把 AI Agent 用在一種很常見的任務：<strong>整理 CSV 與表格資料</strong>。
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        不管是活動報名表、問卷結果、課程名單、書目清單、訪談紀錄，很多資料最後都會變成一張表。<strong>看起來只是一張表，但實際整理起來，常常會遇到很多問題</strong>：
+      </p>
+
+      <ul class="cross-list">
+        <li>資料<strong>格式不一致</strong></li>
+        <li>有些欄位<strong>空白</strong></li>
+        <li>同一個意思被寫成<strong>不同說法</strong></li>
+        <li><strong>欄位名稱看不懂</strong></li>
+        <li>想整理重點，卻<strong>不知道從哪裡開始</strong></li>
+        <li>想做摘要，但又<strong>怕 AI 自己亂猜</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        所以這裡要練習的不是很複雜的資料分析，而是：
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          讓 AI 幫我們<strong>看懂表格、整理表格、檢查表格</strong>，<br/>
+          並產生<strong>可以繼續使用的資料摘要</strong>。
+        </p>
+      </div>
+
+      <!-- ============ Section: 建立練習資料 ============ -->
+      <h2 class="detail-heading">先建立一份 CSV 練習資料</h2>
+      <p class="detail-paragraph">
+        我們先準備一份「<strong>活動報名資料</strong>」。請在 VS Code 裡建立一個專案資料夾 <code>csv-agent-practice</code>，接著在裡面建立一個 <code>data</code> 資料夾，再放入 <code>activity_signup.csv</code>。資料夾結構像這樣：
+      </p>
+
+      <pre class="code-block" is:raw><code>csv-agent-practice
+└─ data
+   └─ activity_signup.csv</code></pre>
+
+      <p class="detail-paragraph">
+        檔案內容如下（記得儲存成 <strong>CSV UTF-8</strong> 格式）：
+      </p>
+
+      <pre class="code-block" is:raw><code>姓名,系級,參加場次,飲食需求,是否需要證明,備註
+王小明,中文二,上午場,葷食,是,
+李佳穎,歷史三,下午場,素食,否,希望坐前排
+陳柏宇,社會一,上午場,,是,飲食需求未填
+林怡君,外文四,下午場,葷食,是,
+張庭瑄,心理二,上午場,素食,是,會晚到 10 分鐘
+黃子豪,傳播三,下午場,葷食,否,
+吳雅婷,教育一,上午場,素食,是,
+鄭宇翔,法律二,下午場,,否,未填飲食</code></pre>
+
+      <p class="detail-paragraph">
+        如果把這份 CSV 看成一般表格，大概會長這樣：
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>姓名</th>
+              <th>系級</th>
+              <th>參加場次</th>
+              <th>飲食需求</th>
+              <th>是否需要證明</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>王小明</td><td>中文二</td><td>上午場</td><td>葷食</td><td>是</td><td></td></tr>
+            <tr><td>李佳穎</td><td>歷史三</td><td>下午場</td><td>素食</td><td>否</td><td>希望坐前排</td></tr>
+            <tr><td>陳柏宇</td><td>社會一</td><td>上午場</td><td class="csv-empty">—</td><td>是</td><td>飲食需求未填</td></tr>
+            <tr><td>林怡君</td><td>外文四</td><td>下午場</td><td>葷食</td><td>是</td><td></td></tr>
+            <tr><td>張庭瑄</td><td>心理二</td><td>上午場</td><td>素食</td><td>是</td><td>會晚到 10 分鐘</td></tr>
+            <tr><td>黃子豪</td><td>傳播三</td><td>下午場</td><td>葷食</td><td>否</td><td></td></tr>
+            <tr><td>吳雅婷</td><td>教育一</td><td>上午場</td><td>素食</td><td>是</td><td></td></tr>
+            <tr><td>鄭宇翔</td><td>法律二</td><td>下午場</td><td class="csv-empty">—</td><td>否</td><td>未填飲食</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        這份資料不大，但很適合練習。因為它裡面有幾個常見情況：
+      </p>
+
+      <ul class="check-list">
+        <li>有些人的<strong>飲食需求沒有填</strong></li>
+        <li>備註欄有些是<strong>空白</strong>，有些有<strong>補充說明</strong></li>
+        <li>可能想知道<strong>上午場和下午場各有幾人</strong></li>
+        <li>可能想整理<strong>需要證明的人有哪些</strong></li>
+        <li>也可能想請 AI 幫忙<strong>檢查資料是否完整</strong></li>
+      </ul>
+
+      <!-- ============ Section: 讀取 CSV 檔案 ============ -->
+      <h2 class="detail-heading">讓 Gemini CLI 讀取本機檔案</h2>
+      <p class="detail-paragraph">
+        這裡的練習<strong>不是把 CSV 內容直接貼進指令裡</strong>，而是讓 Gemini CLI 讀取本機檔案。Gemini CLI 可以用 <code>@檔案路徑</code> 的方式，把指定檔案或資料夾內容加入 prompt；如果是單一檔案路徑，就會讀取該檔案內容。
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text">用 <strong>VS Code 開啟剛剛建立的資料夾</strong> <code>csv-agent-practice</code>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text">開啟終端機（<strong>Terminal → New Terminal</strong>），確認目前的位置是在 <code>csv-agent-practice</code> 裡。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text">在終端機輸入 <code>uv init</code>，<strong>初始化專案</strong>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">4</span>
+          <span class="numbered-list__text">輸入 <code>gemini</code>，<strong>啟動 Gemini CLI</strong>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">5</span>
+          <span class="numbered-list__text">接下來的每個練習，都會用這個檔案路徑：<code>@./data/activity_signup.csv</code>。</span>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>@./data/activity_signup.csv</code> 代表：請 Gemini CLI 讀取目前專案資料夾底下 <code>data</code> 資料夾中的 <code>activity_signup.csv</code>。
+        </p>
+      </div>
+
+      <!-- ============ Part: 指令練習 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PRACTICE</span>
+        <span class="part-text">指令練習</span>
+      </div>
+
+      <p class="detail-paragraph">
+        接下來的四個練習，請按順序進行。每一步都先<strong>確認 AI 有沒有看懂</strong>，再進到下一步。如果發現錯誤，就停下來修正，不要急著往後做。
+      </p>
+
+      <!-- 練習 1 -->
+      <div class="case-header">
+        <p class="case-label">練習 1</p>
+        <h2 class="case-title">先請 AI 看懂資料</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        練習目的是讓 AI 先確認它有沒有看懂資料。<strong>這一步不要急著統計人數，也不要急著產生公告</strong>，先確認三件事：
+      </p>
+
+      <ul class="check-list">
+        <li>AI 是否<strong>讀到正確檔案</strong></li>
+        <li>AI 是否<strong>看懂欄位名稱</strong></li>
+        <li>AI 是否知道這份資料<strong>可以回答哪些問題</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        如果 AI 一開始就誤解欄位，後面的整理就可能跟著錯。
+      </p>
+
+      <p class="prompt-label">指令示範</p>
+      <blockquote class="prompt-example">
+        請讀取 @./data/activity_signup.csv。<br/><br/>
+        先不要分析人數，也不要產生活動公告。<br/><br/>
+        請幫我整理：<br/>
+        1. 這份資料有哪些欄位？<br/>
+        2. 每個欄位代表什麼意思？<br/>
+        3. 這份資料看起來適合用來回答哪些問題？<br/>
+        4. 有哪些地方可能需要人工確認？<br/><br/>
+        請只根據檔案內容回答，不要自行想像沒有出現的資料。
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">1. 這份資料有哪些欄位？</h4>
+          <p class="detail-paragraph">資料中共包含 6 個欄位：姓名、系級、參加場次、飲食需求、是否需要證明、備註。</p>
+
+          <h4 class="example-heading">2. 每個欄位代表什麼意思？</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label">姓名</span>
+              <span class="role-item__desc">參加者的個人姓名</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">系級</span>
+              <span class="role-item__desc">所屬的系所與年級（例：中文二、歷史三）</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">參加場次</span>
+              <span class="role-item__desc">報名的時段（出現「上午場」與「下午場」）</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">飲食需求</span>
+              <span class="role-item__desc">用餐習慣或需求（出現「葷食」、「素食」及空白未填）</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">是否需要證明</span>
+              <span class="role-item__desc">是否需要活動出席證明（以「是」或「否」表示）</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">備註</span>
+              <span class="role-item__desc">額外說明或特殊狀況（例如：希望坐前排、會晚到、飲食需求未填）</span>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">3. 這份資料看起來適合回答哪些問題？</h4>
+          <ul class="check-list">
+            <li>哪些參加者報名了上午場、哪些報名了下午場？</li>
+            <li>特定參加者所在的系級為何？</li>
+            <li>哪些參加者有明確填寫飲食需求？</li>
+            <li>哪些參加者在備註欄提出額外需求？</li>
+            <li>有哪些參加者需要活動證明？</li>
+          </ul>
+
+          <h4 class="example-heading">4. 有哪些地方可能需要人工確認？</h4>
+          <ul class="check-list">
+            <li>陳柏宇 與 鄭宇翔 的<strong>飲食需求欄位為空</strong>，雖然備註欄有提到「飲食需求未填」，仍需確認其實際需求</li>
+            <li>李佳穎 希望「<strong>坐前排</strong>」，需確認場地安排是否可行</li>
+            <li>張庭瑄 表示「<strong>會晚到 10 分鐘</strong>」，需確認是否影響簽到流程</li>
+            <li>系級格式可確認是否所有報名者皆符合「系別+年級」格式，以便後續分類</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個回覆的重點不是「分析得多深入」，而是<strong>確認 AI 有沒有正確理解資料結構</strong>。
+        </p>
+      </div>
+
+      <!-- 練習 2 -->
+      <div class="case-header">
+        <p class="case-label">練習 2</p>
+        <h2 class="case-title">整理基本統計</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        練習目的是讓 AI 根據 CSV 做<strong>簡單的分類統計</strong>。例如上午場 / 下午場各有幾人、葷食 / 素食各有幾人、需要證明的人有哪些。這一步可以把一張表，整理成<strong>比較容易閱讀的統計結果</strong>。
+      </p>
+
+      <p class="prompt-label">指令示範</p>
+      <blockquote class="prompt-example">
+        請讀取 @./data/activity_signup.csv，並根據檔案內容整理基本統計。<br/><br/>
+        請回答：<br/>
+        1. 上午場有幾人？請列出姓名。<br/>
+        2. 下午場有幾人？請列出姓名。<br/>
+        3. 葷食有幾人？請列出姓名。<br/>
+        4. 素食有幾人？請列出姓名。<br/>
+        5. 飲食需求空白或未填的人有幾人？請列出姓名。<br/>
+        6. 需要證明的人有幾人？請列出姓名。<br/><br/>
+        請用表格呈現統計結果。<br/>
+        請只根據檔案內容回答，不要自行補充或猜測。
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">基本統計結果如下：</p>
+
+          <div class="csv-table-wrapper">
+            <table class="csv-table csv-table--stat">
+              <thead>
+                <tr><th>項目</th><th>人數</th><th>姓名清單</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>上午場</td><td class="csv-num">4</td><td>王小明、陳柏宇、張庭瑄、吳雅婷</td></tr>
+                <tr><td>下午場</td><td class="csv-num">4</td><td>李佳穎、林怡君、黃子豪、鄭宇翔</td></tr>
+                <tr><td>葷食</td><td class="csv-num">3</td><td>王小明、林怡君、黃子豪</td></tr>
+                <tr><td>素食</td><td class="csv-num">3</td><td>李佳穎、張庭瑄、吳雅婷</td></tr>
+                <tr><td>飲食需求未填</td><td class="csv-num">2</td><td>陳柏宇、鄭宇翔</td></tr>
+                <tr><td>需要證明</td><td class="csv-num">5</td><td>王小明、陳柏宇、林怡君、張庭瑄、吳雅婷</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 class="example-heading">統計說明</h4>
+          <ul class="check-list">
+            <li><strong>場次分佈</strong>：上午與下午場各有 4 人</li>
+            <li><strong>飲食需求</strong>：葷食與素食各 3 人，另有 2 人欄位空白</li>
+            <li><strong>證明需求</strong>：5 人在「是否需要證明」欄位填寫「是」</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>AI 很適合幫忙整理，但人還是要檢查。</strong>尤其是資料筆數變多時，AI 有可能算錯。所以正式使用前，最好再用試算表或程式工具確認一次。
+        </p>
+      </div>
+
+      <!-- 練習 3 -->
+      <div class="case-header">
+        <p class="case-label">練習 3</p>
+        <h2 class="case-title">找出需要處理的資料問題</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        練習目的是讓 AI 幫忙<strong>檢查資料是否完整</strong>。表格整理不只是計算人數，更重要的是找出：
+      </p>
+
+      <ul class="check-list">
+        <li>哪裡<strong>空白</strong></li>
+        <li>哪裡<strong>需要確認</strong></li>
+        <li>哪些資料會<strong>影響後續安排</strong></li>
+        <li>哪些地方<strong>不能讓 AI 自己補</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這一步的重點不是叫 AI 修改資料，而是<strong>讓 AI 指出問題，提醒人回頭確認</strong>。
+      </p>
+
+      <p class="prompt-label">指令示範</p>
+      <blockquote class="prompt-example">
+        請讀取 @./data/activity_signup.csv，並檢查這份資料中可能需要人工確認的地方。<br/><br/>
+        請特別檢查：<br/>
+        1. 哪些欄位有空白？<br/>
+        2. 哪些資料可能會影響後續安排？<br/>
+        3. 哪些人需要再確認資料？<br/>
+        4. 哪些地方不能由 AI 直接補答案？<br/><br/>
+        請用以下格式回答：<br/><br/>
+        　資料問題：<br/>
+        　需要確認的對象：<br/>
+        　可能影響：<br/>
+        　建議下一步：<br/><br/>
+        請不要直接修改原始資料，也不要替空白欄位補答案。
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">資料問題</h4>
+          <ol class="numbered-list">
+            <li>
+              <span class="numbered-list__num">1</span>
+              <span class="numbered-list__text"><strong>欄位空白</strong>：飲食需求 — 陳柏宇、鄭宇翔；備註 — 王小明、林怡君、黃子豪、吳雅婷。</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">2</span>
+              <span class="numbered-list__text"><strong>特殊註記</strong>：李佳穎 提出座位需求（希望坐前排）；張庭瑄 提出時間變動（會晚到 10 分鐘）。</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">3</span>
+              <span class="numbered-list__text"><strong>不能由 AI 補答案的地方</strong>：飲食需求是個人健康或信仰相關選擇，補錯可能造成安全問題；備註中的需求則牽涉個人權益，必須依實際溝通結果填寫。</span>
+            </li>
+          </ol>
+
+          <h4 class="example-heading">需要確認的對象</h4>
+          <ul class="check-list">
+            <li><strong>陳柏宇、鄭宇翔</strong>：需確認其具體飲食需求</li>
+            <li><strong>李佳穎</strong>：需確認「坐前排」的需求是否可被場地安排滿足</li>
+            <li><strong>張庭瑄</strong>：需確認「晚到 10 分鐘」是否會錯過重要環節（如報到領取資料）</li>
+          </ul>
+
+          <h4 class="example-heading">可能影響</h4>
+          <ul class="check-list">
+            <li><strong>餐點採購</strong>：未確認飲食可能導致當天餐點份數不足或類型錯誤</li>
+            <li><strong>場地佈置</strong>：座位需求若未事先安排，現場可能造成調整困擾</li>
+            <li><strong>報到流程</strong>：晚到可能影響活動開始的流暢度，或需要額外人力引導</li>
+          </ul>
+
+          <h4 class="example-heading">建議下一步</h4>
+          <ul class="check-list">
+            <li><strong>主動聯繫</strong>陳柏宇與鄭宇翔詢問飲食，並更新資料</li>
+            <li>回覆李佳穎座位的安排結果，並在名單中註記「已安排」或「視現場情況而定」</li>
+            <li>通知現場報到人員張庭瑄會晚到，預留其活動資料</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          AI <strong>不應該看到空白就自己補</strong>，<br/>
+          它應該<strong>指出問題，提醒使用者確認</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這和前面學過的工作流觀念一樣：<strong>資料不足時，要停下來，不要硬猜</strong>。
+      </p>
+
+      <!-- 練習 4 -->
+      <div class="case-header">
+        <p class="case-label">練習 4</p>
+        <h2 class="case-title">把資料整理成活動提醒草稿</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        前面三個練習已經完成「<strong>看懂資料 → 整理統計 → 找出問題</strong>」。現在可以讓 AI 根據資料產生一段活動提醒，但<strong>仍然不是直接發布</strong>。比較安全的做法是：
+      </p>
+
+      <ul class="check-list">
+        <li>請 AI 產生<strong>草稿</strong></li>
+        <li>請 AI 列出<strong>資料摘要</strong></li>
+        <li>請 AI 提醒<strong>哪些地方需要人工確認</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        最後要不要發布，仍然由人決定。
+      </p>
+
+      <p class="prompt-label">指令示範</p>
+      <blockquote class="prompt-example">
+        請讀取 @./data/activity_signup.csv，並根據檔案內容幫我產生活動行前提醒草稿。<br/><br/>
+        請遵守以下規則：<br/>
+        1. 只能根據 CSV 檔案中出現的資料整理。<br/>
+        2. 不要公開列出所有人的姓名。<br/>
+        3. 請提醒參加者依照自己報名的場次出席。<br/>
+        4. 請提醒飲食需求未填的人要盡快補填。<br/>
+        5. 請提醒需要證明的人，活動後可以依主辦單位安排領取證明。<br/>
+        6. 這只是草稿，不要替我發布。<br/>
+        7. 最後請列出需要人工確認的地方。<br/><br/>
+        請用以下格式回答：<br/><br/>
+        　活動提醒草稿：<br/>
+        　資料摘要：<br/>
+        　需要人工確認的地方：
+      </blockquote>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <h4 class="example-heading">活動提醒草稿</h4>
+          <blockquote class="prompt-example">
+            【活動行前通知與提醒】<br/><br/>
+            各位參加者您好，活動即將舉行，請留意以下事項：<br/><br/>
+            1. <strong>場次確認</strong>：請務必依照您報名的場次（上午場或下午場）準時出席。<br/>
+            2. <strong>飲食需求補填</strong>：仍有部分參加者「飲食需求」欄位尚未填寫，為確保餐點安排，請盡快聯繫主辦單位補填。<br/>
+            3. <strong>活動證明領取</strong>：報名時選擇「需要證明」的參加者，請於活動結束後依現場引導領取。<br/>
+            4. <strong>特殊狀況註記</strong>：若於報名時有提出特殊需求（座位、時間調整），主辦單位已納入記錄，屆時依現場安排為準。
+          </blockquote>
+
+          <h4 class="example-heading">資料摘要</h4>
+          <ul class="check-list">
+            <li>總報名人數：<strong>8 人</strong></li>
+            <li>場次分佈：上午場 4 人、下午場 4 人</li>
+            <li>證明需求：<strong>5 人</strong>需要活動證明</li>
+            <li>飲食統計：葷食 3 人、素食 3 人、未填 2 人</li>
+            <li>特殊需求：座位需求 1 件、預計晚到 1 件</li>
+          </ul>
+
+          <h4 class="example-heading">需要人工確認的地方</h4>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>補填飲食需求</strong>：聯繫「陳○宇」與「鄭○翔」確認餐點習慣。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>座位需求回覆</strong>：確認「李○穎」希望坐前排的場地標記。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>報到流程預備</strong>：通知報到組「張○瑄」將晚到 10 分鐘，以便保留資料。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>證明文件製作</strong>：核對 5 位需要證明的參加者資料，提前準備。</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習已經進入<strong>「草稿型工作流」</strong>。AI 不是只做統計，而是把表格整理結果<strong>轉成可用文字</strong>。但最後仍然要人工確認。
+        </p>
+      </div>
+
+      <!-- ============ Section: troubleshoot ============ -->
+      <h2 class="detail-heading">如果 Gemini CLI 沒有讀到檔案怎麼辦？</h2>
+      <p class="detail-paragraph">
+        有時候你可能會看到 Gemini CLI 說<strong>找不到檔案</strong>。這時候可以檢查幾件事：
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text">確認檔案<strong>真的存在</strong>：<code>csv-agent-practice/data/activity_signup.csv</code>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text">確認你是在 <code>csv-agent-practice</code> 這個資料夾裡<strong>啟動 Gemini CLI</strong>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text">確認指令中的路徑是 <code>@./data/activity_signup.csv</code>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">4</span>
+          <span class="numbered-list__text">如果資料夾或檔名<strong>有空格</strong>，請避免使用空格，或依工具要求處理路徑。</span>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          初學時，建議資料夾和檔名都先用<strong>英文、數字、底線或減號</strong>，例如 <code>data</code>、<code>activity_signup.csv</code>、<code>course_feedback.csv</code>、<code>reading_list.csv</code>，這樣比較不容易出錯。
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">這裡最重要的觀念</h2>
+      <p class="detail-paragraph">
+        CSV 和表格資料整理，<strong>不是把資料丟給 AI，然後叫它自由發揮</strong>。比較好的做法是：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">先讓 AI <strong>讀取檔案</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">再讓 AI <strong>看懂欄位</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">接著請 AI 做<strong>基本統計</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">然後請 AI <strong>找出資料問題</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">最後才讓 AI 產生<strong>摘要或草稿</strong></span></li>
+      </ol>
+
+      <p class="detail-paragraph">
+        這樣做的好處是<strong>每一步都可以檢查</strong>：第一步看錯欄位可以馬上停下來；統計算錯可以回頭修正；資料不足，就不要讓 AI 硬猜。
+      </p>
+
+      <ul class="check-list">
+        <li>表格是<strong>資料來源</strong></li>
+        <li>AI 是<strong>整理助理</strong></li>
+        <li><strong>原始資料不要隨便改</strong></li>
+        <li>最後的判斷<strong>仍然要由人確認</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          AI 很適合幫忙整理表格資料，<br/>
+          但它的任務是<strong>輔助</strong>，不是<strong>取代</strong>。<br/>
+          最後拍板的，仍然是<strong>人</strong>。
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-csv {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-list--compact {
+    gap: var(--space-2);
+    margin: var(--space-4) 0;
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-list--compact .role-item {
+    padding: var(--space-3);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 6rem;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-list--compact .role-item__label {
+    min-width: 7rem;
+    font-size: var(--text-sm);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 0;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-label {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 0.02em;
+  }
+
+  .prompt-label::before {
+    content: '✦ ';
+    color: var(--color-accent);
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* CSV preview table */
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .csv-empty {
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  .csv-num {
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-accent);
+    width: 4rem;
+  }
+
+  .csv-table--stat tbody td:first-child {
+    font-weight: 600;
+    color: var(--color-heading);
+    white-space: nowrap;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-list--compact .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block,
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

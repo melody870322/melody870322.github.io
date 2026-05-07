@@ -1,0 +1,1727 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Notion API in Practice: Building a Task Management MCP Tool — Using AI Agents for Real Tasks"
+  description="After organizing data, the next step is often to put it into Notion. This page walks through building a small Notion MCP server with three tools — read, create, update — so an AI agent can act on your classroom tasks within a clear, safe boundary."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-notion">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Build Your Own Small Notion MCP — Let AI Touch Notion Inside a Boundary</h1>
+        <p class="detail-subtitle">
+          We've already practiced having AI organize CSV and tabular data. But <strong>after the cleanup, there's almost always a next step</strong>: drop the to-do into Notion, flip a task to "In progress," mark a finished item as done. This page turns Notion into a tool an AI agent can use.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        We're <strong>not going to use an off-the-shelf Notion MCP</strong> here. Instead, we'll build a small classroom-style Notion MCP server ourselves. The benefits:
+      </p>
+
+      <ul class="check-list">
+        <li>We get to <strong>decide what the AI can do</strong></li>
+        <li>And <strong>what the AI can't do</strong></li>
+        <li>The smaller the tool, the <strong>clearer its boundary</strong></li>
+        <li>The clearer the boundary, the <strong>safer it is to use</strong></li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The Notion API lets external tools read, create, and update Notion data. But <strong>before any call you must create a connection</strong> and share the relevant page or database with it — otherwise the API has no permission. Notion also reminds developers that <strong>the token is a secret</strong>: never hardcode it or commit it to version control.
+        </p>
+      </div>
+
+      <h2 class="detail-heading">Three things, no more</h2>
+      <p class="detail-paragraph">
+        This Notion tool is <strong>not an all-purpose Notion assistant</strong>. It only does three things:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">list_classroom_tasks</span>
+          <span class="role-item__desc">read classroom tasks</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">create_classroom_task</span>
+          <span class="role-item__desc">add a new classroom task</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">update_task_status</span>
+          <span class="role-item__desc">update a task's status</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Three actions are enough to practice the basics of the Notion API while <strong>keeping the tool small from day one</strong>.
+      </p>
+
+      <!-- ============ PART 1 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">Build a practice database in Notion</span>
+      </div>
+
+      <p class="detail-paragraph">
+        Before writing any Python or MCP code, we need to set up a database in Notion. A Notion database is <strong>a slightly smarter table</strong> — each row holds field data and can also open into its own page. We recommend a <strong>Table database</strong> here: it's the closest thing to an ordinary table and the most natural fit for read / create / update practice.
+      </p>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">Create a new page</h2>
+      </div>
+      <p class="detail-paragraph">
+        Open Notion and click <strong>"Database"</strong> in the left sidebar. Use this page name:
+      </p>
+      <pre class="code-block" is:raw><code>課堂任務管理 (Classroom Tasks)</code></pre>
+      <p class="detail-paragraph">
+        This page will hold the task data we'll work with later.
+      </p>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">Create a Table database</h2>
+      </div>
+      <p class="detail-paragraph">
+        Inside the new page, choose <strong>"Start with a database"</strong>, then pick the <strong>"Empty database"</strong> option from the menu.
+      </p>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">Confirm the database name</h2>
+      </div>
+      <p class="detail-paragraph">
+        Make sure the database is called <strong>「課堂任務管理」</strong>. If Notion auto-creates an unnamed database, rename it to this title.
+      </p>
+      <div class="callout-card">
+        <p class="callout-text">
+          The name is mostly <strong>for human readers</strong>. What the program actually uses is Notion's <code>data_source_id</code>, not the database name.
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Create the columns</h2>
+      </div>
+      <p class="detail-paragraph">
+        Add the columns the database needs, exactly as listed below:
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>Column name</th>
+              <th>Property type</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>任務名稱</td><td>Text</td><td>The task name</td></tr>
+            <tr><td>類型</td><td>Select</td><td>Which category the task belongs to</td></tr>
+            <tr><td>狀態</td><td>Select</td><td>Current processing status</td></tr>
+            <tr><td>優先順序</td><td>Select</td><td>High / Medium / Low</td></tr>
+            <tr><td>截止日</td><td>Date</td><td>When the task is due</td></tr>
+            <tr><td>來源</td><td>Text</td><td>Where the task came from</td></tr>
+            <tr><td>備註</td><td>Text</td><td>Additional notes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Column names must match exactly.</strong> If the program uses「任務名稱」, don't shorten it to「任務」or「名稱」in Notion. The Notion API looks columns up <strong>by name</strong>; a mismatch means the program won't find the right field.
+        </p>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="case-header">
+        <p class="case-label">STEP 5</p>
+        <h2 class="case-title">Configure the Select options</h2>
+      </div>
+      <p class="detail-paragraph">
+        A few columns aren't free-text — they use <strong>fixed options</strong>. This reduces the inconsistency problem (one person writes「處理中」, another「進行中」, another「正在處理」 — and the program can't tell). So we lock the options down up front. For each column below, use <strong>"Edit property"</strong> and add the options:
+      </p>
+
+      <h4 class="example-heading">「狀態」 column (3 options)</h4>
+      <ul class="check-list">
+        <li>待確認 (Pending)</li>
+        <li>處理中 (In progress)</li>
+        <li>已完成 (Done)</li>
+      </ul>
+
+      <h4 class="example-heading">「類型」 column (4 options)</h4>
+      <ul class="check-list">
+        <li>教學準備 (Teaching prep)</li>
+        <li>學生回覆 (Student response)</li>
+        <li>行政事項 (Admin)</li>
+        <li>閱讀材料 (Reading material)</li>
+      </ul>
+
+      <h4 class="example-heading">「優先順序」 column (3 options)</h4>
+      <ul class="check-list">
+        <li>高 (High)</li>
+        <li>中 (Medium)</li>
+        <li>低 (Low)</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          These fixed options will line up with the Python program later —<br/>
+          the tool <strong>only accepts these values</strong>.<br/>
+          This isn't restricting the AI; it's <strong>making the data more stable</strong>.
+        </p>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">Add some sample rows</h2>
+      </div>
+      <p class="detail-paragraph">
+        Once the columns are in place, add a few rows manually:
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>任務名稱</th>
+              <th>類型</th>
+              <th>狀態</th>
+              <th>優先順序</th>
+              <th>截止日</th>
+              <th>來源</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-03-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
+            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-03-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
+            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-03-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-03-18</td><td>活動報名表</td><td>已確認名單</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        These rows are what later exercises will use. It's a small dataset, but a useful one — it covers <strong>different statuses, types, and priorities</strong>, plus tasks that can be updated.
+      </p>
+
+      <!-- ============ PART 2 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Set up a connection to the Notion API</span>
+      </div>
+
+      <h2 class="detail-heading">First: database vs. data source</h2>
+      <p class="detail-paragraph">
+        In the newer Notion API design, <strong>database and data source are separate concepts</strong>. A simple way to think about it:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Database</span>
+          <span class="role-item__desc">Behaves more like a <strong>shell or container</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Data source</span>
+          <span class="role-item__desc">The actual <strong>table that holds each row</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Page</span>
+          <span class="role-item__desc">Each row in the API is treated as a "page"</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Notion's docs note that starting from <strong>API version 2025-09-03</strong>, most operations that used to take <code>database_id</code> now take <code>data_source_id</code>; <code>2026-03-11</code> is also available as an API header. The examples on this page use the <strong>new data_source_id form</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So we need two key pieces of information:
+      </p>
+
+      <ul class="check-list">
+        <li><code>NOTION_API_KEY</code></li>
+        <li><code>NOTION_DATA_SOURCE_ID</code></li>
+      </ul>
+
+      <!-- STEP A -->
+      <div class="case-header">
+        <p class="case-label">STEP A</p>
+        <h2 class="case-title">Create a Notion connection</h2>
+      </div>
+      <p class="detail-paragraph">
+        For Python to reach Notion, we first create a connection. From the workspace switcher in the top-left of Notion:
+      </p>
+      <pre class="code-block" is:raw><code>Settings → Connections → Develop or manage integrations → Create new internal integration</code></pre>
+      <p class="detail-paragraph">
+        Name it <code>Classroom Tool</code>. Then make sure it has at least these capabilities:
+      </p>
+
+      <ul class="check-list">
+        <li>Read content</li>
+        <li>Update content</li>
+        <li>Insert content</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        <strong>Don't enable more than you need.</strong> This tool only reads, creates, and updates tasks — there's no need for delete, and no need to manage the entire workspace.
+      </p>
+
+      <!-- STEP B -->
+      <div class="case-header">
+        <p class="case-label">STEP B</p>
+        <h2 class="case-title">Share the database with the connection</h2>
+      </div>
+      <p class="detail-paragraph">
+        After creating the connection, <strong>it isn't usable yet</strong>. You need to go back to the「課堂任務管理」database and share it with the connection — otherwise API requests will fail.
+      </p>
+      <p class="detail-paragraph">
+        Open「課堂任務管理」 in Notion, then:
+      </p>
+      <pre class="code-block" is:raw><code>Top-right ⋯ → Connections → Select Classroom Tool</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>This step is critical.</strong> A lot of Notion API errors aren't bugs in the code — they're <strong>databases that haven't been shared with the connection</strong>.
+        </p>
+      </div>
+
+      <!-- STEP C -->
+      <div class="case-header">
+        <p class="case-label">STEP C</p>
+        <h2 class="case-title">Find the data source ID</h2>
+      </div>
+      <p class="detail-paragraph">
+        The simplest path: in the database's top-right area, click the slider icon labelled <strong>"Settings"</strong> (left of "New"), then:
+      </p>
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Click <strong>"Manage data sources"</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Click the <strong>⋯</strong> next to「課堂任務管理」</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Copy the <strong>data source ID</strong></span></li>
+      </ol>
+      <p class="detail-paragraph">
+        Set this ID aside — we'll need it shortly.
+      </p>
+
+      <!-- ============ PART 3 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">Write a small MCP server</span>
+      </div>
+
+      <!-- STEP I -->
+      <div class="case-header">
+        <p class="case-label">STEP I</p>
+        <h2 class="case-title">Create the project folder</h2>
+      </div>
+      <p class="detail-paragraph">
+        In VS Code, create a new project folder named <code>notion-classroom-tool</code>. The structure can start as:
+      </p>
+
+      <pre class="code-block" is:raw><code>notion-classroom-tool
+├─ notion_classroom_server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <!-- STEP II -->
+      <div class="case-header">
+        <p class="case-label">STEP II</p>
+        <h2 class="case-title">Create .env and .gitignore</h2>
+      </div>
+      <p class="detail-paragraph">
+        Put these in <code>.env</code>:
+      </p>
+
+      <pre class="code-block" is:raw><code>NOTION_API_KEY=your_notion_connection_token
+NOTION_DATA_SOURCE_ID=your_data_source_id
+NOTION_VERSION=2026-03-11</code></pre>
+
+      <ul class="check-list">
+        <li>The <code>notion_connection_token</code> appears as <strong>"Internal Integration Secret"</strong> on the Classroom Tool page after creation — click "Show" to reveal it before copying</li>
+        <li>The <code>data_source_id</code> is the one you just copied in STEP C</li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Important:<br/>
+          ✗ Don't <strong>hardcode the API key</strong> in Python.<br/>
+          ✗ Don't <strong>push .env to GitHub</strong>.<br/>
+          ✗ Don't <strong>paste the token into public docs</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>.gitignore</code> can be:
+      </p>
+
+      <pre class="code-block" is:raw><code>.env
+.venv/
+__pycache__/</code></pre>
+
+      <!-- STEP III -->
+      <div class="case-header">
+        <p class="case-label">STEP III</p>
+        <h2 class="case-title">Install dependencies</h2>
+      </div>
+      <p class="detail-paragraph">
+        In the VS Code terminal, initialize the project:
+      </p>
+      <pre class="code-block" is:raw><code>uv init</code></pre>
+      <p class="detail-paragraph">
+        Activate the virtual environment, then add the packages:
+      </p>
+      <pre class="code-block" is:raw><code>uv add "mcp[cli]" python-dotenv requests</code></pre>
+
+      <!-- STEP IV -->
+      <div class="case-header">
+        <p class="case-label">STEP IV</p>
+        <h2 class="case-title">Which tools are we building?</h2>
+      </div>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">list_classroom_tasks</span>
+          <span class="role-item__desc"><strong>Reads Notion tasks</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">create_classroom_task</span>
+          <span class="role-item__desc"><strong>Creates a new Notion task</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">update_task_status</span>
+          <span class="role-item__desc"><strong>Updates a task's status</strong></span>
+        </li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          We're <strong>deliberately not building a delete tool</strong>. Delete is a high-risk action and not appropriate for this practice.
+        </p>
+      </div>
+
+      <!-- STEP V -->
+      <div class="case-header">
+        <p class="case-label">STEP V</p>
+        <h2 class="case-title">Write the MCP server</h2>
+      </div>
+      <p class="detail-paragraph">
+        Place the following in <code>notion_classroom_server.py</code>:
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">notion_classroom_server.py — full source</span>
+          <span class="details-card__hint">Click to expand (~220 lines)</span>
+        </summary>
+        <div class="details-card__body">
+          <pre class="code-block" is:raw><code class="lang-python">from typing import Optional
+import os
+import requests
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+
+load_dotenv()
+
+mcp = FastMCP("notion-classroom")
+
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+NOTION_DATA_SOURCE_ID = os.getenv("NOTION_DATA_SOURCE_ID")
+NOTION_VERSION = os.getenv("NOTION_VERSION", "2026-03-11")
+
+NOTION_BASE_URL = "https://api.notion.com/v1"
+
+ALLOWED_STATUS = ["待確認", "處理中", "已完成"]
+ALLOWED_CATEGORY = ["教學準備", "學生回覆", "行政事項", "閱讀材料"]
+ALLOWED_PRIORITY = ["高", "中", "低"]
+
+
+def notion_headers() -> dict:
+    if not NOTION_API_KEY:
+        raise ValueError("Missing NOTION_API_KEY. Check your .env file.")
+
+    return {
+        "Authorization": f"Bearer {NOTION_API_KEY}",
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+    }
+
+
+def notion_request(method: str, path: str, payload: Optional[dict] = None) -> dict:
+    try:
+        response = requests.request(
+            method=method,
+            url=f"{NOTION_BASE_URL}{path}",
+            headers=notion_headers(),
+            json=payload,
+            timeout=20,
+        )
+
+        if response.status_code >= 400:
+            try:
+                detail = response.json()
+            except Exception:
+                detail = response.text
+
+            return {
+                "ok": False,
+                "status_code": response.status_code,
+                "message": "Notion API returned an error.",
+                "detail": detail,
+            }
+
+        return {
+            "ok": True,
+            "data": response.json(),
+        }
+
+    except requests.RequestException as error:
+        return {
+            "ok": False,
+            "message": "Failed to reach the Notion API.",
+            "detail": str(error),
+        }
+
+
+def get_title(properties: dict, name: str) -> str:
+    title_items = properties.get(name, {}).get("title", [])
+    return "".join(item.get("plain_text", "") for item in title_items)
+
+
+def get_select(properties: dict, name: str) -> str:
+    value = properties.get(name, {}).get("select")
+    if not value:
+        return ""
+    return value.get("name", "")
+
+
+def get_date(properties: dict, name: str) -> str:
+    value = properties.get(name, {}).get("date")
+    if not value:
+        return ""
+    return value.get("start", "")
+
+
+def get_rich_text(properties: dict, name: str) -> str:
+    text_items = properties.get(name, {}).get("rich_text", [])
+    return "".join(item.get("plain_text", "") for item in text_items)
+
+
+def page_to_task(page: dict) -> dict:
+    properties = page.get("properties", {})
+
+    return {
+        "page_id": page.get("id", ""),
+        "url": page.get("url", ""),
+        "任務名稱": get_title(properties, "任務名稱"),
+        "類型": get_select(properties, "類型"),
+        "狀態": get_select(properties, "狀態"),
+        "優先順序": get_select(properties, "優先順序"),
+        "截止日": get_date(properties, "截止日"),
+        "來源": get_rich_text(properties, "來源"),
+        "備註": get_rich_text(properties, "備註"),
+    }
+
+
+@mcp.tool()
+def list_classroom_tasks(status: str = "待確認", limit: int = 10) -> dict:
+    """
+    Read classroom tasks from Notion.
+
+    status can be: 全部, 待確認, 處理中, 已完成.
+    limit is the max number of rows returned, between 1 and 20.
+    """
+    if not NOTION_DATA_SOURCE_ID:
+        return {
+            "ok": False,
+            "message": "Missing NOTION_DATA_SOURCE_ID. Check your .env file.",
+        }
+
+    if status not in ["全部"] + ALLOWED_STATUS:
+        return {
+            "ok": False,
+            "message": "Status not allowed.",
+            "allowed_status": ["全部"] + ALLOWED_STATUS,
+        }
+
+    if limit &lt; 1 or limit &gt; 20:
+        return {
+            "ok": False,
+            "message": "limit must be between 1 and 20.",
+        }
+
+    payload = {
+        "page_size": limit,
+    }
+
+    if status != "全部":
+        payload["filter"] = {
+            "property": "狀態",
+            "select": {
+                "equals": status,
+            },
+        }
+
+    result = notion_request(
+        "POST",
+        f"/data_sources/{NOTION_DATA_SOURCE_ID}/query",
+        payload,
+    )
+
+    if not result["ok"]:
+        return result
+
+    pages = result["data"].get("results", [])
+    tasks = [page_to_task(page) for page in pages]
+
+    return {
+        "ok": True,
+        "count": len(tasks),
+        "tasks": tasks,
+    }
+
+
+@mcp.tool()
+def create_classroom_task(
+    title: str,
+    category: str = "教學準備",
+    priority: str = "中",
+    due_date: str = "",
+    source: str = "",
+    note: str = "",
+) -> dict:
+    """
+    Create a classroom task in Notion.
+
+    title is the task name.
+    category can be: 教學準備, 學生回覆, 行政事項, 閱讀材料.
+    priority can be: 高, 中, 低.
+    due_date should use YYYY-MM-DD format, e.g. 2026-03-20.
+    """
+    if not NOTION_DATA_SOURCE_ID:
+        return {
+            "ok": False,
+            "message": "Missing NOTION_DATA_SOURCE_ID. Check your .env file.",
+        }
+
+    title = title.strip()
+
+    if not title:
+        return {
+            "ok": False,
+            "message": "Task name cannot be empty.",
+        }
+
+    if len(title) &gt; 80:
+        return {
+            "ok": False,
+            "message": "Task name is too long. Keep it under 80 characters.",
+        }
+
+    if category not in ALLOWED_CATEGORY:
+        return {
+            "ok": False,
+            "message": "Category not allowed.",
+            "allowed_category": ALLOWED_CATEGORY,
+        }
+
+    if priority not in ALLOWED_PRIORITY:
+        return {
+            "ok": False,
+            "message": "Priority not allowed.",
+            "allowed_priority": ALLOWED_PRIORITY,
+        }
+
+    properties = {
+        "任務名稱": {
+            "title": [{"text": {"content": title}}],
+        },
+        "類型": {
+            "select": {"name": category},
+        },
+        "狀態": {
+            "select": {"name": "待確認"},
+        },
+        "優先順序": {
+            "select": {"name": priority},
+        },
+        "來源": {
+            "rich_text": [{"text": {"content": source}}],
+        },
+        "備註": {
+            "rich_text": [{"text": {"content": note}}],
+        },
+    }
+
+    if due_date:
+        properties["截止日"] = {
+            "date": {"start": due_date},
+        }
+
+    payload = {
+        "parent": {
+            "type": "data_source_id",
+            "data_source_id": NOTION_DATA_SOURCE_ID,
+        },
+        "properties": properties,
+    }
+
+    result = notion_request("POST", "/pages", payload)
+
+    if not result["ok"]:
+        return result
+
+    page = result["data"]
+
+    return {
+        "ok": True,
+        "message": "Notion task created.",
+        "page_id": page.get("id", ""),
+        "url": page.get("url", ""),
+        "任務名稱": title,
+        "狀態": "待確認",
+    }
+
+
+@mcp.tool()
+def update_task_status(page_id: str, new_status: str) -> dict:
+    """
+    Update a Notion task's status.
+
+    new_status can only be: 待確認, 處理中, 已完成.
+    This tool only updates status — it never modifies the title, date, or notes.
+    """
+    page_id = page_id.strip()
+
+    if not page_id:
+        return {
+            "ok": False,
+            "message": "Missing page_id. Cannot update task.",
+        }
+
+    if new_status not in ALLOWED_STATUS:
+        return {
+            "ok": False,
+            "message": "Status not allowed.",
+            "allowed_status": ALLOWED_STATUS,
+        }
+
+    payload = {
+        "properties": {
+            "狀態": {
+                "select": {"name": new_status},
+            },
+        },
+    }
+
+    result = notion_request("PATCH", f"/pages/{page_id}", payload)
+
+    if not result["ok"]:
+        return result
+
+    return {
+        "ok": True,
+        "message": "Task status updated.",
+        "page_id": page_id,
+        "new_status": new_status,
+    }
+
+
+if __name__ == "__main__":
+    mcp.run()
+</code></pre>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The new <strong>Create page API</strong> can place a new page under an existing page or data source; if the new page is a child of a data source, the submitted properties must match that data source's schema. The <strong>Update page API</strong> updates properties on a data-source child page — the「狀態」column we update here is exactly that case.
+        </p>
+      </div>
+
+      <!-- STEP VI -->
+      <div class="case-header">
+        <p class="case-label">STEP VI</p>
+        <h2 class="case-title">Wire the MCP server into Gemini CLI</h2>
+      </div>
+      <p class="detail-paragraph">
+        Create <code>.gemini/settings.json</code> in the project folder. The structure becomes:
+      </p>
+
+      <pre class="code-block" is:raw><code>notion-classroom-tool
+├─ .gemini
+│  └─ settings.json
+├─ notion_classroom_server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <p class="detail-paragraph">
+        <code>settings.json</code> can be:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "notion-classroom": {
+      "command": "python",
+      "args": ["notion_classroom_server.py"],
+      "cwd": ".",
+      "trust": false
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        Then in the VS Code terminal:
+      </p>
+      <pre class="code-block" is:raw><code>gemini</code></pre>
+      <p class="detail-paragraph">
+        Once Gemini CLI is up:
+      </p>
+      <pre class="code-block" is:raw><code>/mcp list</code></pre>
+      <p class="detail-paragraph">
+        If everything's wired correctly, you should see <code>notion-classroom</code> as an MCP server, along with the <strong>three tools</strong> we just defined.
+      </p>
+
+      <!-- ============ PART 4 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 4</span>
+        <span class="part-text">Prompt Exercises</span>
+      </div>
+
+      <!-- Exercise 1 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 1</p>
+        <h2 class="case-title">Read pending tasks</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to <strong>confirm the AI can read Notion data through our hand-built MCP tool</strong>. Read only — no creating, no updating. <strong>If reading isn't reliable, we shouldn't move on to writes or updates</strong>.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Use the notion-classroom tool to list classroom tasks whose status is「待確認」.<br/><br/>
+            Present the results as a table with these columns:<br/>
+            1. Task name<br/>
+            2. Category<br/>
+            3. Priority<br/>
+            4. Due date<br/>
+            5. Notes<br/><br/>
+            Answer based only on what the tool returns.
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">Here are the classroom tasks currently marked「待確認」 in Notion:</p>
+
+          <div class="csv-table-wrapper">
+            <table class="csv-table">
+              <thead>
+                <tr><th>Task name</th><th>Category</th><th>Priority</th><th>Due date</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>確認下週課堂公告</td><td>教學準備</td><td>高</td><td>2026-03-20</td><td>需要確認教室、時間與提醒內容</td></tr>
+                <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>中</td><td>2026-03-25</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This single exercise checks three things at once:<br/>
+          ✓ Whether the Notion API key is correct<br/>
+          ✓ Whether the data source ID is correct<br/>
+          ✓ Whether the database is <strong>shared with the connection</strong>
+        </p>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 2</p>
+        <h2 class="case-title">Create a new classroom task</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to have the AI create a new row in Notion through the MCP tool. This is the first deliberate practice of "<strong>writing</strong>" — but the write is <strong>constrained</strong>. It can only add tasks, and a new task's status is fixed at「<strong>待確認</strong>」. That prevents the AI from creating something and immediately marking it done.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Use the notion-classroom tool to create a new classroom task.<br/><br/>
+            Task name: 整理下次課程的練習指令<br/>
+            Category: 教學準備<br/>
+            Priority: 中<br/>
+            Due date: 2026-03-28<br/>
+            Source: 課程規劃<br/>
+            Notes: 先整理成草稿，發布前需要人工確認<br/><br/>
+            After creation, please report:<br/>
+            1. Whether the creation succeeded<br/>
+            2. The task name<br/>
+            3. The status<br/>
+            4. The Notion page link
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">A new classroom task was created:</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Created successfully: <strong>Yes</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Task name: <strong>整理下次課程的練習指令</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Status: <strong>待確認</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion page link: open in Notion</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The point of this exercise is to add data <strong>under fixed columns, fixed format, and fixed status</strong>.
+        </p>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 3</p>
+        <h2 class="case-title">Update a task's status</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to practice editing <strong>a single field</strong> in Notion. We <strong>only allow editing「狀態」</strong> — the AI can't simultaneously modify the task name, due date, notes, or anything else. This makes edits safer and easier to review.
+      </p>
+
+      <h4 class="example-heading">How to do it</h4>
+      <p class="detail-paragraph">
+        First run <strong>Exercise 1</strong> to list tasks and find the one to update. The tool's response includes a <code>page_id</code> — pass that to the AI for the next step.
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Use the notion-classroom tool to update the「準備閱讀材料摘要」 task's status to「處理中」.<br/><br/>
+            page_id: paste the page_id returned by the tool<br/><br/>
+            Important:<br/>
+            1. Update only the status.<br/>
+            2. Do not change the task name.<br/>
+            3. Do not change the due date.<br/>
+            4. After updating, please report the result.
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">Update result:</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Updated successfully: <strong>Yes</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">page_id: 3564757f-c450-800c-a921-f095a8ffaec2</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">New status: <strong>處理中</strong></span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This exercise makes a few things clear:<br/>
+          ✓ The AI can modify data<br/>
+          ✓ But <strong>don't let it modify everything from day one</strong><br/>
+          ✓ The smaller the edit surface, the easier to review and the safer to ship
+        </p>
+      </div>
+
+      <!-- Exercise 4 -->
+      <div class="case-header">
+        <p class="case-label">EXERCISE 4</p>
+        <h2 class="case-title">Organize first, then create the Notion task</h2>
+      </div>
+      <p class="detail-paragraph">
+        The goal is to plug in the "<strong>workflow</strong>" idea from earlier pages. The AI doesn't just call a single tool — it can <strong>organize the text first, then create the Notion task</strong>. The constraints stay in place:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">First, <strong>organize the task content</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Confirm <strong>whether the fields are sufficient</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Then <strong>create the Notion task</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">If <strong>data is missing</strong>, don't force the creation</span></li>
+      </ol>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Prompt example</span>
+          <span class="details-card__hint">Click to expand the prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Based on the text below, decide whether it's appropriate to create a Notion classroom task.<br/><br/>
+            Text:<br/>
+            "Next week, remind participants to attend their registered session and ask people who left the diet field blank to fill it in."<br/><br/>
+            Please first organize into these fields:<br/>
+            1. Task name<br/>
+            2. Category<br/>
+            3. Priority<br/>
+            4. Due date<br/>
+            5. Source<br/>
+            6. Notes<br/><br/>
+            If the due date is unclear, don't guess.<br/>
+            Reply with "Missing due date — needs human verification" and don't create the Notion task.
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Possible response</span>
+          <span class="details-card__hint">Click to expand a sample response</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">Based on the supplied text, the organized fields are:</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Task name: Remind participants and follow up on missing diet info</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Category: 行政事項</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Priority: 中</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Due date: <strong>"Next week" — exact date unclear</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Source: (none)</span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">Notes: Next week, remind participants to attend their registered session and ask people who left the diet field blank to fill it in.</span></li>
+          </ol>
+
+          <div class="callout-card callout-card--warn">
+            <p class="callout-text">
+              <strong>Missing due date — needs human verification.</strong> No Notion task was created.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This exercise matters because it teaches the AI:<br/>
+          <strong>not every task has to run to completion. When data is missing, stop first.</strong>
+        </p>
+      </div>
+
+      <!-- ============ Section: safety boundary ============ -->
+      <h2 class="detail-heading">The safety boundaries baked into this tool</h2>
+      <p class="detail-paragraph">
+        This MCP server has several <strong>intentional restrictions</strong>:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">1.</span>
+          <span class="role-item__desc"><strong>No deletes.</strong> Delete is high-risk.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">2.</span>
+          <span class="role-item__desc"><strong>No editing the task name.</strong> Prevents the AI from rewriting what the task means.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">3.</span>
+          <span class="role-item__desc"><strong>No editing the due date.</strong> Dates often involve real-world arrangements and should be confirmed by a human.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">4.</span>
+          <span class="role-item__desc"><strong>No free-form status values.</strong> Status must be one of the fixed options.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">5.</span>
+          <span class="role-item__desc"><strong>New tasks are always created with status「待確認」.</strong> Stops the AI from declaring a brand-new task as done.</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          These limits don't make the tool weaker — they <strong>make it more useful for real workflows</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Section: common errors ============ -->
+      <h2 class="detail-heading">Common errors</h2>
+      <p class="detail-paragraph">
+        If reads fail, the cause is usually one of:
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Wrong <code>NOTION_API_KEY</code> in .env</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Wrong <code>NOTION_DATA_SOURCE_ID</code></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">The Notion database <strong>wasn't shared with the connection</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">The connection lacks <strong>read or update capabilities</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Column names in Notion <strong>don't match the names in the program</strong></span></li>
+      </ol>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">The most important idea on this page</h2>
+      <p class="detail-paragraph">
+        This Notion API exercise isn't about <strong>letting the AI control all of Notion</strong>. It's about designing a small, focused set of tools yourself: the smaller the tool, the easier it is to understand, the easier to test, and the easier to set <strong>safety boundaries</strong> on.
+      </p>
+
+      <p class="detail-paragraph">
+        Our three tools split responsibility cleanly, and they slot directly into the AI workflow we discussed earlier:
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Read first (list_classroom_tasks)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Organize</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Draft when needed (create_classroom_task)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">Human verifies</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">Then update status (update_task_status)</div>
+      </div>
+
+      <p class="detail-paragraph">
+        AI can help operate Notion, but <strong>not every Notion action belongs to the AI</strong>. Starting out, the safer pattern is:
+      </p>
+
+      <ul class="check-list">
+        <li>Expose <strong>only the tools you need</strong></li>
+        <li>Grant <strong>only the permissions you need</strong></li>
+        <li>Let the AI modify <strong>only a small surface</strong></li>
+        <li>Reserve <strong>important decisions for human review</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          The benefit of building your own tool isn't<br/>
+          "making the AI more powerful."<br/>
+          It's <strong>making it clear to yourself what the AI can and can't do inside the boundary you drew</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-notion {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 12rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .role-item__label--ord {
+    min-width: 3rem;
+    font-family: inherit;
+    font-size: var(--text-base);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-label {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 0.02em;
+  }
+
+  .prompt-label::before {
+    content: '✦ ';
+    color: var(--color-accent);
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block,
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>

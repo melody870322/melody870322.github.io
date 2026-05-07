@@ -72,8 +72,19 @@ const navItems: NavItem[] = [
               { label: i.nav.ai_agent_api_server_keys, href: navPath('/learning/ai-agent/api-server/keys') },
               { label: i.nav.ai_agent_api_server_wrapping, href: navPath('/learning/ai-agent/api-server/wrapping') },
               { label: i.nav.ai_agent_api_server_stability, href: navPath('/learning/ai-agent/api-server/stability') },
+              { label: i.nav.ai_agent_api_server_workflow, href: navPath('/learning/ai-agent/api-server/workflow') },
             ],
           },
+          {
+            label: i.nav.ai_agent_real_tasks,
+            href: '#',
+            children: [
+              { label: i.nav.ai_agent_real_tasks_csv, href: navPath('/learning/ai-agent/real-tasks/csv') },
+              { label: i.nav.ai_agent_real_tasks_notion, href: navPath('/learning/ai-agent/real-tasks/notion') },
+              { label: i.nav.ai_agent_real_tasks_reading, href: navPath('/learning/ai-agent/real-tasks/reading') },
+            ],
+          },
+          { label: i.nav.ai_agent_checklist, href: navPath('/learning/ai-agent/checklist') },
         ],
       },
       {

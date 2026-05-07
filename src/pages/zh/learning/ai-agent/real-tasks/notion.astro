@@ -1,0 +1,1727 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Notion API 實作：自製任務管理 MCP 工具 — 把 AI Agent 用在真實任務"
+  description="整理完表格資料之後，下一步常常是把整理結果放到 Notion。這一頁練習自製一個小型 Notion MCP Server，提供讀取、新增、更新三個工具，讓 AI 可以在我們設定的範圍內幫忙操作 Notion 課堂任務。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-notion">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">自己做一個小型 Notion MCP，讓 AI 在邊界內動 Notion</h1>
+        <p class="detail-subtitle">
+          前面我們已經練習過，AI 可以幫我們整理 CSV 與表格資料。但是<strong>整理完資料之後，常常還會有下一步</strong>。例如把待辦事項放進 Notion、把任務狀態改成「處理中」、把已完成的事項標記起來。這一頁要把 Notion 變成一個可以被 AI Agent 使用的工具。
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        不過這裡<strong>不是直接使用現成的 Notion MCP</strong>，而是自己做一個簡單的課堂版 Notion MCP Server。這樣做的好處是：
+      </p>
+
+      <ul class="check-list">
+        <li>我們可以<strong>自己決定 AI 能做什麼</strong></li>
+        <li>也可以<strong>自己決定 AI 不能做什麼</strong></li>
+        <li>工具越小，<strong>邊界越清楚</strong></li>
+        <li>邊界越清楚，<strong>使用起來就越安全</strong></li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Notion API 可以讓外部工具讀取、建立、更新 Notion 裡的資料，但<strong>連線前必須建立 connection</strong>，並把指定的頁面或資料庫分享給這個 connection，否則 API 會沒有權限存取。Notion 也提醒：<strong>token 是秘密，不應該寫進程式或提交到版本控制</strong>。
+        </p>
+      </div>
+
+      <h2 class="detail-heading">這次只做三件事</h2>
+      <p class="detail-paragraph">
+        這個 Notion 工具<strong>不是萬能 Notion 助理</strong>，它只負責三件事：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">list_classroom_tasks</span>
+          <span class="role-item__desc">讀取課堂任務</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">create_classroom_task</span>
+          <span class="role-item__desc">新增一筆課堂任務</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">update_task_status</span>
+          <span class="role-item__desc">更新任務狀態</span>
+        </li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這三個動作已經足夠練習 Notion API 的基本概念，同時也<strong>不會一開始就把工具做得太大</strong>。
+      </p>
+
+      <!-- ============ PART 1 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">在 Notion 裡建立練習資料庫</span>
+      </div>
+
+      <p class="detail-paragraph">
+        在開始寫 Python 和 MCP Server 之前，我們要先在 Notion 裡建立一個資料庫。Notion 資料庫可以想成<strong>一張比較聰明的表格</strong>：每一列除了可以放欄位資料，也可以打開變成一個獨立頁面。這裡建議使用 <strong>Table 資料庫</strong>，因為它最接近一般表格，最適合練習讀取、建立與更新資料。
+      </p>
+
+      <!-- STEP 1 -->
+      <div class="case-header">
+        <p class="case-label">STEP 1</p>
+        <h2 class="case-title">建立一個新頁面</h2>
+      </div>
+      <p class="detail-paragraph">
+        打開 Notion，在左側選單中點選「<strong>資料庫</strong>」。頁面名稱可以輸入：
+      </p>
+      <pre class="code-block" is:raw><code>課堂任務管理</code></pre>
+      <p class="detail-paragraph">
+        這個頁面會用來放後面要操作的任務資料。
+      </p>
+
+      <!-- STEP 2 -->
+      <div class="case-header">
+        <p class="case-label">STEP 2</p>
+        <h2 class="case-title">建立 Table 資料庫</h2>
+      </div>
+      <p class="detail-paragraph">
+        打開新頁面，下方選擇<strong>「開始使用資料庫」</strong>，並選擇畫面上的<strong>「空白資料庫」</strong>選項。
+      </p>
+
+      <!-- STEP 3 -->
+      <div class="case-header">
+        <p class="case-label">STEP 3</p>
+        <h2 class="case-title">確認資料庫名稱</h2>
+      </div>
+      <p class="detail-paragraph">
+        建立後，請確認資料庫名稱是「<strong>課堂任務管理</strong>」。如果 Notion 自動建立了一個沒有名稱的資料庫，請把資料庫標題改成這個名稱。
+      </p>
+      <div class="callout-card">
+        <p class="callout-text">
+          這個名稱主要是<strong>給人看的</strong>。後面程式真正會用到的，是 Notion 的 <code>data_source_id</code>，不是資料庫名稱。
+        </p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">建立欄位</h2>
+      </div>
+      <p class="detail-paragraph">
+        接下來要建立這個資料庫需要的欄位。請依照下面設定：
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>欄位名稱</th>
+              <th>欄位屬性</th>
+              <th>屬性說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>任務名稱</td><td>文字</td><td>這筆任務的名稱</td></tr>
+            <tr><td>類型</td><td>選取</td><td>任務屬於哪一類</td></tr>
+            <tr><td>狀態</td><td>選取</td><td>目前處理狀態</td></tr>
+            <tr><td>優先順序</td><td>選取</td><td>高、中、低</td></tr>
+            <tr><td>截止日</td><td>日期</td><td>任務需要完成的日期</td></tr>
+            <tr><td>來源</td><td>文字</td><td>任務從哪裡來</td></tr>
+            <tr><td>備註</td><td>文字</td><td>補充說明</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>欄位名稱要完全一致。</strong>例如程式裡會寫「任務名稱」，Notion 裡就不要寫成「任務」或「名稱」。因為 Notion API 會依照欄位名稱去找資料，如果名稱不同，程式可能會讀不到正確欄位。
+        </p>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="case-header">
+        <p class="case-label">STEP 5</p>
+        <h2 class="case-title">設定「選取」選項</h2>
+      </div>
+      <p class="detail-paragraph">
+        有些欄位不是自由輸入文字，而是用<strong>固定選項</strong>。這樣可以減少資料不一致的問題 —— 例如有人寫「處理中」，有人寫「進行中」，有人寫「正在處理」，後面程式就會比較難判斷。所以這裡先把選項固定下來。請依序按以下欄位，選擇<strong>「編輯屬性」</strong>，並新增選項：
+      </p>
+
+      <h4 class="example-heading">「狀態」欄位（3 個選項）</h4>
+      <ul class="check-list">
+        <li>待確認</li>
+        <li>處理中</li>
+        <li>已完成</li>
+      </ul>
+
+      <h4 class="example-heading">「類型」欄位（4 個選項）</h4>
+      <ul class="check-list">
+        <li>教學準備</li>
+        <li>學生回覆</li>
+        <li>行政事項</li>
+        <li>閱讀材料</li>
+      </ul>
+
+      <h4 class="example-heading">「優先順序」欄位（3 個選項）</h4>
+      <ul class="check-list">
+        <li>高</li>
+        <li>中</li>
+        <li>低</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這些固定選項會和後面的 Python 程式對應，<br/>
+          也就是說後面的工具<strong>只會接受這幾種值</strong>。<br/>
+          這不是限制 AI，而是<strong>讓資料更穩定</strong>。
+        </p>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">新增範例資料</h2>
+      </div>
+      <p class="detail-paragraph">
+        欄位建立好後，請先手動新增幾筆資料：
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>任務名稱</th>
+              <th>類型</th>
+              <th>狀態</th>
+              <th>優先順序</th>
+              <th>截止日</th>
+              <th>來源</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-03-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
+            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-03-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
+            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-03-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-03-18</td><td>活動報名表</td><td>已確認名單</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        這幾筆資料是後面練習會用到的資料。它不大，但很適合練習 —— 因為裡面有<strong>不同狀態、不同類型、不同優先順序</strong>，也有可以更新的任務。
+      </p>
+
+      <!-- ============ PART 2 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">建立 connection 並連接 API</span>
+      </div>
+
+      <h2 class="detail-heading">先了解：database 跟 data source 的差別</h2>
+      <p class="detail-paragraph">
+        在 Notion API 的新版設計裡，<strong>database 和 data source 被分開處理</strong>。可以先簡單這樣理解：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Database</span>
+          <span class="role-item__desc">比較像一個<strong>資料庫外殼</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Data source</span>
+          <span class="role-item__desc">比較像<strong>真正存放每一列資料的表格</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Page</span>
+          <span class="role-item__desc">每一列資料，在 Notion API 裡通常會被當成一個 page</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Notion 官方文件說明，從 <strong>API version 2025-09-03</strong> 開始，多數原本使用 <code>database_id</code> 的操作改成使用 <code>data_source_id</code>；目前文件也標示新版 API header 可使用 <code>2026-03-11</code>。這一頁的範例會用<strong>新版 data_source_id 寫法</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        所以我們後面會準備兩個重要資訊：
+      </p>
+
+      <ul class="check-list">
+        <li><code>NOTION_API_KEY</code></li>
+        <li><code>NOTION_DATA_SOURCE_ID</code></li>
+      </ul>
+
+      <!-- STEP A -->
+      <div class="case-header">
+        <p class="case-label">STEP A</p>
+        <h2 class="case-title">建立 Notion connection</h2>
+      </div>
+      <p class="detail-paragraph">
+        要讓 Python 程式連到 Notion，必須先建立一個 connection。點選 Notion 頁面左上角「XXX 的空間」中的：
+      </p>
+      <pre class="code-block" is:raw><code>設定 → 連接 → 開發或管理連接 → 在內部連接中建立新的連接</code></pre>
+      <p class="detail-paragraph">
+        這個 connection 可以先命名成 <code>Classroom Tool</code>，接著確認它至少有這幾個能力：
+      </p>
+
+      <ul class="check-list">
+        <li>讀取內容</li>
+        <li>更新內容</li>
+        <li>插入內容</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        這裡<strong>先不要開太多權限</strong>。因為這裡只需要讀取、建立、更新任務，不需要刪除資料，也不需要管理整個工作空間。
+      </p>
+
+      <!-- STEP B -->
+      <div class="case-header">
+        <p class="case-label">STEP B</p>
+        <h2 class="case-title">把資料庫分享給 connection</h2>
+      </div>
+      <p class="detail-paragraph">
+        建立 connection 之後，<strong>還不能直接使用</strong>。你必須回到 Notion 的「課堂任務管理」資料庫，把這個資料庫分享給剛剛建立的 connection，才能開始呼叫 API；如果沒有分享，API 請求會失敗。
+      </p>
+      <p class="detail-paragraph">
+        請在 Notion 裡打開「課堂任務管理」，然後找到：
+      </p>
+      <pre class="code-block" is:raw><code>右上角 ⋯ → 連接 → 選擇 Classroom Tool</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>這一步很重要。</strong>很多 Notion API 錯誤不是程式寫錯，而是<strong>資料庫沒有分享給 connection</strong>。
+        </p>
+      </div>
+
+      <!-- STEP C -->
+      <div class="case-header">
+        <p class="case-label">STEP C</p>
+        <h2 class="case-title">找到 data source ID</h2>
+      </div>
+      <p class="detail-paragraph">
+        建議先用最簡單的方式：在資料庫右上角的「新建」左邊點選滑桿圖示的「<strong>設定</strong>」，依序：
+      </p>
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">點選<strong>管理資料來源</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">點選「課堂任務管理」右邊的 <strong>⋯</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">複製<strong>資料來源 ID</strong></span></li>
+      </ol>
+      <p class="detail-paragraph">
+        把複製到的 ID 先放著，後面會用。
+      </p>
+
+      <!-- ============ PART 3 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">寫一個小型 MCP Server</span>
+      </div>
+
+      <!-- STEP I -->
+      <div class="case-header">
+        <p class="case-label">STEP I</p>
+        <h2 class="case-title">建立專案資料夾</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 VS Code 裡建立一個新的專案資料夾 <code>notion-classroom-tool</code>，資料夾結構可以先長這樣：
+      </p>
+
+      <pre class="code-block" is:raw><code>notion-classroom-tool
+├─ notion_classroom_server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <!-- STEP II -->
+      <div class="case-header">
+        <p class="case-label">STEP II</p>
+        <h2 class="case-title">建立 .env 與 .gitignore</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 <code>.env</code> 裡放入：
+      </p>
+
+      <pre class="code-block" is:raw><code>NOTION_API_KEY=你的 Notion_connection_token
+NOTION_DATA_SOURCE_ID=你的 data_source_id
+NOTION_VERSION=2026-03-11</code></pre>
+
+      <ul class="check-list">
+        <li><code>Notion_connection_token</code> 可以在建立完 Classroom Tool 後的頁面中找到「<strong>安裝存取權杖</strong>」，請先按「顯示」，才能複製</li>
+        <li><code>data_source_id</code> 則前往剛剛 STEP C 的步驟複製</li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          請注意：<br/>
+          ✗ 不要把 API Key <strong>寫進 Python 程式</strong>。<br/>
+          ✗ 不要把 .env <strong>上傳到 GitHub</strong>。<br/>
+          ✗ 不要把 token <strong>貼到公開文件裡</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>.gitignore</code> 可以寫：
+      </p>
+
+      <pre class="code-block" is:raw><code>.env
+.venv/
+__pycache__/</code></pre>
+
+      <!-- STEP III -->
+      <div class="case-header">
+        <p class="case-label">STEP III</p>
+        <h2 class="case-title">安裝需要的套件</h2>
+      </div>
+      <p class="detail-paragraph">
+        在 VS Code 終端機中，先初始化專案：
+      </p>
+      <pre class="code-block" is:raw><code>uv init</code></pre>
+      <p class="detail-paragraph">
+        啟動虛擬環境後，安裝套件：
+      </p>
+      <pre class="code-block" is:raw><code>uv add "mcp[cli]" python-dotenv requests</code></pre>
+
+      <!-- STEP IV -->
+      <div class="case-header">
+        <p class="case-label">STEP IV</p>
+        <h2 class="case-title">這次要設計哪些工具？</h2>
+      </div>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">list_classroom_tasks</span>
+          <span class="role-item__desc">用途是<strong>讀取 Notion 任務</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">create_classroom_task</span>
+          <span class="role-item__desc">用途是<strong>新增一筆 Notion 任務</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">update_task_status</span>
+          <span class="role-item__desc">用途是<strong>更新任務狀態</strong></span>
+        </li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          這裡<strong>不做刪除工具</strong>。因為刪除是高風險動作，現階段不適合作為這次的練習。
+        </p>
+      </div>
+
+      <!-- STEP V -->
+      <div class="case-header">
+        <p class="case-label">STEP V</p>
+        <h2 class="case-title">建立 MCP Server 程式</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在 <code>notion_classroom_server.py</code> 裡放入以下程式：
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">notion_classroom_server.py 完整程式碼</span>
+          <span class="details-card__hint">點擊展開（約 220 行）</span>
+        </summary>
+        <div class="details-card__body">
+          <pre class="code-block" is:raw><code class="lang-python">from typing import Optional
+import os
+import requests
+from dotenv import load_dotenv
+from mcp.server.fastmcp import FastMCP
+
+load_dotenv()
+
+mcp = FastMCP("notion-classroom")
+
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+NOTION_DATA_SOURCE_ID = os.getenv("NOTION_DATA_SOURCE_ID")
+NOTION_VERSION = os.getenv("NOTION_VERSION", "2026-03-11")
+
+NOTION_BASE_URL = "https://api.notion.com/v1"
+
+ALLOWED_STATUS = ["待確認", "處理中", "已完成"]
+ALLOWED_CATEGORY = ["教學準備", "學生回覆", "行政事項", "閱讀材料"]
+ALLOWED_PRIORITY = ["高", "中", "低"]
+
+
+def notion_headers() -> dict:
+    if not NOTION_API_KEY:
+        raise ValueError("缺少 NOTION_API_KEY，請檢查 .env 檔案。")
+
+    return {
+        "Authorization": f"Bearer {NOTION_API_KEY}",
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+    }
+
+
+def notion_request(method: str, path: str, payload: Optional[dict] = None) -> dict:
+    try:
+        response = requests.request(
+            method=method,
+            url=f"{NOTION_BASE_URL}{path}",
+            headers=notion_headers(),
+            json=payload,
+            timeout=20,
+        )
+
+        if response.status_code >= 400:
+            try:
+                detail = response.json()
+            except Exception:
+                detail = response.text
+
+            return {
+                "ok": False,
+                "status_code": response.status_code,
+                "message": "Notion API 回傳錯誤。",
+                "detail": detail,
+            }
+
+        return {
+            "ok": True,
+            "data": response.json(),
+        }
+
+    except requests.RequestException as error:
+        return {
+            "ok": False,
+            "message": "連線 Notion API 時發生錯誤。",
+            "detail": str(error),
+        }
+
+
+def get_title(properties: dict, name: str) -> str:
+    title_items = properties.get(name, {}).get("title", [])
+    return "".join(item.get("plain_text", "") for item in title_items)
+
+
+def get_select(properties: dict, name: str) -> str:
+    value = properties.get(name, {}).get("select")
+    if not value:
+        return ""
+    return value.get("name", "")
+
+
+def get_date(properties: dict, name: str) -> str:
+    value = properties.get(name, {}).get("date")
+    if not value:
+        return ""
+    return value.get("start", "")
+
+
+def get_rich_text(properties: dict, name: str) -> str:
+    text_items = properties.get(name, {}).get("rich_text", [])
+    return "".join(item.get("plain_text", "") for item in text_items)
+
+
+def page_to_task(page: dict) -> dict:
+    properties = page.get("properties", {})
+
+    return {
+        "page_id": page.get("id", ""),
+        "url": page.get("url", ""),
+        "任務名稱": get_title(properties, "任務名稱"),
+        "類型": get_select(properties, "類型"),
+        "狀態": get_select(properties, "狀態"),
+        "優先順序": get_select(properties, "優先順序"),
+        "截止日": get_date(properties, "截止日"),
+        "來源": get_rich_text(properties, "來源"),
+        "備註": get_rich_text(properties, "備註"),
+    }
+
+
+@mcp.tool()
+def list_classroom_tasks(status: str = "待確認", limit: int = 10) -> dict:
+    """
+    讀取 Notion 課堂任務。
+
+    status 可以是：全部、待確認、處理中、已完成。
+    limit 代表最多回傳幾筆，範圍是 1 到 20。
+    """
+    if not NOTION_DATA_SOURCE_ID:
+        return {
+            "ok": False,
+            "message": "缺少 NOTION_DATA_SOURCE_ID，請檢查 .env 檔案。",
+        }
+
+    if status not in ["全部"] + ALLOWED_STATUS:
+        return {
+            "ok": False,
+            "message": "狀態不符合限制。",
+            "allowed_status": ["全部"] + ALLOWED_STATUS,
+        }
+
+    if limit &lt; 1 or limit &gt; 20:
+        return {
+            "ok": False,
+            "message": "limit 必須介於 1 到 20 之間。",
+        }
+
+    payload = {
+        "page_size": limit,
+    }
+
+    if status != "全部":
+        payload["filter"] = {
+            "property": "狀態",
+            "select": {
+                "equals": status,
+            },
+        }
+
+    result = notion_request(
+        "POST",
+        f"/data_sources/{NOTION_DATA_SOURCE_ID}/query",
+        payload,
+    )
+
+    if not result["ok"]:
+        return result
+
+    pages = result["data"].get("results", [])
+    tasks = [page_to_task(page) for page in pages]
+
+    return {
+        "ok": True,
+        "count": len(tasks),
+        "tasks": tasks,
+    }
+
+
+@mcp.tool()
+def create_classroom_task(
+    title: str,
+    category: str = "教學準備",
+    priority: str = "中",
+    due_date: str = "",
+    source: str = "",
+    note: str = "",
+) -> dict:
+    """
+    在 Notion 建立一筆課堂任務。
+
+    title 是任務名稱。
+    category 可以是：教學準備、學生回覆、行政事項、閱讀材料。
+    priority 可以是：高、中、低。
+    due_date 請使用 YYYY-MM-DD 格式，例如 2026-03-20。
+    """
+    if not NOTION_DATA_SOURCE_ID:
+        return {
+            "ok": False,
+            "message": "缺少 NOTION_DATA_SOURCE_ID，請檢查 .env 檔案。",
+        }
+
+    title = title.strip()
+
+    if not title:
+        return {
+            "ok": False,
+            "message": "任務名稱不可空白。",
+        }
+
+    if len(title) &gt; 80:
+        return {
+            "ok": False,
+            "message": "任務名稱太長，請控制在 80 字以內。",
+        }
+
+    if category not in ALLOWED_CATEGORY:
+        return {
+            "ok": False,
+            "message": "類型不符合限制。",
+            "allowed_category": ALLOWED_CATEGORY,
+        }
+
+    if priority not in ALLOWED_PRIORITY:
+        return {
+            "ok": False,
+            "message": "優先順序不符合限制。",
+            "allowed_priority": ALLOWED_PRIORITY,
+        }
+
+    properties = {
+        "任務名稱": {
+            "title": [{"text": {"content": title}}],
+        },
+        "類型": {
+            "select": {"name": category},
+        },
+        "狀態": {
+            "select": {"name": "待確認"},
+        },
+        "優先順序": {
+            "select": {"name": priority},
+        },
+        "來源": {
+            "rich_text": [{"text": {"content": source}}],
+        },
+        "備註": {
+            "rich_text": [{"text": {"content": note}}],
+        },
+    }
+
+    if due_date:
+        properties["截止日"] = {
+            "date": {"start": due_date},
+        }
+
+    payload = {
+        "parent": {
+            "type": "data_source_id",
+            "data_source_id": NOTION_DATA_SOURCE_ID,
+        },
+        "properties": properties,
+    }
+
+    result = notion_request("POST", "/pages", payload)
+
+    if not result["ok"]:
+        return result
+
+    page = result["data"]
+
+    return {
+        "ok": True,
+        "message": "已建立 Notion 任務。",
+        "page_id": page.get("id", ""),
+        "url": page.get("url", ""),
+        "任務名稱": title,
+        "狀態": "待確認",
+    }
+
+
+@mcp.tool()
+def update_task_status(page_id: str, new_status: str) -> dict:
+    """
+    更新 Notion 任務狀態。
+
+    new_status 只能是：待確認、處理中、已完成。
+    這個工具只更新狀態，不修改任務名稱、日期或備註。
+    """
+    page_id = page_id.strip()
+
+    if not page_id:
+        return {
+            "ok": False,
+            "message": "缺少 page_id，無法更新任務。",
+        }
+
+    if new_status not in ALLOWED_STATUS:
+        return {
+            "ok": False,
+            "message": "狀態不符合限制。",
+            "allowed_status": ALLOWED_STATUS,
+        }
+
+    payload = {
+        "properties": {
+            "狀態": {
+                "select": {"name": new_status},
+            },
+        },
+    }
+
+    result = notion_request("PATCH", f"/pages/{page_id}", payload)
+
+    if not result["ok"]:
+        return result
+
+    return {
+        "ok": True,
+        "message": "已更新任務狀態。",
+        "page_id": page_id,
+        "new_status": new_status,
+    }
+
+
+if __name__ == "__main__":
+    mcp.run()
+</code></pre>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Notion 的新版 <strong>Create page API</strong> 可以把新頁面建立在既有 page 或 data source 底下；若新頁面是 data source 的子項目，送出的 properties 必須符合該 data source 的欄位結構。<strong>Update page API</strong> 則可以更新 data source 子頁面的 properties，例如這裡示範的「狀態」欄位。
+        </p>
+      </div>
+
+      <!-- STEP VI -->
+      <div class="case-header">
+        <p class="case-label">STEP VI</p>
+        <h2 class="case-title">把 MCP Server 接到 Gemini CLI</h2>
+      </div>
+      <p class="detail-paragraph">
+        請在專案資料夾裡建立 <code>.gemini/settings.json</code>。資料夾結構會變成：
+      </p>
+
+      <pre class="code-block" is:raw><code>notion-classroom-tool
+├─ .gemini
+│  └─ settings.json
+├─ notion_classroom_server.py
+├─ .env
+└─ .gitignore</code></pre>
+
+      <p class="detail-paragraph">
+        <code>settings.json</code> 可以先寫成：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "notion-classroom": {
+      "command": "python",
+      "args": ["notion_classroom_server.py"],
+      "cwd": ".",
+      "trust": false
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">
+        接著在 VS Code 終端機輸入：
+      </p>
+      <pre class="code-block" is:raw><code>gemini</code></pre>
+      <p class="detail-paragraph">
+        進入 Gemini CLI 後，輸入：
+      </p>
+      <pre class="code-block" is:raw><code>/mcp list</code></pre>
+      <p class="detail-paragraph">
+        如果設定成功，應該可以看到 <code>notion-classroom</code> 這個 MCP Server，以及剛剛建立的<strong>三個工具</strong>。
+      </p>
+
+      <!-- ============ PART 4 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 4</span>
+        <span class="part-text">指令練習</span>
+      </div>
+
+      <!-- 練習 1 -->
+      <div class="case-header">
+        <p class="case-label">練習 1</p>
+        <h2 class="case-title">讀取待確認任務</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是<strong>確認 AI 能不能透過我們自製的 MCP Tool 讀取 Notion 資料</strong>。這一步只做讀取，不做新增，也不做修改。<strong>如果讀取都不穩，後面就不適合直接做寫入或更新</strong>。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 notion-classroom 工具，列出 Notion 裡狀態為「待確認」的課堂任務。<br/><br/>
+            請用表格整理：<br/>
+            1. 任務名稱<br/>
+            2. 類型<br/>
+            3. 優先順序<br/>
+            4. 截止日<br/>
+            5. 備註<br/><br/>
+            請只根據工具回傳資料回答。
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">以下是 Notion 中狀態為「待確認」的課堂任務：</p>
+
+          <div class="csv-table-wrapper">
+            <table class="csv-table">
+              <thead>
+                <tr><th>任務名稱</th><th>類型</th><th>優先順序</th><th>截止日</th><th>備註</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>確認下週課堂公告</td><td>教學準備</td><td>高</td><td>2026-03-20</td><td>需要確認教室、時間與提醒內容</td></tr>
+                <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>中</td><td>2026-03-25</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習可以一次檢查三件事：<br/>
+          ✓ Notion API Key 是否正確<br/>
+          ✓ data source ID 是否正確<br/>
+          ✓ 資料庫是否有<strong>分享給 connection</strong>
+        </p>
+      </div>
+
+      <!-- 練習 2 -->
+      <div class="case-header">
+        <p class="case-label">練習 2</p>
+        <h2 class="case-title">新增一筆課堂任務</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 透過 MCP Tool 在 Notion 裡建立一筆新資料。這是第一次正式練習「<strong>寫入</strong>」，但這個寫入動作是<strong>受限制的</strong> —— 它只能新增任務，而且新任務的狀態固定是「<strong>待確認</strong>」。這樣可以避免 AI 一建立資料就直接把任務標成完成。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 notion-classroom 工具，幫我建立一筆新的課堂任務。<br/><br/>
+            任務名稱：整理下次課程的練習指令<br/>
+            類型：教學準備<br/>
+            優先順序：中<br/>
+            截止日：2026-03-28<br/>
+            來源：課程規劃<br/>
+            備註：先整理成草稿，發布前需要人工確認<br/><br/>
+            建立後請回覆：<br/>
+            1. 是否建立成功<br/>
+            2. 任務名稱<br/>
+            3. 狀態<br/>
+            4. Notion 頁面連結
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">新課堂任務已建立：</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">是否建立成功：<strong>是</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">任務名稱：<strong>整理下次課程的練習指令</strong></span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">狀態：<strong>待確認</strong></span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion 頁面連結：點此開啟 Notion</span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這個練習的重點，是讓 AI 在<strong>固定欄位、固定格式、固定狀態</strong>下新增資料。
+        </p>
+      </div>
+
+      <!-- 練習 3 -->
+      <div class="case-header">
+        <p class="case-label">練習 3</p>
+        <h2 class="case-title">更新任務狀態</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是讓 AI 練習修改 Notion 裡的<strong>一個欄位</strong>。這裡<strong>只允許修改「狀態」</strong>，不允許 AI 同時修改任務名稱、截止日、備註或其他欄位。這樣可以讓修改動作變得比較安全，也比較容易檢查。
+      </p>
+
+      <h4 class="example-heading">操作方式</h4>
+      <p class="detail-paragraph">
+        請先用<strong>練習 1</strong> 列出任務，找到你想更新的任務。工具回傳資料中會包含 <code>page_id</code>，接著再請 AI 更新狀態。
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請使用 notion-classroom 工具，把「準備閱讀材料摘要」這筆任務的狀態更新為「處理中」。<br/><br/>
+            page_id：請填入剛剛工具回傳的 page_id<br/><br/>
+            請注意：<br/>
+            1. 只更新狀態。<br/>
+            2. 不要修改任務名稱。<br/>
+            3. 不要修改截止日。<br/>
+            4. 更新後請回覆更新結果。
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">任務狀態更新結果：</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">是否更新成功：<strong>是</strong></span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">page_id：3564757f-c450-800c-a921-f095a8ffaec2</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">更新後狀態：<strong>處理中</strong></span></li>
+          </ol>
+        </div>
+      </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個練習可以讓使用者知道：<br/>
+          ✓ AI 可以修改資料<br/>
+          ✓ 但<strong>最好不要一開始就讓它什麼都能改</strong><br/>
+          ✓ 修改範圍越小，越容易確認，也越安全
+        </p>
+      </div>
+
+      <!-- 練習 4 -->
+      <div class="case-header">
+        <p class="case-label">練習 4</p>
+        <h2 class="case-title">先整理，再建立 Notion 任務</h2>
+      </div>
+      <p class="detail-paragraph">
+        練習目的是把前面學過的「<strong>工作流</strong>」概念接進來。AI 不只是單獨呼叫一個工具，也能<strong>先整理文字，再建立 Notion 任務</strong>。不過這裡仍然要保留限制：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">先<strong>整理任務內容</strong></span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">確認<strong>欄位是否足夠</strong></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">再<strong>建立 Notion 任務</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">如果<strong>資料不足</strong>，就不要硬建立</span></li>
+      </ol>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">指令示範</span>
+          <span class="details-card__hint">點擊展開可複製的指令</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            請根據下面這段文字，判斷是否適合建立成 Notion 課堂任務。<br/><br/>
+            文字如下：<br/>
+            「下週要提醒參加者依照報名場次出席，並請飲食需求未填的人補填資料。」<br/><br/>
+            請先整理成以下欄位：<br/>
+            1. 任務名稱<br/>
+            2. 類型<br/>
+            3. 優先順序<br/>
+            4. 截止日<br/>
+            5. 來源<br/>
+            6. 備註<br/><br/>
+            如果截止日不明確，請不要自己猜日期。<br/>
+            請先回覆「缺少截止日，需要人工確認」，不要建立 Notion 任務。
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">可能回覆</span>
+          <span class="details-card__hint">點擊展開示範回覆</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">根據您提供的文字，整理如下：</p>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">任務名稱：提醒參加者出席並補填飲食需求</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">類型：行政事項</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">優先順序：中</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">截止日：<strong>下週（具體日期不明）</strong></span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">來源：（無）</span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">備註：下週要提醒參加者依照報名場次出席，並請飲食需求未填的人補填資料。</span></li>
+          </ol>
+
+          <div class="callout-card callout-card--warn">
+            <p class="callout-text">
+              <strong>缺少截止日，需要人工確認</strong> —— 不建立 Notion 任務。
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這個練習很重要，因為它讓 AI 知道：<br/>
+          <strong>不是每次都要做到底。資料不足時，要先停下來。</strong>
+        </p>
+      </div>
+
+      <!-- ============ Section: safety boundary ============ -->
+      <h2 class="detail-heading">這個 Notion 工具的安全邊界</h2>
+      <p class="detail-paragraph">
+        這個 MCP Server 有幾個<strong>刻意設計的限制</strong>：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第一</span>
+          <span class="role-item__desc"><strong>不能刪除任務。</strong>因為刪除是高風險動作。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第二</span>
+          <span class="role-item__desc"><strong>不能修改任務名稱。</strong>避免 AI 把原本的任務意思改掉。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第三</span>
+          <span class="role-item__desc"><strong>不能修改截止日。</strong>因為日期常常牽涉實際安排，應該人工確認。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第四</span>
+          <span class="role-item__desc"><strong>不能自由新增狀態。</strong>狀態只能從固定選項中選。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第五</span>
+          <span class="role-item__desc"><strong>新增任務時，狀態一律是「待確認」。</strong>避免 AI 自己把新任務判定為已完成。</span>
+        </li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這些限制不是讓工具變弱，而是<strong>讓工具更適合拿來做真實工作流</strong>。
+        </p>
+      </div>
+
+      <!-- ============ Section: common errors ============ -->
+      <h2 class="detail-heading">常見錯誤</h2>
+      <p class="detail-paragraph">
+        如果讀不到 Notion 資料，可能有幾個原因：
+      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">.env 裡的 <code>NOTION_API_KEY</code> 寫錯</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><code>NOTION_DATA_SOURCE_ID</code> 寫錯</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Notion 資料庫<strong>沒有分享給 connection</strong></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">connection <strong>沒有讀取或更新權限</strong></span></li>
+        <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Notion 資料庫欄位名稱<strong>和程式裡的欄位名稱不一致</strong></span></li>
+      </ol>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">這裡最重要的觀念</h2>
+      <p class="detail-paragraph">
+        Notion API 實作版的重點，<strong>不是讓 AI 控制整個 Notion</strong>。而是讓我們自己設計一組小工具：工具越小，越容易理解；工具越小，越容易測試；工具越小，也越容易設定<strong>安全邊界</strong>。
+      </p>
+
+      <p class="detail-paragraph">
+        這裡的三個工具分工很清楚，剛好可以接到前面學過的 AI 工作流：
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">先讀取（list_classroom_tasks）</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">再整理</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">需要時建立草稿（create_classroom_task）</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step">人工確認</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-step flow-step--accent">最後才更新狀態（update_task_status）</div>
+      </div>
+
+      <p class="detail-paragraph">
+        AI 可以幫忙操作 Notion，<strong>但不是每個 Notion 動作都要交給 AI</strong>。一開始最好的做法是：
+      </p>
+
+      <ul class="check-list">
+        <li>只開<strong>需要的工具</strong></li>
+        <li>只給<strong>必要的權限</strong></li>
+        <li>只讓 AI 修改<strong>很小的範圍</strong></li>
+        <li>重要決定<strong>保留人工確認</strong></li>
+      </ul>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          自己做工具的好處，<br/>
+          不是「讓 AI 變得更強」，<br/>
+          而是<strong>讓你自己更清楚，AI 在邊界內到底能做什麼</strong>。
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-notion {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .case-label {
+    display: inline-block;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 11rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .role-item__label--ord {
+    min-width: 4rem;
+    font-family: inherit;
+    font-size: var(--text-base);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-label {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-heading);
+    letter-spacing: 0.02em;
+  }
+
+  .prompt-label::before {
+    content: '✦ ';
+    color: var(--color-accent);
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .code-block {
+    margin: var(--space-4) 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: #1e1e2e;
+    color: #e4e4e7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .code-block code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  .details-card {
+    margin: var(--space-4) 0 var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-3);
+  }
+
+  @media (max-width: 720px) {
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block,
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1em);
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
+  }
+</style>
