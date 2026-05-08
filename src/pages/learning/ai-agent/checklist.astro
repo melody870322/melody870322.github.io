@@ -4,7 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="AI Workflow Design & Execution Checklist — AI Agent Puzzle"
-  description="A checklist for designing and running an AI workflow — confirm the task scope, boundaries, and output format before you start."
+  description="A checklist to walk through before running any AI workflow: task goal, data source, steps, tools, output format, stop conditions, human review, modification scope, privacy, and result verification. Once the task is split clearly, AI can help inside a safe, checkable boundary."
   lang="en"
 >
   <section class="section">
@@ -12,11 +12,851 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/">&larr; Back to Home</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">AI Workflow Design & Execution Checklist</h1>
+        <h1 class="detail-title">A Checklist to Run Through Before Any AI Workflow</h1>
         <p class="detail-subtitle">
-          Page under construction...
+          We've already practiced several AI workflows: organizing CSV and tabular data, creating and updating tasks via the Notion API, and turning an article into reading notes, an outline, and a draft revision. The tasks look different on the surface, but they share one principle: <strong>don't ask the AI to do the whole thing in one shot</strong>.
         </p>
       </header>
+
+      <p class="detail-paragraph">
+        A more reliable approach is:
+      </p>
+
+      <ul class="check-list">
+        <li>First confirm the <strong>goal</strong></li>
+        <li>Then confirm the <strong>data source</strong></li>
+        <li>Then split into <strong>steps</strong></li>
+        <li>Then decide <strong>where tools are needed</strong></li>
+        <li>Finally, <strong>check the result</strong> and keep human review in place</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        This page isn't building a new tool — it's putting together an "<strong>AI workflow checklist</strong>." From now on, whenever you ask AI to organize data, write drafts, drive Notion, read files, or call an API, you can run through this list once first.
+      </p>
+
+      <h2 class="detail-heading">Why bother with a checklist?</h2>
+      <p class="detail-paragraph">
+        Many AI failures <strong>aren't broken tools</strong> — they're tasks that weren't stated clearly enough up front:
+      </p>
+
+      <ul class="cross-list">
+        <li>The <strong>data source</strong> wasn't named</li>
+        <li>The <strong>output format</strong> wasn't specified</li>
+        <li>What's <strong>off-limits</strong> wasn't stated</li>
+        <li>What to do <strong>on failure</strong> wasn't stated</li>
+        <li>Whether the result <strong>needs human review</strong> wasn't stated</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        In those cases the AI may quietly fill in the blanks. But what it fills in <strong>isn't necessarily true, and isn't necessarily what we wanted</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The point of a checklist: <strong>make the workflow clearer, safer, and easier to audit later</strong>.
+        </p>
+      </div>
+
+      <!-- ============ Quick Checklist ============ -->
+      <h2 class="detail-heading">Quick checklist (when time is short)</h2>
+      <p class="detail-paragraph">
+        Before any AI workflow, run through these 8 questions:
+      </p>
+
+      <div class="checklist-group">
+        <ul class="checklist-group__list">
+          <li>Did I <strong>state the task goal</strong> clearly?</li>
+          <li>Did I <strong>provide the data source</strong>?</li>
+          <li>Did I tell the AI <strong>which data it can rely on</strong>?</li>
+          <li>Did I <strong>split the task into steps</strong>?</li>
+          <li>Did I <strong>specify the output format</strong>?</li>
+          <li>Did I say <strong>when to stop</strong>?</li>
+          <li>Did I name what <strong>needs human review</strong>?</li>
+          <li>Did I <strong>verify the final result</strong>?</li>
+        </ul>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If several of these have no clear answer, the task <strong>isn't ready to be handed to the AI yet</strong>. Sort the brief out first — it's almost always smoother that way.
+        </p>
+      </div>
+
+      <!-- ============ PART 1 ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 1</span>
+        <span class="part-text">10 detailed checks</span>
+      </div>
+
+      <p class="detail-paragraph">
+        Each item expands into more detail, with self-check questions and example phrasings.
+      </p>
+
+      <!-- Item 1 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">1</span>
+          <span class="details-card__title">Is the task goal clear?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            First check: <strong>what's this workflow ultimately supposed to produce</strong>? Don't just say "help me handle this data" — too vague. The AI doesn't know whether you want a count, summary, check, classification, or a draft.
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">A clearer phrasing</span>
+              <p>Based on this CSV, organize event sign-up counts, identify people whose diet field is blank, and finally produce a draft event reminder.</p>
+            </div>
+          </div>
+
+          <p class="detail-paragraph">
+            Now the AI knows the endpoint: <strong>tally counts → flag issues → produce reminder draft</strong>.
+          </p>
+
+          <h4 class="example-heading">Self-check questions</h4>
+          <ul class="check-list">
+            <li>What <strong>result</strong> do I want?</li>
+            <li>Is it a <strong>table, list, summary, or draft</strong>?</li>
+            <li>Am I asking it to <strong>organize data, or perform an action</strong>?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 2 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">2</span>
+          <span class="details-card__title">Is the data source explicit?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            When the AI answers, it should know <strong>what data it's grounded in</strong>. The source might be:
+          </p>
+
+          <ul class="check-list">
+            <li>A CSV file</li>
+            <li>A Notion database</li>
+            <li>An article file</li>
+            <li>An assignment specification</li>
+            <li>An API response</li>
+            <li>A piece of text the user supplied</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            If the source isn't stated, the AI may fall back on its own background knowledge — which goes wrong fast when you're handling data, reports, tasks, or announcements.
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--bad">
+              <span class="compare-pair__label">Vague phrasing</span>
+              <p>Help me organize this.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Clearer phrasing</span>
+              <p>Please read @./data/activity_signup.csv and organize using only this file's contents — don't add anything outside this file.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Organize based on what the Notion tool returns. Don't assume there are other tasks in Notion that the tool didn't return.</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">Self-check questions</h4>
+          <ul class="check-list">
+            <li>Which <strong>file should the AI read</strong>?</li>
+            <li>Is that data <strong>complete</strong>?</li>
+            <li>Can the AI <strong>use external information</strong>?</li>
+            <li>If <strong>data is missing</strong>, what should the AI do?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 3 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">3</span>
+          <span class="details-card__title">Has the task been split into steps?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Most tasks aren't one-shot. "<strong>Generate an event reminder</strong>" actually contains: read sign-up data, count by session, find missing fields, organize the notes, produce a draft, list items needing human review.
+          </p>
+
+          <p class="detail-paragraph">
+            If you just say "<strong>write me an event reminder</strong>", the AI tends to skip the earlier checks and jump straight to plausible-looking text. We'd rather it <strong>walk through the steps</strong>.
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">A better phrasing</span>
+              <p>
+                Please complete in these steps:<br/>
+                1. Read the CSV.<br/>
+                2. Tally counts for the morning and afternoon sessions.<br/>
+                3. Find people whose diet field is blank.<br/>
+                4. Produce a reminder draft based on the result.<br/>
+                5. End with a list of items needing human review.<br/><br/>
+                If the data is incomplete earlier on, stop and don't write a draft.
+              </p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">Self-check questions</h4>
+          <ul class="check-list">
+            <li>What <strong>smaller steps</strong> does this break into?</li>
+            <li>Which step <strong>has to come first</strong>?</li>
+            <li>Which step should <strong>cause a stop on failure</strong>?</li>
+            <li>Which steps are <strong>just organizing</strong>, and which <strong>change data</strong>?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 4 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">4</span>
+          <span class="details-card__title">Which steps actually need a tool?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            <strong>Not every step needs an MCP tool</strong>. Some steps are just text organization the AI can do on its own. Tools are needed when:
+          </p>
+
+          <ul class="check-list">
+            <li>Reading Notion tasks</li>
+            <li>Creating a Notion page</li>
+            <li>Updating Notion status</li>
+            <li>Calling an API for data</li>
+            <li>Reading a local file</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            <strong>More tools isn't better</strong>. More tools means more risk.
+          </p>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              Use a tool when you need <strong>external data</strong>.<br/>
+              Use a tool when you need to <strong>create or update data</strong>.<br/>
+              For pure <strong>summarizing, classifying, or checking</strong>, you usually <strong>don't need a tool</strong>.
+            </p>
+          </div>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">A better phrasing</span>
+              <p>Use the notion-classroom tool to read tasks with status「待確認」. After reading, organize the result first — <strong>don't update any tasks yet</strong>.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Use the weather-api tool to query the weather. If the query succeeds, produce a reminder from the response. <strong>If it fails, stop — don't guess the weather</strong>.</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">Self-check questions</h4>
+          <ul class="check-list">
+            <li>Does this step <strong>really need a tool</strong>?</li>
+            <li>Is the AI just organizing text, or does it need <strong>external data</strong>?</li>
+            <li>Will the AI <strong>write to or modify data</strong>?</li>
+            <li>Is the tool's <strong>permission scope too wide</strong>?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 5 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">5</span>
+          <span class="details-card__title">Is the output format fixed?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            If the AI's response shape changes every time, follow-up steps get harder. Sometimes you get a paragraph, sometimes a table, sometimes a long analysis, sometimes the source disappears. <strong>Better to lock the format down up front</strong>.
+          </p>
+
+          <h4 class="example-heading">Format example 1: data organization</h4>
+          <blockquote class="prompt-example">
+            Please answer in this format:<br/><br/>
+            　Data overview:<br/>
+            　Issues found:<br/>
+            　Basic statistics:<br/>
+            　Items needing human review:
+          </blockquote>
+
+          <h4 class="example-heading">Format example 2: draft review</h4>
+          <blockquote class="prompt-example">
+            Please answer in this format:<br/><br/>
+            　Strengths:<br/>
+            　Structural issues:<br/>
+            　Content issues:<br/>
+            　Expression issues:<br/>
+            　Suggested revision order:
+          </blockquote>
+
+          <h4 class="example-heading">Format example 3: tool execution result</h4>
+          <blockquote class="prompt-example">
+            Please answer in this format:<br/><br/>
+            　Run status:<br/>
+            　Tool used:<br/>
+            　Tool response summary:<br/>
+            　Success?:<br/>
+            　Suggested next step:
+          </blockquote>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              Fixed format means: <strong>humans read it more easily, AI can chain it more easily, and when something goes wrong, it's easier to spot which step failed</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 6 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">6</span>
+          <span class="details-card__title">Are there stop conditions?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            A good workflow doesn't always grind to the end. Some situations should trigger a stop:
+          </p>
+
+          <ul class="cross-list">
+            <li>The data <strong>wasn't provided</strong></li>
+            <li>The file <strong>can't be read</strong></li>
+            <li>The API <strong>call failed</strong></li>
+            <li>Field content is <strong>incomplete</strong></li>
+            <li>The user didn't supply a <strong>due date</strong></li>
+            <li>The task involves <strong>publishing, sending, deleting, or modifying real data</strong></li>
+            <li>The AI <strong>isn't sure which tool to use</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            In all these cases, <strong>the AI shouldn't guess</strong>. Add lines like:
+          </p>
+
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">If <strong>data is incomplete</strong>, stop first and explain what's missing.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">If a <strong>tool call fails</strong>, don't fabricate an answer.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">If the action involves <strong>publishing, emailing, deleting, or modifying data</strong>, produce a draft first and wait for me to confirm.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">If you're <strong>unsure which tool to use</strong>, ask first — don't pick on your own.</span></li>
+          </ol>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              Stop conditions don't slow the AI down — they <strong>prevent the AI from acting wrongly when data is missing</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 7 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">7</span>
+          <span class="details-card__title">What needs human review?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            The AI can organize a lot. But some calls still belong to a human:
+          </p>
+
+          <ul class="check-list">
+            <li>Whether an announcement <strong>can be published</strong></li>
+            <li>Whether an email <strong>can be sent</strong></li>
+            <li>Whether a Notion status <strong>should really be updated</strong></li>
+            <li>Whether to <strong>fill missing data</strong></li>
+            <li>Whether a report's stance <strong>matches your own</strong></li>
+            <li>Whether a draft <strong>can stand as the final version</strong></li>
+            <li>Whether the content involves <strong>private or non-public information</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            One simple line at the end of the prompt does a lot of work:
+          </p>
+
+          <blockquote class="prompt-example">
+            At the end, list <strong>items that need human review</strong>.
+          </blockquote>
+
+          <p class="detail-paragraph">
+            It pushes the AI from "completing the task" to <strong>"completing the task and flagging risk"</strong>.
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Example</span>
+              <p>Generate a draft event reminder, but <strong>don't publish it on my behalf</strong>. End with the items that need human review before publishing.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Help revise the draft, but <strong>don't change the meaning of the original article</strong>. End with items that still need human verification.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 8 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">8</span>
+          <span class="details-card__title">Does this involve modification or writing?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            In an AI workflow, <strong>"modify" and "write" need the most caution</strong> — they actually change data: creating a Notion task, updating status, editing a draft, building a page, updating fields. These aren't off-limits, but check first:
+          </p>
+
+          <ul class="check-list">
+            <li><strong>What's being modified</strong>?</li>
+            <li><strong>How wide is the scope</strong>?</li>
+            <li>Is the change <strong>reversible</strong>?</li>
+            <li>Does it <strong>need human review</strong>?</li>
+            <li>Is the AI <strong>only touching the specified fields</strong>?</li>
+          </ul>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--bad">
+              <span class="compare-pair__label">Vague phrasing</span>
+              <p>Just sort it out, and update everything in Notion while you're at it.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">A safer way to ask</span>
+              <p>Update only the「狀態」field.<br/>Don't change the task name.<br/>Don't change the due date.<br/>Don't change the notes.<br/>After updating, report the result.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>List the items you intend to update first. <strong>Don't run any update before I confirm</strong>.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Item 9 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">9</span>
+          <span class="details-card__title">Does it involve personal or sensitive data?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            Forms, surveys, sign-up sheets, interview transcripts, course feedback — they often contain personal or sensitive content:
+          </p>
+
+          <ul class="check-list">
+            <li>Names, emails, phone numbers, student IDs</li>
+            <li>Identity information</li>
+            <li><strong>Health or dietary needs</strong></li>
+            <li>Private opinions</li>
+            <li>Interview content</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            This kind of data <strong>shouldn't be casually exposed</strong>, and shouldn't be listed when AI generates public-facing content.
+          </p>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">A better phrasing</span>
+              <p>Organize the statistics, but <strong>don't list individual names in the public draft</strong>.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>If names are needed, put them only in the <strong>internal verification list</strong>, not the public draft.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Check whether the data contains anything inappropriate to publish, and flag it.</p>
+            </div>
+          </div>
+
+          <h4 class="example-heading">Self-check questions</h4>
+          <ul class="check-list">
+            <li>Does this data contain <strong>personal information</strong>?</li>
+            <li>Will the final output <strong>be published publicly</strong>?</li>
+            <li>Does it need to be <strong>anonymized</strong>?</li>
+            <li>Which content is <strong>internal-only</strong>?</li>
+          </ul>
+        </div>
+      </details>
+
+      <!-- Item 10 -->
+      <details class="details-card details-card--num">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__num">10</span>
+          <span class="details-card__title">Is the result auditable?</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            A good AI workflow should be <strong>auditable in hindsight</strong>. We should be able to see:
+          </p>
+
+          <ul class="check-list">
+            <li>What data the AI <strong>used</strong></li>
+            <li>What steps the AI <strong>took</strong></li>
+            <li>Which parts came <strong>directly from the data</strong></li>
+            <li>Which parts are <strong>AI's inference</strong></li>
+            <li>Which parts <strong>need human review</strong></li>
+          </ul>
+
+          <div class="compare-pair">
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Add lines like</span>
+              <p>Mark which content is <strong>derived from the data</strong>, and which is your inference.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Don't only give the conclusion — also <strong>briefly explain how you got there</strong>.</p>
+            </div>
+            <div class="compare-pair__item compare-pair__item--good">
+              <span class="compare-pair__label">Or</span>
+              <p>Anything you're uncertain about, list under "<strong>needs verification</strong>."</p>
+            </div>
+          </div>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              That way the AI doesn't hand you a result that <strong>looks complete but has unclear origins</strong>.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ============ PART 2: full checklist ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 2</span>
+        <span class="part-text">Full checklist (10 categories)</span>
+      </div>
+
+      <p class="detail-paragraph">
+        A more complete version. Pull this up before each new AI workflow.
+      </p>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">1. Task goal</p>
+        <ul class="checklist-group__list">
+          <li>I know <strong>what this workflow should ultimately produce</strong>.</li>
+          <li>I know <strong>what the final result should look like</strong>.</li>
+          <li>I'm <strong>not</strong> using a vague brief like "just sort it out."</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">2. Data source</p>
+        <ul class="checklist-group__list">
+          <li>I've <strong>provided an explicit data source</strong>.</li>
+          <li>I've stated whether the AI must <strong>rely only on the named data</strong>.</li>
+          <li>I've told the AI to <strong>stop if data is missing</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">3. Step order</p>
+        <ul class="checklist-group__list">
+          <li>I've <strong>split the task into steps</strong>.</li>
+          <li>I've stated <strong>which step comes first</strong>.</li>
+          <li>I've stated <strong>which steps cannot be skipped</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">4. Tool use</p>
+        <ul class="checklist-group__list">
+          <li>I know <strong>which steps actually need a tool</strong>.</li>
+          <li>I know which steps are just text organization that <strong>doesn't need a tool</strong>.</li>
+          <li>I'm <strong>not letting the AI use unnecessary tools</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">5. Output format</p>
+        <ul class="checklist-group__list">
+          <li>I've <strong>specified the response format</strong>.</li>
+          <li>I've asked for organization in a <strong>table, list, or fixed fields</strong>.</li>
+          <li>I'm <strong>not letting the AI vary the format</strong> from run to run.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">6. Stop conditions</p>
+        <ul class="checklist-group__list">
+          <li>I've stated <strong>what to do when a tool fails</strong>.</li>
+          <li>I've stated <strong>what to do when data is missing</strong>.</li>
+          <li>I've told the AI <strong>not to guess missing data</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">7. Human review</p>
+        <ul class="checklist-group__list">
+          <li>I've stated <strong>which results need human review</strong>.</li>
+          <li>I'm <strong>not</strong> letting the AI publish important content directly.</li>
+          <li>I'm <strong>not</strong> letting the AI make high-risk calls on its own.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">8. Modification & writing</p>
+        <ul class="checklist-group__list">
+          <li>If data will be modified, I've <strong>specified the scope of changes</strong>.</li>
+          <li>I've asked the AI to <strong>only modify specified fields or drafts</strong>.</li>
+          <li>I've <strong>kept the original data or original draft</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">9. Privacy & safety</p>
+        <ul class="checklist-group__list">
+          <li>I've checked the data for <strong>personal information</strong>.</li>
+          <li>I've asked the public version not to <strong>list unnecessary names or details</strong>.</li>
+          <li>I'm <strong>not</strong> pasting <strong>API keys, tokens, or passwords</strong> into public content.</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <p class="checklist-group__title">10. Result verification</p>
+        <ul class="checklist-group__list">
+          <li>I've checked whether the AI's response <strong>matches the data</strong>.</li>
+          <li>I've confirmed <strong>counts, names, dates, and statuses are correct</strong>.</li>
+          <li>I've confirmed the <strong>final result is usable</strong>.</li>
+        </ul>
+      </div>
+
+      <!-- ============ PART 3: prompt template ============ -->
+      <div class="part-divider">
+        <span class="part-label">PART 3</span>
+        <span class="part-text">A reusable prompt template</span>
+      </div>
+
+      <p class="detail-paragraph">
+        If you're not sure where to start, this template works:
+      </p>
+
+      <blockquote class="prompt-example prompt-example--template">
+        Please complete the task based on the following:<br/><br/>
+        <strong>Data source:</strong><br/>
+        Read / use ＿＿＿＿＿＿.<br/><br/>
+        <strong>Task goal:</strong><br/>
+        I want to ＿＿＿＿＿＿.<br/><br/>
+        <strong>Steps:</strong><br/>
+        1. First ＿＿＿＿＿＿.<br/>
+        2. Then ＿＿＿＿＿＿.<br/>
+        3. Finally ＿＿＿＿＿＿.<br/><br/>
+        <strong>Constraints:</strong><br/>
+        1. Use only the named data.<br/>
+        2. Don't add anything not in the data.<br/>
+        3. If data is missing, stop and explain what's missing.<br/>
+        4. If you'd modify, publish, send, or update real data, produce a draft first — don't run the action directly.<br/><br/>
+        <strong>Output format:</strong><br/>
+        Please answer in this format:<br/><br/>
+        　Result:<br/>
+        　Data summary:<br/>
+        　Items needing verification:<br/>
+        　Suggested next step:
+      </blockquote>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          You can adapt this template to a lot of cases — organizing CSV, reading articles, reviewing drafts, creating Notion tasks. <strong>All can be derived from this shape</strong>.
+        </p>
+      </div>
+
+      <h2 class="detail-heading">Three applied examples</h2>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Example 1: a checked prompt for organizing CSV</span>
+          <span class="details-card__hint">Click to expand the full prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/activity_signup.csv.<br/><br/>
+            <strong>Task goal:</strong><br/>
+            Organize event sign-up data and surface items needing human review.<br/><br/>
+            <strong>Steps:</strong><br/>
+            1. Confirm the column names.<br/>
+            2. Tally counts for the morning and afternoon sessions.<br/>
+            3. Find people whose diet field is blank.<br/>
+            4. Produce an internal verification list.<br/><br/>
+            <strong>Constraints:</strong><br/>
+            1. Use only what's in the CSV.<br/>
+            2. Don't fill in answers for blank fields.<br/>
+            3. Don't modify the original CSV.<br/>
+            4. Don't list every name in any public-facing text.<br/><br/>
+            <strong>Output format:</strong><br/>
+            　Data overview:<br/>
+            　Basic statistics:<br/>
+            　Issues found:<br/>
+            　Items needing human review:
+          </blockquote>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Example 2: a checked prompt for driving Notion</span>
+          <span class="details-card__hint">Click to expand the full prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph"><strong>First prompt: read only, no updates</strong></p>
+          <blockquote class="prompt-example">
+            Use the notion-classroom tool to list tasks with status「待確認」.<br/><br/>
+            <strong>Read only — don't create or update any tasks</strong>.<br/><br/>
+            Please answer in this format:<br/><br/>
+            　Read status:<br/>
+            　Task list:<br/>
+            　Suggested priority:<br/>
+            　Items needing human review:
+          </blockquote>
+
+          <p class="detail-paragraph"><strong>Second prompt: update only after confirmation</strong></p>
+          <blockquote class="prompt-example">
+            Please update the given page_id's task status to「處理中」.<br/><br/>
+            <strong>Constraints:</strong><br/>
+            1. Update only the status.<br/>
+            2. Don't change the task name.<br/>
+            3. Don't change the due date.<br/>
+            4. Don't change the notes.<br/>
+            5. Report the result after updating.
+          </blockquote>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              Splitting "<strong>read</strong>" and "<strong>modify</strong>" into separate prompts is safer and easier to audit.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Example 3: a checked prompt for reading & writing</span>
+          <span class="details-card__hint">Click to expand the full prompt</span>
+        </summary>
+        <div class="details-card__body">
+          <blockquote class="prompt-example">
+            Please read @./data/article.txt and @./data/assignment.txt.<br/><br/>
+            <strong>Task goal:</strong><br/>
+            Based on the article and the assignment, generate a reading-report outline.<br/><br/>
+            <strong>Constraints:</strong><br/>
+            1. Don't write the full report.<br/>
+            2. Don't add information not in the article.<br/>
+            3. For the personal viewpoint, offer optional directions only — don't decide my stance.<br/>
+            4. List anything I still need to confirm myself.<br/><br/>
+            <strong>Output format:</strong><br/>
+            　Suggested titles:<br/>
+            　Article topic:<br/>
+            　Section outline:<br/>
+            　Optional viewpoint directions:<br/>
+            　Items I need to confirm myself:
+          </blockquote>
+        </div>
+      </details>
+
+      <!-- ============ Section: common errors ============ -->
+      <h2 class="detail-heading">Common mistakes</h2>
+      <p class="detail-paragraph">
+        A few common patterns when working with AI workflows:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">1</span>
+          <span class="role-item__desc"><strong>Task too big.</strong> "Sort the data, write the report, build the Notion page, and update the status — all in one go." Too many steps in one breath: one mistake in the middle and everything downstream is wrong. Better to split it: organize the data first → produce a draft → human review → only then update Notion.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">2</span>
+          <span class="role-item__desc"><strong>No data source named.</strong> The AI fills in content from background knowledge — looks complete, but isn't necessarily true.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">3</span>
+          <span class="role-item__desc"><strong>No stop condition.</strong> When data is missing, the AI keeps writing — and starts guessing.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">4</span>
+          <span class="role-item__desc"><strong>Letting the AI modify real data directly.</strong> Updating, publishing, sending, or deleting without confirmation is high-risk.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">5</span>
+          <span class="role-item__desc"><strong>No result verification.</strong> The response reads smoothly, but the <strong>numbers, names, dates, and statuses</strong> can still be wrong.</span>
+        </li>
+      </ul>
+
+      <!-- ============ Section: when to continue ============ -->
+      <h2 class="detail-heading">When can the AI move to the next step?</h2>
+      <p class="detail-paragraph">
+        A simple rule of thumb:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Organize / summarize</span>
+          <span class="role-item__desc">If it's just <strong>organizing, summarizing, or classifying</strong>, the AI can usually keep going.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Produce a draft</span>
+          <span class="role-item__desc">Can keep going, but <strong>label it as a draft</strong>.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Modify data</span>
+          <span class="role-item__desc">Confirm the <strong>scope of modification</strong> first.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Publish / write</span>
+          <span class="role-item__desc">If it involves <strong>publishing, sending, deleting, or updating real data</strong>, get <strong>human confirmation first</strong>.</span>
+        </li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Organizing can move fast.</strong><br/>
+          <strong>Drafts need confirmation.</strong><br/>
+          <strong>Modifications stay narrow.</strong><br/>
+          <strong>Publishing is a human call.</strong>
+        </p>
+      </div>
+
+      <!-- ============ Section: takeaway ============ -->
+      <h2 class="detail-heading">The most important idea on this page</h2>
+      <p class="detail-paragraph">
+        AI workflows aren't <strong>"hand everything to AI."</strong> They're about splitting the task clearly so the AI can help inside a <strong>clear, safe, auditable</strong> boundary. Before each workflow, confirm:
+      </p>
+
+      <ul class="check-list">
+        <li>What's the <strong>goal</strong></li>
+        <li>Where does the <strong>data come from</strong></li>
+        <li>What's the <strong>step order</strong></li>
+        <li>Where do you <strong>need a tool</strong></li>
+        <li>Should it <strong>stop on failure</strong></li>
+        <li>Which results <strong>need human review</strong></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        AI is good at <strong>repetition, organization, checking, drafts, and first-pass suggestions</strong>. But <strong>important calls still belong to a human</strong>.
+      </p>
+
+      <div class="highlight-card highlight-card--final">
+        <p class="highlight-text">
+          Data sources clear. Tool permissions limited.<br/>
+          Output format fixed. Stop on failure.<br/>
+          <strong>Important actions stay with a human.</strong>
+        </p>
+      </div>
 
     </div>
   </section>
@@ -57,5 +897,529 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .example-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin: var(--space-16) 0 var(--space-8);
+    padding: var(--space-4) 0;
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+  }
+
+  .part-label {
+    flex-shrink: 0;
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .part-text {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.role-item__desc) code,
+  :global(.numbered-list__text) code,
+  :global(.compare-pair__item) code,
+  :global(.checklist-group__list) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--final {
+    margin-top: var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.9;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .role-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .role-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .role-item__label {
+    flex-shrink: 0;
+    min-width: 9rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+
+  .role-item__label--ord {
+    min-width: 3rem;
+    font-size: var(--text-base);
+  }
+
+  .role-item__desc {
+    flex: 1;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .role-item__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .numbered-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .numbered-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+  }
+
+  .numbered-list__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .numbered-list__text {
+    flex: 1;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .prompt-example {
+    margin: var(--space-2) 0 var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    border-left: 3px solid var(--color-accent);
+    background-color: var(--color-bg-secondary);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.9;
+    font-style: italic;
+  }
+
+  .prompt-example strong {
+    color: var(--color-accent);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .prompt-example--template {
+    border-left-width: 4px;
+    background-color: var(--color-tag-bg);
+  }
+
+  .compare-pair {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .compare-pair__item {
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .compare-pair__item--bad {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.05);
+  }
+
+  .compare-pair__item--good {
+    border-left-color: var(--color-accent);
+  }
+
+  .compare-pair__label {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+    padding: 0.1rem 0.6rem;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .compare-pair__item--bad .compare-pair__label {
+    background-color: #d97706;
+  }
+
+  .compare-pair__item p {
+    margin: 0;
+    font-style: italic;
+  }
+
+  .compare-pair__item p strong {
+    color: var(--color-heading);
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  .checklist-group {
+    margin: var(--space-4) 0;
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .checklist-group__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin: 0 0 var(--space-3);
+  }
+
+  .checklist-group__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .checklist-group__list li {
+    position: relative;
+    padding-left: 2.8em;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .checklist-group__list li::before {
+    content: '\2610';
+    position: absolute;
+    left: 1em;
+    top: -0.05em;
+    color: var(--color-accent);
+    font-size: 1.2em;
+  }
+
+  .checklist-group__list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .details-card {
+    margin: var(--space-3) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .details-card[open] {
+    border-color: var(--color-accent);
+  }
+
+  .details-card__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    list-style: none;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+    transition: background-color var(--transition);
+    user-select: none;
+  }
+
+  .details-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details-card__summary:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .details-card[open] .details-card__summary {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .details-card__icon {
+    flex-shrink: 0;
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: var(--text-base);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+  }
+
+  .details-card[open] .details-card__icon {
+    transform: rotate(90deg);
+  }
+
+  .details-card__num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .details-card__title {
+    flex: 1;
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .details-card__hint {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .details-card[open] .details-card__hint {
+    display: none;
+  }
+
+  .details-card__body {
+    padding: var(--space-4);
+  }
+
+  @media (max-width: 720px) {
+    .part-divider {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .role-item__label,
+    .role-item__label--ord {
+      min-width: 0;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .checklist-group {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .details-card__summary {
+      padding: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .details-card__hint {
+      flex-basis: 100%;
+      padding-left: calc(var(--space-3) + 1.8rem + var(--space-3));
+    }
+
+    .details-card__body {
+      padding: var(--space-4);
+    }
   }
 </style>
