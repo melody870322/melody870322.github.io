@@ -777,6 +777,7 @@ Prompt 是可以重複使用的工作流程。
         <p class="detail-subtitle">
           上一頁我們把工具面想清楚了：四個 tools、一個 resource、一個 prompt。這一頁開始<strong>動手把它做出來</strong>。每一步都會附上完整指令；如果中途某一步沒過，先停下來把它修好，再往下走。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <!-- ============ Part 1: 先做一個能跑的最小版本 ============ -->
@@ -1814,5 +1815,13 @@ if __name__ == "__main__":
     .code-block--md {
       max-height: 24rem;
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

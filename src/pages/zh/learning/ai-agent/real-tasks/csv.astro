@@ -16,6 +16,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           AI 工作流不是讓 AI 自己亂跑，而是把任務拆成清楚的步驟，再讓 AI 在<strong>安全、可檢查的範圍內</strong>幫忙完成。這一頁要把 AI Agent 用在一種很常見的任務：<strong>整理 CSV 與表格資料</strong>。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <p class="detail-paragraph">
@@ -124,14 +125,10 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         </li>
         <li>
           <span class="numbered-list__num">3</span>
-          <span class="numbered-list__text">在終端機輸入 <code>uv init</code>，<strong>初始化專案</strong>。</span>
-        </li>
-        <li>
-          <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">輸入 <code>gemini</code>，<strong>啟動 Gemini CLI</strong>。</span>
         </li>
         <li>
-          <span class="numbered-list__num">5</span>
+          <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">接下來的每個練習，都會用這個檔案路徑：<code>@./data/activity_signup.csv</code>。</span>
         </li>
       </ol>
@@ -1126,5 +1123,13 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

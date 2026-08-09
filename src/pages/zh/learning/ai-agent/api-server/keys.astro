@@ -16,6 +16,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           前面我們已經知道，MCP Server 不只能讀取本機資料夾，也可以透過 API 連到外部資料。但只要開始使用 API，很快就會遇到一個問題 ——<strong>有些 API 不是任何人都能直接用</strong>。它會要求你提供一把「鑰匙」，這把鑰匙通常就叫做 <code>API Key</code>。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <!-- Section: What is API Key -->
@@ -247,7 +248,14 @@ __pycache__/</code></pre>
         如果你是用 uv 管理專案，可以在 VS Code 終端機中執行：
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-shell">uv add python-dotenv</code></pre>
+      <pre class="code-block" is:raw><code class="lang-shell">uv init
+uv add "mcp[cli]" python-dotenv</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>這裡要裝的不只是 <code>python-dotenv</code>。</strong>下一節的程式碼會用到 <code>from mcp.server.fastmcp import FastMCP</code>，那個 <code>mcp</code> 套件必須一起裝，否則跑起來會是 <code>ModuleNotFoundError</code>。<code>uv init</code> 則是替這個新資料夾建立專案結構，只有第一次需要。
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         如果你是用 pip 和 .venv，可以執行：
@@ -1052,5 +1060,13 @@ if __name__ == "__main__":
       gap: var(--space-3);
       padding: var(--space-4) var(--space-5);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

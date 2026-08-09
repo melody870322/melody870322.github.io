@@ -71,7 +71,41 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
       </div>
 
       <!-- Section: Install Python in VS Code -->
-      <h2 class="detail-heading">在 VS Code 裡安裝 Python</h2>
+      <h2 class="detail-heading">先安裝 Python 本體</h2>
+      <p class="detail-paragraph">
+        這一步很容易被跳過。<strong>VS Code 的 Python 擴充套件不含 Python 本身</strong> —— 它只是編輯器的輔助工具，真正執行程式的直譯器要另外裝。
+      </p>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">前往 <strong>python.org</strong> 的下載頁，抓 Windows 版安裝檔</p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <div class="setup-body">
+            <p class="setup-text">執行安裝檔，<strong>務必勾選「Add Python to PATH」</strong></p>
+            <p class="setup-text setup-text--muted">這個勾選框在安裝畫面的最下方，很容易漏掉。沒勾的話終端機會找不到 <code>python</code> 指令。</p>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">安裝完成後，開一個<strong>新的</strong>終端機視窗，輸入：</p>
+            <pre class="code-block code-block--py"><code>python --version</code></pre>
+            <p class="setup-text setup-text--muted">看到版本號就成功了。</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>沒裝直譯器會出現兩種症狀，而且都不像是「沒裝 Python」。</strong>一是等一下的 <code>Python: Select Interpreter</code> 清單會是空的；二是在 Windows 終端機輸入 <code>python</code> 會直接彈出 Microsoft Store。看到這兩種情況，就回來把這一步做完。
+        </p>
+      </div>
+
+      <!-- Section: Install VS Code extension -->
+      <h2 class="detail-heading">再在 VS Code 裡裝 Python 擴充套件</h2>
 
       <ol class="setup-list">
         <li class="setup-item">
@@ -94,6 +128,12 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
 
       <!-- Section: Create first Python file -->
       <h2 class="detail-heading">建立第一個 Python 檔案</h2>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>所有檔案一律用 VS Code 建立與編輯</strong>，並確認右下角的編碼顯示為 <code>UTF-8</code>。不要用記事本建立含中文的檔案 —— 記事本會自作主張存成 <code>.env.txt</code>，而檔案總管預設隱藏副檔名，看起來完全正常。也不要用 PowerShell 的 <code>Set-Content</code>：它在中文 Windows 上預設走 Big5，寫進去的中文在 CLI 裡會變成亂碼。後面「自製 MCP Server」的程式碼有大量中文字串（docstring、回覆訊息、錯誤提示），用錯工具建檔會全部受影響。
+        </p>
+      </div>
 
       <ol class="setup-list">
         <li class="setup-item">
@@ -654,6 +694,11 @@ week3.md</code></pre>
     border-left: 4px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
   }
 
   .callout-text {

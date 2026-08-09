@@ -114,6 +114,7 @@ if __name__ == "__main__":
         <p class="detail-subtitle">
           前面我們已經知道 MCP Server 可以當成 AI 和外部資料之間的橋。AI 不是直接衝進外部服務裡亂拿資料，而是透過我們寫好的 MCP Server，使用幾個被設計過的 tools 來完成任務。這一頁要做的事情就是 ——<strong>把一個外部 API，包成 AI 可以使用的 MCP Tool</strong>。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <p class="detail-paragraph">
@@ -1302,5 +1303,13 @@ if not api_key:
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

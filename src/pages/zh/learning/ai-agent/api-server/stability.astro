@@ -11,7 +11,7 @@ const helpersCode = String.raw`def success_response(
         "查詢狀態：成功\n"
         f"城市：{city}\n"
         f"更新時間：{update_time}\n"
-        f"目前氣溫:約 {temperature} °C\n"
+        f"目前氣溫：約 {temperature} °C\n"
         f"目前風速：約 {wind_speed} km/h\n"
         "提醒：這是外部天氣 API 回傳的資料，實際情況仍可能因地點不同而有差異。"
     )
@@ -107,7 +107,7 @@ def list_supported_cities() -> str:
 
 
 @mcp.tool()
-def get_current_weather(city: str) -> str:
+def get_current_weather(city: str = "") -> str:
     """查詢指定城市目前的天氣，並用固定格式回覆。"""
     city = normalize_city_name(city)
 
@@ -193,6 +193,7 @@ if __name__ == "__main__":
         <p class="detail-subtitle">
           前面我們已經把外部 API 包成 MCP Tool，讓 AI 可以透過工具查詢資料。不過，第一版工具通常只能處理「使用者輸入剛剛好、API 也剛好正常」的情況。<strong>而真實世界不會這麼乖。</strong>
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <p class="detail-paragraph">使用者可能會輸入：</p>
@@ -1200,5 +1201,13 @@ if temperature is None or wind_speed is None or update_time is None:
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

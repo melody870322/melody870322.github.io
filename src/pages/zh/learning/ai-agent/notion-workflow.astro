@@ -16,7 +16,14 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           剛剛你已經完成一件很重要的事：把 Gemini CLI 裝好、打開，並且把第一個現成 MCP 接進來。這裡開始，我們<strong>不只是確認它「有連上」，而是要真的讓它做一輪完整的事情</strong>。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>課前提醒：</strong>這一頁全程都要用到 Notion，請在上課前先<strong>註冊好帳號並登入</strong>。現場才開始註冊、等驗證信，會吃掉大半堂課的時間。
+        </p>
+      </div>
 
       <!-- Section: Why Notion -->
       <h2 class="detail-heading">為什麼第一次真正的工作流，我會選 Notion</h2>
@@ -64,9 +71,56 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </li>
         <li class="prereq-item">
           <span class="prereq-num">3</span>
-          <p class="prereq-text">你的 Notion 裡<strong>最好已經有一些頁面可以拿來測試</strong>。不一定要很多，但至少要有幾頁你看得懂內容、知道大概放在哪裡。這樣你第一次做工作流時，比較容易判斷 AI 做得對不對。</p>
+          <p class="prereq-text">你的 Notion 裡<strong>要有幾頁可以拿來測試</strong>。內容要是你看得懂、也知道放在哪裡的，這樣才判斷得出 AI 做得對不對。如果現在還沒有，下面直接給你三頁現成的。</p>
         </li>
       </ol>
+
+      <h3 class="sub-heading">還沒有測試頁面的話，先把這三頁建起來</h3>
+      <p class="detail-paragraph">
+        在 Notion 裡新增三個頁面，標題和內容直接照抄。三頁都建好，全班的素材才會一致，等一下比對結果才有意義。
+      </p>
+
+      <div class="sample-list">
+        <article class="sample-card">
+          <p class="sample-tag">頁面一</p>
+          <h4 class="sample-title">課程大綱｜AI Agent 實作</h4>
+          <pre class="code-block"><code>【題目】期末報告：自製一個 MCP Server
+
+【要求】
+- 至少實作兩個 tool
+- 附上一份 settings.json 設定內容
+- 需說明最小權限的設計考量
+- 報告 3 到 5 頁
+
+【截止時間】
+- 提案：11/15
+- 完整報告：12/20</code></pre>
+        </article>
+
+        <article class="sample-card">
+          <p class="sample-tag">頁面二</p>
+          <h4 class="sample-title">課程公告｜第一週補課通知</h4>
+          <pre class="code-block"><code>原訂 10/8 停課，補課時間改為 10/15 下午。</code></pre>
+        </article>
+
+        <article class="sample-card">
+          <p class="sample-tag">頁面三</p>
+          <h4 class="sample-title">讀書筆記｜MCP 三種 primitive</h4>
+          <pre class="code-block"><code>Tools 由模型決定何時呼叫，Resources 由應用程式決定何時提供，Prompts 由使用者主動選用。</code></pre>
+        </article>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>這三頁是刻意這樣設計的。</strong>搜尋「課程」時，應該找到前兩頁、不該找到第三頁 —— 這正好對應下面 STEP 1 要你觀察的四件事。而頁面一同時包含題目、要求、截止時間三類資訊，是為了讓 STEP 4 的「整理成三個小段落」有真的素材可以整理。
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          建好頁面後<strong>先等一下再開始</strong>。Notion 需要幾秒到幾分鐘替新頁面建立索引，馬上執行 STEP 1 很可能什麼都搜不到，那不是你做錯了。
+        </p>
+      </div>
 
       <!-- Step 1: Search -->
       <div class="case-header">
@@ -81,7 +135,13 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="tool-box__label">Notion MCP supported tool</p>
         <p class="tool-box__name"><code>notion-search</code></p>
         <p class="tool-box__desc">
-          可以搜尋你的 Notion 工作區；如果你有 Notion AI，還可以搜尋連接來源，例如 Slack、Google Drive、Jira。沒有 Notion AI 的情況下，搜尋會限於 Notion 工作區本身。
+          可以搜尋你的 Notion 工作區；如果你有 Notion AI，還可以搜尋連接來源，例如 Slack、Google Drive、Jira。
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>本課程使用免費帳號，搜尋範圍只限 Notion 工作區本身。</strong>所以你會看到搜尋結果比想像中少，那是帳號權限的差別，不是你哪裡做錯了。
         </p>
       </div>
 
@@ -233,7 +293,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
       <div class="tool-box">
         <p class="tool-box__label">Notion MCP supported tool</p>
-        <p class="tool-box__name"><code>notion-update</code></p>
+        <p class="tool-box__name"><code>notion-update-page</code></p>
         <p class="tool-box__desc">
           可以根據前一步找到或建立的內容，再更新頁面屬性或內容。
         </p>
@@ -431,6 +491,76 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     margin-top: var(--space-12);
   }
 
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Sample pages to copy into Notion */
+  .sample-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .sample-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .sample-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .sample-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .sample-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
   /* Inline code */
   :global(.detail-paragraph) code,
   :global(.detail-subtitle) code,
@@ -509,6 +639,11 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     border-left: 4px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
   }
 
   .callout-text {
@@ -775,6 +910,15 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
     .prompt-example {
       padding: var(--space-3) var(--space-5);
+    }
+
+    .sample-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.8rem;
     }
   }
 </style>

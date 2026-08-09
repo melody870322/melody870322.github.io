@@ -16,6 +16,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           前面我們已經練習過 AI 整理 CSV，也透過 Notion API 建立和更新任務。接下來要把 AI Agent 用在另一種很常見的任務：<strong>閱讀文章、整理重點、規劃報告大綱、檢查草稿</strong>。這類任務看起來不像操作資料庫，也不像整理表格，但其實很適合用工作流來處理。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <p class="detail-paragraph">
@@ -1407,5 +1408,13 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

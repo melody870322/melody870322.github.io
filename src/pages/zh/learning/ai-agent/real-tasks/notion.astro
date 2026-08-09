@@ -16,6 +16,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           前面我們已經練習過，AI 可以幫我們整理 CSV 與表格資料。但是<strong>整理完資料之後，常常還會有下一步</strong>。例如把待辦事項放進 Notion、把任務狀態改成「處理中」、把已完成的事項標記起來。這一頁要把 Notion 變成一個可以被 AI Agent 使用的工具。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <p class="detail-paragraph">
@@ -138,6 +139,12 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
           <strong>欄位名稱要完全一致。</strong>例如程式裡會寫「任務名稱」，Notion 裡就不要寫成「任務」或「名稱」。因為 Notion API 會依照欄位名稱去找資料，如果名稱不同，程式可能會讀不到正確欄位。
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>「狀態」這一欄的型別，一定要選「選取 / Select」，不要選「狀態 / Status」。</strong>Notion 新建資料庫時常常預設給你 Status 欄位，名字看起來一樣，但兩者的 API 結構不同 —— Status 走的是 <code>"status"</code> 而不是 <code>"select"</code>。選錯了程式會回 400 錯誤，而且從畫面上完全看不出差別。這是這一頁最常見的卡關原因。
         </p>
       </div>
 
@@ -774,13 +781,19 @@ if __name__ == "__main__":
       <pre class="code-block" is:raw><code class="lang-json">{
   "mcpServers": {
     "notion-classroom": {
-      "command": "python",
-      "args": ["notion_classroom_server.py"],
-      "cwd": ".",
+      "command": "uv",
+      "args": ["run", "python", "notion_classroom_server.py"],
+      "cwd": "C:\\完整絕對路徑\\notion-classroom-server",
       "trust": false
     }
   }
 }</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>這兩行不能寫成 <code>python</code> 和 <code>"."</code>，會直接失敗。</strong>前面 PART 3 是用 <code>uv init</code> + <code>uv add</code> 裝套件的，它們裝在專案的 <code>.venv</code> 裡；直接叫 <code>python</code> 會用到系統的 Python，找不到 <code>mcp</code>、<code>dotenv</code>、<code>requests</code>，必然是 <code>ModuleNotFoundError</code>。而 <code>"cwd": "."</code> 是相對於 Gemini CLI 的啟動位置，不是相對於這個資料夾，<code>.env</code> 也可能一起讀不到 —— 所以請填<strong>完整絕對路徑</strong>。
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         接著在 VS Code 終端機輸入：
@@ -1723,5 +1736,13 @@ if __name__ == "__main__":
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

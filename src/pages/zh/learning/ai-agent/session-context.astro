@@ -1,0 +1,569 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Session 與脈絡管理 — AI Agent 拼圖"
+  description="接上 MCP、跑過一輪工作流之後，第一個真正會卡住你的不是功能，而是額度。這一頁用 /stats 的實測數字，帶你看懂請求怎麼被消耗掉，以及 /clear、GEMINI.md、/resume 這些工具各自能幫你什麼。"
+  lang="zh"
+>
+  <section class="section">
+    <div class="container ai-agent-session-context">
+      <a class="back-link" href="/zh/">&larr; 返回首頁</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">為什麼跑沒幾句就沒額度了</h1>
+        <p class="detail-subtitle">
+          你已經接上 Notion、跑過一輪完整工作流。接下來第一個真正會卡住你的，通常不是功能不夠，而是<strong>額度用完了</strong>。這一頁要處理的就是這件事：搞清楚請求是怎麼被吃掉的，以及有哪些工具可以救。
+        </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+      </header>
+
+      <!-- Section 1: /stats -->
+      <h2 class="detail-heading">先看得見成本：<code>/stats</code></h2>
+      <p class="detail-paragraph">
+        在 Gemini CLI 裡輸入 <code>/stats</code>，可以看到這次 session 用掉多少請求、多少 token。這是整頁的起點 —— <strong>看不到成本，就沒辦法談節省</strong>。
+      </p>
+      <pre class="code-block"><code>/stats</code></pre>
+
+      <p class="detail-paragraph">
+        下面是同一句摘要指令，在兩種工具設定下的實測結果：
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th></th><th>28 個工具全開</th><th>限制成 4 個工具</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>請求數</td><td>3</td><td><strong>2</strong></td></tr>
+            <tr><td>輸入 token</td><td>121,554</td><td><strong>41,353</strong></td></tr>
+            <tr><td>平均每次請求</td><td>40,518</td><td><strong>20,677</strong></td></tr>
+            <tr><td>250K TPM 可跑幾次</td><td>約 6</td><td><strong>約 12</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          關鍵在這裡：<strong>每一次請求，都會把整段對話歷史重新送出去一次。</strong>所以對話越長，單次請求越貴 —— 不是越後面越省，是越後面越貴。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        另外還有一筆<strong>約 1.7 萬 token 的固定成本</strong>，來自 CLI 自己的系統提示和內建工具。這筆你關不掉，但它也提醒了一件事：你的每一句話都不是從零開始算的。
+      </p>
+
+      <!-- Section 2: one instruction != one request -->
+      <h2 class="detail-heading">一句指令不等於一個請求</h2>
+      <p class="detail-paragraph">
+        這是最容易低估的地方。你打一句「幫我把這頁 Notion 筆記整理成摘要」，感覺上是一次，但背後 agent 會跑：
+      </p>
+
+      <ol class="callout-list callout-list--plain">
+        <li>送出指令 → 請求 1</li>
+        <li>模型決定呼叫 <code>notion-search</code> → 請求 2（把搜尋結果送回模型）</li>
+        <li>模型決定呼叫 <code>notion-fetch</code> → 請求 3</li>
+        <li>模型讀完內容產生摘要 → 請求 4</li>
+      </ol>
+
+      <p class="detail-paragraph">
+        這樣一句話可能就是 <strong>4～10 個請求</strong>。實測跑完前面那套四步 Notion 工作流，總共用掉 <strong>9 個請求、5 次工具呼叫</strong>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>TPM 額度通常會比 RPM 額度先用完。</strong>因為每一次請求都會把整段對話歷史當作輸入重送一次，所以對話越長，單次請求吃掉的 token 越多。很多人以為自己是撞到「每分鐘 15 次」的上限，其實是撞到 token 的上限。
+        </p>
+      </div>
+
+      <!-- Section 3: three limits -->
+      <h2 class="detail-heading">額度的三種限制</h2>
+      <p class="detail-paragraph">
+        免費層有三道獨立的限制，任何一道超過都會回 429。差別在於<strong>要等多久</strong>：
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>縮寫</th><th>意義</th><th>額度</th><th>重置方式</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>RPM</td><td>每分鐘請求數</td><td>15</td><td>滾動 60 秒</td></tr>
+            <tr><td>TPM</td><td>每分鐘輸入 token</td><td>250,000</td><td>滾動 60 秒</td></tr>
+            <tr><td>RPD</td><td>每天請求數</td><td>500</td><td>太平洋時間午夜</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        RPM 和 TPM 是<strong>滾動 60 秒</strong>，不是整分鐘歸零 —— 14:30:10 用完，要到 14:31:10 才恢復。實務上記得「撞到就等一分鐘」就夠了。RPD 則是以太平洋時間午夜重置，換算成台灣時間是<strong>每天下午 15:00</strong>（11 月到隔年 3 月因為美國時區調整，會變成 16:00）。撞到 RPD 只能等隔天。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>額度是算在「專案」上，不是算在金鑰上。</strong>所以同一個 Google Cloud 專案底下發幾把金鑰都沒用，額度是共用的。每個人都必須<strong>用自己的 Google 帳號、建自己的專案</strong>，否則整班會共吃同一份 500 RPD。
+        </p>
+      </div>
+
+      <!-- Section 4: /clear + GEMINI.md -->
+      <h2 class="detail-heading">可靠的做法：<code>/clear</code> 加 <code>GEMINI.md</code></h2>
+      <p class="detail-paragraph">
+        既然成本來自「整段對話歷史重送」，那省錢的方向就很清楚：<strong>把不需要的歷史丟掉，把需要的東西寫進檔案</strong>。
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">丟掉歷史</p>
+          <h3 class="method-title"><code>/clear</code></h3>
+          <p class="method-desc">
+            清空對話脈絡。這是<strong>純本地操作，不送請求，也不會失敗</strong>。下一句話就從乾淨的狀態重新開始。
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">留住重點</p>
+          <h3 class="method-title"><code>GEMINI.md</code></h3>
+          <p class="method-desc">
+            專案層級的長期記憶。寫成檔案、不佔對話脈絡，而且<strong>可版控、可發給全班</strong>。
+          </p>
+        </article>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          課堂上的節奏建議是：<strong>每完成一個練習就 <code>/clear</code> 一次</strong>，需要保留的資訊寫進 <code>GEMINI.md</code>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這不是什麼偏門技巧。CLI 啟動畫面的第一行提示就是 <code>Create GEMINI.md files to customize your interactions</code>。
+      </p>
+
+      <!-- Section 5: /compress -->
+      <h2 class="detail-heading"><code>/compress</code> 目前不能用</h2>
+      <p class="detail-paragraph">
+        看到額度問題，很多人第一個想到的是壓縮對話歷史。但這條路目前是斷的。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>v0.54.4 實測：41K 和 373K 兩種脈絡規模都卡在「Compressing chat history」永不結束。</strong>按 Esc 無效，只能按兩次 Ctrl+C 或直接關掉終端機。官方 repo 的 issue #16213 有相同症狀的回報。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <strong>不要放進課堂操作。</strong>不過這件事本身很值得講給學生聽 —— 官方文件寫得好好的功能，實際上有 bug。<strong>不能因為文件說可以，就假設可以。</strong>這是使用任何工具都適用的態度。
+      </p>
+
+      <!-- Section 6: /resume -->
+      <h2 class="detail-heading">跨次續接：<code>/resume</code></h2>
+      <p class="detail-paragraph">
+        CLI 會自動儲存 session，不需要你另外存檔。在 PowerShell 執行：
+      </p>
+      <pre class="code-block"><code>gemini --resume
+gemini -r</code></pre>
+      <p class="detail-paragraph">
+        或是已經進到 CLI 裡了，輸入：
+      </p>
+      <pre class="code-block"><code>/resume</code></pre>
+
+      <p class="detail-paragraph">
+        Session 存在 <code>~/.gemini/tmp/&lt;project_hash&gt;/chats/</code>，是<strong>專案專屬</strong>的 —— 換一個資料夾，就看不到原本的歷史。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          在不同資料夾續接時，<strong>絕對路徑的檔案引用可能會失效，相對路徑比較安全</strong>。另外，<code>--resume</code> 是否真的一併還原模型脈絡（還是只還原畫面顯示）目前尚未驗證，寫進教材前建議自己先測一次：開新 session → 告訴它一件事 → <code>/quit</code> → <code>gemini --resume</code> → 追問那件事。
+        </p>
+      </div>
+
+      <!-- Section 7: /rewind -->
+      <h2 class="detail-heading">回到剛剛的樣子：<code>/rewind</code></h2>
+      <p class="detail-paragraph">
+        輸入 <code>/rewind</code>，或是連按兩下 <code>Esc</code>，會顯示還原點清單，以及每一步的檔案變更（例如 <code>1 file changed +3</code>，或 <code>No files have been changed</code>）。
+      </p>
+      <p class="detail-paragraph">
+        你可以選擇<strong>只回溯對話</strong>、<strong>只還原檔案</strong>，或是兩者都做。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          查看完之後請按 <strong>Esc</strong> 離開。按 Enter 會直接套用目前游標選中的還原點 —— 這是最容易誤觸的地方。
+        </p>
+      </div>
+
+      <!-- Section 8: /memory -->
+      <h2 class="detail-heading">注意 <code>/memory</code> 已經變了</h2>
+      <p class="detail-paragraph">
+        如果你看過比較舊的教學，會看到 <code>/memory add</code>。<strong>v0.54.4 已經沒有 <code>add</code> 子指令了</strong>，只剩 <code>show</code>、<code>reload</code>、<code>list</code>、<code>inbox</code>。記憶現在統一改用 <code>GEMINI.md</code> 檔案管理。
+      </p>
+      <pre class="code-block"><code>/memory show     # 顯示目前記憶內容
+/memory reload   # 重新載入 GEMINI.md</code></pre>
+
+      <!-- Section 9: agent writes its own memory -->
+      <h2 class="detail-heading">Agent 會自己寫記憶檔案</h2>
+      <p class="detail-paragraph">
+        這一節是整頁最值得停下來想的地方。實測跟 CLI 說「請記住我的幸運數字是 6」，它會<strong>主動呼叫 <code>write_file</code> 去修改 <code>MEMORY.md</code></strong>（標題自己寫成 <code>#&nbsp;Private Project Memory</code>），並顯示完整 diff 請你確認：
+      </p>
+
+      <pre class="code-block"><code>Apply this change?
+  1. Allow once                    ← 建議選這個
+  2. Allow for this session        ← 游標預設停在這裡
+  3. Modify with external editor
+  4. No, suggest changes (esc)</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>游標預設就停在選項 2。</strong>一路按 Enter，等於放開整個 session 的寫入權限 —— 之後它要寫什麼都不會再問你。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        寫入之後，底部狀態列會從 <code>1 GEMINI.md file</code> 變成 <code>2 GEMINI.md files</code> —— 這個檔案往後<strong>每次啟動都會自動載入脈絡</strong>。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這就是 agent 和 chatbot 最本質的差別：<strong>它為了未來的自己，改變了環境。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        所以請養成一個習慣：<strong>定期打開記憶檔案，看看裡面到底存了什麼</strong>。避免個人資訊被無感地寫入，然後永久保留下來。
+      </p>
+
+      <!-- Section: bonus -->
+      <h2 class="detail-heading">補充：<code>/stats</code> 裡為什麼有兩個模型</h2>
+      <p class="detail-paragraph">
+        看 <code>/stats</code> 的 Model Usage 表時，你可能會發現不只一個模型：
+      </p>
+      <pre class="code-block"><code>gemini-3.1-flash-lite    1    ⟶ utility_summarizer
+gemini-3.5-flash-lite    9    ⟶ main</code></pre>
+
+      <p class="detail-paragraph">
+        CLI 內部會另外叫一個<strong>工具型模型</strong>去處理摘要之類的雜活，和你在 <code>.env</code> 鎖定的主模型分開。3.1 Flash-Lite 的額度同樣是 15 RPM / 500 RPD，不影響課堂使用。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這件事的教學價值在於：<strong>agent 不是只有一個模型在跑，而是背後有分工。</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-session-context {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-heading code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.method-desc) code,
+  :global(.callout-list) code,
+  :global(.info-table) td code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Ordered list used for the request breakdown */
+  .callout-list {
+    margin: var(--space-4) 0 var(--space-6);
+    padding-left: var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .callout-list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .callout-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table tbody td:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  /* Method grid (/clear vs GEMINI.md) */
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .method-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .method-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .method-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .method-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .method-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .method-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .method-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .method-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.8rem;
+    }
+
+    .info-table {
+      font-size: 0.78rem;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: var(--space-2);
+    }
+  }
+</style>
