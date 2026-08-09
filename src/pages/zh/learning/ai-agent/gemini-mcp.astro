@@ -1,10 +1,17 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
+
+const fixPathCode = String.raw`$userPath = [Environment]::GetEnvironmentVariable("Path","User")
+$npmPath  = "$env:AppData\npm"
+if ($userPath -notlike "*$npmPath*") {
+    $newPath = if ([string]::IsNullOrEmpty($userPath)) { $npmPath } else { "$userPath;$npmPath" }
+    [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+}`;
 ---
 
 <BaseLayout
   title="Gemini CLI 入門與 MCP 初次串接 — AI Agent 拼圖"
-  description="從安裝 Gemini CLI、確認能打開、完成登入，到把第一個現成 MCP（以 Notion 為例）接進來，一步一步走完最常見的入門流程。"
+  description="從安裝 Gemini CLI、申請 API Key、鎖定模型，到把第一個現成 MCP（以 Notion 為例）接進來，一步一步走完最常見的入門流程。"
   lang="zh"
 >
   <section class="section">
@@ -16,6 +23,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           前面你已經知道大語言模型、Gemini CLI、MCP、API 這幾個角色大概是怎麼分工的。接著我們要繼續往前走一步：先把 Gemini CLI 裝好、打開、知道自己在哪裡操作，再把第一個現成 MCP 接進來，並確認它能用。至於 OAuth、權限、設定檔進一步修改，之後再學就好。Gemini CLI 是 Google 的開源 AI agent，主打直接在終端機裡和 Gemini 工作，並且支援 MCP 擴充。
         </p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
       </header>
 
       <!-- Section: Prep -->
@@ -153,49 +161,101 @@ npm install express</code></pre>
         </details>
       </div>
 
-      <!-- Section: Install Gemini CLI -->
-      <h2 class="detail-heading">安裝 Gemini CLI，有兩種最適合初學者的方式</h2>
+      <!-- Section: PowerShell execution policy -->
+      <h2 class="detail-heading">Windows 使用者：先把 PowerShell 的執行原則打開</h2>
       <p class="detail-paragraph">
-        如果你是第一次接觸 Gemini CLI，建議你從下面兩種方式選一種就好。
+        Windows 在新帳戶的 PowerShell 執行原則預設是 <code>Restricted</code>，會擋掉 <code>npm.ps1</code> 和 <code>gemini.ps1</code>。這一步沒先做，下一步安裝就會卡住。
       </p>
-
-      <div class="install-grid">
-        <article class="install-card">
-          <p class="install-tag">方式一</p>
-          <h3 class="install-title">先用 npx 試跑</h3>
-          <p class="install-desc">
-            這是最適合「先試一次看看」的方式。官方 README 和安裝文件都列出 <code>npx @google/gemini-cli</code> 作為免安裝直接執行的方法。
-          </p>
-          <pre class="code-block"><code>npx @google/gemini-cli</code></pre>
-          <p class="install-desc">
-            這種方式的好處是，你不用先把 Gemini CLI 永久裝到系統裡，就能先打開它、看看介面、試著登入。如果你只是想先體驗一次，這個方法很適合。
-          </p>
-        </article>
-
-        <article class="install-card">
-          <p class="install-tag">方式二</p>
-          <h3 class="install-title">正式安裝到電腦裡</h3>
-          <p class="install-desc">
-            如果你知道自己接下來會常常用 Gemini CLI，比較推薦直接用 npm 全域安裝：
-          </p>
-          <pre class="code-block"><code>npm install -g @google/gemini-cli</code></pre>
-          <p class="install-desc">
-            這通常比每次都用 npx 更方便。
-          </p>
-        </article>
-      </div>
+      <p class="detail-paragraph">
+        錯誤訊息長這樣：
+      </p>
 
       <figure class="figure">
         <img
           class="figure__img"
-          src="/learning/agent/成功進入Gemini CLI.jpg"
-          alt="成功進入 Gemini CLI 的終端機畫面"
+          src="/learning/agent/PowerShell執行原則錯誤.png"
+          alt="PowerShell 因為執行原則被停用而無法載入 npm.ps1 的錯誤訊息"
           loading="lazy"
         />
-        <figcaption class="figure__caption">圖一、成功進入 Gemini CLI</figcaption>
+        <figcaption class="figure__caption">圖一、執行原則被停用時，npm 指令會出現的錯誤訊息</figcaption>
       </figure>
 
+      <p class="detail-paragraph">
+        解法是在 PowerShell 輸入這一行，不需要管理員權限：
+      </p>
+      <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+      <p class="detail-paragraph">
+        出現確認提示時輸入 <code>Y</code>。接著可以驗證一下：
+      </p>
+      <pre class="code-block"><code>Get-ExecutionPolicy -Scope CurrentUser   # 會顯示 RemoteSigned
+npm -v</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>這行指令在做什麼：</strong><code>RemoteSigned</code> 表示本機自己寫的腳本可以執行，從網路下載的腳本則需要數位簽章。這是 Microsoft 對一般使用場境的建議設定，不是把安全防護關掉。<code>-Scope CurrentUser</code> 也只影響目前這個帳戶，不會動到整台電腦。
+        </p>
+      </div>
+
+      <!-- Section: Install Gemini CLI -->
+      <h2 class="detail-heading">安裝 Gemini CLI，看你在哪一台電腦上</h2>
+      <p class="detail-paragraph">
+        下面兩條路線，依你手邊的環境選一條就好。差別不在難易度，而在你對那台電腦有沒有安裝的權限。
+      </p>
+
+      <div class="install-grid">
+        <article class="install-card">
+          <p class="install-tag">路線 A</p>
+          <h3 class="install-title">自己的筆電</h3>
+          <p class="install-desc">
+            如果這台電腦是你自己的，直接裝起來最省事：
+          </p>
+          <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+npm install -g @google/gemini-cli
+gemini --version</code></pre>
+          <p class="install-desc">
+            之後每次只要輸入 <code>gemini</code> 就能啟動。
+          </p>
+        </article>
+
+        <article class="install-card">
+          <p class="install-tag">路線 B</p>
+          <h3 class="install-title">電腦教室，或有還原卡的機器</h3>
+          <p class="install-desc">
+            沒有管理員權限也沒關係。這條路線不用安裝、不用修 PATH，關機也不會留下痕跡：
+          </p>
+          <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            後續教材中出現 <code>gemini</code> 指令的地方，一律代換為 <code>npx @google/gemini-cli</code>，子指令的語法完全相同。
+          </p>
+        </article>
+      </div>
+
       <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">路線 A 補充：如果出現「無法辨識 'gemini'」</summary>
+          <div class="faq-answer">
+            <p>這在新帳戶很常見。套件其實已經裝在 <code>%AppData%\npm</code>，只是那個路徑不在使用者的 PATH 裡。</p>
+            <p>先確認套件確實裝好了：</p>
+            <pre class="code-block"><code>npm config get prefix
+Test-Path "$env:AppData\npm\gemini.ps1"</code></pre>
+            <p>再把路徑補進去，一樣不需要管理員權限：</p>
+            <pre class="code-block"><code>{fixPathCode}</code></pre>
+            <p>改完之後，關掉 PowerShell、重新開一個新視窗才會生效。</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">路線 B 補充：npx 的第一次會比較慢</summary>
+          <div class="faq-answer">
+            <p>npx 首次執行需要下載，快取會放在 <code>%LocalAppData%\npm-cache\_npx</code>，而有還原卡的教室每次重開機都要重新下載一次。</p>
+            <p>這條路線也可以直接用參數鎖定模型，不必另外建 <code>.env</code>：</p>
+            <pre class="code-block"><code>npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+            <p>子指令也照用就好，例如：</p>
+            <pre class="code-block"><code>npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp</code></pre>
+          </div>
+        </details>
+
         <details class="faq-item">
           <summary class="faq-summary">其他系統的安裝方式</summary>
           <div class="faq-answer">
@@ -208,29 +268,132 @@ npm install express</code></pre>
         </details>
       </div>
 
+      <!-- Section: Get an API Key -->
+      <h2 class="detail-heading">第一次啟動之前，先去申請一把 API Key</h2>
+      <p class="detail-paragraph">
+        Gemini CLI 從 2026 年 6 月 18 日起，不再對免費個人帳號提供 Google 登入服務。過去那種「打開瀏覽器、用 Google 帳號登入」的方式已經完全失效，現在要改用 Gemini API Key。
+      </p>
+      <p class="detail-paragraph">
+        申請步驟：
+      </p>
+      <pre class="code-block"><code>1. 用 Google 帳號登入 Google AI Studio
+2. 按左下角 Get API Key（鑰匙圖案）
+3. 按右上角 Create API Key
+4. 建立完成後，複製 API Key</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>必須用個人 Gmail 帳號，不要用學校信箱。</strong>學校的 Google Workspace 通常關閉了「建立 Google Cloud 專案」權限，會跳出 <code>Project creation is disabled</code>，無法解決。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">順手確認一下額度</h3>
+      <p class="detail-paragraph">
+        金鑰拿到後，建議先看一眼額度頁，確認等一下真的跑得動：
+      </p>
+      <pre class="code-block"><code>1. 按左側的 Rate Limit 會顯示你當前帳號可使用的額度
+2. 點「See more」展開完整清單
+3. 確認 Gemini 3.5 Flash Lite 那一列是 15 RPM / 250K TPM / 500 RPD</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>RPM（Requests Per Minute）：</strong>每分鐘可送出的請求次數，上面顯示額度 15 次，用完則每分鐘重置一次。
+        </p>
+        <p class="callout-text">
+          <strong>TPM（Tokens Per Minute）：</strong>每分鐘可送出的輸入 token 量，上面顯示額度 250,000 個 token，用完則每分鐘重置一次。
+        </p>
+        <p class="callout-text">
+          <strong>RPD（Requests Per Day）：</strong>每天可送出的請求總數，上面顯示額度 500 次，用完則台灣時間每天下午 15:00 或 16:00 重置。
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>一句指令 ≠ 一個請求。</strong>舉例，打一句「幫我把這頁 Notion 筆記整理成摘要」，背後 agent 會跑：
+        </p>
+        <ol class="callout-list">
+          <li>送出指令 → 請求 1</li>
+          <li>模型決定呼叫 notion-search → 請求 2（把搜尋結果送回模型）</li>
+          <li>模型決定呼叫 notion-fetch → 請求 3</li>
+          <li>模型讀完內容產生摘要 → 請求 4</li>
+        </ol>
+        <p class="callout-text">
+          這樣一句話可能就是 4～10 個請求。
+        </p>
+        <p class="callout-text">
+          <strong>TPM 額度可能比 RPM 額度先用完。</strong>因為每一次請求都會把整段對話歷史當作輸入重送一次，所以對話越長，單次請求吃掉的 token 越多。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">建立測試專案與設定檔</h3>
+      <p class="detail-paragraph">
+        先開一個乾淨的測試資料夾，再把設定檔寫進去：
+      </p>
+      <pre class="code-block"><code>mkdir C:\gemini-class-test
+cd C:\gemini-class-test
+mkdir .gemini
+Set-Content -Path ".gemini\.env" -Value "GEMINI_API_KEY=你的金鑰`nGEMINI_MODEL=gemini-3.5-flash-lite"</code></pre>
+
+      <h3 class="sub-heading">驗證檔案真的建對了</h3>
+      <pre class="code-block"><code>Get-ChildItem .gemini -Force
+Get-Content .gemini\.env</code></pre>
+
+      <p class="detail-paragraph">
+        備援模型是 <code>gemini-3.1-flash-lite-preview</code>，額度相同。要注意 3.1 要帶 <code>-preview</code>、3.5 不用，兩者是不同模型，寫錯不會互相支援。如果你走的是路線 B，也可以不建 <code>.env</code>，改在啟動時用 <code>--model</code> 參數指定。
+      </p>
+
       <!-- Section: After install -->
       <h2 class="detail-heading">安裝好之後，先確認它真的能開</h2>
       <p class="detail-paragraph">
-        安裝完之後，你之後就可以直接輸入：
+        準備到這裡，就可以直接輸入：
       </p>
       <pre class="code-block"><code>gemini</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/資料夾信任提示.png"
+          alt="Gemini CLI 第一次在資料夾裡啟動時，詢問是否信任這個資料夾的畫面"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖二、第一次在資料夾裡啟動時的信任提示</figcaption>
+      </figure>
+
       <p class="detail-paragraph">
-        第一次打開時，你可能會看到三種登入選項：
+        請選擇我們剛剛建立的資料夾「Trust folder (gemini-class-test)」。
+      </p>
+
+      <p class="detail-paragraph">
+        接著，你會看到三種驗證選項：
       </p>
       <ol class="login-list">
-        <li><span class="login-letter">a</span><span class="login-text">Login with Google</span></li>
-        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API key</span></li>
+        <li><span class="login-letter">a</span><span class="login-text">Sign in with Google</span></li>
+        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API Key</span></li>
         <li><span class="login-letter">c</span><span class="login-text">Vertex AI</span></li>
       </ol>
       <p class="detail-paragraph">
-        對大多數人來說，最簡單的方式是直接用 Google 帳號登入。登入時，Gemini CLI 會打開瀏覽器，帶你走登入流程，之後憑證會緩存在本機，未來不用每次都重來。
+        請選 <strong>b</strong>。第一個選項雖然還留在畫面上，但對免費個人帳號已經不再提供服務，選下去只會走進一條走不通的路。你前面建立的 <code>.env</code>，就是為了這一步。
       </p>
 
       <div class="callout-card">
         <p class="callout-text">
-          所以第一次啟動後，如果你看到登入選單，不用緊張。<strong>這不是卡住，而是正常流程的一部分。</strong>如果你看到 Gemini CLI 啟動（如圖一所示），代表安裝這一步大致成功了。
+          所以第一次啟動後，如果你看到選單，不用緊張。<strong>這不是卡住，而是正常流程的一部分。</strong>選完之後看到下面這個畫面，就代表前面幾步都做對了。
         </p>
       </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/成功進入Gemini CLI.png"
+          alt="成功進入 Gemini CLI 的終端機畫面"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖三、成功進入 Gemini CLI</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        看右下角的模型是否為我們剛剛設定的 <code>gemini-3.5-flash-lite</code>，若有，表示我們的設定已生效。
+      </p>
 
       <div class="faq-list">
         <details class="faq-item">
@@ -248,7 +411,7 @@ npm install express</code></pre>
                 <p>如果你是用 npx，要確認終端機能連網，因為它需要抓取套件。</p>
               </li>
               <li>
-                <p>如果你已經開起來了，但不知道怎麼登入，就記得：大多數人第一次直接選 <strong>Login with Google</strong> 就可以了。</p>
+                <p>如果你已經開起來了，但不知道要選哪一個，就記得：選 <strong>Use Gemini API Key</strong>，不要選 Sign in with Google。</p>
               </li>
             </ol>
           </div>
@@ -263,7 +426,7 @@ npm install express</code></pre>
       <ul class="check-list">
         <li>Gemini CLI 裝好了</li>
         <li>Gemini CLI 打得開</li>
-        <li>你已經完成基本登入</li>
+        <li>你已經用 API Key 完成驗證，而且模型鎖在 Flash Lite</li>
       </ul>
       <p class="detail-paragraph">
         這時候才是最適合開始接第一個現成 MCP 的時機。因為到這一步，你已經知道自己現在是在 Gemini CLI 這個工作介面裡操作，而不是一開始就掉進一堆外部設定裡。
@@ -338,35 +501,37 @@ npm install express</code></pre>
             <p class="step-desc">
               成功後會出現：
             </p>
-            <pre class="code-block code-block--quote"><code>The Notion MCP server has been successfully added to your Gemini CLI configuration.</code></pre>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/新增MCP成功.png"
+                alt="執行 gemini mcp add 後的成功訊息，以及 Get-Content 讀出的 settings.json 內容"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption">圖四、新增 Notion MCP 後，表示有內容，且設定寫進了專案層級的 settings.json</figcaption>
+            </figure>
           </div>
         </li>
         <li class="step-item">
           <span class="step-num">2</span>
           <div class="step-body">
-            <h3 class="step-title">重開 Gemini CLI 並做 OAuth 驗證</h3>
+            <h3 class="step-title">重開 Gemini CLI 並先查看目前的 MCP 狀態</h3>
             <p class="step-desc">重開 Gemini CLI 後，輸入：</p>
-            <pre class="code-block"><code>/mcp auth notion</code></pre>
-            <p class="step-desc">授權成功後會出現：</p>
-            <pre class="code-block code-block--quote"><code>Successfully authenticated and reloaded tools for 'notion'</code></pre>
+            <pre class="code-block"><code>/mcp list</code></pre>
+            <p class="step-desc">應該會看到 notion 的狀態為未連接。</p>
           </div>
         </li>
         <li class="step-item">
           <span class="step-num">3</span>
           <div class="step-body">
-            <h3 class="step-title">查看目前的 MCP 狀態</h3>
-            <p class="step-desc">最後可以用以下任一指令查看目前的 MCP 狀態：</p>
+            <h3 class="step-title">做 OAuth 驗證並再次查看目前的 MCP 狀態</h3>
+            <p class="step-desc">跳轉瀏覽器 OAuth，用測試 Notion 帳號授權。</p>
+            <pre class="code-block"><code>/mcp auth notion</code></pre>
+            <p class="step-desc">再查看一次，應該會看到 notion 的狀態變為連接，並列出完整工具清單。</p>
             <pre class="code-block"><code>/mcp list</code></pre>
-            <pre class="code-block"><code>gemini mcp list</code></pre>
           </div>
         </li>
       </ol>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          <strong>補充說明：</strong>簡單講，<code>gemini mcp list</code> 比較像是在終端機裡直接查看；<code>/mcp list</code> 則是在 Gemini CLI 已經打開時，在裡面直接查看。
-        </p>
-      </div>
 
     </div>
   </section>
@@ -408,6 +573,14 @@ npm install express</code></pre>
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Section headings */
@@ -573,6 +746,11 @@ npm install express</code></pre>
     background-color: var(--color-bg-secondary);
   }
 
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
   .callout-text {
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -583,6 +761,28 @@ npm install express</code></pre>
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Stacked entries inside one callout */
+  .callout-text + .callout-text,
+  .callout-list + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  .callout-list {
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .callout-list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .callout-list li:last-child {
+    margin-bottom: 0;
   }
 
   /* Scope grid (user-level vs project-level) */
@@ -874,15 +1074,17 @@ npm install express</code></pre>
     margin-bottom: var(--space-1);
   }
 
-  /* Install grid */
+  /* Install grid — one route per row, so the long commands fit without
+     forcing the grid wider than the article column */
   .install-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--space-4);
     margin: var(--space-6) 0 var(--space-6);
   }
 
   .install-card {
+    min-width: 0;
     padding: var(--space-6) var(--space-8);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
@@ -946,6 +1148,16 @@ npm install express</code></pre>
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: 1.6;
+  }
+
+  /* Figures sitting inside a step card need tighter vertical rhythm,
+     but keep the centred caption the other figures use */
+  .step-body .figure {
+    margin: var(--space-3) 0;
+  }
+
+  .step-body .figure__caption {
+    margin-top: var(--space-2);
   }
 
   /* Login list */
