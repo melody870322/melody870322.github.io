@@ -297,13 +297,13 @@ Test-Path "$env:AppData\npm\gemini.ps1"</code></pre>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>RPM（Requests Per Minute）：</strong>每分鐘可送出的請求次數，上面顯示額度 15 次，用完則每分鐘重置一次。
+          <strong>RPM（Requests Per Minute）：</strong>每分鐘可送出的請求次數，額度 15 次。它不是整分鐘歸零，而是持續計算「過去 60 秒內」的用量 —— 如果你在 14:30:10 用完，要等到 14:31:10 才會恢復。實務上記得一句話就好：撞到就等一分鐘。
         </p>
         <p class="callout-text">
-          <strong>TPM（Tokens Per Minute）：</strong>每分鐘可送出的輸入 token 量，上面顯示額度 250,000 個 token，用完則每分鐘重置一次。
+          <strong>TPM（Tokens Per Minute）：</strong>每分鐘可送出的輸入 token 量，額度 250,000。重置方式和 RPM 一樣是滾動 60 秒。
         </p>
         <p class="callout-text">
-          <strong>RPD（Requests Per Day）：</strong>每天可送出的請求總數，上面顯示額度 500 次，用完則台灣時間每天下午 15:00 或 16:00 重置。
+          <strong>RPD（Requests Per Day）：</strong>每天可送出的請求總數，額度 500 次。以太平洋時間午夜重置，換算成台灣時間是每天下午 15:00（11 月到隔年 3 月因為美國時區調整，會變成 16:00）。撞到 RPD 就只能等隔天，不像 RPM 等一分鐘就好。
         </p>
       </div>
 
@@ -418,6 +418,42 @@ Get-Content .gemini\.env</code></pre>
         </details>
       </div>
 
+      <!-- Section: Where am I typing -->
+      <h2 class="detail-heading">先搞清楚：你現在在哪裡打字</h2>
+      <p class="detail-paragraph">
+        接下來會出現兩種指令，長得很像，但要打在不同的地方。先學會分辨你現在在哪裡，可以少走很多冤枉路。
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>你看到的畫面</th><th>你在哪裡</th><th>可以打什麼</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>黑底白字的 <code>PS C:\...&gt;</code>，沒有 logo</td>
+              <td>PowerShell</td>
+              <td><code>gemini</code>、<code>gemini mcp add</code>、<code>gemini --resume</code></td>
+            </tr>
+            <tr>
+              <td>有 Gemini logo，底部有狀態列和輸入框</td>
+              <td>Gemini CLI 裡面</td>
+              <td><code>/mcp list</code>、<code>/mcp auth</code>、<code>/stats</code>、<code>/quit</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        要離開 Gemini CLI 回到 PowerShell，輸入 <code>/quit</code>，或按兩次 <code>Ctrl+C</code>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          打錯地方不會跳錯誤訊息。如果你把 <code>gemini mcp add</code> 打進 Gemini CLI 裡，它只會把這句話當成你在跟它聊天，然後禮貌地回你一句 —— 看起來很正常，但指令其實沒有執行。
+        </p>
+      </div>
+
       <!-- Section: Warm-up before MCP -->
       <h2 class="detail-heading">使用 MCP 前的暖身</h2>
       <p class="detail-paragraph">
@@ -468,6 +504,9 @@ Get-Content .gemini\.env</code></pre>
       <div class="callout-card">
         <p class="callout-text">
           初學時，<strong>先用專案層級理解這件事，通常會比一開始就做全域設定更穩</strong>。
+        </p>
+        <p class="callout-text">
+          好消息是，<code>gemini mcp add</code> 預設就是寫進專案層級的 <code>.gemini/settings.json</code>，所以照著下面的步驟做，不用擔心會不小心改到整台電腦的設定。
         </p>
       </div>
 
@@ -698,6 +737,7 @@ Get-Content .gemini\.env</code></pre>
   :global(.step-desc) code,
   :global(.faq-answer) code:not(.code-block code),
   :global(.callout-text) code,
+  :global(.info-table) td code,
   :global(.trouble-list) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -783,6 +823,52 @@ Get-Content .gemini\.env</code></pre>
 
   .callout-list li:last-child {
     margin-bottom: 0;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
   }
 
   /* Scope grid (user-level vs project-level) */
@@ -1247,6 +1333,15 @@ Get-Content .gemini\.env</code></pre>
 
     .login-list li {
       padding: var(--space-6);
+    }
+
+    .info-table {
+      font-size: 0.78rem;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: var(--space-2);
     }
   }
 </style>
