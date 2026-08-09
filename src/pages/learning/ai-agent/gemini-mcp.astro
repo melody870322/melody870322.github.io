@@ -1,10 +1,17 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const fixPathCode = String.raw`$userPath = [Environment]::GetEnvironmentVariable("Path","User")
+$npmPath  = "$env:AppData\npm"
+if ($userPath -notlike "*$npmPath*") {
+    $newPath = if ([string]::IsNullOrEmpty($userPath)) { $npmPath } else { "$userPath;$npmPath" }
+    [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+}`;
 ---
 
 <BaseLayout
   title="Gemini CLI Getting Started & First MCP Integration — AI Agent Puzzle"
-  description="From installing Gemini CLI to confirming it opens, completing login, and connecting your first off-the-shelf MCP (using Notion as an example) — walk through the most common entry-level workflow step by step."
+  description="From installing Gemini CLI to getting an API Key, locking the model, and connecting your first off-the-shelf MCP (using Notion as an example) — walk through the most common entry-level workflow step by step."
   lang="en"
 >
   <section class="section">
@@ -16,6 +23,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           By now you already understand roughly how the LLM, Gemini CLI, MCP, and API divide their work. Next, we'll move forward one step: install Gemini CLI, open it, know where you're operating, then connect your first off-the-shelf MCP and confirm it works. As for OAuth, permissions, and deeper config-file edits — those can wait. Gemini CLI is Google's open-source AI agent designed to work with Gemini directly in the terminal, with built-in MCP extension support.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <!-- Section: Prep -->
@@ -153,49 +161,101 @@ npm install express</code></pre>
         </details>
       </div>
 
-      <!-- Section: Install Gemini CLI -->
-      <h2 class="detail-heading">Two Beginner-Friendly Ways to Install Gemini CLI</h2>
+      <!-- Section: PowerShell execution policy -->
+      <h2 class="detail-heading">Windows Users: Open Up the PowerShell Execution Policy First</h2>
       <p class="detail-paragraph">
-        If this is your first time touching Gemini CLI, just pick one of the two methods below.
+        On a fresh Windows account, the PowerShell execution policy defaults to <code>Restricted</code>, which blocks <code>npm.ps1</code> and <code>gemini.ps1</code>. Skip this step and the next one — installing — will get stuck.
       </p>
-
-      <div class="install-grid">
-        <article class="install-card">
-          <p class="install-tag">Option 1</p>
-          <h3 class="install-title">Try it first with npx</h3>
-          <p class="install-desc">
-            This is the best option for "I just want to try it once." Both the official README and install docs list <code>npx @google/gemini-cli</code> as the install-free way to run it directly.
-          </p>
-          <pre class="code-block"><code>npx @google/gemini-cli</code></pre>
-          <p class="install-desc">
-            The advantage: you don't need to install Gemini CLI permanently to your system before opening it, looking around, and trying to log in. If you just want to experience it once, this method is a great fit.
-          </p>
-        </article>
-
-        <article class="install-card">
-          <p class="install-tag">Option 2</p>
-          <h3 class="install-title">Properly install it on your computer</h3>
-          <p class="install-desc">
-            If you know you'll use Gemini CLI often, it's better to install it globally with npm:
-          </p>
-          <pre class="code-block"><code>npm install -g @google/gemini-cli</code></pre>
-          <p class="install-desc">
-            This is usually more convenient than running npx every time.
-          </p>
-        </article>
-      </div>
+      <p class="detail-paragraph">
+        The error message looks like this:
+      </p>
 
       <figure class="figure">
         <img
           class="figure__img"
-          src="/learning/agent/成功進入Gemini CLI.jpg"
-          alt="Terminal screen after successfully entering Gemini CLI"
+          src="/learning/agent/PowerShell執行原則錯誤.png"
+          alt="PowerShell error showing npm.ps1 cannot be loaded because running scripts is disabled on this system"
           loading="lazy"
         />
-        <figcaption class="figure__caption">Figure 1. Successfully entering Gemini CLI</figcaption>
+        <figcaption class="figure__caption">Figure 1. The error npm returns when script execution is disabled</figcaption>
       </figure>
 
+      <p class="detail-paragraph">
+        The fix is one line in PowerShell — no administrator rights needed:
+      </p>
+      <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+      <p class="detail-paragraph">
+        Type <code>Y</code> at the confirmation prompt. Then you can verify:
+      </p>
+      <pre class="code-block"><code>Get-ExecutionPolicy -Scope CurrentUser   # should show RemoteSigned
+npm -v</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>What that line actually does:</strong> <code>RemoteSigned</code> means scripts you wrote locally can run, while scripts downloaded from the internet need a digital signature. This is Microsoft's recommended setting for ordinary use — it isn't turning security off. And <code>-Scope CurrentUser</code> only affects the current account, not the whole machine.
+        </p>
+      </div>
+
+      <!-- Section: Install Gemini CLI -->
+      <h2 class="detail-heading">Installing Gemini CLI: It Depends Which Computer You're On</h2>
+      <p class="detail-paragraph">
+        Pick one of the two routes below based on the machine in front of you. The difference isn't difficulty — it's whether you have permission to install things on that computer.
+      </p>
+
+      <div class="install-grid">
+        <article class="install-card">
+          <p class="install-tag">Route A</p>
+          <h3 class="install-title">Your own laptop</h3>
+          <p class="install-desc">
+            If the computer is yours, installing it properly is the least hassle:
+          </p>
+          <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+npm install -g @google/gemini-cli
+gemini --version</code></pre>
+          <p class="install-desc">
+            After that, typing <code>gemini</code> is all it takes to launch.
+          </p>
+        </article>
+
+        <article class="install-card">
+          <p class="install-tag">Route B</p>
+          <h3 class="install-title">A computer lab, or a machine with a restore card</h3>
+          <p class="install-desc">
+            No administrator rights required. This route needs no install, no PATH fixing, and leaves no trace after a reboot:
+          </p>
+          <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            Wherever the rest of this material shows a <code>gemini</code> command, substitute <code>npx @google/gemini-cli</code> — the subcommand syntax is identical.
+          </p>
+        </article>
+      </div>
+
       <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-summary">Route A note: if you get "'gemini' is not recognized"</summary>
+          <div class="faq-answer">
+            <p>This is common on a new account. The package really did install, into <code>%AppData%\npm</code> — that path just isn't in your user PATH.</p>
+            <p>First confirm the package is actually there:</p>
+            <pre class="code-block"><code>npm config get prefix
+Test-Path "$env:AppData\npm\gemini.ps1"</code></pre>
+            <p>Then add the path — again, no administrator rights needed:</p>
+            <pre class="code-block"><code>{fixPathCode}</code></pre>
+            <p>After changing it, close PowerShell and open a fresh window for it to take effect.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-summary">Route B note: the first npx run is slower</summary>
+          <div class="faq-answer">
+            <p>npx downloads the package on first run and caches it in <code>%LocalAppData%\npm-cache\_npx</code>, and in a lab with restore cards every reboot means downloading it again.</p>
+            <p>This route can also lock the model straight from a flag, so you don't need a <code>.env</code> at all:</p>
+            <pre class="code-block"><code>npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+            <p>Subcommands work the same way, for example:</p>
+            <pre class="code-block"><code>npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp</code></pre>
+          </div>
+        </details>
+
         <details class="faq-item">
           <summary class="faq-summary">Installation methods for other systems</summary>
           <div class="faq-answer">
@@ -208,29 +268,132 @@ npm install express</code></pre>
         </details>
       </div>
 
+      <!-- Section: Get an API Key -->
+      <h2 class="detail-heading">Before the First Launch, Go Get an API Key</h2>
+      <p class="detail-paragraph">
+        As of June 18, 2026, Gemini CLI no longer offers Google sign-in for free personal accounts. The old "open a browser and log in with your Google account" path is fully gone; you now use a Gemini API Key instead.
+      </p>
+      <p class="detail-paragraph">
+        The steps:
+      </p>
+      <pre class="code-block"><code>1. Sign in to Google AI Studio with your Google account
+2. Click Get API Key at the bottom left (the key icon)
+3. Click Create API Key at the top right
+4. Once it's created, copy the API Key</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>You must use a personal Gmail account, not a school one.</strong> School Google Workspace accounts usually have "create a Google Cloud project" disabled, which surfaces as <code>Project creation is disabled</code>, and there's no way around it.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">While you're there, check your quota</h3>
+      <p class="detail-paragraph">
+        Once you have the key, it's worth a quick look at the rate-limit page to confirm things will actually run:
+      </p>
+      <pre class="code-block"><code>1. Click Rate Limit on the left to see your current account's quota
+2. Click "See more" to expand the full list
+3. Confirm the Gemini 3.5 Flash Lite row reads 15 RPM / 250K TPM / 500 RPD</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>RPM (Requests Per Minute):</strong> how many requests you can send per minute. The page shows a quota of 15, and it resets every minute.
+        </p>
+        <p class="callout-text">
+          <strong>TPM (Tokens Per Minute):</strong> how many input tokens you can send per minute. The page shows a quota of 250,000 tokens, and it resets every minute.
+        </p>
+        <p class="callout-text">
+          <strong>RPD (Requests Per Day):</strong> how many requests you can send per day in total. The page shows a quota of 500, and it resets at 15:00 or 16:00 Taiwan time each day.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>One instruction ≠ one request.</strong> Say you type "summarize this Notion note for me" — behind the scenes, the agent runs:
+        </p>
+        <ol class="callout-list">
+          <li>Sends the instruction → request 1</li>
+          <li>Model decides to call notion-search → request 2 (search results go back to the model)</li>
+          <li>Model decides to call notion-fetch → request 3</li>
+          <li>Model reads the content and produces a summary → request 4</li>
+        </ol>
+        <p class="callout-text">
+          So a single sentence can easily be 4–10 requests.
+        </p>
+        <p class="callout-text">
+          <strong>TPM can run out before RPM does.</strong> Every request resends the entire conversation history as input, so the longer the conversation, the more tokens each single request eats.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Create a test project and the config file</h3>
+      <p class="detail-paragraph">
+        Start with a clean test folder, then write the config file into it:
+      </p>
+      <pre class="code-block"><code>mkdir C:\gemini-class-test
+cd C:\gemini-class-test
+mkdir .gemini
+Set-Content -Path ".gemini\.env" -Value "GEMINI_API_KEY=your-key`nGEMINI_MODEL=gemini-3.5-flash-lite"</code></pre>
+
+      <h3 class="sub-heading">Verify the file was actually created correctly</h3>
+      <pre class="code-block"><code>Get-ChildItem .gemini -Force
+Get-Content .gemini\.env</code></pre>
+
+      <p class="detail-paragraph">
+        The fallback model is <code>gemini-3.1-flash-lite-preview</code>, with the same quota. Note that 3.1 needs the <code>-preview</code> suffix and 3.5 doesn't — they're different models, and getting it wrong won't quietly fall back. If you're on Route B, you can skip <code>.env</code> entirely and pass <code>--model</code> at launch instead.
+      </p>
+
       <!-- Section: After install -->
       <h2 class="detail-heading">After Installing, Confirm It Actually Opens</h2>
       <p class="detail-paragraph">
-        Once installed, you can simply type:
+        Once that's ready, you can simply type:
       </p>
       <pre class="code-block"><code>gemini</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/資料夾信任提示.png"
+          alt="Gemini CLI asking whether you trust the files in this folder on first launch"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 2. The folder-trust prompt on first launch inside a folder</figcaption>
+      </figure>
+
       <p class="detail-paragraph">
-        On first launch, you may see three login options:
+        Pick the folder you just created — "Trust folder (gemini-class-test)".
+      </p>
+
+      <p class="detail-paragraph">
+        Next, you'll see three authentication options:
       </p>
       <ol class="login-list">
-        <li><span class="login-letter">a</span><span class="login-text">Login with Google</span></li>
-        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API key</span></li>
+        <li><span class="login-letter">a</span><span class="login-text">Sign in with Google</span></li>
+        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API Key</span></li>
         <li><span class="login-letter">c</span><span class="login-text">Vertex AI</span></li>
       </ol>
       <p class="detail-paragraph">
-        For most people, the simplest option is to log in directly with a Google account. During login, Gemini CLI opens your browser and walks you through the sign-in flow; afterward the credentials are cached locally, so you don't have to redo this every time.
+        Pick <strong>b</strong>. The first option is still on screen, but it no longer serves free personal accounts — choosing it just leads down a path that doesn't go anywhere. The <code>.env</code> you set up earlier exists precisely for this step.
       </p>
 
       <div class="callout-card">
         <p class="callout-text">
-          So if you see the login menu after first launch, don't panic. <strong>This isn't a stuck state — it's part of the normal flow.</strong> If you see Gemini CLI launch (as in Figure 1), the install step has basically succeeded.
+          So if you see the menu after first launch, don't panic. <strong>This isn't a stuck state — it's part of the normal flow.</strong> If you land on the screen below after choosing, everything up to here went right.
         </p>
       </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/成功進入Gemini CLI.png"
+          alt="Terminal screen after successfully entering Gemini CLI"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 3. Successfully entering Gemini CLI</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Check the model in the bottom-right corner. If it reads <code>gemini-3.5-flash-lite</code> — the one you set earlier — your configuration has taken effect.
+      </p>
 
       <div class="faq-list">
         <details class="faq-item">
@@ -248,7 +411,7 @@ npm install express</code></pre>
                 <p>If you're using npx, make sure your terminal can reach the internet, since it needs to fetch the package.</p>
               </li>
               <li>
-                <p>If you've already opened it but don't know how to log in, just remember: most people, on their first time, can simply pick <strong>Login with Google</strong>.</p>
+                <p>If you've already opened it but don't know which option to take, just remember: pick <strong>Use Gemini API Key</strong>, not Sign in with Google.</p>
               </li>
             </ol>
           </div>
@@ -263,7 +426,7 @@ npm install express</code></pre>
       <ul class="check-list">
         <li>Gemini CLI is installed</li>
         <li>Gemini CLI opens</li>
-        <li>You've completed basic login</li>
+        <li>You've authenticated with an API Key, and the model is locked to Flash Lite</li>
       </ul>
       <p class="detail-paragraph">
         That's the right moment to start connecting your first off-the-shelf MCP. Because by this point, you already know you're operating inside the Gemini CLI workspace — instead of jumping straight into a pile of external configuration from the start.
@@ -338,35 +501,37 @@ npm install express</code></pre>
             <p class="step-desc">
               On success, you'll see:
             </p>
-            <pre class="code-block code-block--quote"><code>The Notion MCP server has been successfully added to your Gemini CLI configuration.</code></pre>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/新增MCP成功.png"
+                alt="The success message from gemini mcp add, and the settings.json contents read back with Get-Content"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption">Figure 4. After adding the Notion MCP, there's content, and the config landed in the project-level settings.json</figcaption>
+            </figure>
           </div>
         </li>
         <li class="step-item">
           <span class="step-num">2</span>
           <div class="step-body">
-            <h3 class="step-title">Restart Gemini CLI and complete OAuth</h3>
+            <h3 class="step-title">Restart Gemini CLI and check the current MCP status first</h3>
             <p class="step-desc">After restarting Gemini CLI, type:</p>
-            <pre class="code-block"><code>/mcp auth notion</code></pre>
-            <p class="step-desc">After authorization succeeds, you'll see:</p>
-            <pre class="code-block code-block--quote"><code>Successfully authenticated and reloaded tools for 'notion'</code></pre>
+            <pre class="code-block"><code>/mcp list</code></pre>
+            <p class="step-desc">You should see notion listed as not connected.</p>
           </div>
         </li>
         <li class="step-item">
           <span class="step-num">3</span>
           <div class="step-body">
-            <h3 class="step-title">Check the current MCP status</h3>
-            <p class="step-desc">Finally, you can check the current MCP status with either of these commands:</p>
+            <h3 class="step-title">Complete OAuth, then check the MCP status again</h3>
+            <p class="step-desc">It jumps to your browser for OAuth — authorize with your test Notion account.</p>
+            <pre class="code-block"><code>/mcp auth notion</code></pre>
+            <p class="step-desc">Check once more: notion should now show as connected, with the full tool list.</p>
             <pre class="code-block"><code>/mcp list</code></pre>
-            <pre class="code-block"><code>gemini mcp list</code></pre>
           </div>
         </li>
       </ol>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          <strong>A quick note:</strong> in short, <code>gemini mcp list</code> is more like "checking directly from the terminal," while <code>/mcp list</code> is for "checking inside Gemini CLI once it's already open."
-        </p>
-      </div>
 
     </div>
   </section>
@@ -408,6 +573,14 @@ npm install express</code></pre>
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Section headings */
@@ -573,6 +746,11 @@ npm install express</code></pre>
     background-color: var(--color-bg-secondary);
   }
 
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
   .callout-text {
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -583,6 +761,28 @@ npm install express</code></pre>
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Stacked entries inside one callout */
+  .callout-text + .callout-text,
+  .callout-list + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  .callout-list {
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .callout-list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .callout-list li:last-child {
+    margin-bottom: 0;
   }
 
   /* Scope grid (user-level vs project-level) */
@@ -874,15 +1074,17 @@ npm install express</code></pre>
     margin-bottom: var(--space-1);
   }
 
-  /* Install grid */
+  /* Install grid — one route per row, so the long commands fit without
+     forcing the grid wider than the article column */
   .install-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--space-4);
     margin: var(--space-6) 0 var(--space-6);
   }
 
   .install-card {
+    min-width: 0;
     padding: var(--space-6) var(--space-8);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
@@ -946,6 +1148,16 @@ npm install express</code></pre>
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: 1.6;
+  }
+
+  /* Figures sitting inside a step card need tighter vertical rhythm,
+     but keep the centred caption the other figures use */
+  .step-body .figure {
+    margin: var(--space-3) 0;
+  }
+
+  .step-body .figure__caption {
+    margin-top: var(--space-2);
   }
 
   /* Login list */
