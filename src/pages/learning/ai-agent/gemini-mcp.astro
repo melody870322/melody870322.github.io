@@ -297,13 +297,13 @@ Test-Path "$env:AppData\npm\gemini.ps1"</code></pre>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>RPM (Requests Per Minute):</strong> how many requests you can send per minute. The page shows a quota of 15, and it resets every minute.
+          <strong>RPM (Requests Per Minute):</strong> how many requests you can send per minute — a quota of 15. It doesn't zero out on the minute mark; it continuously counts what you've used over the past 60 seconds, so if you run out at 14:30:10, you're clear again at 14:31:10. In practice one rule is enough: if you hit it, wait a minute.
         </p>
         <p class="callout-text">
-          <strong>TPM (Tokens Per Minute):</strong> how many input tokens you can send per minute. The page shows a quota of 250,000 tokens, and it resets every minute.
+          <strong>TPM (Tokens Per Minute):</strong> how many input tokens you can send per minute — a quota of 250,000. It resets the same rolling-60-second way RPM does.
         </p>
         <p class="callout-text">
-          <strong>RPD (Requests Per Day):</strong> how many requests you can send per day in total. The page shows a quota of 500, and it resets at 15:00 or 16:00 Taiwan time each day.
+          <strong>RPD (Requests Per Day):</strong> how many requests you can send per day in total — a quota of 500. It resets at midnight Pacific time, which works out to 15:00 Taiwan time (16:00 from November through March, because of the US time change). Hitting RPD means waiting until the next day — unlike RPM, where a minute is enough.
         </p>
       </div>
 
@@ -418,6 +418,42 @@ Get-Content .gemini\.env</code></pre>
         </details>
       </div>
 
+      <!-- Section: Where am I typing -->
+      <h2 class="detail-heading">First, Work Out Where You're Typing</h2>
+      <p class="detail-paragraph">
+        Two kinds of commands are coming up. They look alike, but they belong in different places. Learning to tell where you are right now saves a lot of wasted effort.
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>What you see</th><th>Where you are</th><th>What you can type</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>White-on-black <code>PS C:\...&gt;</code>, no logo</td>
+              <td>PowerShell</td>
+              <td><code>gemini</code>, <code>gemini mcp add</code>, <code>gemini --resume</code></td>
+            </tr>
+            <tr>
+              <td>A Gemini logo, with a status bar and input box at the bottom</td>
+              <td>Inside Gemini CLI</td>
+              <td><code>/mcp list</code>, <code>/mcp auth</code>, <code>/stats</code>, <code>/quit</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        To leave Gemini CLI and get back to PowerShell, type <code>/quit</code>, or press <code>Ctrl+C</code> twice.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Typing in the wrong place doesn't raise an error. If you type <code>gemini mcp add</code> inside Gemini CLI, it just treats the line as conversation and answers you politely — it looks perfectly normal, but the command never ran.
+        </p>
+      </div>
+
       <!-- Section: Warm-up before MCP -->
       <h2 class="detail-heading">Warm-up Before Using MCP</h2>
       <p class="detail-paragraph">
@@ -468,6 +504,9 @@ Get-Content .gemini\.env</code></pre>
       <div class="callout-card">
         <p class="callout-text">
           When you're starting out, <strong>using project level to understand this concept is usually steadier than going straight to a global setup</strong>.
+        </p>
+        <p class="callout-text">
+          The good news: <code>gemini mcp add</code> writes to the project-level <code>.gemini/settings.json</code> by default, so following the steps below won't accidentally change settings for your whole computer.
         </p>
       </div>
 
@@ -698,6 +737,7 @@ Get-Content .gemini\.env</code></pre>
   :global(.step-desc) code,
   :global(.faq-answer) code:not(.code-block code),
   :global(.callout-text) code,
+  :global(.info-table) td code,
   :global(.trouble-list) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -783,6 +823,52 @@ Get-Content .gemini\.env</code></pre>
 
   .callout-list li:last-child {
     margin-bottom: 0;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
   }
 
   /* Scope grid (user-level vs project-level) */
@@ -1247,6 +1333,15 @@ Get-Content .gemini\.env</code></pre>
 
     .login-list li {
       padding: var(--space-6);
+    }
+
+    .info-table {
+      font-size: 0.78rem;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: var(--space-2);
     }
   }
 </style>
