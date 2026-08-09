@@ -1,0 +1,704 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Building Your Own MCP Server: Starting from a Class-Notes Helper — AI Agent Puzzle"
+  description="Your first MCP server isn't about building a bigger system. It's about building a clearer, safer, more situation-fit set of tools. Start with a tiny server that only handles class notes: list them, read them, and produce a reflection draft — with sharp boundaries."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-custom-server">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Building Your Own MCP Server: Starting from a Class-Notes Helper</h1>
+        <p class="detail-subtitle">
+          We've already used off-the-shelf MCPs and seen how Notion can search, read, and create pages for us. But off-the-shelf MCPs usually pack a lot of capability — great for general use, not always great for beginners. Often, what we really want is for AI to <strong>finish one small, clearly-scoped task</strong>.
+        </p>
+      </header>
+
+      <p class="detail-paragraph">
+        So what we're going to build next isn't a big, full, do-everything AI system. We're just going to build a tiny MCP server: it can read class notes from a specific folder and produce a reflection draft in a fixed format, <strong>without messing with the original notes</strong>.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Building your own MCP server isn't about building something bigger.<br/>
+          It's about building <strong>a clearer, safer, more situation-fit tool surface</strong>.
+        </p>
+      </div>
+
+      <!-- Section: MCP Server as tool provider -->
+      <h2 class="detail-heading">Think of an MCP Server as a "Tool Provider"</h2>
+      <p class="detail-paragraph">
+        The first time people hear "make your own MCP server," they often think they have to build a whole new AI. They don't. The AI is still Gemini. The MCP server we're building is more like <strong>a "tool provider" standing on the side</strong>.
+      </p>
+
+      <p class="detail-paragraph">It tells Gemini CLI:</p>
+      <ul class="check-list">
+        <li><strong>Which tools</strong> are available here</li>
+        <li><strong>What each tool does</strong></li>
+        <li><strong>What inputs</strong> each tool needs</li>
+        <li><strong>What it returns</strong> after running</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        The MCP Python SDK lets you build a server that exposes <code>tools</code>, <code>resources</code>, and <code>prompts</code>; Gemini CLI can connect to those servers via <code>settings.json</code> and let the model call into them.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So picture it like this: <strong>Gemini CLI is where you and the AI work together; the MCP server is a small set of tools you've built yourself.</strong>
+        </p>
+      </div>
+
+      <!-- Section: stdio vs HTTP -->
+      <h2 class="detail-heading">This Time We're Using stdio, Not HTTP</h2>
+      <p class="detail-paragraph">
+        When we connected to Notion's MCP earlier, we used HTTP — Gemini CLI dialed into a URL that already existed. This time is different. We're building a <strong>local MCP server</strong>, and we're using stdio.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          You can think of stdio simply as:<br/>
+          <strong>Gemini CLI launches a Python program on your machine, and talks to it through standard input and standard output.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So this time there's no URL like <code>https://mcp.notion.com/mcp</code>, and we're not using <code>--transport http</code> to dial a remote service. The shape of it is more like this:
+      </p>
+
+      <div class="flow-card">
+        <div class="flow-step">Gemini CLI</div>
+        <div class="flow-arrow">↓ launches</div>
+        <div class="flow-step flow-step--accent">python server.py</div>
+        <div class="flow-arrow">↓ provides</div>
+        <div class="flow-step">tools / resources / prompts</div>
+      </div>
+
+      <p class="detail-paragraph">
+        Gemini CLI supports several MCP transports. stdio means "spawn a subprocess and talk over stdin/stdout"; the HTTP-style transports dial an HTTP or SSE endpoint instead.
+      </p>
+
+      <!-- Section: What we are building -->
+      <h2 class="detail-heading">What We're Building This Time</h2>
+      <p class="detail-paragraph">
+        Let's not touch the Notion API yet. Building your first MCP server while juggling Python, MCP, an API, keys, permissions, and network requests at the same time makes it <strong>really hard to tell where things go wrong</strong>.
+      </p>
+
+      <p class="detail-paragraph">
+        So for the first version, we're building something very small:
+      </p>
+
+      <div class="project-card">
+        <p class="project-label">YOUR FIRST CUSTOM MCP SERVER</p>
+        <p class="project-name">Class-Notes Helper</p>
+        <p class="project-desc">
+          It only handles Markdown notes inside a specific folder on your machine.
+        </p>
+      </div>
+
+      <div class="boundary-grid">
+        <div class="boundary-col boundary-col--can">
+          <p class="boundary-label">What it can do</p>
+          <ul class="check-list boundary-list">
+            <li>List <strong>which class notes</strong> exist</li>
+            <li>Read the contents of <strong>one specific note</strong></li>
+            <li><strong>Create a new reflection draft</strong> based on a note</li>
+          </ul>
+        </div>
+        <div class="boundary-col boundary-col--cant">
+          <p class="boundary-label">What it can't do</p>
+          <ul class="cross-list boundary-list">
+            <li>Cannot <strong>delete</strong> the original notes</li>
+            <li>Cannot <strong>modify</strong> the original notes</li>
+            <li>Cannot read files <strong>outside the designated folder</strong></li>
+            <li>Cannot auto-<strong>submit</strong> assignments or publish content</li>
+            <li>Cannot produce the student's <strong>final version</strong> for them</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This design looks small, but that smallness matters. A good AI workflow isn't judged by how much it can do up front — it's judged by whether it can <strong>do one small thing reliably, inside clear boundaries</strong>.
+        </p>
+      </div>
+
+      <!-- Section: Tool surface design first -->
+      <h2 class="detail-heading">Design the Tool Surface First — Don't Rush to Code</h2>
+      <p class="detail-paragraph">
+        Before writing any code, let's think the tool surface through. The class-notes helper breaks down into <strong>three kinds of things</strong>:
+      </p>
+
+      <!-- Tools -->
+      <div class="case-header">
+        <p class="case-label">TOOLS</p>
+        <h2 class="case-title">The Things That Actually Do Something</h2>
+      </div>
+      <p class="detail-paragraph">
+        We'll build four tools.
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool 1</p>
+        <p class="tool-box__name"><code>hello</code></p>
+        <p class="tool-box__desc">
+          A sanity check — confirms the MCP server actually started up.
+        </p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool 2</p>
+        <p class="tool-box__name"><code>list_notes</code></p>
+        <p class="tool-box__desc">
+          Lists which class notes are in the <code>class_notes</code> folder.
+        </p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool 3</p>
+        <p class="tool-box__name"><code>read_note</code></p>
+        <p class="tool-box__desc">
+          Reads one specific class note.
+        </p>
+      </div>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Tool 4</p>
+        <p class="tool-box__name"><code>create_reflection_draft</code></p>
+        <p class="tool-box__desc">
+          Creates a new reflection draft inside the <code>drafts</code> folder.
+        </p>
+      </div>
+
+      <!-- Resource -->
+      <div class="case-header">
+        <p class="case-label">RESOURCE</p>
+        <h2 class="case-title">Fixed Reference Material for the AI</h2>
+      </div>
+      <p class="detail-paragraph">
+        We'll also expose one resource:
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Resource</p>
+        <p class="tool-box__name"><code>course://reflection-rules</code></p>
+        <p class="tool-box__desc">
+          Holds the fixed rules for writing a class reflection draft.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">For example:</p>
+      <ul class="check-list">
+        <li>A reflection should cover <strong>"what I understood," "where I'm still stuck," and "how I might apply this"</strong></li>
+        <li>Don't finish the student's final assignment for them</li>
+        <li>If the source material is thin, <strong>flag it to the user</strong> — don't fill in the gaps yourself</li>
+      </ul>
+
+      <!-- Prompt -->
+      <div class="case-header">
+        <p class="case-label">PROMPT</p>
+        <h2 class="case-title">A Reusable Workflow</h2>
+      </div>
+      <p class="detail-paragraph">
+        We'll also define one prompt:
+      </p>
+
+      <div class="tool-box">
+        <p class="tool-box__label">Prompt</p>
+        <p class="tool-box__name"><code>draft_reflection</code></p>
+        <p class="tool-box__desc">
+          Wraps "produce a class reflection draft" into a fixed flow.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">The flow looks roughly like this:</p>
+
+      <ol class="reflect-list reflect-list--single">
+        <li class="reflect-item">
+          <span class="reflect-num">1</span>
+          <span class="reflect-text">First, <strong>read</strong> the chosen note</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">2</span>
+          <span class="reflect-text">Then pull out the <strong>points relevant to the topic</strong></span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">3</span>
+          <span class="reflect-text">Consult the <strong>reflection rules</strong></span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">4</span>
+          <span class="reflect-text">Show the draft to the user for <strong>confirmation</strong> first</span>
+        </li>
+        <li class="reflect-item">
+          <span class="reflect-num">5</span>
+          <span class="reflect-text">Only after the user agrees, <strong>create the draft file</strong></span>
+        </li>
+      </ol>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Once the tools, resource, and prompt are clear in your head,<br/>
+          <strong>the implementation gets a lot easier.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-custom-server {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Case header (TOOLS / RESOURCE / PROMPT) */
+  .case-label {
+    display: inline-block;
+    margin-bottom: var(--space-0);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .case-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 2.4;
+  }
+
+  .case-header {
+    margin-top: var(--space-12);
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.tool-box__desc) code,
+  :global(.boundary-list) code,
+  :global(.reflect-text) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list (✗ items) */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  .cross-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card (key takeaway) */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Flow card (Gemini CLI ↓ python server.py ↓ tools) */
+  .flow-card {
+    margin: var(--space-6) 0;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .flow-step {
+    display: inline-block;
+    padding: var(--space-2);
+    background-color: #fff;
+    color: var(--color-heading);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .flow-step--accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .flow-arrow {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.05em;
+  }
+
+  /* Project card (Class-Notes Helper) */
+  .project-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+    text-align: center;
+  }
+
+  .project-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+  }
+
+  .project-name {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
+  .project-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Boundary grid (can / can't) */
+  .boundary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .boundary-col {
+    padding: var(--space-3) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .boundary-col--can {
+    border-top: 3px solid var(--color-accent);
+  }
+
+  .boundary-col--cant {
+    border-top: 3px solid var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .boundary-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+  }
+
+  .boundary-list {
+    margin-bottom: 0;
+  }
+
+  .boundary-list li {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+  }
+
+  /* Tool box */
+  .tool-box {
+    margin: var(--space-4) 0 var(--space-4);
+    padding: var(--space-2) var(--space-6);
+    border: 1px dashed var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+    text-align: center;
+  }
+
+  .tool-box__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-accent);
+    margin-bottom: var(--space-2);
+    text-align: center;
+  }
+
+  .tool-box__name {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    text-align: center;
+  }
+
+  .tool-box__name code {
+    padding: 0.15em 0.5em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  .tool-box__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  /* Reflect list (steps in the prompt flow) */
+  .reflect-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .reflect-list--single {
+    grid-template-columns: 1fr;
+  }
+
+  .reflect-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .reflect-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: var(--color-tag-bg);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    font-weight: 700;
+  }
+
+  .reflect-text {
+    font-size: var(--text-sm);
+    color: var(--color-heading);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .reflect-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .boundary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .reflect-list {
+      grid-template-columns: 1fr;
+    }
+
+    .case-title {
+      font-size: var(--text-lg);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .project-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .tool-box {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .flow-card {
+      padding: var(--space-5) var(--space-4);
+    }
+
+    .reflect-item {
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>

@@ -1,0 +1,773 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Basics 2 — Python Basics: Preparing to Build Your Own MCP Server"
+  description="Continuing from Basics 1 — pick up the more advanced ideas you'll actually use to build your own MCP Server: import, Path, reading and writing files, exists, try / except, type hints, docstrings, decorators, and if __name__ == '__main__'."
+  lang="en"
+>
+  <section class="section">
+    <div class="container python-basics">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">The Only Python You Need Before Building an MCP (Continued)</h1>
+        <p class="detail-subtitle">
+          Basics 1 already walked through <strong>variables, strings, if, list, for, functions, and return</strong>. This page does one simple thing: fill in the remaining ideas you'll need for your <strong>first self-built MCP server</strong>.
+        </p>
+      </header>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Same principle: <strong>not a full Python course — only the small slice you'll actually use next.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Things like <code>def</code>, <code>return</code>, <code>Path("notes")</code>, or <code>@mcp.tool()</code> can make you pause for a moment. <strong>That's fine — let's take them apart one at a time.</strong>
+      </p>
+
+      <!-- Concept: import -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 08</p>
+        <h2 class="concept-title">import: Borrow Tools Other People Have Already Written</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Python doesn't make you write everything from scratch. <strong>Many common features are already built</strong>. We use <code>import</code> to pull them in. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path</code></pre>
+
+      <p class="detail-paragraph">
+        Read this as: <strong>from the <code>pathlib</code> toolbox, take out the <code>Path</code> tool</strong>.
+      </p>
+      <p class="detail-paragraph">
+        Later, when building an MCP Server, you'll see:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path
+from mcp.server.fastmcp import FastMCP</code></pre>
+
+      <p class="detail-paragraph">Which means:</p>
+      <ul class="check-list">
+        <li>I want to borrow <code>Path</code> to <strong>handle file paths</strong></li>
+        <li>I want to borrow <code>FastMCP</code> to <strong>build an MCP Server</strong></li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So <code>import</code> can be understood simply as: <strong>pull in the tools you need.</strong>
+        </p>
+      </div>
+
+      <!-- Concept: Path -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 09</p>
+        <h2 class="concept-title">Path: A Cleaner Way to Handle File Paths</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        When building an MCP Server, we often deal with folders and files. For example:
+      </p>
+      <ul class="check-list">
+        <li>Where are the class notes stored?</li>
+        <li>Where should drafts be saved?</li>
+        <li>Does this file exist?</li>
+        <li>Which note should I read?</li>
+      </ul>
+      <p class="detail-paragraph">
+        Python's <code>Path</code> makes these things much easier to read. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path
+
+BASE_DIR = Path(__file__).parent
+NOTES_DIR = BASE_DIR / "class_notes"
+
+print(NOTES_DIR)</code></pre>
+
+      <p class="detail-paragraph">You can read this as:</p>
+      <ul class="check-list">
+        <li><code>Path(__file__)</code> is <strong>the location of the current Python file</strong></li>
+        <li><code>.parent</code> is <strong>the folder it lives in</strong></li>
+        <li><code>BASE_DIR / "class_notes"</code> is <strong>the <code>class_notes</code> folder inside it</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          You don't need to understand every detail right away. Just remember: <strong><code>Path</code> helps us locate folders and files.</strong>
+        </p>
+      </div>
+
+      <!-- Concept: read file -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 10</p>
+        <h2 class="concept-title">Reading Files: Let Python See the Note Content</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Next, we'll have Python read a class note. Suppose you have a folder <code>class_notes</code> with a file <code>week1.md</code>. We can read it in Python:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path
+
+path = Path("class_notes/week1.md")
+content = path.read_text(encoding="utf-8")
+print(content)</code></pre>
+
+      <p class="detail-paragraph">This program means:</p>
+      <ul class="check-list">
+        <li>First, <strong>specify the file location</strong></li>
+        <li>Then use <code>read_text</code> to <strong>read the text content</strong></li>
+        <li>Finally, use <code>print</code> to <strong>display it</strong></li>
+      </ul>
+      <p class="detail-paragraph">
+        The <code>encoding="utf-8"</code> part is so that <strong>non-ASCII characters are less likely to be garbled</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If you hit an error, don't panic. The first time you read a file, <strong>the most common mistake usually isn't your code — it's a wrong file path</strong>. Maybe the folder name is different, the filename is different, or the terminal is pointing at the wrong location.
+        </p>
+      </div>
+
+      <!-- Concept: write file -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 11</p>
+        <h2 class="concept-title">Writing Files: Let Python Create a Draft</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Beyond reading, Python can also create new text files. Set up a folder <code>drafts</code>, then write:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path
+
+path = Path("drafts/my_reflection.md")
+path.write_text("# My Reflection\n\nThis is the first-draft version.", encoding="utf-8")</code></pre>
+
+      <p class="detail-paragraph">
+        This creates a file <code>my_reflection.md</code> inside the <code>drafts</code> folder. Open it and you'll see:
+      </p>
+
+      <pre class="code-block code-block--py"><code># My Reflection
+
+This is the first-draft version.</code></pre>
+
+      <p class="detail-paragraph">One important caveat:</p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          If <code>write_text</code> hits an existing file, <strong>it may overwrite the original content.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So when building an MCP Server, <strong>we won't let AI casually overwrite old files</strong>. We'll check first whether a file exists. The first time you build an AI write feature, remember this principle:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>Create new files; don't modify the original data directly.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        That way, even if AI's writing isn't great, you just get one extra draft — <strong>your original notes stay safe</strong>.
+      </p>
+
+      <!-- Concept: exists -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 12</p>
+        <h2 class="concept-title">exists: Check First, Then Act</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Before reading or writing a file, we can <strong>check whether it exists first</strong>. For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>from pathlib import Path
+
+path = Path("class_notes/week1.md")
+
+if path.exists():
+    print("Found it")
+else:
+    print("Can't find this file")</code></pre>
+
+      <p class="detail-paragraph">
+        Here, <code>path.exists()</code> means: <strong>does this file or folder exist?</strong> If yes, show "Found it"; if not, show "Can't find this file".
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This idea is important inside an MCP Server. If AI tries to read a note that doesn't exist, <strong>the tool shouldn't guess</strong>. It should reply clearly: "Can't find this note — please confirm the filename first."
+        </p>
+      </div>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          A good tool isn't one that pushes through everything.<br/>
+          <strong>A good tool knows when to stop.</strong>
+        </p>
+      </div>
+
+      <!-- Concept: string handling for filename -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 13</p>
+        <h2 class="concept-title">String Handling: Turn a Title Into a Safer Filename</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Later we'll have AI create drafts based on a title. The title might be something like "My understanding of MCP." <strong>But titles aren't always safe to use directly as filenames</strong>:
+      </p>
+      <ul class="cross-list">
+        <li>Some titles contain spaces</li>
+        <li>Some contain special characters</li>
+        <li>Some users may not enter a title at all</li>
+      </ul>
+      <p class="detail-paragraph">
+        So we'll write a small function that turns a title into a safer filename. The idea is roughly:
+      </p>
+      <ul class="check-list">
+        <li>Replace spaces with underscores</li>
+        <li>Strip out unsafe characters</li>
+        <li>If the title is empty, give it a default name</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        You don't need to memorize this part right now. <strong>The point is to remember one thing</strong>:
+      </p>
+
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>Don't take user input and apply it directly to file operations.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Because user input can be unpredictable, and AI works based on user input. So we have to <strong>build a layer of protection into the tool first</strong>.
+      </p>
+
+      <!-- Concept: try / except -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 14</p>
+        <h2 class="concept-title">try / except: Don't Let Errors Crash the Whole Program</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Some errors are <strong>predictable</strong>. For example:
+      </p>
+      <ul class="cross-list">
+        <li>Wrong filename</li>
+        <li>Unsafe path</li>
+        <li>File doesn't exist</li>
+        <li>Input doesn't match the expected format</li>
+      </ul>
+      <p class="detail-paragraph">
+        For these, we can use <code>try / except</code>. You can think of it as: <strong>try doing something. If it fails, don't crash the whole program — return a clearer message instead.</strong> For example:
+      </p>
+
+      <pre class="code-block code-block--py"><code>try:
+    number = int("abc")
+except ValueError:
+    print("That isn't a number")</code></pre>
+
+      <p class="detail-paragraph">
+        In this code, Python tries to convert <code>"abc"</code> into a number. But <code>"abc"</code> isn't a number, so it errors. <strong>Without <code>try / except</code>, the program might just halt.</strong> With <code>try / except</code>, we can have it show "That isn't a number" instead.
+      </p>
+      <p class="detail-paragraph">
+        Inside an MCP Server, this matters. <strong>We don't want students to see a wall of red error text</strong>. We want the tool to reply with messages people can understand. For example:
+      </p>
+
+      <ul class="check-list">
+        <li>Please enter just a filename, not a folder path</li>
+        <li>Can't find this note — please run <code>list_notes</code> to verify the filename</li>
+      </ul>
+
+      <!-- Concept: type hints -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 15</p>
+        <h2 class="concept-title">type hints: Just Read filename: str -&gt; str As-Is</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        You'll see this kind of syntax later:
+      </p>
+
+      <pre class="code-block code-block--py"><code>def read_note(filename: str) -&gt; str:</code></pre>
+
+      <p class="detail-paragraph">
+        It might look complex, but <strong>it can be split into pieces</strong>:
+      </p>
+
+      <div class="hint-grid">
+        <article class="hint-card">
+          <p class="hint-card__name"><code>filename: str</code></p>
+          <p class="hint-card__desc">
+            The <code>filename</code> parameter is <strong>expected to be a piece of text</strong>.
+          </p>
+        </article>
+        <article class="hint-card">
+          <p class="hint-card__name"><code>-&gt; str</code></p>
+          <p class="hint-card__desc">
+            This function will <strong>return a piece of text</strong>.
+          </p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">So the whole line can be read as:</p>
+      <ul class="check-list">
+        <li>This is a function called <code>read_note</code></li>
+        <li>It takes a <strong>text-form filename</strong></li>
+        <li>It will <strong>return a piece of text</strong></li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Don't treat type hints like a memorization quiz at first — <strong>just treat them as hints</strong>. They're a reminder for you, and for whoever uses this tool later: this function takes this kind of input and gives back this kind of output.
+        </p>
+      </div>
+
+      <!-- Concept: docstring -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 16</p>
+        <h2 class="concept-title">docstring: A Tool Description Written for Humans</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Later, you'll see this:
+      </p>
+
+      <pre class="code-block code-block--py"><code>def list_notes() -&gt; str:
+    """List class notes inside the class_notes folder."""</code></pre>
+
+      <p class="detail-paragraph">
+        Text wrapped in three quotes is usually called a <strong>docstring</strong>. You can think of it as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A short manual for the function.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        It <strong>isn't an executable instruction</strong> — it's a description of what this function does.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Inside an MCP tool, a docstring is especially important. Because it <strong>doesn't just help humans understand it — it also helps AI understand what this tool is for</strong>.
+        </p>
+      </div>
+
+      <!-- Concept: decorator -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 17</p>
+        <h2 class="concept-title">decorator: Think of @mcp.tool() as a Label</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        This next symbol can feel intimidating the first time:
+      </p>
+
+      <pre class="code-block code-block--py"><code>@mcp.tool()
+def hello() -&gt; str:
+    return "MCP Server is up."</code></pre>
+
+      <p class="detail-paragraph">
+        The <code>@mcp.tool()</code> written above the function is called a <strong>decorator</strong>. The name sounds fancy, but here you can think of it as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>A label.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">It roughly means:</p>
+      <ul class="check-list">
+        <li>The function below isn't just an ordinary Python function</li>
+        <li>It's being <strong>registered as an MCP tool</strong></li>
+        <li>Gemini CLI will be able to invoke it</li>
+      </ul>
+
+      <h3 class="sub-heading">With label vs without label</h3>
+      <p class="detail-paragraph">
+        If you only have:
+      </p>
+
+      <pre class="code-block code-block--py"><code>def hello() -&gt; str:
+    return "MCP Server is up."</code></pre>
+
+      <p class="detail-paragraph">
+        That's just an <strong>ordinary Python function</strong>. But once you add:
+      </p>
+
+      <pre class="code-block code-block--py"><code>@mcp.tool()
+def hello() -&gt; str:
+    return "MCP Server is up."</code></pre>
+
+      <p class="detail-paragraph">
+        It becomes <strong>a tool that the MCP Server exposes to the outside world</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          You don't need to understand the underlying mechanics of decorators here. <strong>Just remember this one line: <code>@mcp.tool()</code> registers the function below it as a tool.</strong>
+        </p>
+      </div>
+
+      <!-- Concept: __main__ -->
+      <div class="concept-header">
+        <p class="concept-label">CONCEPT 18</p>
+        <h2 class="concept-title">if __name__ == "__main__": Start Only When Run Directly</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Later, you'll see MCP Server programs ending with this:
+      </p>
+
+      <pre class="code-block code-block--py"><code>if __name__ == "__main__":
+    mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        This line is a bit abstract for beginners. <strong>You don't need to understand every detail right now</strong>. Just read it as:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>When we run this <code>server.py</code> directly, start the MCP Server.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        The piece that actually starts the MCP Server is:
+      </p>
+
+      <pre class="code-block code-block--py"><code>mcp.run()</code></pre>
+
+      <p class="detail-paragraph">
+        So this code can be simplified to: <strong>if this file is being run directly, start the MCP Server</strong>. Later, Gemini CLI will use a config file to launch this Python file — which is why this line shows up in our MCP Server programs.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .python-basics {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .detail-subtitle strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Concept header */
+  .concept-header {
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .concept-label {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background-color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .concept-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.check-list) code,
+  :global(.cross-list) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.hint-card__desc) code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block (Python) */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-8);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Check list */
+  .check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .check-list li {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .check-list li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .check-list li strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Cross list */
+  .cross-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .cross-list li {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.9;
+    padding-left: var(--space-6);
+    position: relative;
+    margin-bottom: var(--space-2);
+  }
+
+  .cross-list li::before {
+    content: '\2717';
+    position: absolute;
+    left: 0;
+    color: var(--color-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-4) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-3) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    padding: var(--space-4) var(--space-8);
+    border-width: 2px;
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Hint grid (type hints) */
+  .hint-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .hint-card {
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .hint-card__name {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+  }
+
+  .hint-card__name code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1em;
+    background-color: var(--color-bg);
+    color: var(--color-accent);
+    border-radius: var(--border-radius);
+  }
+
+  .hint-card__desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .hint-card__desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .hint-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-4) var(--space-6);
+    }
+
+    .highlight-card--strong {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-xs);
+    }
+
+    .hint-card {
+      padding: var(--space-4) var(--space-5);
+    }
+  }
+</style>
