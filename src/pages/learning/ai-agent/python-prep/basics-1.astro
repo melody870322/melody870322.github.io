@@ -71,7 +71,41 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       </div>
 
       <!-- Section: Install Python in VS Code -->
-      <h2 class="detail-heading">Install Python in VS Code</h2>
+      <h2 class="detail-heading">First, Install Python Itself</h2>
+      <p class="detail-paragraph">
+        This step is easy to skip. <strong>The VS Code Python extension does not include Python</strong> — it's an editor helper, and the interpreter that actually runs your code has to be installed separately.
+      </p>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">Go to the <strong>python.org</strong> downloads page and grab the Windows installer</p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <div class="setup-body">
+            <p class="setup-text">Run the installer and <strong>be sure to tick "Add Python to PATH"</strong></p>
+            <p class="setup-text setup-text--muted">That checkbox sits at the very bottom of the installer screen and is easy to miss. Without it, your terminal won't find the <code>python</code> command.</p>
+          </div>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">After installing, open a <strong>fresh</strong> terminal window and run:</p>
+            <pre class="code-block code-block--py"><code>python --version</code></pre>
+            <p class="setup-text setup-text--muted">A version number means you're set.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Missing the interpreter produces two symptoms, neither of which looks like "Python isn't installed".</strong> First, the <code>Python: Select Interpreter</code> list further down will be empty. Second, typing <code>python</code> in a Windows terminal pops open the Microsoft Store. If you see either, come back and finish this step.
+        </p>
+      </div>
+
+      <!-- Section: Install VS Code extension -->
+      <h2 class="detail-heading">Then Install the Python Extension in VS Code</h2>
 
       <ol class="setup-list">
         <li class="setup-item">
@@ -94,6 +128,12 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
       <!-- Section: Create first Python file -->
       <h2 class="detail-heading">Create Your First Python File</h2>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Create and edit every file in VS Code</strong>, and check that the encoding indicator in the bottom-right reads <code>UTF-8</code>. Don't use Notepad for files containing Chinese — it silently saves as <code>.env.txt</code>, and File Explorer hides extensions by default, so it looks perfectly fine. Don't use PowerShell's <code>Set-Content</code> either: on a Chinese Windows install it defaults to Big5, and the text comes out garbled in the CLI. The "build your own MCP Server" pages later on are full of Chinese strings (docstrings, response messages, error text), so the wrong tool here affects all of them.
+        </p>
+      </div>
 
       <ol class="setup-list">
         <li class="setup-item">
@@ -653,6 +693,11 @@ week3.md</code></pre>
     border-left: 4px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
   }
 
   .callout-text {

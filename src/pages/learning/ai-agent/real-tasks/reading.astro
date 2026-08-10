@@ -16,6 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           We've already practiced having AI organize CSV data and used the Notion API to create and update tasks. Next, we'll apply an AI agent to another very common task: <strong>reading articles, organizing key points, planning a report outline, and checking drafts</strong>. This kind of task isn't database operations or table cleanup, but it's still a great fit for a workflow.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <p class="detail-paragraph">
@@ -1405,5 +1406,13 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

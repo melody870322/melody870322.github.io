@@ -16,6 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           We already know an MCP Server can do more than read a local folder — it can talk to external data through APIs. But once you start using APIs, a problem arrives quickly: <strong>some APIs aren't open to anyone</strong>. They ask you for a "key." That key is usually called an <code>API Key</code>.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <!-- Section: What is API Key -->
@@ -247,7 +248,14 @@ __pycache__/</code></pre>
         If you're using uv, run this in VS Code's integrated terminal:
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-shell">uv add python-dotenv</code></pre>
+      <pre class="code-block" is:raw><code class="lang-shell">uv init
+uv add "mcp[cli]" python-dotenv</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>You're installing more than <code>python-dotenv</code> here.</strong> The next section's code uses <code>from mcp.server.fastmcp import FastMCP</code>, so the <code>mcp</code> package has to go in too — otherwise you'll hit <code>ModuleNotFoundError</code> at runtime. <code>uv init</code> sets up the project structure in this new folder, and is only needed the first time.
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         With pip + .venv:
@@ -1052,5 +1060,13 @@ if __name__ == "__main__":
       gap: var(--space-3);
       padding: var(--space-4) var(--space-5);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

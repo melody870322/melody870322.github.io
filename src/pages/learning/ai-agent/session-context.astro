@@ -1,0 +1,569 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Sessions & Context Management — AI Agent Puzzle"
+  description="Once the MCP is wired up and you've run a full workflow, the first thing that really stops you isn't features — it's quota. This page uses measured /stats numbers to show where your requests go, and what /clear, GEMINI.md, and /resume can each do about it."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-session-context">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Why You Run Out of Quota After Just a Few Prompts</h1>
+        <p class="detail-subtitle">
+          You've connected Notion and run through a complete workflow. The next thing that actually stops you usually isn't a missing feature — it's <strong>running out of quota</strong>. This page is about exactly that: understanding where the requests go, and which tools can help.
+        </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+      </header>
+
+      <!-- Section 1: /stats -->
+      <h2 class="detail-heading">First, Make the Cost Visible: <code>/stats</code></h2>
+      <p class="detail-paragraph">
+        Type <code>/stats</code> inside Gemini CLI to see how many requests and tokens this session has used. That's where the whole page starts — <strong>you can't economize on something you can't see</strong>.
+      </p>
+      <pre class="code-block"><code>/stats</code></pre>
+
+      <p class="detail-paragraph">
+        Here's the same summarization prompt, measured under two different tool configurations:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th></th><th>All 28 tools open</th><th>Limited to 4 tools</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Requests</td><td>3</td><td><strong>2</strong></td></tr>
+            <tr><td>Input tokens</td><td>121,554</td><td><strong>41,353</strong></td></tr>
+            <tr><td>Average per request</td><td>40,518</td><td><strong>20,677</strong></td></tr>
+            <tr><td>Runs available within 250K TPM</td><td>~6</td><td><strong>~12</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Here's the crux: <strong>every request resends the entire conversation history.</strong> So the longer the conversation, the more each individual request costs — it doesn't get cheaper as you go, it gets more expensive.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        On top of that there's a <strong>fixed cost of roughly 17,000 tokens</strong>, coming from the CLI's own system prompt and built-in tools. You can't turn that off, but it's a useful reminder: none of your prompts start from zero.
+      </p>
+
+      <!-- Section 2: one instruction != one request -->
+      <h2 class="detail-heading">One Instruction Is Not One Request</h2>
+      <p class="detail-paragraph">
+        This is the easiest thing to underestimate. You type "summarize this Notion note for me" and it feels like one action, but behind the scenes the agent runs:
+      </p>
+
+      <ol class="callout-list">
+        <li>Sends the instruction → request 1</li>
+        <li>Model decides to call <code>notion-search</code> → request 2 (search results go back to the model)</li>
+        <li>Model decides to call <code>notion-fetch</code> → request 3</li>
+        <li>Model reads the content and produces a summary → request 4</li>
+      </ol>
+
+      <p class="detail-paragraph">
+        So a single sentence can easily be <strong>4–10 requests</strong>. Measured across the full four-step Notion workflow from earlier: <strong>9 requests and 5 tool calls</strong> in total.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>TPM usually runs out before RPM does.</strong> Because every request resends the whole conversation history as input, the longer the conversation, the more tokens each single request eats. People often assume they hit the "15 per minute" ceiling when they actually hit the token ceiling.
+        </p>
+      </div>
+
+      <!-- Section 3: three limits -->
+      <h2 class="detail-heading">Three Separate Quota Limits</h2>
+      <p class="detail-paragraph">
+        The free tier has three independent limits, and exceeding any one of them returns a 429. What differs is <strong>how long you have to wait</strong>:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Abbrev.</th><th>Meaning</th><th>Quota</th><th>How it resets</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>RPM</td><td>Requests per minute</td><td>15</td><td>Rolling 60 seconds</td></tr>
+            <tr><td>TPM</td><td>Input tokens per minute</td><td>250,000</td><td>Rolling 60 seconds</td></tr>
+            <tr><td>RPD</td><td>Requests per day</td><td>500</td><td>Midnight Pacific time</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        RPM and TPM use a <strong>rolling 60-second window</strong>, not a reset on the minute mark — run out at 14:30:10 and you're clear again at 14:31:10. In practice, "if you hit it, wait a minute" is all you need to remember. RPD resets at midnight Pacific, which is <strong>15:00 Taiwan time</strong> (16:00 from November through March, because of the US time change). Hit RPD and you're waiting until tomorrow.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Quota is counted per project, not per key.</strong> Issuing several keys under the same Google Cloud project doesn't help — they share the same quota. Everyone must <strong>use their own Google account and create their own project</strong>, or the whole class eats one shared pool of 500 RPD.
+        </p>
+      </div>
+
+      <!-- Section 4: /clear + GEMINI.md -->
+      <h2 class="detail-heading">What Actually Works: <code>/clear</code> plus <code>GEMINI.md</code></h2>
+      <p class="detail-paragraph">
+        Since the cost comes from resending the whole history, the way to save is clear: <strong>throw away history you don't need, and put what you do need into a file</strong>.
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">Drop the history</p>
+          <h3 class="method-title"><code>/clear</code></h3>
+          <p class="method-desc">
+            Wipes the conversation context. It's a <strong>purely local operation — no request, and it can't fail</strong>. Your next prompt starts from a clean slate.
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">Keep what matters</p>
+          <h3 class="method-title"><code>GEMINI.md</code></h3>
+          <p class="method-desc">
+            Project-level long-term memory. It lives in a file rather than the conversation context, so it's <strong>version-controllable and shareable with a whole class</strong>.
+          </p>
+        </article>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          A good classroom rhythm: <strong>run <code>/clear</code> after finishing each exercise</strong>, and write anything worth keeping into <code>GEMINI.md</code>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        This isn't some obscure trick. The very first tip on the CLI's launch screen is <code>Create GEMINI.md files to customize your interactions</code>.
+      </p>
+
+      <!-- Section 5: /compress -->
+      <h2 class="detail-heading"><code>/compress</code> Currently Doesn't Work</h2>
+      <p class="detail-paragraph">
+        Faced with a quota problem, most people's first instinct is to compress the conversation history. That road is currently closed.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Measured on v0.54.4: both a 41K and a 373K context hang forever on "Compressing chat history".</strong> Esc does nothing; the only way out is Ctrl+C twice or closing the terminal. Issue #16213 on the official repo reports the same symptom.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <strong>Keep it out of classroom exercises.</strong> That said, it's worth telling students about — a feature the official docs describe perfectly well is, in practice, broken. <strong>Don't assume something works just because the documentation says it does.</strong> That attitude applies to every tool.
+      </p>
+
+      <!-- Section 6: /resume -->
+      <h2 class="detail-heading">Picking Up Across Sessions: <code>/resume</code></h2>
+      <p class="detail-paragraph">
+        The CLI saves sessions automatically — you don't have to save anything yourself. In PowerShell:
+      </p>
+      <pre class="code-block"><code>gemini --resume
+gemini -r</code></pre>
+      <p class="detail-paragraph">
+        Or, if you're already inside the CLI:
+      </p>
+      <pre class="code-block"><code>/resume</code></pre>
+
+      <p class="detail-paragraph">
+        Sessions live in <code>~/.gemini/tmp/&lt;project_hash&gt;/chats/</code> and are <strong>project-scoped</strong> — switch folders and the earlier history is no longer visible.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          When resuming in a different folder, <strong>absolute file references can break; relative paths are safer</strong>. Also, whether <code>--resume</code> genuinely restores the model's context (rather than just redrawing the transcript) hasn't been verified. Test it yourself before teaching it: new session → tell it something → <code>/quit</code> → <code>gemini --resume</code> → ask about that thing.
+        </p>
+      </div>
+
+      <!-- Section 7: /rewind -->
+      <h2 class="detail-heading">Going Back a Step: <code>/rewind</code></h2>
+      <p class="detail-paragraph">
+        Type <code>/rewind</code>, or press <code>Esc</code> twice, and you'll get a list of restore points along with the file changes at each step (for example <code>1 file changed +3</code>, or <code>No files have been changed</code>).
+      </p>
+      <p class="detail-paragraph">
+        You can choose to <strong>rewind only the conversation</strong>, <strong>restore only the files</strong>, or do both.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Press <strong>Esc</strong> to leave once you've looked. Pressing Enter immediately applies whichever restore point the cursor is sitting on — the easiest thing to trigger by accident.
+        </p>
+      </div>
+
+      <!-- Section 8: /memory -->
+      <h2 class="detail-heading"><code>/memory</code> Has Changed</h2>
+      <p class="detail-paragraph">
+        Older tutorials show <code>/memory add</code>. <strong>As of v0.54.4 there is no <code>add</code> subcommand</strong> — only <code>show</code>, <code>reload</code>, <code>list</code>, and <code>inbox</code>. Memory is now managed through the <code>GEMINI.md</code> file instead.
+      </p>
+      <pre class="code-block"><code>/memory show     # show the current memory contents
+/memory reload   # reload GEMINI.md</code></pre>
+
+      <!-- Section 9: agent writes its own memory -->
+      <h2 class="detail-heading">The Agent Writes Its Own Memory File</h2>
+      <p class="detail-paragraph">
+        This section is the one worth pausing on. Tell the CLI "please remember my lucky number is 6" and it will <strong>call <code>write_file</code> on its own to modify <code>MEMORY.md</code></strong> (giving it the heading <code>#&nbsp;Private Project Memory</code> by itself), then show you the full diff for confirmation:
+      </p>
+
+      <pre class="code-block"><code>Apply this change?
+  1. Allow once                    ← pick this one
+  2. Allow for this session        ← the cursor starts here
+  3. Modify with external editor
+  4. No, suggest changes (esc)</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The cursor defaults to option 2.</strong> Holding down Enter grants write permission for the entire session — after that it won't ask you again, whatever it decides to write.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Once written, the status bar changes from <code>1 GEMINI.md file</code> to <code>2 GEMINI.md files</code> — and from then on that file <strong>loads into context automatically on every launch</strong>.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This is the essential difference between an agent and a chatbot: <strong>it changed its environment for the benefit of its future self.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So build the habit: <strong>open the memory file periodically and read what's actually in it</strong>. It's how you avoid personal information being written in without you noticing, and then kept forever.
+      </p>
+
+      <!-- Section: bonus -->
+      <h2 class="detail-heading">Aside: Why <code>/stats</code> Shows Two Models</h2>
+      <p class="detail-paragraph">
+        Looking at the Model Usage table in <code>/stats</code>, you may notice more than one model:
+      </p>
+      <pre class="code-block"><code>gemini-3.1-flash-lite    1    ⟶ utility_summarizer
+gemini-3.5-flash-lite    9    ⟶ main</code></pre>
+
+      <p class="detail-paragraph">
+        Internally the CLI calls a separate <strong>utility model</strong> for chores like summarization, distinct from the main model you locked in <code>.env</code>. 3.1 Flash-Lite has the same 15 RPM / 500 RPD quota, so it doesn't affect classroom use.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The teaching value: <strong>an agent isn't one model doing everything — there's a division of labour behind it.</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-session-context {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-heading code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.method-desc) code,
+  :global(.callout-list) code,
+  :global(.info-table) td code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Ordered list used for the request breakdown */
+  .callout-list {
+    margin: var(--space-4) 0 var(--space-6);
+    padding-left: var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .callout-list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .callout-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table tbody td:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  /* Method grid (/clear vs GEMINI.md) */
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .method-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .method-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .method-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .method-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .method-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .method-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .method-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .method-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.8rem;
+    }
+
+    .info-table {
+      font-size: 0.78rem;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: var(--space-2);
+    }
+  }
+</style>

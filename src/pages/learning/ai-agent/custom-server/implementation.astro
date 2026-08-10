@@ -777,6 +777,7 @@ A good MCP server is one where every tool, every piece of reference material, an
         <p class="detail-subtitle">
           On the previous page we sketched out the tool surface: four tools, one resource, one prompt. This page <strong>builds it</strong>. Each step ships with full commands. If a step doesn't pass, stop and fix it before moving on.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <!-- ============ Part 1: Get a minimal version running ============ -->
@@ -1814,5 +1815,13 @@ if __name__ == "__main__":
     .code-block--md {
       max-height: 24rem;
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

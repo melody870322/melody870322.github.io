@@ -16,6 +16,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           What we did earlier was important: you got Gemini CLI connected to Notion and actually ran through a full workflow, so you know AI can help you search pages, read content, create new pages, and even update pages. What you'll learn here is the next, more important question.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <div class="highlight-card">
@@ -98,6 +99,31 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </article>
       </div>
 
+      <h3 class="sub-heading">Least privilege isn't only about safety</h3>
+      <p class="detail-paragraph">
+        Everything above argues from safety. But measured in practice, there's a second, more practical reason — for the same task, the fewer tools you open, the cheaper it runs:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th></th><th>Wide open (28 tools)</th><th>Least privilege (4 tools)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Requests to finish the same task</td><td>3</td><td><strong>2</strong></td></tr>
+            <tr><td>Tokens per request</td><td>40,518</td><td><strong>20,677</strong></td></tr>
+            <tr><td>Requests you can run per minute</td><td>~6</td><td><strong>~12</strong></td></tr>
+            <tr><td>Blast radius</td><td>Can move pages, alter database structure, list every private page</td><td>Search, read, create, update only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So least privilege <strong>isn't "trading convenience for safety" — safety and performance improve together</strong>. The tool list itself gets sent to the model, so the more you open, the fatter every request gets.
+        </p>
+      </div>
+
       <p class="detail-paragraph">
         So the core of this page isn't memorizing a bunch of security terms. It's about slowly building a habit of asking yourself:
       </p>
@@ -109,6 +135,42 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       <!-- Section: How to narrow tools in Gemini CLI -->
       <h2 class="detail-heading">How to Shrink the Tool Surface in Gemini CLI</h2>
+      <p class="detail-paragraph">
+        Before touching any config, get a clear look at how much is currently open. Type <code>/mcp list</code> inside Gemini CLI and you'll see that the Notion MCP actually exposes <strong>28 tools</strong>:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Category</th><th>Tools</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Used in this course</td>
+              <td><code>notion-search</code>, <code>notion-fetch</code>, <code>notion-create-pages</code>, <code>notion-update-page</code></td>
+            </tr>
+            <tr>
+              <td>Privacy-related</td>
+              <td><code>notion-list-private-pages</code>, <code>notion-list-shared-pages</code>, <code>notion-get-users</code>, <code>notion-get-teams</code></td>
+            </tr>
+            <tr>
+              <td>Structurally destructive</td>
+              <td><code>notion-move-pages</code>, <code>notion-update-data-source</code>, <code>notion-create-database</code>, <code>notion-update-view</code></td>
+            </tr>
+            <tr>
+              <td>Everything else</td>
+              <td><code>notion-convert-page-to-skill</code>, <code>notion-search-agents</code>, <code>notion-query-meeting-notes</code>, <code>notion-create-folder</code>, <code>notion-create-comment</code>, <code>notion-get-comments</code>, <code>notion-duplicate-page</code>, <code>notion-create-attachment</code>, <code>notion-download-attachment</code>, <code>notion-create-file-upload</code>, <code>notion-create-view</code>, <code>notion-get-async-task</code>, <code>notion-list-favorite-pages</code>, <code>notion-list-recent-pages</code>, <code>notion-query-data-sources</code>, <code>notion-query-database-view</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Look at that table and ask yourself one question: <strong>of those 28, how many does this course actually need?</strong> Four. Going from 28 down to 4 makes the case for least privilege on its own.
+        </p>
+      </div>
+
       <p class="detail-paragraph">
         Continuing with the Notion route, the first time you do a safety config, I recommend trimming the tool list down to these 3 and turning update off for now:
       </p>
@@ -176,30 +238,40 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <h3 class="sub-heading">How to find it</h3>
+      <h3 class="sub-heading">How to edit it: generate first, then look</h3>
       <p class="detail-paragraph">
-        Follow this path to the config file:
+        Don't hand-write the JSON from scratch — it's far too easy to drop a comma or a quote. The steadier approach is to <strong>let the command generate the file, then open it and see what it wrote</strong>. In PowerShell:
       </p>
-      <nav class="path-breadcrumb" aria-label="settings.json path">
-        <span class="path-step">C: drive</span>
-        <span class="path-sep">→</span>
-        <span class="path-step">Users</span>
-        <span class="path-sep">→</span>
-        <span class="path-step">&lt;username&gt;</span>
-        <span class="path-sep">→</span>
-        <span class="path-step">.gemini</span>
-        <span class="path-sep">→</span>
-        <span class="path-step path-step--file">settings.json</span>
-      </nav>
+      <pre class="code-block"><code># 1. Let the command generate the config
+gemini mcp add --transport http notion https://mcp.notion.com/mcp
+
+# 2. Open the file and see what it wrote
+Get-Content .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">
+        The first command prints:
+      </p>
+      <pre class="code-block code-block--quote"><code>MCP server "notion" added to project settings.</code></pre>
+
+      <p class="detail-paragraph">
+        Note those last two words: <code>project settings</code>. <code>gemini mcp add</code> <strong>writes to the project level by default</strong> — the <code>.gemini\settings.json</code> inside the folder you're currently in — and won't touch settings for your whole machine. So the file you're about to edit lives <strong>inside your project folder</strong>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This order isn't just about avoiding typos. <strong>Running it once and then reading the file teaches you both "how to do it" and "what happens when you do"</strong>; copying a block of JSON only teaches the first.
+        </p>
+      </div>
 
       <h3 class="sub-heading">Method 1: Whitelist (includeTools)</h3>
       <p class="detail-paragraph">
-        You can change the Notion server to:
+        Now, in the file you just generated, add <code>includeTools</code> to the notion server:
       </p>
       <pre class="code-block code-block--json"><code>{`{
   "mcpServers": {
     "notion": {
-      "httpUrl": "https://mcp.notion.com/mcp",
+      "url": "https://mcp.notion.com/mcp",
+      "type": "http",
       "includeTools": [
         "notion-search",
         "notion-fetch",
@@ -215,9 +287,43 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <h3 class="sub-heading">Save and try it out</h3>
       <p class="detail-paragraph">
-        Save → restart Gemini CLI → send these 4 prompts in order:
+        Two spots trip people up:
+      </p>
+      <ul class="check-list">
+        <li><code>includeTools</code> belongs <strong>inside that MCP server's own block</strong> — a sibling of <code>url</code> and <code>type</code>, not at the outermost level</li>
+        <li>Use <strong>bare tool names</strong> like <code>notion-search</code>; don't add a prefix such as <code>mcp_notion_</code></li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Put it at the wrong level and the CLI raises no error and no warning — it silently ignores your setting.</strong> Nothing changes on screen, you'll assume the permissions are in place, and all 28 tools are still wide open. This is the easiest trap in this section.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">After saving, two steps you can't skip</h3>
+      <p class="detail-paragraph">
+        Config changes don't take effect immediately, and "looks like it worked" is not the same as "actually worked". Do both of these:
+      </p>
+
+      <ol class="test-list">
+        <li class="test-item">
+          <span class="test-num">1</span>
+          <div class="test-body">
+            <p class="test-desc"><strong>Exit Gemini CLI completely, then relaunch.</strong> Press Ctrl+C twice to quit, then type <code>gemini</code> again. Closing just the chat view isn't enough — settings won't be re-read.</p>
+          </div>
+        </li>
+        <li class="test-item">
+          <span class="test-num">2</span>
+          <div class="test-body">
+            <p class="test-desc"><strong>After relaunching, run <code>/mcp list</code> and confirm the tool count actually dropped.</strong> Don't treat "the config file says so" as done — check the real result. Going from 28 to 3 is what counts as working.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 class="sub-heading">Now try it out</h3>
+      <p class="detail-paragraph">
+        Once the tool count really has dropped, send these 4 prompts in order:
       </p>
 
       <ol class="test-list">
@@ -246,7 +352,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           <span class="test-num">4</span>
           <div class="test-body">
             <p class="test-desc">Please update the page you just created: add a short summary at the top and organize the content under three subheadings.</p>
-            <p class="test-tag test-tag--blocked">Blocked</p>
+            <p class="test-tag test-tag--blocked">Can't do it</p>
           </div>
         </li>
       </ol>
@@ -254,6 +360,12 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <div class="callout-card">
         <p class="callout-text">
           The strength of Notion MCP isn't any single step — it's <strong>chaining these tools together</strong>. The first 3 steps still work, but step 4 "update page" is no longer an available capability.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Step 4 won't produce an error screen.</strong> What <code>includeTools</code> does is make the tool <strong>disappear from the list the model can see</strong> — it doesn't intercept anything. So the AI will usually just tell you it doesn't have that capability, or quietly route around it another way. Nothing turns red. If you're waiting for an error message, you'll wait forever.
         </p>
       </div>
 
@@ -266,7 +378,8 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <pre class="code-block code-block--json"><code>{`{
   "mcpServers": {
     "notion": {
-      "httpUrl": "https://mcp.notion.com/mcp",
+      "url": "https://mcp.notion.com/mcp",
+      "type": "http",
       "excludeTools": [
         "notion-update-page"
       ]
@@ -334,10 +447,40 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <pre class="code-block code-block--json"><code>{`{
   "mcpServers": {
     "notion": {
-      "httpUrl": "https://mcp.notion.com/mcp"
+      "url": "https://mcp.notion.com/mcp",
+      "type": "http"
     }
   }
 }`}</code></pre>
+
+      <!-- Section: Three layers of permission -->
+      <h2 class="detail-heading">Permissions Have Three Layers — This Page Covered the Middle One</h2>
+      <p class="detail-paragraph">
+        The <code>includeTools</code> we've been discussing governs MCP tools. But Gemini CLI's permissions actually come in three layers, and so far you've only touched the second:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Layer</th><th>What it controls</th><th>How it's set</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Folder</td><td>Whether local config can be read at all</td><td>The Trust choice at launch</td></tr>
+            <tr><td>MCP tools</td><td>Notion's 28 tools</td><td><code>includeTools</code> in the server block</td></tr>
+            <tr><td>CLI built-in tools</td><td><code>write_file</code>, <code>run_shell_command</code>, and friends</td><td>Top-level <code>coreTools</code> / <code>excludeTools</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        The third layer deserves a moment. <code>write_file</code> is a <strong>built-in</strong> CLI tool, outside the reach of <code>includeTools</code> — meaning that even after you lock Notion down to three tools, the AI can still write files to your disk.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The exact syntax for the third layer hasn't been verified for this course.</strong> Treat the <code>coreTools</code> / <code>excludeTools</code> in the table above as a pointer for what to look up, not as config you can copy. Check the current official docs and verify it yourself before relying on it.
+        </p>
+      </div>
 
       <!-- Section: Common errors -->
       <h2 class="detail-heading">Common Errors and Misconceptions</h2>
@@ -448,13 +591,23 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   :global(.highlight-text) code,
   :global(.scope-card__desc) code,
   :global(.mistake-title) code,
-  :global(.mistake-desc) code {
+  :global(.mistake-desc) code,
+  :global(.info-table) td code,
+  :global(.test-desc) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.9em;
     background-color: var(--color-tag-bg);
     color: var(--color-tag-text);
     border-radius: var(--border-radius);
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Code block (JSON) */
@@ -478,6 +631,68 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     color: var(--color-heading);
     font-size: inherit;
   }
+
+  .code-block--quote {
+    background-color: var(--color-tag-bg);
+    border-color: var(--color-accent);
+    font-style: italic;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table tbody td:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
 
   /* Check list */
   .check-list {
@@ -539,6 +754,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     border-left: 4px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
   }
 
   .callout-text {
@@ -790,41 +1010,6 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     margin: 0;
   }
 
-  /* Path breadcrumb */
-  .path-breadcrumb {
-    margin: var(--space-3) 0 var(--space-6);
-    padding: var(--space-4) var(--space-6);
-    background-color: var(--color-bg-secondary);
-    border: 1px dashed var(--color-border);
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: var(--text-sm);
-  }
-
-  .path-step {
-    padding: var(--space-1) var(--space-3);
-    background-color: var(--color-bg);
-    color: var(--color-heading);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-  }
-
-  .path-step--file {
-    background-color: var(--color-tag-bg);
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-    font-weight: 700;
-  }
-
-  .path-sep {
-    color: var(--color-accent);
-    font-weight: 700;
-  }
-
   /* Test list */
   .test-list {
     list-style: none;
@@ -1062,13 +1247,5 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       padding: var(--space-4) var(--space-5);
     }
 
-    .path-breadcrumb {
-      padding: var(--space-3) var(--space-4);
-    }
-
-    .path-step {
-      padding: var(--space-1) var(--space-2);
-      font-size: var(--text-xs);
-    }
   }
 </style>

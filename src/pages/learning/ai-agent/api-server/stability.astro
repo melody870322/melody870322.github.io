@@ -110,7 +110,7 @@ def list_supported_cities() -> str:
 
 
 @mcp.tool()
-def get_current_weather(city: str) -> str:
+def get_current_weather(city: str = "") -> str:
     """Look up current weather for a city, with a fixed response format."""
     city = normalize_city_name(city)
 
@@ -196,6 +196,7 @@ if __name__ == "__main__":
         <p class="detail-subtitle">
           We've already wrapped an external API into an MCP tool so the AI can query data through it. But the first pass usually only handles the case where "the input is just right and the API is fine." <strong>The real world isn't that polite.</strong>
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <p class="detail-paragraph">Users might type:</p>
@@ -1202,5 +1203,13 @@ Suggestion: Please pass a city name, e.g. Taipei, Taichung, Kaohsiung, Tamsui.</
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

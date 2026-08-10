@@ -16,7 +16,14 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           You've just finished something important: installing Gemini CLI, opening it, and connecting your first off-the-shelf MCP. From here on, we're <strong>not just confirming it "connects" — we're going to have it actually complete one full round of work</strong>.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Before class:</strong> this whole page runs on Notion, so <strong>register an account and sign in beforehand</strong>. Signing up on the spot and waiting for a verification email will eat most of the session.
+        </p>
+      </div>
 
       <!-- Section: Why Notion -->
       <h2 class="detail-heading">Why Notion Is My Pick for the First Real Workflow</h2>
@@ -64,9 +71,56 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         </li>
         <li class="prereq-item">
           <span class="prereq-num">3</span>
-          <p class="prereq-text">Your Notion <strong>already has some pages you can use for testing</strong>. Not a huge amount is needed, but at least a few pages whose content you recognize and whose rough location you know. That way, when you run your first workflow, it's easier to tell whether AI got it right.</p>
+          <p class="prereq-text">Your Notion <strong>has a few pages you can test against</strong>. They should be pages whose content you recognize and whose location you know, so you can judge whether AI got it right. If you don't have any yet, three ready-made ones are below.</p>
         </li>
       </ol>
+
+      <h3 class="sub-heading">No test pages yet? Create these three first</h3>
+      <p class="detail-paragraph">
+        Add three pages in Notion, copying the titles and content exactly. With all three in place, everyone works from the same material, which is what makes comparing results meaningful.
+      </p>
+
+      <div class="sample-list">
+        <article class="sample-card">
+          <p class="sample-tag">Page 1</p>
+          <h4 class="sample-title">Course Outline | AI Agent Practicum</h4>
+          <pre class="code-block"><code>[Assignment] Final project: build your own MCP Server
+
+[Requirements]
+- Implement at least two tools
+- Attach the contents of one settings.json
+- Explain the least-privilege design reasoning
+- 3 to 5 pages
+
+[Deadlines]
+- Proposal: 11/15
+- Full report: 12/20</code></pre>
+        </article>
+
+        <article class="sample-card">
+          <p class="sample-tag">Page 2</p>
+          <h4 class="sample-title">Course Announcement | Week 1 Make-up Class</h4>
+          <pre class="code-block"><code>Class on 10/8 is cancelled; the make-up session moves to the afternoon of 10/15.</code></pre>
+        </article>
+
+        <article class="sample-card">
+          <p class="sample-tag">Page 3</p>
+          <h4 class="sample-title">Reading Notes | The Three MCP Primitives</h4>
+          <pre class="code-block"><code>Tools: the model decides when to call them. Resources: the application decides when to supply them. Prompts: the user chooses them deliberately.</code></pre>
+        </article>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>These three are designed this way on purpose.</strong> Searching for "course" should find the first two and should not find the third — which is exactly what STEP 1 below asks you to watch for. And Page 1 deliberately carries three kinds of information (assignment, requirements, deadlines) so STEP 4's "reorganize into three short sections" has real material to work with.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          After creating the pages, <strong>wait a moment before starting</strong>. Notion takes anywhere from seconds to minutes to index new pages, so running STEP 1 immediately may turn up nothing — that isn't your mistake.
+        </p>
+      </div>
 
       <!-- Step 1: Search -->
       <div class="case-header">
@@ -81,7 +135,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="tool-box__label">Notion MCP supported tool</p>
         <p class="tool-box__name"><code>notion-search</code></p>
         <p class="tool-box__desc">
-          Searches your Notion workspace; if you have Notion AI, it can also search connected sources like Slack, Google Drive, and Jira. Without Notion AI, search is limited to the Notion workspace itself.
+          Searches your Notion workspace; if you have Notion AI, it can also search connected sources like Slack, Google Drive, and Jira.
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>This course uses a free account, so search covers the Notion workspace only.</strong> You'll get fewer results than you might expect — that's an account-tier difference, not something you did wrong.
         </p>
       </div>
 
@@ -233,7 +293,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       <div class="tool-box">
         <p class="tool-box__label">Notion MCP supported tool</p>
-        <p class="tool-box__name"><code>notion-update</code></p>
+        <p class="tool-box__name"><code>notion-update-page</code></p>
         <p class="tool-box__desc">
           Updates page properties or content based on what was found or created in the previous step.
         </p>
@@ -431,6 +491,76 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     margin-top: var(--space-12);
   }
 
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Sample pages to copy into Notion */
+  .sample-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-4) 0 var(--space-6);
+  }
+
+  .sample-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .sample-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .sample-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .sample-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-2);
+  }
+
   /* Inline code */
   :global(.detail-paragraph) code,
   :global(.detail-subtitle) code,
@@ -509,6 +639,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     border-left: 4px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
   }
 
   .callout-text {
@@ -773,6 +908,15 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
     .prompt-example {
       padding: var(--space-3) var(--space-6);
+    }
+
+    .sample-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.8rem;
     }
   }
 </style>

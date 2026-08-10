@@ -16,6 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           AI workflows aren't about letting the model run wild. They're about <strong>breaking the task into clear steps</strong> and letting AI help inside a safe, checkable boundary. This page applies AI agents to a very common task: <strong>organizing CSV and tabular data</strong>.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <p class="detail-paragraph">
@@ -124,14 +125,10 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
         </li>
         <li>
           <span class="numbered-list__num">3</span>
-          <span class="numbered-list__text">Run <code>uv init</code> to <strong>initialize the project</strong>.</span>
-        </li>
-        <li>
-          <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">Run <code>gemini</code> to <strong>start Gemini CLI</strong>.</span>
         </li>
         <li>
-          <span class="numbered-list__num">5</span>
+          <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">Each exercise below uses this file path: <code>@./data/activity_signup.csv</code>.</span>
         </li>
       </ol>
@@ -1126,5 +1123,13 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

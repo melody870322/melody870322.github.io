@@ -16,6 +16,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           Over the past few pages, we've been laying down the path step by step: install Gemini CLI and connect your first off-the-shelf MCP; see Notion actually run through a full workflow; learn that more tools isn't better, and not every capability should be a tool. This page tackles the <strong>next important question</strong>.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <div class="highlight-card highlight-card--strong">
@@ -74,6 +75,41 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
           <strong>The boundary is too vague.</strong>
         </p>
       </div>
+
+      <p class="detail-paragraph">
+        That sounds abstract until you see the number. Type <code>/mcp list</code> in Gemini CLI and the Notion MCP unfolds into <strong>28 tools</strong>:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Category</th><th>Tools</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Used in this course</td>
+              <td><code>notion-search</code>, <code>notion-fetch</code>, <code>notion-create-pages</code>, <code>notion-update-page</code></td>
+            </tr>
+            <tr>
+              <td>Privacy-related</td>
+              <td><code>notion-list-private-pages</code>, <code>notion-list-shared-pages</code>, <code>notion-get-users</code>, <code>notion-get-teams</code></td>
+            </tr>
+            <tr>
+              <td>Structurally destructive</td>
+              <td><code>notion-move-pages</code>, <code>notion-update-data-source</code>, <code>notion-create-database</code>, <code>notion-update-view</code></td>
+            </tr>
+            <tr>
+              <td>Everything else</td>
+              <td><code>notion-convert-page-to-skill</code>, <code>notion-search-agents</code>, <code>notion-query-meeting-notes</code>, <code>notion-create-folder</code>, <code>notion-create-comment</code>, <code>notion-get-comments</code>, <code>notion-duplicate-page</code>, <code>notion-create-attachment</code>, <code>notion-download-attachment</code>, <code>notion-create-file-upload</code>, <code>notion-create-view</code>, <code>notion-get-async-task</code>, <code>notion-list-favorite-pages</code>, <code>notion-list-recent-pages</code>, <code>notion-query-data-sources</code>, <code>notion-query-database-view</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        "Let AI manage my whole Notion" means handing over all 28 of those — including listing every private page, moving pages around, and rewriting database structure. <strong>This course genuinely needs only the four in the first row.</strong>
+      </p>
+
 
       <p class="detail-paragraph">
         The moment you don't shrink the task first, a pile of questions follows:
@@ -605,6 +641,66 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
   }
 
   /* Callout card */
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table tbody td:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  :global(.info-table) td code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
   .callout-card {
     margin: var(--space-6) 0 var(--space-8);
     padding: var(--space-4) var(--space-8);
@@ -1134,5 +1230,13 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       padding: var(--space-4) var(--space-5);
       gap: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

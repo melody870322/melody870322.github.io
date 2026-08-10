@@ -16,6 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           We've already practiced having AI organize CSV and tabular data. But <strong>after the cleanup, there's almost always a next step</strong>: drop the to-do into Notion, flip a task to "In progress," mark a finished item as done. This page turns Notion into a tool an AI agent can use.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <p class="detail-paragraph">
@@ -138,6 +139,12 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
           <strong>Column names must match exactly.</strong> If the program uses「任務名稱」, don't shorten it to「任務」or「名稱」in Notion. The Notion API looks columns up <strong>by name</strong>; a mismatch means the program won't find the right field.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>For the 「狀態」 column you must pick the 「選取 / Select」 type, not 「狀態 / Status」.</strong> New Notion databases often default to a Status field. The names look identical, but the API shapes differ: Status uses <code>"status"</code> rather than <code>"select"</code>. Pick the wrong one and the API returns a 400, with no visible difference in the UI. This is the single most common place people get stuck on this page.
         </p>
       </div>
 
@@ -774,13 +781,19 @@ if __name__ == "__main__":
       <pre class="code-block" is:raw><code class="lang-json">{
   "mcpServers": {
     "notion-classroom": {
-      "command": "python",
-      "args": ["notion_classroom_server.py"],
-      "cwd": ".",
+      "command": "uv",
+      "args": ["run", "python", "notion_classroom_server.py"],
+      "cwd": "C:\\\\full\\\\absolute\\\\path\\\\notion-classroom-server",
       "trust": false
     }
   }
 }</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Do not write <code>python</code> and <code>"."</code> here — it fails outright.</strong> PART 3 installed the packages with <code>uv init</code> + <code>uv add</code>, which puts them in the project's <code>.venv</code>. Calling <code>python</code> directly uses the system Python, which cannot find <code>mcp</code>, <code>dotenv</code>, or <code>requests</code> — a guaranteed <code>ModuleNotFoundError</code>. And <code>"cwd": "."</code> is relative to wherever Gemini CLI was launched, not to this folder, so <code>.env</code> can go missing too. Use the <strong>full absolute path</strong>.
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         Then in the VS Code terminal:
@@ -1723,5 +1736,13 @@ if __name__ == "__main__":
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>

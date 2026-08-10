@@ -114,6 +114,7 @@ if __name__ == "__main__":
         <p class="detail-subtitle">
           We already know an MCP Server can act as the bridge between AI and external data. The AI doesn't barge into the external service — it works through tools we've already designed inside our MCP Server. The job for this page is simple: <strong>wrap an external API into an MCP tool the AI can use</strong>.
         </p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
       </header>
 
       <p class="detail-paragraph">
@@ -1301,5 +1302,13 @@ if not api_key:
     .details-card__body {
       padding: var(--space-4);
     }
+  }
+
+  /* Version note */
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 </style>
