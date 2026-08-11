@@ -43,21 +43,61 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
+      <!-- ============ Section: environment check ============ -->
+      <h2 class="detail-heading">Environment check before you start</h2>
+      <p class="detail-paragraph">
+        Before touching anything, confirm two things. If you skip these, later failures are hard to trace back to their cause.
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text">Check your <strong>Node.js version</strong>: it needs to be <strong>20 or above</strong>. Below 20 you'll see <code>EBADENGINE</code>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text">Check the <strong>PowerShell execution policy</strong>, and look at the <strong>CurrentUser</strong> row.</span>
+        </li>
+      </ol>
+
+      <pre class="code-block"><code>node -v
+Get-ExecutionPolicy -List</code></pre>
+
+      <p class="detail-paragraph">
+        If <strong>CurrentUser</strong> shows <code>Restricted</code> or <code>Undefined</code>, run the line below to set it to <code>RemoteSigned</code>. This does not require administrator rights:
+      </p>
+
+      <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If the <code>MachinePolicy</code> or <code>UserPolicy</code> rows are <strong>not</strong> <code>Undefined</code>, they're locked by group policy and the command above will have no effect.
+        </p>
+      </div>
+
       <!-- ============ Section: build practice data ============ -->
       <h2 class="detail-heading">Build a CSV practice file first</h2>
       <p class="detail-paragraph">
-        We'll prepare an "<strong>event sign-up</strong>" sheet. In VS Code, create a project folder called <code>csv-agent-practice</code>, then a <code>data</code> folder inside it, and place <code>activity_signup.csv</code> there. The folder structure looks like:
+        We'll prepare an "<strong>event sign-up</strong>" sheet. Everything happens in PowerShell — <strong>no particular editor is required</strong>. First create the project folder:
       </p>
 
-      <pre class="code-block" is:raw><code>csv-agent-practice
-└─ data
-   └─ activity_signup.csv</code></pre>
+      <pre class="code-block"><code>cd $HOME
+mkdir csv-agent-practice
+cd csv-agent-practice
+mkdir data</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Avoid creating it at the root of <code>C:\</code> — a standard account may not have write permission there.
+        </p>
+      </div>
 
       <p class="detail-paragraph">
-        File contents (save as <strong>CSV UTF-8</strong>):
+        Now create the CSV. <strong>Copy the whole block and paste it into PowerShell</strong> — no Excel needed, and no column-structure problems:
       </p>
 
-      <pre class="code-block" is:raw><code>name,department,session,diet,needs_certificate,notes
+      <pre class="code-block"><code>@'
+name,department,session,diet,needs_certificate,notes
 Wang Xiaoming,Chinese Y2,Morning,Meat,Yes,
 Li Jiaying,History Y3,Afternoon,Vegetarian,No,Wants front row
 Chen Boyu,Sociology Y1,Morning,,Yes,Diet not filled
@@ -65,10 +105,60 @@ Lin Yijun,Foreign Lang Y4,Afternoon,Meat,Yes,
 Zhang Tingxuan,Psychology Y2,Morning,Vegetarian,Yes,Will be 10 min late
 Huang Zihao,Communication Y3,Afternoon,Meat,No,
 Wu Yating,Education Y1,Morning,Vegetarian,Yes,
-Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
+Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled
+'@ | Set-Content -Path "data\activity_signup.csv" -Encoding UTF8</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If you prefer building the file in Excel yourself: when saving, pick the file type "<strong>CSV UTF-8 (Comma delimited)</strong>", and the data must sit across <strong>columns A to F</strong> — not pasted as whole rows into column A. Then run the self-check below.
+        </p>
+      </div>
+
+      <!-- ============ Section: self-check after creating the file ============ -->
+      <p class="detail-paragraph">
+        Once it's created, confirm the file structure is correct:
+      </p>
+
+      <pre class="code-block"><code>Get-Content data\activity_signup.csv -TotalCount 2</code></pre>
 
       <p class="detail-paragraph">
-        Viewed as a table, it looks like:
+        If it's right, you'll see two lines with <strong>no double quotes at the start or end</strong>.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If every line is wrapped in <code>"</code>, the file has <strong>only one column</strong>, not six (usually caused by pasting whole rows into column A in Excel). Recreate it with the command above.
+        </p>
+      </div>
+
+      <!-- ============ Section: API key and model ============ -->
+      <h2 class="detail-heading">Set the API key and model</h2>
+      <p class="detail-paragraph">
+        Next, create <code>.gemini/.env</code> in the project, put your API key in it, and pin the model this page uses:
+      </p>
+
+      <pre class="code-block"><code>mkdir .gemini
+Set-Content -Path ".gemini\.env" -Value "GEMINI_API_KEY=your_key`nGEMINI_MODEL=gemini-3.5-flash-lite"
+Get-Content .gemini\.env</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          When you edit <code>.env</code> later, <strong>don't use Notepad</strong>. It quietly appends <code>.txt</code> on save, turning the file into <code>.env.txt</code>, and it will no longer be read.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        At this point the folder structure looks like:
+      </p>
+
+      <pre class="code-block"><code>csv-agent-practice
+├─ .gemini
+│  └─ .env
+└─ data
+   └─ activity_signup.csv</code></pre>
+
+      <p class="detail-paragraph">
+        Viewed as a table, the CSV you just created looks like:
       </p>
 
       <div class="csv-table-wrapper">
@@ -117,25 +207,118 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
       <ol class="numbered-list">
         <li>
           <span class="numbered-list__num">1</span>
-          <span class="numbered-list__text">Open the folder you just created — <code>csv-agent-practice</code> — in <strong>VS Code</strong>.</span>
+          <span class="numbered-list__text">Open PowerShell and <code>cd</code> into <code>csv-agent-practice</code> (<strong>not <code>data</code></strong>).</span>
         </li>
         <li>
           <span class="numbered-list__num">2</span>
-          <span class="numbered-list__text">Open a terminal (<strong>Terminal → New Terminal</strong>) and confirm the working directory is <code>csv-agent-practice</code>.</span>
+          <span class="numbered-list__text"><strong>Start Gemini CLI.</strong> Pick one of the two routes below, depending on which machine you're on.</span>
         </li>
         <li>
           <span class="numbered-list__num">3</span>
-          <span class="numbered-list__text">Run <code>gemini</code> to <strong>start Gemini CLI</strong>.</span>
-        </li>
-        <li>
-          <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">Each exercise below uses this file path: <code>@./data/activity_signup.csv</code>.</span>
         </li>
       </ol>
 
+      <div class="install-grid">
+        <article class="install-card">
+          <p class="install-tag">ROUTE A</p>
+          <h3 class="install-title">Your own laptop</h3>
+          <p class="install-desc">
+            Install it once, and from then on a single word starts it:
+          </p>
+          <pre class="code-block"><code>npm install -g @google/gemini-cli
+gemini</code></pre>
+          <p class="install-desc">
+            You may still need to set PATH afterwards, otherwise you'll get "<code>gemini</code> is not recognized".
+          </p>
+        </article>
+
+        <article class="install-card">
+          <p class="install-tag">ROUTE B</p>
+          <h3 class="install-title">School computer (this page's default)</h3>
+          <p class="install-desc">
+            No install, no PATH setup, and it still works after a restore-card reset:
+          </p>
+          <pre class="code-block"><code>npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            Lab machines have restore cards, so anything installed is gone by the next class — reinstalling every session isn't practical. <strong>The syntax after startup is identical</strong> on both routes, sub-commands included.
+          </p>
+        </article>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The first <code>npx</code> run downloads and caches the package — <strong>about 30 seconds in testing</strong> (single user, normal network). A restore card wipes that cache too, so the first launch of every class has to download again, and a whole class downloading at once will be slow.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        A few things worth being clear about regarding <code>@</code>:
+      </p>
+
+      <ul class="check-list">
+        <li><code>@</code> is <strong>Gemini CLI's file-reading syntax, unrelated to VS Code</strong> — it works the same in any terminal</li>
+        <li>Whether the file can be read depends only on <strong>which folder the CLI was started from</strong></li>
+        <li>The backslash form <code>@data\activity_signup.csv</code> <strong>also works</strong> — either is fine</li>
+        <li>Typing <code>@</code> opens a path autocomplete menu. If the menu blocks the screen after you paste a prompt, press <strong>Esc</strong> to close it, then submit</li>
+      </ul>
+
       <div class="callout-card">
         <p class="callout-text">
           <code>@./data/activity_signup.csv</code> means: please ask Gemini CLI to read <code>activity_signup.csv</code> in the <code>data</code> folder under the current project directory.
+        </p>
+      </div>
+
+      <!-- ============ Section: first launch screens ============ -->
+      <h2 class="detail-heading">What you'll see on the first launch</h2>
+      <p class="detail-paragraph">
+        A few things appear in sequence the first time you start. Knowing what's coming makes it less confusing.
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text"><strong>First npx run</strong>: the screen sits on downloading and caching the package, about 30 seconds in testing. You may see <code>Ok to proceed? (y)</code> along the way.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text"><strong>"Do you trust the files in this folder?"</strong>: three options (trust this folder / trust the parent folder / don't trust). <strong>You must pick <code>1. Trust folder</code></strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text"><strong>Authentication screen</strong>: when <code>.gemini/.env</code> holds a valid key, this screen <strong>does not appear</strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">4</span>
+          <span class="numbered-list__text"><strong>Confirm the model</strong>: check the <strong>status bar in the bottom-right corner</strong> — it should read <code>gemini-3.5-flash-lite</code>.</span>
+        </li>
+      </ol>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/CSV練習資料夾信任提示.png"
+          alt="Gemini CLI starting for the first time inside csv-agent-practice, showing the version, API-key authentication, and the three folder-trust options"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 1. The first-launch screen. The top shows Gemini CLI v0.54.4 and Authenticated with gemini-api-key (with a key present, no auth menu appears), and above the trust prompt: Skipping project agents due to untrusted folder.</figcaption>
+      </figure>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>Skipping project agents due to untrusted folder.</code> means exactly this: <strong>until you choose, project-level settings are not loaded</strong>. Pick "Don't trust" and neither <code>.env</code> nor your MCP settings come through. The screen itself spells it out — trusting a folder means allowing it to load local configuration and run actions on your behalf.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Normally you <strong>won't see the authentication screen</strong>. <strong>If it does appear</strong>, <code>.env</code> wasn't read — it may be missing, in the wrong path, renamed to <code>.env.txt</code>, or you chose not to trust the folder in the previous step. Go back and check rather than clicking through. (Also, don't pick Sign in with Google — that option has been unavailable for free personal accounts since 2026/6/18.)
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Don't type <code>/model</code>.</strong> It switches you to Auto, which routes to <code>gemini-3.1-pro-preview</code> (0 quota) and <code>gemini-3.5-flash</code> (20 RPD) — neither is usable in class.
         </p>
       </div>
 
@@ -166,7 +349,27 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
       </ul>
 
       <p class="detail-paragraph">
-        If the AI misreads a column up front, every later step inherits that mistake.
+        If the AI misreads a column up front, every later step inherits that mistake. So <strong>once you have the response, go back and check it against the original CSV item by item</strong> — is the column it calls blank actually blank? Are the people it names the right ones?
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Observed in testing:</strong> if the CSV's structure is broken (for example, whole rows pasted into column A in Excel), the AI will claim "<strong>the session column has blanks</strong>" — when that column is full from top to bottom. The response looks well-organized and neatly formatted, and the first three points are all correct; only the fourth is fabricated.
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/CSV練習1修檔前幻覺.png"
+          alt="The AI response when the file structure is broken: point four claims the session or diet columns are blank and cites rows 4 and 8"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 2. The response before the file was fixed. The first three points are correct; only the fourth claims the "session" or "diet" columns are blank and points at "rows 4 and 8" — but the session column is full throughout, and the row numbers are wrong too. (Screenshots on this page come from the Chinese-language run of the same exercise.)</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        This is exactly why step one is a verification step. <strong>It isn't that the AI isn't smart — the data structure it received was wrong</strong>, so all it could do was guess from text alignment.
       </p>
 
       <p class="prompt-label">Prompt example</p>
@@ -181,62 +384,21 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
         Answer based only on the file contents — don't invent data that isn't there.
       </blockquote>
 
-      <details class="details-card">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">Possible response</span>
-          <span class="details-card__hint">Click to expand a sample response</span>
-        </summary>
-        <div class="details-card__body">
-          <h4 class="example-heading">1. What columns does this file contain?</h4>
-          <p class="detail-paragraph">The file contains 6 columns: name, department, session, diet, needs_certificate, notes.</p>
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/CSV練習1實測回覆.png"
+          alt="After the CSV was corrected to six columns, the same prompt's response names Chen Boyu and Zheng Yuxiang as the ones with a blank diet column"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 3. After the CSV was fixed to six proper columns, the same prompt and the same model. Point four now names the genuinely blank column — "diet" (Chen Boyu, Zheng Yuxiang). Compared with Figure 2, the difference isn't the model; it's the data structure.</figcaption>
+      </figure>
 
-          <h4 class="example-heading">2. What does each column mean?</h4>
-          <ul class="role-list role-list--compact">
-            <li class="role-item">
-              <span class="role-item__label">name</span>
-              <span class="role-item__desc">The participant's name</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label">department</span>
-              <span class="role-item__desc">Department and year (e.g. Chinese Y2, History Y3)</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label">session</span>
-              <span class="role-item__desc">Time slot they registered for (Morning or Afternoon)</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label">diet</span>
-              <span class="role-item__desc">Dietary preference (Meat, Vegetarian, or blank)</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label">needs_certificate</span>
-              <span class="role-item__desc">Whether they need an attendance certificate (Yes / No)</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label">notes</span>
-              <span class="role-item__desc">Extra requests or context (e.g. wants front row, will be late, diet not filled)</span>
-            </li>
-          </ul>
-
-          <h4 class="example-heading">3. What questions can this data answer?</h4>
-          <ul class="check-list">
-            <li>Who registered for the morning session, and who for the afternoon?</li>
-            <li>What department / year does a given participant belong to?</li>
-            <li>Who has a clearly filled-in dietary preference?</li>
-            <li>Who has additional requests in the notes column?</li>
-            <li>Who needs an attendance certificate?</li>
-          </ul>
-
-          <h4 class="example-heading">4. Where might human verification be needed?</h4>
-          <ul class="check-list">
-            <li>Chen Boyu and Zheng Yuxiang's <strong>diet column is blank</strong>; the notes column says "Diet not filled," but their actual preference still needs to be confirmed</li>
-            <li>Li Jiaying wants to <strong>sit in the front row</strong> — confirm whether the venue can accommodate this</li>
-            <li>Zhang Tingxuan said she <strong>will be 10 minutes late</strong> — confirm whether this affects check-in</li>
-            <li>The department format ("Department + Year") could be checked for consistency across rows</li>
-          </ul>
-        </div>
-      </details>
+      <div class="callout-card">
+        <p class="callout-text">
+          Note the last item under point 2 — the first five columns each state their column name, and only "<strong>notes</strong>" drops it. The content is right, but the format slipped. Small drifts like this are common on lightweight models, and they're the reason to read each step before moving on.
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -275,36 +437,29 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">Basic statistics from the file:</p>
+          <h4 class="example-heading">Basic statistics</h4>
 
           <div class="csv-table-wrapper">
             <table class="csv-table csv-table--stat">
               <thead>
-                <tr><th>Item</th><th>Count</th><th>Names</th></tr>
+                <tr><th>Statistic</th><th>Count</th><th>Names</th></tr>
               </thead>
               <tbody>
-                <tr><td>Morning session</td><td class="csv-num">4</td><td>Wang Xiaoming, Chen Boyu, Zhang Tingxuan, Wu Yating</td></tr>
-                <tr><td>Afternoon session</td><td class="csv-num">4</td><td>Li Jiaying, Lin Yijun, Huang Zihao, Zheng Yuxiang</td></tr>
-                <tr><td>Meat</td><td class="csv-num">3</td><td>Wang Xiaoming, Lin Yijun, Huang Zihao</td></tr>
-                <tr><td>Vegetarian</td><td class="csv-num">3</td><td>Li Jiaying, Zhang Tingxuan, Wu Yating</td></tr>
-                <tr><td>Diet not filled</td><td class="csv-num">2</td><td>Chen Boyu, Zheng Yuxiang</td></tr>
-                <tr><td>Needs certificate</td><td class="csv-num">5</td><td>Wang Xiaoming, Chen Boyu, Lin Yijun, Zhang Tingxuan, Wu Yating</td></tr>
+                <tr><td>1. Morning session</td><td class="csv-num">4</td><td>Wang Xiaoming, Chen Boyu, Zhang Tingxuan, Wu Yating</td></tr>
+                <tr><td>2. Afternoon session</td><td class="csv-num">4</td><td>Li Jiaying, Lin Yijun, Huang Zihao, Zheng Yuxiang</td></tr>
+                <tr><td>3. Meat</td><td class="csv-num">3</td><td>Wang Xiaoming, Lin Yijun, Huang Zihao</td></tr>
+                <tr><td>4. Vegetarian</td><td class="csv-num">3</td><td>Li Jiaying, Zhang Tingxuan, Wu Yating</td></tr>
+                <tr><td>5. Diet blank or not filled</td><td class="csv-num">2</td><td>Chen Boyu, Zheng Yuxiang</td></tr>
+                <tr><td>6. Needs certificate</td><td class="csv-num">5</td><td>Wang Xiaoming, Chen Boyu, Lin Yijun, Zhang Tingxuan, Wu Yating</td></tr>
               </tbody>
             </table>
           </div>
-
-          <h4 class="example-heading">Notes on the statistics</h4>
-          <ul class="check-list">
-            <li><strong>Session split</strong>: Morning and afternoon each have 4 people</li>
-            <li><strong>Diet</strong>: 3 meat-eaters, 3 vegetarians, 2 blanks</li>
-            <li><strong>Certificate</strong>: 5 people marked "Yes" under needs_certificate</li>
-          </ul>
         </div>
       </details>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>AI is good at organizing, but a human still needs to check.</strong> The risk of miscounting grows with row count, so before any official use, verify with a spreadsheet or script as well.
+          This dataset has only 8 rows, so the counts will usually be right. But <strong>as row counts grow, the risk of the AI miscounting rises — and the mistakes aren't necessarily visible</strong>, because the response stays just as neatly formatted. Before any official use, verify with a spreadsheet or script as well.
         </p>
       </div>
 
@@ -356,40 +511,51 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
           <ol class="numbered-list">
             <li>
               <span class="numbered-list__num">1</span>
-              <span class="numbered-list__text"><strong>Blank columns</strong>: diet — Chen Boyu, Zheng Yuxiang; notes — Wang Xiaoming, Lin Yijun, Huang Zihao, Wu Yating.</span>
+              <span class="numbered-list__text">The diet column has blanks (Chen Boyu, Zheng Yuxiang).</span>
             </li>
             <li>
               <span class="numbered-list__num">2</span>
-              <span class="numbered-list__text"><strong>Special notes</strong>: Li Jiaying wants the front row; Zhang Tingxuan will be 10 minutes late.</span>
-            </li>
-            <li>
-              <span class="numbered-list__num">3</span>
-              <span class="numbered-list__text"><strong>Gaps the AI shouldn't fill</strong>: diet is a personal health or belief preference — guessing wrong could create safety problems. Notes about seating or timing involve personal preferences and must be filled based on actual communication.</span>
+              <span class="numbered-list__text">The notes column contains supplementary information (Li Jiaying wants the front row, Zhang Tingxuan will be 10 minutes late) as well as prompts about unfilled diet fields (Chen Boyu's "Diet not filled", Zheng Yuxiang's "Diet not filled").</span>
             </li>
           </ol>
 
           <h4 class="example-heading">People to verify</h4>
-          <ul class="check-list">
-            <li><strong>Chen Boyu, Zheng Yuxiang</strong>: confirm their actual diet</li>
-            <li><strong>Li Jiaying</strong>: confirm whether the venue can accommodate her seating request</li>
-            <li><strong>Zhang Tingxuan</strong>: confirm whether being 10 minutes late means missing key items (e.g. check-in materials)</li>
-          </ul>
+          <p class="detail-paragraph">Chen Boyu, Zheng Yuxiang, Li Jiaying, Zhang Tingxuan</p>
 
           <h4 class="example-heading">Possible impact</h4>
-          <ul class="check-list">
-            <li><strong>Catering</strong>: missing diet info could lead to wrong meal counts or types on the day</li>
-            <li><strong>Venue setup</strong>: an unconfirmed seating request can create on-site adjustment problems</li>
-            <li><strong>Check-in flow</strong>: a late arrival may slow the start or require extra staff to direct her</li>
-          </ul>
+          <ol class="numbered-list">
+            <li>
+              <span class="numbered-list__num">1</span>
+              <span class="numbered-list__text">Catering: with Chen Boyu's and Zheng Yuxiang's diet fields blank, leaving them unconfirmed could lead to the wrong meal count or the wrong meat/vegetarian split.</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">2</span>
+              <span class="numbered-list__text">Venue and flow: Li Jiaying wants the front row and Zhang Tingxuan will be 10 minutes late; without advance attention this could affect on-site seat reservation and the check-in process.</span>
+            </li>
+          </ol>
 
           <h4 class="example-heading">Recommended next step</h4>
-          <ul class="check-list">
-            <li><strong>Reach out</strong> to Chen Boyu and Zheng Yuxiang to confirm diet, then update the data</li>
-            <li>Reply to Li Jiaying about her seat, and mark "arranged" or "depends on venue" in the list</li>
-            <li>Notify check-in staff that Zhang Tingxuan will be late, and reserve her materials</li>
-          </ul>
+          <p class="detail-paragraph">Have the organizer contact the relevant people directly (Chen Boyu and Zheng Yuxiang to confirm dietary preference; Li Jiaying to confirm the seating request; Zhang Tingxuan to confirm check-in and late-arrival timing), and have the organizer update or record the data manually after verification.</p>
+
+          <h4 class="example-heading">Which gaps must not be filled in by AI</h4>
+          <ol class="numbered-list">
+            <li>
+              <span class="numbered-list__num">1</span>
+              <span class="numbered-list__text">Diet: the AI cannot know Chen Boyu's and Zheng Yuxiang's actual dietary habits (meat, vegetarian, or some other special requirement).</span>
+            </li>
+            <li>
+              <span class="numbered-list__num">2</span>
+              <span class="numbered-list__text">On-site special requests: the AI cannot decide on the organizer's behalf whether Li Jiaying can be seated in the front row, or assess the real impact of Zhang Tingxuan's 10-minute delay on the event flow.</span>
+            </li>
+          </ol>
         </div>
       </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>Question for class:</strong> "People to verify" lists four names, but Li Jiaying's and Zhang Tingxuan's data is actually complete. Why do they need verifying too?
+        </p>
+      </div>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -448,32 +614,35 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
         <div class="details-card__body">
           <h4 class="example-heading">Reminder draft</h4>
           <blockquote class="prompt-example">
-            [Pre-event Notice & Reminder]<br/><br/>
-            Hello everyone — the event is approaching. Please note the following:<br/><br/>
-            1. <strong>Session confirmation</strong>: please attend the session you registered for (morning or afternoon).<br/>
-            2. <strong>Diet info</strong>: a few participants haven't filled in the diet field yet. To ensure correct catering, please contact the organizer to update it.<br/>
-            3. <strong>Certificate pickup</strong>: those who selected "Needs certificate" can pick it up after the event according to on-site staff guidance.<br/>
-            4. <strong>Special notes</strong>: if you submitted a special request (seating, timing) at registration, the organizer has it on record. Please follow on-site arrangements on the day.
+            Hello everyone,<br/>
+            Thank you for registering for this event! Please note the following points:<br/>
+            1. <strong>Attend your registered session</strong>: please be sure to attend the session you registered for (morning or afternoon) and arrive on time.<br/>
+            2. <strong>Reminder for unfilled diet fields</strong>: some registrants have not yet filled in their dietary requirement (the notes column also shows unfilled cases). Please contact the organizer as soon as possible to complete it, so catering can be counted correctly.<br/>
+            3. <strong>Certificate collection</strong>: participants who checked "needs certificate" can collect it after the event according to the organizer's arrangements.<br/>
+            4. <strong>On-site notes</strong>: if you raised a seating request or expect to arrive late, please explain it to the on-site staff at check-in.
           </blockquote>
 
           <h4 class="example-heading">Data summary</h4>
           <ul class="check-list">
-            <li>Total registrations: <strong>8</strong></li>
-            <li>Session split: 4 morning, 4 afternoon</li>
-            <li>Certificate: <strong>5</strong> need an attendance certificate</li>
-            <li>Diet: 3 meat, 3 vegetarian, 2 blank</li>
-            <li>Special requests: 1 seating request, 1 expected late arrival</li>
+            <li>The event is split into a "morning session" and an "afternoon session".</li>
+            <li>Participants' dietary requirements include meat and vegetarian, and some have not yet filled it in.</li>
+            <li>Some participants have checked that they need a participation certificate.</li>
+            <li>Some participants raised personal requests such as seating or late arrival in the notes column.</li>
           </ul>
 
           <h4 class="example-heading">Items needing human verification</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Diet follow-up</strong>: contact "Chen B." and "Zheng Y." to confirm their preferences.</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Seating reply</strong>: confirm front-row arrangement for "Li J." and tag the seating chart.</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Check-in prep</strong>: notify check-in staff that "Zhang T." will be 10 minutes late so her materials are reserved.</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Certificate prep</strong>: cross-check the 5 people needing certificates and prepare the documents in advance.</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Participants whose diet field is blank or unfilled (such as Chen Boyu and Zheng Yuxiang) need the organizer to contact them and confirm their actual dietary preference.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Participants who raised personal requests (such as Li Jiaying wanting the front row, and Zhang Tingxuan arriving 10 minutes late) need the organizer to confirm on-site arrangements and feasibility.</span></li>
           </ol>
         </div>
       </details>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Names appearing in the last section is fine — that section is an <strong>internal note for the organizer</strong> and won't be published. What goes out is the "reminder draft" above, and that has to stay clean. <strong>The AI telling those two sections apart is what this exercise is really testing.</strong>
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -484,7 +653,7 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
       <!-- ============ Section: troubleshoot ============ -->
       <h2 class="detail-heading">If Gemini CLI can't find the file</h2>
       <p class="detail-paragraph">
-        Sometimes Gemini CLI will report that it <strong>can't find the file</strong>. In that case, check a few things:
+        Sometimes Gemini CLI will report that it <strong>can't find the file</strong>, or it reads something but the answer looks off. In that case, check a few things:
       </p>
 
       <ol class="numbered-list">
@@ -503,6 +672,14 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
         <li>
           <span class="numbered-list__num">4</span>
           <span class="numbered-list__text">If the folder or filename <strong>contains spaces</strong>, avoid them, or escape the path according to the tool's rules.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">5</span>
+          <span class="numbered-list__text"><strong>The AI can read the file but reports column problems that don't exist</strong>: check the CSV structure with <code>Get-Content data\activity_signup.csv -TotalCount 2</code> and see whether each line is wrapped in double quotes.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">6</span>
+          <span class="numbered-list__text"><strong>An authentication menu appears at startup</strong>: <code>.env</code> wasn't read. Go back and check the key setup and the folder-trust step.</span>
         </li>
       </ol>
 
@@ -680,6 +857,7 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
   :global(.callout-text) code,
   :global(.highlight-text) code,
   :global(.role-item__desc) code,
+  :global(.install-desc) code,
   :global(.numbered-list__text) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1002,6 +1180,82 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
     white-space: nowrap;
   }
 
+  /* Install grid — one route per row, so the long commands fit without
+     forcing the grid wider than the article column */
+  .install-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 var(--space-6);
+  }
+
+  .install-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    display: flex;
+    flex-direction: column;
+    transition: border-color var(--transition);
+  }
+
+  .install-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .install-tag {
+    display: inline-block;
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .install-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+  }
+
+  .install-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin-bottom: var(--space-2);
+  }
+
+  .install-desc:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Figure / Image */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
   .details-card {
     margin: var(--space-4) 0 var(--space-6);
     border: 1px solid var(--color-border);
@@ -1093,6 +1347,14 @@ Zheng Yuxiang,Law Y2,Afternoon,,No,Diet not filled</code></pre>
     .role-item__label,
     .role-list--compact .role-item__label {
       min-width: 0;
+    }
+
+    .install-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .install-card {
+      padding: var(--space-6);
     }
 
     .callout-card,

@@ -84,7 +84,15 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">Create the project folder</h2>
       </div>
       <p class="detail-paragraph">
-        In VS Code, create a new project folder called <code>reading-writing-agent</code>. The structure can start as:
+        The whole process runs in <strong>PowerShell</strong> — <strong>no particular editor required</strong>. First create the project folder:
+      </p>
+
+      <pre class="code-block" is:raw><code>New-Item -ItemType Directory -Path "$HOME\reading-writing-agent\data" -Force
+New-Item -ItemType Directory -Path "$HOME\reading-writing-agent\.gemini" -Force
+cd "$HOME\reading-writing-agent"</code></pre>
+
+      <p class="detail-paragraph">
+        The folder structure will look like this:
       </p>
 
       <pre class="code-block" is:raw><code>reading-writing-agent
@@ -93,13 +101,47 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
    ├─ assignment.txt
    └─ draft_v1.txt</code></pre>
 
+      <p class="detail-paragraph">
+        <code>.gemini\.env</code> holds the API key and model setting — same as the previous two pages, so an existing one can be reused.
+      </p>
+
       <!-- STEP 2 -->
       <div class="case-header">
         <p class="case-label">STEP 2</p>
         <h2 class="case-title">Sample file 1: practice article</h2>
       </div>
       <p class="detail-paragraph">
-        Put the following into <code>article.txt</code>. The article is in Chinese — keep it as-is so later prompts can reference the original wording:
+        Next, create the practice article. <strong>Copy the whole block and run it in PowerShell</strong> — one write, no editor needed. The article is in Chinese; keep it as-is so later prompts can reference the original wording:
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+社群媒體與公共討論
+
+近年來，社群媒體已經成為許多人獲取資訊、表達意見和參與公共討論的重要空間。和傳統媒體相比，社群媒體的門檻較低，使用者可以快速發布訊息，也可以即時回應他人的看法。這讓公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。
+
+然而，社群媒體也帶來一些新的問題。首先，資訊傳播速度很快，但查證速度不一定跟得上。當一則未經確認的消息被大量轉發時，錯誤資訊可能在短時間內擴散。其次，平台演算法常常會根據使用者過去的點擊、停留時間和互動紀錄，推薦相似的內容。這可能讓使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。
+
+此外，社群媒體上的討論容易受到情緒影響。簡短、強烈、容易引起反應的內容，往往比細緻、複雜、需要花時間理解的內容更容易被看見。這不代表所有社群媒體討論都是不好的，而是提醒我們，在使用社群媒體參與公共議題時，需要更注意資訊來源、表達方式與討論品質。
+
+如果使用得當，社群媒體仍然可以成為公共參與的重要工具。例如，一些社會議題可以透過社群媒體被更多人看見，弱勢群體也可能透過網路平台發聲。問題不在於社群媒體本身一定好或壞，而在於使用者、平台和社會如何共同建立更好的資訊判斷方式與討論規則。
+
+因此，面對社群媒體上的公共討論，我們不應只問「要不要使用社群媒體」，而應該進一步思考：如何判斷資訊是否可靠？如何避免只接觸單一觀點？如何在快速回應的環境中保留思考空間？這些問題，會影響我們能否把社群媒體變成更有品質的公共討論場域。
+'@ | Set-Content -Path "data\article.txt" -Encoding UTF8</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <code>-Encoding UTF8</code> <strong>must not be omitted</strong>. Windows PowerShell's default encoding will turn the Chinese text into mojibake.
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The closing <code>'@</code> <strong>must start at column 0</strong> — no whitespace before it.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        You can also expand the full article to compare:
       </p>
 
       <details class="details-card">
@@ -138,7 +180,29 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">Sample file 2: assignment requirements</h2>
       </div>
       <p class="detail-paragraph">
-        Put the following into <code>assignment.txt</code>:
+        Same approach — one write from PowerShell. This file is <strong>plain text</strong>; don't carry Markdown asterisks into it:
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+Task: Based on the given article, write a short reading report.
+Length: about 800 to 1200 characters.
+
+The report must contain:
+1. Article topic introduction: what does the article mainly discuss?
+2. Key-point summary: organize the main arguments; no need for paragraph-by-paragraph summary.
+3. Personal viewpoint: where you agree, disagree, or want to discuss further.
+4. Follow-up questions: propose 1 to 2 questions worth thinking about.
+
+Notes:
+1. Don't simply copy the article.
+2. Don't take AI-generated content as the final version.
+3. If you use the article's wording, confirm it actually came from the article.
+4. The report should have clear paragraphs.
+5. Don't end abruptly - the conclusion should circle back to the discussion.
+'@ | Set-Content -Path "data\assignment.txt" -Encoding UTF8</code></pre>
+
+      <p class="detail-paragraph">
+        You can also expand the assignment to compare:
       </p>
 
       <details class="details-card">
@@ -184,7 +248,21 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">Sample file 3: a draft to check</h2>
       </div>
       <p class="detail-paragraph">
-        Put the following into <code>draft_v1.txt</code>:
+        The third file, written the same way:
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+社群媒體現在很重要，很多人都會用社群媒體看新聞和表達自己的想法。這篇文章主要是在說社群媒體對公共討論有很大的影響。
+
+我覺得社群媒體有好處也有壞處。好處是大家都可以發表意見，不一定只有記者或專家可以說話。這樣很多議題就可以被更多人看到。可是壞處是網路上也有很多假消息，而且大家常常只看自己想看的東西，這樣可能會讓討論變得不理性。
+
+文章也提到演算法會推薦使用者喜歡看的內容，所以人們可能一直看到差不多的觀點。我覺得這是一個問題，因為如果大家都只看自己同意的東西，就不容易理解其他人的想法。
+
+總之，社群媒體是一個有用的工具，但是也有很多問題。我們應該要小心使用，不要亂相信網路上的資訊，也要多看不同的觀點。
+'@ | Set-Content -Path "data\draft_v1.txt" -Encoding UTF8</code></pre>
+
+      <p class="detail-paragraph">
+        You can also expand the draft to compare:
       </p>
 
       <details class="details-card">
@@ -219,12 +297,45 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         We'll ask the AI to help review this draft later.
       </p>
 
-      <!-- ============ Section: read files ============ -->
-      <h2 class="detail-heading">Read the files via Gemini CLI in VS Code</h2>
+      <!-- ============ Section: file check ============ -->
+      <h2 class="detail-heading">Confirm the three files aren't broken</h2>
       <p class="detail-paragraph">
-        The exercise is <strong>not</strong> to paste articles into the prompt — it's to let Gemini CLI read local files. Open <code>reading-writing-agent</code> in VS Code, open a terminal (<strong>Terminal → New Terminal</strong>), and run:
+        When Chinese encoding goes wrong, <strong>the error only surfaces once the AI reads the file</strong> — and it's hard to spot, because the response stays just as tidy while the content isn't what you thought. So check once first:
       </p>
-      <pre class="code-block" is:raw><code>gemini</code></pre>
+
+      <pre class="code-block" is:raw><code>Get-ChildItem data | Select-Object Name, Length
+Get-Content "data\article.txt" -Encoding UTF8 | Select-Object -First 3</code></pre>
+
+      <p class="detail-paragraph">
+        If you see mojibake or question marks, re-run the file-creation commands above and <strong>don't continue</strong>.
+      </p>
+
+      <!-- ============ Section: read files ============ -->
+      <h2 class="detail-heading">Read local files with Gemini CLI</h2>
+      <p class="detail-paragraph">
+        The exercise is <strong>not</strong> to paste articles into the prompt — it's to let Gemini CLI read local files. Launch it from inside the project folder:
+      </p>
+      <pre class="code-block" is:raw><code>npx @google/gemini-cli</code></pre>
+
+      <p class="detail-paragraph">
+        On startup you'll hit three screens in order:
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text"><strong>"Do you trust the files in this folder?"</strong>: you must pick <code>1. Trust folder</code>. Choosing not to trust means <code>.env</code> won't be read.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text"><strong>If an authentication menu appears</strong>: don't pick <strong>Sign in with Google</strong>.</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text"><strong>Confirm the model</strong>: check the <strong>status bar at the bottom right</strong>; it should show <code>gemini-3.5-flash-lite</code>. Don't press <code>/model</code>.</span>
+        </li>
+      </ol>
+
       <p class="detail-paragraph">
         Once Gemini CLI is up, the exercises below will use these file paths:
       </p>
@@ -302,37 +413,35 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
           <p class="detail-paragraph">Social media and public discourse.</p>
 
           <h4 class="example-heading">Core question</h4>
-          <p class="detail-paragraph">(Inferred from the article) What changes and challenges does social media bring to public discourse, and how should we respond to improve the quality of public participation on social media?</p>
+          <p class="detail-paragraph">As a space for obtaining information, expressing opinions, and holding public discussion, social media has brought problems such as verification failing to keep up, the echo-chamber effect (algorithms recommending similar content), and discussion being easily swayed by emotion (short, strong content is more easily seen).</p>
 
           <h4 class="example-heading">Key points</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Social media <strong>lowers the threshold of public discussion</strong>, making information transmission faster and participation broader.</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Information flow and platform algorithms can lead to <strong>spread of misinformation</strong> and <strong>narrowing of viewpoints</strong> (echo-chamber effect).</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Discussions are <strong>easily emotion-driven</strong>; short, strong content tends to get more attention than nuanced, complex arguments.</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Social media has a low threshold and fast transmission, making public discussion faster and letting more people participate.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">There are phenomena such as misinformation spreading quickly, algorithms leading to less exposure to different viewpoints, and discussion being easily swayed by emotion.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Used well, social media can become an important tool for public participation, making social issues visible to more people and letting marginalized groups be heard.</span></li>
           </ol>
 
           <h4 class="example-heading">Strengths the article raises</h4>
           <ul class="check-list">
-            <li><strong>Lower threshold</strong> for accessing information and expressing views</li>
-            <li><strong>Real-time, fast</strong> publishing and response</li>
-            <li>More people can engage with otherwise hard-to-reach issues</li>
-            <li>Helps social issues become visible to a wider public</li>
-            <li>Provides <strong>a channel for marginalized groups to be heard</strong></li>
+            <li>The threshold for obtaining information, expressing opinions, and joining public discussion is low; users can publish quickly and respond to others' thoughts in real time.</li>
+            <li>It makes public discussion faster, and gives more people the chance to engage with issues that were otherwise hard to approach.</li>
+            <li>Social issues can be seen by more people through social media.</li>
+            <li>Marginalized groups may be able to speak up through online platforms.</li>
           </ul>
 
           <h4 class="example-heading">Problems the article raises</h4>
           <ul class="check-list">
-            <li>Verification can't keep up with transmission speed; <strong>misinformation spreads quickly</strong></li>
-            <li>Algorithms recommend similar content, reducing exposure to different viewpoints</li>
-            <li>Discussion is easily affected by emotion</li>
-            <li>Nuanced, complex content that takes time to digest is less visible</li>
+            <li>Information spreads very fast, but verification doesn't necessarily keep up; when unconfirmed messages are widely forwarded, misinformation can spread within a short time.</li>
+            <li>Platform algorithms recommend similar content based on users' past clicks, dwell time, and interaction records, which may mean users often see information close to their own position and encounter different viewpoints less often.</li>
+            <li>Discussion is easily affected by emotion; short, strong, reaction-provoking content tends to be seen more easily than nuanced, complex content that takes time to understand.</li>
           </ul>
 
-          <h4 class="example-heading">Possible follow-up questions</h4>
+          <h4 class="example-heading">Possible follow-up questions (inferred from the article)</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">How do we <strong>judge whether information is reliable</strong>?</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">How do we <strong>avoid only ever encountering one perspective</strong>?</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">How do we <strong>preserve room to think</strong> in a fast-response environment?</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">How do we judge whether information is reliable?</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">How do we avoid only ever encountering one perspective?</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">How do we preserve room to think in a fast-response environment?</span></li>
           </ol>
         </div>
       </details>
@@ -389,78 +498,111 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </summary>
         <div class="details-card__body">
           <h4 class="example-heading">Suggested titles</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Public dialogue in the digital age: opportunities and challenges of social media</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Algorithms, emotion, and participation: a reflection on social media as a public-discussion space</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Protecting discussion quality in fast-spreading channels: the future of social media and public participation</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>Toward higher-quality public discussion: the opportunities and challenges of social media</li>
+            <li>Public participation in the internet age: how social media shapes public discussion</li>
+          </ul>
 
           <h4 class="example-heading">Overall direction</h4>
           <p class="detail-paragraph">
-            Take "<strong>the two-sided impact of a tool</strong>" as the central thread. Analyze how social media reshapes public discussion, and discuss how individuals and society can build judgment and rules around its use.
+            This report takes "social media and public discussion" as its core, examining the challenges that come alongside social media's lowering of the participation threshold: the gap in verification speed, algorithmic echo chambers, and emotionally driven discussion. The article aims to lead readers to think about how to build better ways of judging information and better discussion norms, rather than simply debating whether to use social media. The writing should avoid copying the original directly, and instead synthesize the key points and challenges, offer multiple directions of thought in the personal-viewpoint section, and finally echo the earlier questions through a concluding reflection.
           </p>
 
-          <h4 class="example-heading">Section 1: Article topic introduction</h4>
+          <h4 class="example-heading">Section outline</h4>
+
+          <h4 class="example-heading">Section 1: Introduction and topic entry</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Purpose</span>
-              <span class="role-item__desc">Set the stage; describe social media's role in modern public life.</span>
+              <span class="role-item__desc">Introduce the article's core topic and point out social media's role and double-sided nature in modern public discussion.</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Possible content</span>
-              <span class="role-item__desc">Describe how social media has become the primary space where the public gets information and expresses views; state the article's core question: how do social-media traits affect public participation?</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>Explain that social media has become an important space for obtaining information, expressing opinions, and joining public discussion.</li>
+                  <li>Contrast with traditional media, noting social media's lower threshold, fast transmission, and capacity to let more people participate.</li>
+                  <li>Note that although social media brings convenience, it also comes with challenges around verification, echo chambers, and emotional discussion.</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
-          <h4 class="example-heading">Section 2: Key-point summary</h4>
+          <h4 class="example-heading">Section 2: Key-point summary — the challenges social media brings</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Purpose</span>
-              <span class="role-item__desc">Distill the article's observations on social media's discussion dynamics.</span>
+              <span class="role-item__desc">Distill the three major problems the article identifies, clarifying their negative impact on public discussion.</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Possible content</span>
-              <span class="role-item__desc"><strong>Strengths</strong>: lower threshold, real-time response, voice for marginalized groups. <strong>Problems</strong>: verification lag, algorithmic narrowing, short and emotional content crowding out nuance. <strong>Wrap-up</strong>: social media is neither inherently good nor bad — it depends on how it's used.</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>Information spreads fast but verification lags; unconfirmed messages spread easily.</li>
+                  <li>The echo-chamber effect produced by algorithmic recommendation of similar content leaves people less exposed to different viewpoints.</li>
+                  <li>Discussion is easily swayed by emotion; short, strong content is seen more easily than nuanced, complex content.</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
-          <h4 class="example-heading">Section 3: Personal viewpoint (optional directions)</h4>
+          <h4 class="example-heading">Section 3: Key-point summary — social media's value and possibilities</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Purpose</span>
-              <span class="role-item__desc">Engage with the article's points or take a stance.</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">Direction A</span>
-              <span class="role-item__desc">Discuss the limits of "algorithms" on information intake — does "only seeing what you want to see" undermine the foundation of public discussion?</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">Direction B</span>
-              <span class="role-item__desc">Discuss the tension between "emotion vs. content quality" — does "stronger content gets seen more" help or hurt public participation?</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">Direction C</span>
-              <span class="role-item__desc">Discuss shared responsibility among "users, platforms, and society" — whose role matters most when building discussion norms?</span>
-            </li>
-          </ul>
-
-          <h4 class="example-heading">Section 4: Conclusion and follow-up</h4>
-          <ul class="role-list role-list--compact">
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">Purpose</span>
-              <span class="role-item__desc">Sum up the argument and pose a question worth pursuing.</span>
+              <span class="role-item__desc">Explain social media's potential value when used positively, and clarify the nature of the problem.</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">Possible content</span>
-              <span class="role-item__desc">Echo the article's closing: don't only debate "use it or not" — instead learn "how to use it with quality"; close with a follow-up question.</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>Stress that social media is not absolutely good or bad in itself; used well, it can still be an important tool for public participation.</li>
+                  <li>Give examples showing social issues can be seen by more people, and marginalized groups can speak up through online platforms.</li>
+                  <li>Point out that the core of the problem lies in how users, platforms, and society jointly build ways of judging information and rules for discussion.</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Section 4: Personal viewpoint (optional directions)</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Give readers directions for deeper thinking and taking a stance on the article's content, leaving the position free to choose while writing.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Possible content<br/>(optional directions)</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>Direction 1 (leaning toward institutions and platform responsibility): examine whether platform algorithms and mechanisms should bear the main responsibility — for example, improving echo chambers and emotional discussion through technical or rule adjustments.</li>
+                  <li>Direction 2 (leaning toward personal literacy and behavior): stress how users themselves, facing fast information and emotional content, can actively strengthen verification and maintain multiple perspectives.</li>
+                  <li>Direction 3 (balanced development): argue that improving the quality of public discussion requires users, platforms, and society to work together, with no single solution.</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">Section 5: Conclusion and follow-up questions</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Purpose</span>
+              <span class="role-item__desc">Sum up the whole discussion, avoid an abrupt conclusion, and lead readers into further follow-up thinking.</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">Possible content</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>Echo the earlier text, restating that we shouldn't only ask "should we use social media", but focus on how to improve the quality of public discussion.</li>
+                  <li>Pose 1 to 2 follow-up questions (for example: how should we judge whether information is reliable? How do we preserve room to think in a fast-response environment?).</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
           <h4 class="example-heading">Items I still need to verify or supplement</h4>
           <ul class="check-list">
-            <li><strong>Word-count budget</strong>: the assignment asks for 800–1200; since the article is fairly compact, you'll need to expand the "personal viewpoint" section.</li>
-            <li><strong>Section transitions</strong>: pay attention to how Section 3 (viewpoint) flows back into Section 4 (conclusion).</li>
-            <li><strong>Source check</strong>: the article never names specific platforms (Facebook, Twitter, etc.) — keep references generic to stay faithful to it.</li>
+            <li>Decide the final stance of the personal viewpoint (agree, disagree, or a direction you want to explore further).</li>
+            <li>Adjust each section's textual detail and depth of argument against the 800–1200 character length requirement.</li>
           </ul>
         </div>
       </details>
@@ -510,37 +652,44 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">
-            Length is around 750 characters, leaving room to expand toward the assignment's 800–1200 target.
-          </p>
-
           <h4 class="example-heading">Report draft (first pass)</h4>
           <article class="prose-card">
-            <p><strong>Title</strong>: Public dialogue in the digital age — on social media's impact and the reflections it demands</p>
+            <p><strong>Title</strong>: The opportunities and challenges of social media and public discussion</p>
 
-            <p><strong>1. Topic introduction</strong></p>
-            <p>This article examines the role social media plays in modern public discussion and the shifts it has produced. As technology has advanced, social media has moved beyond a social tool to become a primary space where the public obtains information, expresses opinions, and participates in public issues. The article centers on how social media's low threshold and high efficiency reshape discussion, while pointing out the challenges hidden behind these traits.</p>
+            <p>In recent years, social media has become an important space for many people to obtain information, express opinions, and take part in public discussion. Compared with traditional media, social media has a lower threshold; users can publish messages quickly and respond to others' views in real time, which makes public discussion faster and gives more people the chance to engage with issues that were otherwise hard to approach.</p>
 
-            <p><strong>2. Key-point summary</strong></p>
-            <p>According to the article, social media's contribution to public discussion lies mainly in "accessibility" and "immediacy." Compared with traditional media, social media lowers the bar to participation, lets users publish and respond quickly, makes once-obscure issues more visible, and even gives marginalized groups a channel to be heard.</p>
-            <p>Yet these traits come with serious problems: a "verification gap" lets misinformation spread fast; "algorithmic limits" reduce exposure to diverse views; and discussion that's "driven by emotion" — short, strong, reactive content — tends to outperform nuanced argument, dragging on overall quality.</p>
+            <p>However, while social media brings convenience, it also comes with some new problems. First, information spreads fast, but verification doesn't necessarily keep up; if unconfirmed messages are widely forwarded, misinformation may spread within a short time. Second, platform algorithms recommend similar content based on users' clicks, dwell time, and interaction records, which may mean users often see information close to their own position and encounter different viewpoints less often. In addition, discussion on social media is easily affected by emotion; short, strong, reaction-provoking content tends to be seen more easily than nuanced, complex content that takes time to understand.</p>
 
-            <p><strong>3. Personal viewpoint</strong></p>
-            <p>Among the article's points, I think "quality of use" is the most worth focusing on right now. The article's framing — that social media's traits aren't absolute good or bad — is pragmatic. On information flow, I agree that the verification risk is real; on algorithm-driven narrowing, I do see public conversation collapsing into echo-chamber comfort. I'd add that <strong>"building rules and judgment" shouldn't be only the user's job — platforms and society also need to set norms</strong>.</p>
+            <p>Even so, this does not mean that discussion on social media is all bad. Used well, social media can still become an important tool for public participation. For example, social issues can be seen by more people through social media, and marginalized groups may be able to speak up through online platforms. The problem does not lie in whether social media itself is absolutely good or bad, but in how users, platforms, and society jointly build better ways of judging information and better rules for discussion.</p>
 
-            <p><strong>4. Conclusion and follow-up</strong></p>
-            <p>In short, social media offers a fast, democratic space for participation, but raises serious questions about information judgment and discussion quality. We should work on "how to judge reliability," "how to break through single perspectives," and "how to preserve thinking time in a fast environment" — together turning social media into a space of better-quality public discussion.</p>
+            <p>From a personal viewpoint, social media is both a force that promotes public participation and a challenge that affects the quality of discussion. We might consider how, while enjoying the convenience and fast participation social media brings, we can stay alert in everyday use and try to understand different voices.</p>
+
+            <p>In conclusion, facing public discussion on social media, we should not only ask "should we use social media", but should think further about how to judge whether information is reliable, how to avoid only ever encountering one perspective, and how to preserve room to think in a fast-response environment. These questions will affect whether we can turn social media into a space for higher-quality public discussion.</p>
           </article>
 
           <h4 class="example-heading">Items I should revise myself</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Length expansion</strong>: currently around 750 characters; still short of the 800–1200 target. Expand the "personal viewpoint" section.</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Style polish</strong>: the draft's tone is fairly neutral. Adjust phrasing to match your own writing voice.</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Transitions</strong>: add bridging sentences between paragraphs so the flow reads more naturally.</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Citation check</strong>: before finalizing, verify that everything marked "according to the article" actually matches the original.</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Check whether the length falls within the 800–1200 character range (the current draft is fairly compact; if you need more, add detail elaborating on the article's content).</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">The personal-viewpoint section is currently written in a fairly conservative, neutral way; adjust it or add or remove concrete impressions based on what you actually think.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Make sure every claim fully matches the article's content, with no outside material that the article doesn't mention.</span></li>
           </ol>
         </div>
       </details>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Compare this draft against the original, carefully</strong>
+        </p>
+        <p class="callout-text">
+          This draft reads as complete, but line it up against <code>article.txt</code> sentence by sentence and you'll find most sentences merely swap a few words. The article says 「和傳統媒體相比」, the draft says 「相較於傳統媒體」; the article says 「也可以即時回應他人的看法」, the draft says 「並即時回應他人看法」. The three questions in the final paragraph come straight from the article's ending.
+        </p>
+        <p class="callout-text">
+          But the very first note in <code>assignment.txt</code> says "Don't simply copy the article."
+        </p>
+        <p class="callout-text">
+          The AI isn't deliberately deceiving anyone. With limited material, it picked the safest move: stay close to the original. This is exactly why a draft can only ever be a draft. <strong>The output of this step can't be handed in — it just gives you something to revise.</strong>
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -604,36 +753,34 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <div class="details-card__body">
           <h4 class="example-heading">Strengths</h4>
           <ul class="check-list">
-            <li><strong>Clear topic</strong>: identifies social media's impact on public discussion as the core</li>
-            <li><strong>Balanced framing</strong>: notes both upsides and downsides, in line with the article</li>
-            <li><strong>Partial coverage</strong>: includes a personal viewpoint (on misinformation and algorithms)</li>
+            <li>The language is colloquial and natural; it reads smoothly.</li>
+            <li>It covers the article's topic, both sides of the key points, and a personal viewpoint.</li>
+            <li>It doesn't add outside material the article never mentions.</li>
           </ul>
 
           <h4 class="example-heading">Structural issues</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Incomplete sections</strong>: the assignment requires four parts, but the draft mixes "key-point summary" with "personal viewpoint" and is <strong>missing the follow-up questions</strong>.</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Weak conclusion link</strong>: the conclusion arrives abruptly and doesn't recap the specific issues raised earlier.</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>The paragraphs are loose and short, without clearly separating out complete blocks such as "article topic introduction", "key-point summary", "personal viewpoint", and "follow-up questions".</li>
+            <li>It lacks the concrete follow-up questions raised at the article's end, so it doesn't fully address the "follow-up questions" item in the assignment.</li>
+          </ul>
 
           <h4 class="example-heading">Content issues</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Far too short</strong>: assignment asks for 800–1200; the draft is around 250.</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Key points lack specificity</strong>: details like "lower discussion threshold", "voice for marginalized groups", and "emotional content crowding out nuance" are not fully captured.</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Personal viewpoint is too thin</strong>: takes a stance but doesn't show the "why" behind agreeing or disagreeing.</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>The length is on the short side (around 350 characters), short of the assignment's 800–1200 requirement.</li>
+            <li>The key-point summary is fairly sketchy; details the article raises — "verification can't keep up", "emotional content is seen more easily", and "the shared responsibility of users, platforms, and society" — aren't elaborated fully enough.</li>
+          </ul>
 
           <h4 class="example-heading">Expression issues</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Too colloquial</strong>: phrases like "very important", "many people use it", "has good and bad sides" should shift to more formal wording (e.g. "plays a key role", "potential strengths and emerging challenges").</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Repetitive sentence shapes</strong>: "…is…" / "I think…" / "the article also mentions…" recur too often.</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>Some sentence shapes are monotonous (e.g. frequent use of subjective connectives like "I think" and "this is a problem"); the tone could be strengthened toward an academic or formal report.</li>
+            <li>The links between paragraphs could be tighter, so the conclusion ties back more naturally to the earlier discussion and the article's central question.</li>
+          </ul>
 
           <h4 class="example-heading">Suggested revision order</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Fix the structure</strong>: split into the four required sections and add the missing "follow-up questions."</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Expand content</strong>: re-read the article and pull more specific points into the "key-point summary" section — this also closes the length gap.</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Deepen the viewpoint</strong>: pick one point (algorithms or misinformation) and explain why it's the most important challenge.</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Polish the prose</strong>: convert colloquial phrasing into more formal wording.</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Add the follow-up questions: based on the questions at the article's end, add 1 to 2 concrete questions worth thinking about further.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Expand the key-point summary and the length: fill out the article's three major challenges (verification lag, algorithmic echo chambers, emotional discussion) and the remedy (the shared responsibility of users, platforms, and society) more completely, to approach the 800–1200 character target.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Improve paragraph structure and tone: rework the paragraph hierarchy so that topic introduction, key-point summary, personal viewpoint, and follow-up questions are distinct blocks, polish the colloquial phrasing, and let the conclusion close naturally.</span></li>
           </ol>
         </div>
       </details>
@@ -641,6 +788,14 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <div class="callout-card">
         <p class="callout-text">
           The point of this exercise: <strong>diagnose first, revise second. Don't ask the AI to rewrite the whole thing on the first try</strong>.
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          This response never hands over a rewritten version — it only lists problems.<br/>
+          The prompt said "don't rewrite the whole thing for me", and it genuinely didn't.<br/>
+          <strong>State the instruction clearly, and the AI does understand.</strong>
         </p>
       </div>
 
@@ -695,48 +850,44 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">
-            Here's the revised <code>draft_v2</code>. Colloquial phrasing was converted to formal report language; the structure now matches the assignment, and the article's internal logic was reused — without adding outside data — to lengthen the draft.
-          </p>
-
           <h4 class="example-heading">Revised draft</h4>
           <article class="prose-card">
-            <p><strong>Title</strong>: Social media and public dialogue — on the opportunities and challenges of information transmission</p>
+            <p><strong>Title</strong>: The opportunities and challenges of social media and public discussion</p>
 
-            <p><strong>1. Topic introduction</strong></p>
-            <p>This article examines how social media reshapes contemporary public discussion. As technology has advanced, social media has become the primary space where the public gets information and expresses views. The article centers on how its traits — low threshold, real-time response — both broaden public participation and pose serious challenges to discussion quality, information accuracy, and the diversity of viewpoints.</p>
+            <p>In recent years, social media has gradually become an important core space for the public to obtain information, express opinions, and take part in public discussion. Compared with traditional media, social media has a lower participation threshold; users can not only publish messages quickly but also respond to others' views in real time. This characteristic makes the rhythm of public discussion considerably faster, and at the same time gives more people the chance to engage with social issues they would not easily have encountered.</p>
 
-            <p><strong>2. Key-point summary</strong></p>
-            <p>Social media has clear positive value for public participation. Its low-threshold quality lets more people publish and respond quickly, brings hard-to-reach issues into the public eye, and gives marginalized groups a channel to be heard.</p>
-            <p>The article also names several attendant problems: a "verification gap" that lets misinformation spread fast; an "algorithmic constraint" that nudges users into narrower information sets; and a "shift in discussion quality," where strong, emotional content tends to dominate while nuanced argument is pushed to the edge.</p>
+            <p>However, alongside the convenience and ubiquity social media brings, many new problems follow. First, although information spreads rapidly, verification often cannot keep pace, so unconfirmed messages, once widely forwarded, may cause misinformation to spread within a short time. Second, platform algorithms recommend similar content based on users' clicks, dwell time, and interaction records, which easily leaves users in a long-term information environment close to their own position, reducing the chance of encountering different viewpoints. In addition, discussion on social media is easily driven by emotion: compared with nuanced, complex content that takes time to understand, short, strong, reaction-provoking information tends to attract more attention.</p>
 
-            <p><strong>3. Personal viewpoint</strong></p>
-            <p>I think "preserving room to think in a fast environment" is the most critical task for digital citizens. I strongly agree with the article that the question isn't "use it or not" but how we respond. On algorithms in particular, when we get used to information that matches our stance, our capacity to understand and tolerate different views drops. Building transparent, quality-improving "rules" <strong>isn't only the user's responsibility — it's a structural problem that platforms and the broader society have to face together</strong>.</p>
+            <p>Even so, this does not mean all discussion on social media is negative. Used appropriately, social media can still be a powerful tool for advancing public participation. For example, many social issues have become visible to the public through online platforms, and marginalized groups have thereby gained a channel to be heard. The article points out that the key to the problem lies not in whether social media itself is absolutely good or bad, but in how users, platforms, and society jointly build sounder ways of judging information and rules for discussion.</p>
 
-            <p><strong>4. Conclusion and follow-up</strong></p>
-            <p>In sum, social media has lowered the threshold for participation and amplified marginal voices, but without solid information judgment and healthy discussion mechanisms, the harm to public space cannot be ignored. We should move from passive recipients toward more deliberate digital citizens.</p>
-            <p>Two follow-up questions worth pursuing:</p>
-            <ol class="prose-list">
-              <li>Under platform mechanisms that chase real-time and reach, how should we design or build discussion rules that better surface "nuanced, complex content"?</li>
-              <li>Beyond personal discipline, what mechanisms can society and platforms use to reduce the negative impact of "single-perspective recommendation" caused by algorithms?</li>
-            </ol>
+            <p>From a personal viewpoint, social media plays a double-edged role in public discussion. On one hand it opens up channels for diverse participation; on the other it brings tests such as information authenticity and echo chambers. While enjoying the convenience, we should perhaps also reflect on how to raise our information literacy in everyday use and avoid over-relying on information from a single position.</p>
+
+            <p>In conclusion, facing the public-discussion environment social media has shaped, we should not remain at the binary question of "should we use social media", but should explore further: first, how can we effectively judge the reliability of information? Second, how do we avoid falling into the confines of a single perspective in everyday information intake? These directions of thought will be the key to whether social media can be turned into a space for higher-quality public discussion.</p>
           </article>
 
           <h4 class="example-heading">Summary of changes</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>Restructured</strong>: rearranged strictly into the assignment's four sections (intro, key-point summary, personal viewpoint, follow-up questions).</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>Formalized tone</strong>: "very important" → "primary space / key role"; "good and bad sides" → "clear positive value… also attendant problems."</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>Expanded content (no outside data)</strong>: reused the article's keywords (algorithm, threshold, emotional impact) to extend the internal argument.</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>Added missing section</strong>: the "follow-up questions" section that v1 lacked.</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Restructured: expanded the draft and divided it into clear paragraphs, covering in order the topic introduction, the key-point summary (challenges and opportunities), the personal viewpoint, and follow-up questions tied to the article's ending.</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Elevated tone: adjusted the original draft's more colloquial expressions (such as "many people use it" and "I think") into objective narration better suited to a formal report.</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Added content and follow-up questions: based on the article, filled in key points such as algorithmic echo chambers, emotional content, and the shared responsibility of users, platforms, and society, and included 2 concrete follow-up questions at the end.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Kept within limits: used only viewpoints and illustrations mentioned in the article throughout, with no outside material added.</span></li>
           </ol>
 
           <h4 class="example-heading">Items still needing human verification</h4>
-          <ul class="check-list">
-            <li><strong>Length check</strong>: v2 is around 650–700 characters, still short of 800–1200. Expand "personal viewpoint" with one or two more passes.</li>
-            <li><strong>Stance check</strong>: "personal viewpoint" leans on "agree", "key", etc. If you disagree with the article anywhere, swap those passages out.</li>
-          </ul>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Please confirm whether the length and report requirements are appropriate (if there is an upper or lower limit, adjust the length as needed).</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Whether the personal-viewpoint section matches your real stance; if adjustment is needed, you can fine-tune the tone or add your own views.</span></li>
+          </ol>
         </div>
       </details>
+
+      <p class="detail-paragraph">
+        This draft_v2 <strong>only appears on screen — it isn't saved to a file automatically</strong>. The <code>@</code> syntax can only read files, never write them. To keep this version, copy it out and save it yourself — the <code>data</code> folder still contains only the original three files.
+      </p>
+
+      <p class="detail-paragraph">
+        Also worth noting: point 1 of the summary of changes says it "divided it into clear paragraphs", but the actual output never added any subheadings. <strong>What the AI says about its own work also needs checking by you.</strong>
+      </p>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -1045,6 +1196,10 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
   }
 
   .highlight-card {

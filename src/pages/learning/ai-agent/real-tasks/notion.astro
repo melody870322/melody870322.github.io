@@ -73,42 +73,82 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <!-- STEP 1 -->
       <div class="case-header">
         <p class="case-label">STEP 1</p>
-        <h2 class="case-title">Create a new page</h2>
+        <h2 class="case-title">Create the database page</h2>
       </div>
       <p class="detail-paragraph">
-        Open Notion and click <strong>"Database"</strong> in the left sidebar. Use this page name:
+        Open Notion and do four things in order:
       </p>
-      <pre class="code-block" is:raw><code>課堂任務管理 (Classroom Tasks)</code></pre>
-      <p class="detail-paragraph">
-        This page will hold the task data we'll work with later.
-      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Hover over the <strong>"Private"</strong> section in the sidebar and click <code>+</code> — or use the new-page button in the top-left — to create a new page</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Title it <code>課堂任務管理</code> (Classroom Tasks)</span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">In the empty body below the title, type <code>/database</code>（<code>/資料庫</code> in the Chinese UI）</span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">When the menu appears, choose <strong>"Database - Full page"</strong>（「資料庫 - 整頁」）</span></li>
+      </ol>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion側邊欄無資料庫入口.png"
+          alt="The current Notion sidebar, showing only Home, Chat, Inbox, Search and a list of pages — with no Database entry"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 1. The Notion sidebar as it stands today. The top holds only Home, Chat, Inbox and Search, followed by the page list — there is no longer a "Database" entry. The older instruction to "click Database in the left sidebar" no longer applies; you create one from a new page's body using a slash command instead. (Screenshots on this page come from the Chinese-language run of the same exercise.)</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion斜線資料庫選單.png"
+          alt="The filtered slash-command menu inside a Notion page body, listing Database - Inline, Database - Full page, and the table, board, gallery, list, feed, dashboard and calendar view modes"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 2. The filtered results after typing /資料庫. Only the top two entries actually create a database — pick the second one, "Database - Full page".</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The menu is full of near-identical entries; only "Database - Full page" is the one you want.</strong><br/>
+          ・"Database - Inline"（「資料庫 - 內嵌」）works too, but it sits inline with the page content, which makes it harder to follow along.<br/>
+          ・"Table view", "Board view", "Gallery view" and the rest of that long list <strong>are ways of viewing data, not ways of creating a new database</strong>.<br/>
+          ・The "Linked view of data source" entry at the bottom points at an <strong>existing</strong> data source — definitely not that one.
+        </p>
+      </div>
 
       <!-- STEP 2 -->
       <div class="case-header">
         <p class="case-label">STEP 2</p>
-        <h2 class="case-title">Create a Table database</h2>
+        <h2 class="case-title">Confirm the database and title column names</h2>
       </div>
       <p class="detail-paragraph">
-        Inside the new page, choose <strong>"Start with a database"</strong>, then pick the <strong>"Empty database"</strong> option from the menu.
+        There are <strong>two names</strong> to check here, and both need changing:
       </p>
 
-      <!-- STEP 3 -->
-      <div class="case-header">
-        <p class="case-label">STEP 3</p>
-        <h2 class="case-title">Confirm the database name</h2>
-      </div>
+      <h4 class="example-heading">1. The database name</h4>
       <p class="detail-paragraph">
-        Make sure the database is called <strong>「課堂任務管理」</strong>. If Notion auto-creates an unnamed database, rename it to this title.
+        A newly created database is called <strong>"New database"</strong>（「新資料庫」）by default. Rename it to <strong>「課堂任務管理」</strong>.
       </p>
+
+      <h4 class="example-heading">2. The title column name</h4>
+      <p class="detail-paragraph">
+        A new database starts with <strong>exactly one column</strong> — the title column, called <strong>"Name"</strong>（「名稱」）and marked <code>Aa</code>. Click it and <strong>rename it to 「任務名稱」</strong>.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The title column's <strong>type cannot be changed</strong>, but its name can — and must be. The program reads <code>get_title(properties, "任務名稱")</code>; if the name doesn't match, it reads nothing, and all three tools come back with a blank task name.
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
           The name is mostly <strong>for human readers</strong>. What the program actually uses is Notion's <code>data_source_id</code>, not the database name.
         </p>
       </div>
 
-      <!-- STEP 4 -->
+      <!-- STEP 3 -->
       <div class="case-header">
-        <p class="case-label">STEP 4</p>
+        <p class="case-label">STEP 3</p>
         <h2 class="case-title">Create the columns</h2>
       </div>
       <p class="detail-paragraph">
@@ -144,13 +184,23 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>For the 「狀態」 column you must pick the 「選取 / Select」 type, not 「狀態 / Status」.</strong> New Notion databases often default to a Status field. The names look identical, but the API shapes differ: Status uses <code>"status"</code> rather than <code>"select"</code>. Pick the wrong one and the API returns a 400, with no visible difference in the UI. This is the single most common place people get stuck on this page.
+          <strong>Take special care when adding the 「狀態」 column: the column is named 「狀態」, but its property type must be 「選取 / Select」.</strong> Not the property in that menu which is also called 「狀態 / Status」. The two sit right next to each other in the list and their icons look alike, but their API shapes are completely different — Status uses <code>"status"</code>, Select uses <code>"select"</code>. Pick the wrong one and the program reports an error, with no visible difference in the UI. This is the single most common place people get stuck on this page.
         </p>
       </div>
 
-      <!-- STEP 5 -->
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion屬性類型選取與狀態.png"
+          alt="Notion's property-type menu when adding a column: the left column reads Text, Select, Status, Person, Checkbox, Phone; the right reads Number, Multi-select, Date, Files and media, URL, Email"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 3. The property-type menu when adding a column. 「選取 / Select」 and 「狀態 / Status」 sit one above the other in the left column and their icons look alike — this page needs 「選取 / Select」.</figcaption>
+      </figure>
+
+      <!-- STEP 4 -->
       <div class="case-header">
-        <p class="case-label">STEP 5</p>
+        <p class="case-label">STEP 4</p>
         <h2 class="case-title">Configure the Select options</h2>
       </div>
       <p class="detail-paragraph">
@@ -187,9 +237,9 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- STEP 6 -->
+      <!-- STEP 5 -->
       <div class="case-header">
-        <p class="case-label">STEP 6</p>
+        <p class="case-label">STEP 5</p>
         <h2 class="case-title">Add some sample rows</h2>
       </div>
       <p class="detail-paragraph">
@@ -210,13 +260,23 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
             </tr>
           </thead>
           <tbody>
-            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-03-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
-            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-03-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
-            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-03-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
-            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-03-18</td><td>活動報名表</td><td>已確認名單</td></tr>
+            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-09-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
+            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-09-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
+            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-09-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-09-18</td><td>活動報名表</td><td>已確認名單</td></tr>
           </tbody>
         </table>
       </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion課堂任務管理範例資料.png"
+          alt="The 課堂任務管理 database in table view, with columns for task name, type, status, priority, due date, source and notes, holding four sample rows"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 4. What PART 1 looks like when it's done. All seven columns are in place, the four sample rows are filled in, and 「類型」「狀態」「優先順序」 all render as coloured select tags. The Notion side is ready.</figcaption>
+      </figure>
 
       <p class="detail-paragraph">
         These rows are what later exercises will use. It's a small dataset, but a useful one — it covers <strong>different statuses, types, and priorities</strong>, plus tasks that can be updated.
@@ -269,26 +329,116 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">Create a Notion connection</h2>
       </div>
       <p class="detail-paragraph">
-        For Python to reach Notion, we first create a connection. From the workspace switcher in the top-left of Notion:
+        For Python to reach Notion, we first create a connection. From the workspace switcher in the top-left of Notion, go to <strong>Settings → Connections</strong>.
       </p>
-      <pre class="code-block" is:raw><code>Settings → Connections → Develop or manage integrations → Create new internal integration</code></pre>
       <p class="detail-paragraph">
-        Name it <code>Classroom Tool</code>. Then make sure it has at least these capabilities:
+        That page has three tabs across the top — Explore, Installed, Manage — but <strong>none of those is what you want</strong>. Click <strong>"Go to developer portal ↗" on the right</strong>.
       </p>
 
-      <ul class="check-list">
-        <li>Read content</li>
-        <li>Update content</li>
-        <li>Insert content</li>
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion設定連接頁面.png"
+          alt="The Connections page in Notion settings, with Explore, Installed and Manage tabs, a grid of connectors such as Google Calendar and Slack, and a link to the developer portal on the right"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 5. The Settings → Connections screen. The large grid in the middle is the ready-made connectors, none of which we need here — the link to click is "Go to developer portal ↗" on the right.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        In the developer portal, create a new integration. The <strong>"New connection"</strong> dialog has three fields to fill in:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Name</span>
+          <span class="role-item__desc">Enter <code>Classroom Tool</code></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Auth method</span>
+          <span class="role-item__desc">Choose <strong>"Access token"</strong> — a static, workspace-scoped API token shared by collaborators, limited to one workspace</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Can be installed in</span>
+          <span class="role-item__desc">Pick your own workspace</span>
+        </li>
       </ul>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion新連接對話框.png"
+          alt="Notion's New connection dialog with Classroom Tool entered as the name and two auth options, Access token and OAuth, with Access token selected"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 6. The New connection dialog. For the auth method, pick the upper option, "Access token".</figcaption>
+      </figure>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The other option, <strong>OAuth</strong>, is for apps that will be listed on the Marketplace and support multiple workspaces. We don't need it here.<br/><br/>
+          The difference between the two echoes something from the fundamentals: <strong>granting an account is not the same as granting a token</strong>. With OAuth, each signed-in user authorizes separately and permissions follow the person; an access token is a fixed key — whoever holds it can use it. That's exactly why it belongs in <code>.env</code> and never in the source code.
+        </p>
+      </div>
+
+      <!-- STEP B -->
+      <div class="case-header">
+        <p class="case-label">STEP B</p>
+        <h2 class="case-title">Set the connection's permissions</h2>
+      </div>
+      <p class="detail-paragraph">
+        Creating it <strong>does not drop you into its settings page</strong>. Go to <strong>"Connections" in the left sidebar</strong> and click into the <code>Classroom Tool</code> you just made — that's where the token and the capability settings live.
+      </p>
+      <p class="detail-paragraph">
+        The <strong>"Capabilities"</strong> block on that page has three groups, and all three need a look:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Content</span>
+          <span class="role-item__desc">Read content, update content, insert content — <strong>already checked by default; leave them on</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Comment</span>
+          <span class="role-item__desc">Read comments, insert comments — <strong>leave them off</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">User</span>
+          <span class="role-item__desc">One of three, defaulting to <strong>"Read user information including email addresses"</strong> — <strong>you must change it to the topmost option, "No user information"</strong></span>
+        </li>
+      </ul>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion連接功能權限設定.png"
+          alt="The Classroom Tool settings page, showing the Capabilities block split into content, comment and user capabilities, with the user group defaulting to reading user information including email addresses"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 7. The "Capabilities" block on the connection settings page. The three content capabilities come pre-checked and the comment ones stay off; below them, the three user-capability options run from narrowest to widest — and Notion pre-selects the widest.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The user capability defaults to the widest setting, and you have to narrow it yourself.</strong> This tool has no use for user data — it only reads and writes columns in the 「課堂任務管理」 database. It doesn't need to know who anyone is, and it certainly doesn't need email addresses. Change it to <strong>"No user information"</strong>.
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Three options, narrowest to widest, side by side on one screen —<br/>
+          and the default isn't the narrowest.<br/>
+          <strong>Which one should you pick, and why isn't the narrowest the default?</strong>
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         <strong>Don't enable more than you need.</strong> This tool only reads, creates, and updates tasks — there's no need for delete, and no need to manage the entire workspace.
       </p>
 
-      <!-- STEP B -->
+      <!-- STEP C -->
       <div class="case-header">
-        <p class="case-label">STEP B</p>
+        <p class="case-label">STEP C</p>
         <h2 class="case-title">Share the database with the connection</h2>
       </div>
       <p class="detail-paragraph">
@@ -297,7 +447,10 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <p class="detail-paragraph">
         Open「課堂任務管理」 in Notion, then:
       </p>
-      <pre class="code-block" is:raw><code>Top-right ⋯ → Connections → Select Classroom Tool</code></pre>
+      <pre class="code-block" is:raw><code>Top-right ⋯ → Connections → Select Classroom Tool → Add to page</code></pre>
+      <p class="detail-paragraph">
+        That last <strong>"Add to page"</strong> has to be clicked for it to take effect — selecting <code>Classroom Tool</code> on its own isn't enough.
+      </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
@@ -305,9 +458,9 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- STEP C -->
+      <!-- STEP D -->
       <div class="case-header">
-        <p class="case-label">STEP C</p>
+        <p class="case-label">STEP D</p>
         <h2 class="case-title">Find the data source ID</h2>
       </div>
       <p class="detail-paragraph">
@@ -328,37 +481,88 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <span class="part-text">Write a small MCP server</span>
       </div>
 
+      <h2 class="detail-heading">Before you start: check that uv works</h2>
+      <p class="detail-paragraph">
+        Everything from here runs in PowerShell, and it needs <code>uv</code>. Confirm it's installed:
+      </p>
+      <pre class="code-block" is:raw><code>uv --version</code></pre>
+      <p class="detail-paragraph">
+        If the command isn't found, install it first:
+      </p>
+      <pre class="code-block" is:raw><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Installing takes about <strong>30 seconds</strong> in practice, needs <strong>no administrator rights</strong>, and lands in <code>%USERPROFILE%\.local\bin</code>. You may need to <strong>open a fresh PowerShell window</strong> afterwards before the command is found.
+        </p>
+      </div>
+
       <!-- STEP I -->
       <div class="case-header">
         <p class="case-label">STEP I</p>
         <h2 class="case-title">Create the project folder</h2>
       </div>
       <p class="detail-paragraph">
-        In VS Code, create a new project folder named <code>notion-classroom-tool</code>. The structure can start as:
+        In PowerShell, run these in order:
+      </p>
+
+      <pre class="code-block" is:raw><code>cd $HOME
+mkdir notion-classroom-tool
+cd notion-classroom-tool
+uv init</code></pre>
+
+      <p class="detail-paragraph">
+        Once <code>uv init</code> finishes, the folder looks like this:
       </p>
 
       <pre class="code-block" is:raw><code>notion-classroom-tool
-├─ notion_classroom_server.py
-├─ .env
-└─ .gitignore</code></pre>
+├─ .git/            ← uv init also initializes a git repository
+├─ .gitignore       ← written by uv itself
+├─ .python-version
+├─ README.md
+├─ main.py          ← not used on this page; just leave it
+└─ pyproject.toml</code></pre>
+
+      <p class="detail-paragraph">
+        Running <code>uv add</code> later adds <code>.venv/</code> and <code>uv.lock</code> on top of these. <code>main.py</code> is the sample file <code>uv init</code> ships with — this page never touches it, so <strong>there's no need to delete or edit it</strong>.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Open <code>pyproject.toml</code> and look at the <code>requires-python</code> line. <strong>Its value follows whichever Python is on your machine</strong> — we've seen both <code>&gt;=3.14</code> and <code>&gt;=3.10</code> in testing. <strong>If it isn't <code>&gt;=3.10</code>, change it to <code>&gt;=3.10</code></strong> to avoid a version conflict in the next step.
+        </p>
+      </div>
 
       <!-- STEP II -->
       <div class="case-header">
         <p class="case-label">STEP II</p>
-        <h2 class="case-title">Create .env and .gitignore</h2>
+        <h2 class="case-title">Create the three config files</h2>
       </div>
       <p class="detail-paragraph">
-        Put these in <code>.env</code>:
+        This step creates three files: <code>.env</code>, <code>.gitignore</code> and <code>.gemini\.env</code>. <strong>Do all three before moving on</strong> — that way there's nothing to come back for.
       </p>
 
-      <pre class="code-block" is:raw><code>NOTION_API_KEY=your_notion_connection_token
-NOTION_DATA_SOURCE_ID=your_data_source_id
-NOTION_VERSION=2026-03-11</code></pre>
+      <h4 class="example-heading">1. Set up .env</h4>
+      <p class="detail-paragraph">
+        Get two values ready:
+      </p>
 
       <ul class="check-list">
         <li>The <code>notion_connection_token</code> appears as <strong>"Internal Integration Secret"</strong> on the Classroom Tool page after creation — click "Show" to reveal it before copying</li>
-        <li>The <code>data_source_id</code> is the one you just copied in STEP C</li>
+        <li>The <code>data_source_id</code> is the one you just copied in STEP D</li>
       </ul>
+
+      <p class="detail-paragraph">
+        Then create the file from PowerShell:
+      </p>
+
+      <pre class="code-block" is:raw><code>Set-Content -Path ".env" -Value "NOTION_API_KEY=your_token`nNOTION_DATA_SOURCE_ID=your_id`nNOTION_VERSION=2026-03-11"</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Don't create <code>.env</code> in Notepad.</strong> Notepad quietly appends <code>.txt</code> on save, turning it into <code>.env.txt</code>, and the program won't find it.
+        </p>
+      </div>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
@@ -369,13 +573,40 @@ NOTION_VERSION=2026-03-11</code></pre>
         </p>
       </div>
 
+      <h4 class="example-heading">NOTION_VERSION is a fixed identifier, not today's date</h4>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <code>NOTION_VERSION</code> looks like a date, but it <strong>isn't "today"</strong> — it's an <strong>API version identifier</strong> that Notion has published. Only a handful of values are legal; any other date is rejected, <strong>including future ones</strong>. Copy <code>2026-03-11</code> exactly (it's the newest, and the one that supports the <code>data_source_id</code> form).
+        </p>
+      </div>
+
+      <h4 class="example-heading">2. .gitignore</h4>
       <p class="detail-paragraph">
-        <code>.gitignore</code> can be:
+        <code>uv init</code> already wrote a <code>.gitignore</code> for you, but <strong>it doesn't list <code>.env</code></strong>. Overwrite it with the three entries that matter here:
       </p>
 
-      <pre class="code-block" is:raw><code>.env
-.venv/
-__pycache__/</code></pre>
+      <pre class="code-block" is:raw><code>Set-Content -Path ".gitignore" -Value ".env`n.venv/`n__pycache__/"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This isn't optional — <code>uv init</code> also ran <code>git init</code>, so <strong>this folder is already a git repository</strong>. Commit without <code>.env</code> in <code>.gitignore</code> and the token goes straight into version history.
+        </p>
+      </div>
+
+      <h4 class="example-heading">3. .gemini\.env</h4>
+      <p class="detail-paragraph">
+        This project folder <strong>needs its own Gemini key and model setting</strong> too, otherwise the CLI will show an auth menu when you launch it later:
+      </p>
+
+      <pre class="code-block" is:raw><code>mkdir .gemini
+Set-Content -Path ".gemini\.env" -Value "GEMINI_API_KEY=your_key`nGEMINI_MODEL=gemini-3.5-flash-lite"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Verified in testing: with this file present, the CLI's start-up screen shows <code>Authenticated with gemini-api-key</code> directly and <strong>no auth menu appears</strong>. If one does appear, the file wasn't created properly or is in the wrong place.
+        </p>
+      </div>
 
       <!-- STEP III -->
       <div class="case-header">
@@ -383,13 +614,35 @@ __pycache__/</code></pre>
         <h2 class="case-title">Install dependencies</h2>
       </div>
       <p class="detail-paragraph">
-        In the VS Code terminal, initialize the project:
+        The project was already initialized with <code>uv init</code> in STEP I, so go straight to installing. <strong>Copy this exactly, version range included</strong>:
       </p>
-      <pre class="code-block" is:raw><code>uv init</code></pre>
+      <pre class="code-block" is:raw><code>uv add "mcp[cli]&gt;=1.0,&lt;2.0" python-dotenv requests</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Why pin the version?</strong><br/><br/>
+          Without a version range, <code>uv add</code> pulls the newest release every time. The mcp package removed <code>mcp.server.fastmcp</code> entirely in 2.0, so the import on line 5 of the program fails outright with <code>ModuleNotFoundError: No module named 'mcp.server.fastmcp'</code>.<br/><br/>
+          This is the hardest kind of error to diagnose yourself, because it looks like a typo. In fact not a character of the program is wrong — <strong>the package changed under it</strong>.<br/><br/>
+          Pinning to the lower range tells the machine: this material was written against 1.x, please install 1.x.
+        </p>
+      </div>
+
       <p class="detail-paragraph">
-        Activate the virtual environment, then add the packages:
+        Once it's installed, <strong>confirm the version immediately</strong> rather than waiting until you run the program:
       </p>
-      <pre class="code-block" is:raw><code>uv add "mcp[cli]" python-dotenv requests</code></pre>
+
+      <pre class="code-block" is:raw><code>uv pip show mcp
+uv run python -c "from mcp.server.fastmcp import FastMCP; print('ok')"</code></pre>
+
+      <p class="detail-paragraph">
+        The first line should report a version starting with 1; the second should print <code>ok</code>, meaning the import resolves. <strong>Both must pass before you continue.</strong>
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>If you hit a <code>requires-python</code> conflict here</strong> (the message will say it can't find a combination satisfying both <code>mcp&lt;2.0</code> and your Python version), the <code>pyproject.toml</code> from STEP I hasn't been edited yet. Go back, set <code>requires-python</code> to <code>&gt;=3.10</code>, and run <code>uv add</code> again.
+        </p>
+      </div>
 
       <!-- STEP IV -->
       <div class="case-header">
@@ -424,7 +677,13 @@ __pycache__/</code></pre>
         <h2 class="case-title">Write the MCP server</h2>
       </div>
       <p class="detail-paragraph">
-        Place the following in <code>notion_classroom_server.py</code>:
+        The program runs to about 220 lines, which is painful to paste line by line in PowerShell. Open Notepad instead:
+      </p>
+
+      <pre class="code-block" is:raw><code>notepad notion_classroom_server.py</code></pre>
+
+      <p class="detail-paragraph">
+        Choose <strong>Yes</strong> when it asks whether to create a new file, paste in the full program below, then save and close.
       </p>
 
       <details class="details-card">
@@ -615,7 +874,7 @@ def create_classroom_task(
     title is the task name.
     category can be: 教學準備, 學生回覆, 行政事項, 閱讀材料.
     priority can be: 高, 中, 低.
-    due_date should use YYYY-MM-DD format, e.g. 2026-03-20.
+    due_date should use YYYY-MM-DD format, e.g. 2026-09-20.
     """
     if not NOTION_DATA_SOURCE_ID:
         return {
@@ -754,28 +1013,48 @@ if __name__ == "__main__":
 
       <div class="callout-card">
         <p class="callout-text">
-          The new <strong>Create page API</strong> can place a new page under an existing page or data source; if the new page is a child of a data source, the submitted properties must match that data source's schema. The <strong>Update page API</strong> updates properties on a data-source child page — the「狀態」column we update here is exactly that case.
+          STEP II said "don't create <code>.env</code> in Notepad", and here we're creating a <code>.py</code> in Notepad — the two don't conflict. <strong>Notepad only meddles with files that have no base name.</strong> <code>.env</code> is nothing but an extension, so it gets saved as <code>.env.txt</code>; <code>notion_classroom_server.py</code> has a base name and saves under the name you gave it.
         </p>
       </div>
+
+      <p class="detail-paragraph">
+        Once you've saved and closed it, go back to PowerShell and confirm the file really has content:
+      </p>
+
+      <pre class="code-block" is:raw><code>Get-Content notion_classroom_server.py -TotalCount 3</code></pre>
+
+      <p class="detail-paragraph">
+        You should see the first three lines, starting with <code>from typing import Optional</code>. If it's empty or garbled, go back and save it again.
+      </p>
 
       <!-- STEP VI -->
       <div class="case-header">
         <p class="case-label">STEP VI</p>
-        <h2 class="case-title">Wire the MCP server into Gemini CLI</h2>
+        <h2 class="case-title">Write settings.json</h2>
       </div>
       <p class="detail-paragraph">
-        Create <code>.gemini/settings.json</code> in the project folder. The structure becomes:
+        The <code>.gemini</code> folder already exists from STEP II; now we add its second file. The structure becomes:
       </p>
 
       <pre class="code-block" is:raw><code>notion-classroom-tool
 ├─ .gemini
-│  └─ settings.json
+│  ├─ .env           ← created in STEP II
+│  └─ settings.json  ← created here
 ├─ notion_classroom_server.py
 ├─ .env
 └─ .gitignore</code></pre>
 
       <p class="detail-paragraph">
-        <code>settings.json</code> can be:
+        <strong>First get this folder's absolute path</strong> — you'll need it in a moment:
+      </p>
+      <pre class="code-block" is:raw><code>(Get-Location).Path</code></pre>
+      <p class="detail-paragraph">
+        Note down what it prints, e.g. <code>C:\Users\your-account\notion-classroom-tool</code>. Then open Notepad:
+      </p>
+      <pre class="code-block" is:raw><code>notepad .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">
+        Paste in the following, <strong>replacing <code>cwd</code> with the path you just looked up</strong>:
       </p>
 
       <pre class="code-block" is:raw><code class="lang-json">{
@@ -783,7 +1062,7 @@ if __name__ == "__main__":
     "notion-classroom": {
       "command": "uv",
       "args": ["run", "python", "notion_classroom_server.py"],
-      "cwd": "C:\\\\full\\\\absolute\\\\path\\\\notion-classroom-server",
+      "cwd": "C:\\Users\\your-account\\notion-classroom-tool",
       "trust": false
     }
   }
@@ -791,21 +1070,124 @@ if __name__ == "__main__":
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>Do not write <code>python</code> and <code>"."</code> here — it fails outright.</strong> PART 3 installed the packages with <code>uv init</code> + <code>uv add</code>, which puts them in the project's <code>.venv</code>. Calling <code>python</code> directly uses the system Python, which cannot find <code>mcp</code>, <code>dotenv</code>, or <code>requests</code> — a guaranteed <code>ModuleNotFoundError</code>. And <code>"cwd": "."</code> is relative to wherever Gemini CLI was launched, not to this folder, so <code>.env</code> can go missing too. Use the <strong>full absolute path</strong>.
+          <strong>Every backslash in the path has to be doubled.</strong> <code>(Get-Location).Path</code> prints <code>C:\Users\your-account\notion-classroom-tool</code>; in JSON that becomes <code>C:\\Users\\your-account\\notion-classroom-tool</code>. Miss one and the JSON won't parse.
+        </p>
+      </div>
+
+      <!-- STEP VII -->
+      <div class="case-header">
+        <p class="case-label">STEP VII</p>
+        <h2 class="case-title">Start it on its own first</h2>
+      </div>
+      <p class="detail-paragraph">
+        Before wiring it into Gemini CLI, <strong>run the program by itself</strong> to confirm it's sound:
+      </p>
+      <pre class="code-block" is:raw><code>uv run python notion_classroom_server.py</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The correct result is: no output at all, cursor sitting there.</strong><br/>
+          Press Ctrl+C to stop.
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Nothing happening is the right outcome. Once an MCP server starts, it simply waits for Gemini CLI to connect — it was never going to print anything.<br/><br/>
+          If you get <code>ModuleNotFoundError</code> here, <strong>the packages are the problem</strong>; if you get <code>ValueError: 缺少 NOTION_API_KEY</code>, <strong><code>.env</code> isn't being read</strong>. <strong>Solve it here before going further.</strong>
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Don't skip this step.</strong> If you go straight to Gemini CLI, a failure shows up only as an empty <code>/mcp list</code>, with nothing to go on — packages? <code>.env</code>? a broken <code>settings.json</code>? Testing here rules out one possibility at a time.
+        </p>
+      </div>
+
+      <!-- STEP VIII -->
+      <div class="case-header">
+        <p class="case-label">STEP VIII</p>
+        <h2 class="case-title">Launch the CLI and verify</h2>
+      </div>
+      <p class="detail-paragraph">
+        Start it from inside the project folder:
+      </p>
+      <pre class="code-block" is:raw><code>npx @google/gemini-cli</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          On start-up it asks whether you trust this folder — <strong>choose <code>1. Trust folder</code></strong>. This is a new folder, so it will ask again. Choose wrong and <code>settings.json</code> is never loaded, leaving <code>/mcp list</code> empty — and the screen won't tell you why.
         </p>
       </div>
 
       <p class="detail-paragraph">
-        Then in the VS Code terminal:
-      </p>
-      <pre class="code-block" is:raw><code>gemini</code></pre>
-      <p class="detail-paragraph">
-        Once Gemini CLI is up:
+        Check that the <strong>status bar in the bottom-right</strong> reads <code>gemini-3.5-flash-lite</code>, then run:
       </p>
       <pre class="code-block" is:raw><code>/mcp list</code></pre>
       <p class="detail-paragraph">
         If everything's wired correctly, you should see <code>notion-classroom</code> as an MCP server, along with the <strong>three tools</strong> we just defined.
       </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion練習mcp清單.png"
+          alt="The Gemini CLI mcp list screen showing two MCP servers, notion and notion-classroom, the latter marked Ready with three tools listed"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 8. The <code>/mcp list</code> screen. <code>notion-classroom</code> shows Ready (3 tools) with the full name of each tool below it. The <code>notion</code> entry above it is the official Notion MCP, present only because this machine had already worked through "Getting started with Gemini CLI and MCP" — if you haven't done that page, you'll see just <code>notion-classroom</code>, and that's fine.</figcaption>
+      </figure>
+
+      <h2 class="detail-heading">Why there are two MCP servers</h2>
+      <p class="detail-paragraph">
+        Gemini CLI reads MCP configuration from <strong>two layers</strong>, and they stack rather than replace one another:
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Path</th>
+              <th>Server on this page</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>User</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>Official <code>notion</code> (<code>url</code> + <code>type: http</code> + <code>includeTools</code>)</td></tr>
+            <tr><td>Project</td><td><code>project\.gemini\settings.json</code></td><td>Our own <code>notion-classroom</code> (<code>command</code> + <code>args</code> + <code>cwd</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>For this page's exercises, temporarily disable the official <code>notion</code> server.</strong> With both present, the model may reach for the official tools instead — the task gets done, but <strong>your own tool was never actually wired up correctly and you can't tell</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Disable it by renaming the user-layer config:
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json" -NewName "settings.json.bak"</code></pre>
+      <p class="detail-paragraph">
+        Rename it back when you're done:
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json.bak" -NewName "settings.json"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <strong>Fully close Gemini CLI before renaming</strong>, or the file will be locked and the rename will fail.
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Worth noting as a comparison:<br/>
+          the official Notion MCP exposes <strong>28 tools</strong> when unrestricted,<br/>
+          while ours has <strong>3</strong>.<br/>
+          Fewer tools means <strong>less description to read, and fewer tokens per call</strong>.
+        </p>
+      </div>
 
       <!-- ============ PART 4 ============ -->
       <div class="part-divider">
@@ -842,6 +1224,25 @@ if __name__ == "__main__":
         </div>
       </details>
 
+      <p class="detail-paragraph">
+        In testing, setting <code>NOTION_VERSION</code> in the earlier command to the current date <code>2026-09-21</code> made this exercise report an error, as shown in Figure 9.
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">"code": "missing_version",
+"message": "Notion-Version header failed validation: Notion-Version header should be
+\"2021-05-11\", \"2021-05-13\", \"2021-08-16\", \"2022-02-22\", \"2022-06-28\",
+\"2025-09-03\", or \"2026-03-11\", instead was \"2026-09-21\"."</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/NotionVersion版本錯誤.png"
+          alt="A Gemini CLI screen showing list_classroom_tasks returning a 400 error with code missing_version, listing the seven legal Notion-Version values"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 9. What a wrong version identifier looks like. The tool returns ok: false with status_code 400, and Gemini breaks the error code, message and detailed reason into three lines below it.</figcaption>
+      </figure>
+
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
@@ -849,18 +1250,60 @@ if __name__ == "__main__":
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">Here are the classroom tasks currently marked「待確認」 in Notion:</p>
+          <p class="detail-paragraph">The tool call the model made:</p>
+          <pre class="code-block" is:raw><code>list_classroom_tasks {"status":"待確認"}</code></pre>
+
+          <p class="detail-paragraph">What the tool returned:</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "count": 2,
+  "tasks": [
+    {
+      "page_id": "3b84757f-c450-8002-83dc-f6bf37215b68",
+      "任務名稱": "準備閱讀材料摘要",
+      "類型": "閱讀材料",
+      "狀態": "待確認",
+      "優先順序": "中",
+      "截止日": "2026-09-25",
+      "來源": "閱讀清單",
+      "備註": "先產生摘要草稿，不直接發給學生"
+    },
+    {
+      "page_id": "3b84757f-c450-80c5-97f6-d9fb0fbce2b5",
+      "任務名稱": "確認下週課堂公告",
+      "類型": "教學準備",
+      "狀態": "待確認",
+      "優先順序": "高",
+      "截止日": "2026-09-20",
+      "來源": "課程安排",
+      "備註": "需要確認教室、時間與提醒內容"
+    }
+  ]
+}</code></pre>
+
+          <p class="detail-paragraph">The table the model then produced:</p>
 
           <div class="csv-table-wrapper">
             <table class="csv-table">
               <thead>
-                <tr><th>Task name</th><th>Category</th><th>Priority</th><th>Due date</th><th>Notes</th></tr>
+                <tr><th>任務名稱</th><th>類型</th><th>優先順序</th><th>截止日</th><th>備註</th></tr>
               </thead>
               <tbody>
-                <tr><td>確認下週課堂公告</td><td>教學準備</td><td>高</td><td>2026-03-20</td><td>需要確認教室、時間與提醒內容</td></tr>
-                <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>中</td><td>2026-03-25</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+                <tr>
+                  <td>準備閱讀材料摘要<br/>確認下週課堂公告</td>
+                  <td>閱讀材料<br/>教學準備</td>
+                  <td>中<br/>高</td>
+                  <td>2026-09-25<br/>2026-09-20</td>
+                  <td>先產生摘要草稿，不直接發給學生<br/>需要確認教室、時間與提醒內容</td>
+                </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              <strong>The content is right, but the table came out skewed</strong> — both tasks were crammed into a single row, with two lines of text per cell instead of two separate rows. This is a common lapse in lightweight models; what matters is that the data itself is correct.
+            </p>
           </div>
         </div>
       </details>
@@ -895,7 +1338,7 @@ if __name__ == "__main__":
             Task name: 整理下次課程的練習指令<br/>
             Category: 教學準備<br/>
             Priority: 中<br/>
-            Due date: 2026-03-28<br/>
+            Due date: 2026-09-28<br/>
             Source: 課程規劃<br/>
             Notes: 先整理成草稿，發布前需要人工確認<br/><br/>
             After creation, please report:<br/>
@@ -914,12 +1357,25 @@ if __name__ == "__main__":
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">A new classroom task was created:</p>
+          <p class="detail-paragraph">The tool call the model made:</p>
+          <pre class="code-block" is:raw><code>create_classroom_task {"title":"整理下次課程的練習指令","priority":"中","source":"課程規劃","category":"教學準備", ...}</code></pre>
+
+          <p class="detail-paragraph">What the tool returned:</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "message": "已建立 Notion 任務。",
+  "page_id": "3b84757f-c450-8199-9f69-f83bc28b73d5",
+  "url": "https://app.notion.com/p/3b84757fc45081999f69f83bc28b73d5",
+  "任務名稱": "整理下次課程的練習指令",
+  "狀態": "待確認"
+}</code></pre>
+
+          <p class="detail-paragraph">The model's reply:</p>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Created successfully: <strong>Yes</strong></span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Task name: <strong>整理下次課程的練習指令</strong></span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Status: <strong>待確認</strong></span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion page link: open in Notion</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Created successfully: yes</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Task name: 整理下次課程的練習指令</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Status: 待確認</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion page link: https://app.notion.com/p/3b84757fc45081999f69f83bc28b73d5</span></li>
           </ol>
         </div>
       </details>
@@ -944,6 +1400,14 @@ if __name__ == "__main__":
         First run <strong>Exercise 1</strong> to list tasks and find the one to update. The tool's response includes a <code>page_id</code> — pass that to the AI for the next step.
       </p>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>You must replace the page_id line in the prompt below yourself.</strong><br/><br/>
+          If you don't, the AI very likely <strong>won't come back and ask</strong> — it'll go look the value up itself and proceed. That's exactly what happened in testing: it called <code>list_classroom_tasks</code> on its own, matched by task name, found the <code>page_id</code>, and updated successfully.<br/><br/>
+          It guessed right that time. But the tool <strong>only validates the shape of the <code>page_id</code>; it never checks whether that's the row you meant</strong>. If the database holds two tasks with similar names, it may well edit the wrong one — and the reply will look exactly the same.
+        </p>
+      </div>
+
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
@@ -953,7 +1417,7 @@ if __name__ == "__main__":
         <div class="details-card__body">
           <blockquote class="prompt-example">
             Use the notion-classroom tool to update the「準備閱讀材料摘要」 task's status to「處理中」.<br/><br/>
-            page_id: paste the page_id returned by the tool<br/><br/>
+            page_id: (replace this line with the page_id returned in Exercise 1, formatted like 3b84757f-c450-8002-83dc-f6bf37215b68)<br/><br/>
             Important:<br/>
             1. Update only the status.<br/>
             2. Do not change the task name.<br/>
@@ -970,12 +1434,39 @@ if __name__ == "__main__":
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">Update result:</p>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Updated successfully: <strong>Yes</strong></span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">page_id: 3564757f-c450-800c-a921-f095a8ffaec2</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">New status: <strong>處理中</strong></span></li>
-          </ol>
+          <p class="detail-paragraph">The tool call the model made:</p>
+          <pre class="code-block" is:raw><code>update_task_status {"new_status":"處理中","page_id":"3b84757f-c450-8002-83dc-f6bf37215b68"}</code></pre>
+
+          <p class="detail-paragraph">What the tool returned:</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "message": "已更新任務狀態。",
+  "page_id": "3b84757f-c450-8002-83dc-f6bf37215b68",
+  "new_status": "處理中"
+}</code></pre>
+
+          <p class="detail-paragraph">The model's reply:</p>
+          <blockquote class="prompt-example">
+            Successfully updated the「準備閱讀材料摘要」 task's status to「處理中」.<br/><br/>
+            Update result:<br/>
+            ・Task name: 準備閱讀材料摘要<br/>
+            ・Page ID: 3b84757f-c450-8002-83dc-f6bf37215b68<br/>
+            ・New status: 處理中
+          </blockquote>
+
+          <h4 class="example-heading">Verify back in Notion</h4>
+          <p class="detail-paragraph">
+            Check the row in Notion afterwards — only the status should have moved:
+          </p>
+          <ul class="check-list">
+            <li>Status <strong>changed to「處理中」</strong></li>
+            <li>Task name <strong>unchanged</strong></li>
+            <li>Category <strong>unchanged</strong></li>
+            <li>Priority <strong>unchanged</strong></li>
+            <li>Due date 2026-09-25 <strong>unchanged</strong></li>
+            <li>Source <strong>unchanged</strong></li>
+            <li>Notes <strong>unchanged</strong></li>
+          </ul>
         </div>
       </details>
 
@@ -1035,23 +1526,39 @@ if __name__ == "__main__":
           <span class="details-card__hint">Click to expand a sample response</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">Based on the supplied text, the organized fields are:</p>
+          <div class="callout-card">
+            <p class="callout-text">
+              This one made <strong>no call to <code>create_classroom_task</code></strong> — the Notion database stayed at five rows and gained nothing.
+            </p>
+          </div>
+
+          <p class="detail-paragraph">The model's reply:</p>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Task name: Remind participants and follow up on missing diet info</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">Task name: 提醒參加者依報名場次出席並補填飲食需求資料</span></li>
             <li><span class="numbered-list__num">2</span><span class="numbered-list__text">Category: 行政事項</span></li>
             <li><span class="numbered-list__num">3</span><span class="numbered-list__text">Priority: 中</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Due date: <strong>"Next week" — exact date unclear</strong></span></li>
-            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Source: (none)</span></li>
-            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">Notes: Next week, remind participants to attend their registered session and ask people who left the diet field blank to fill it in.</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Due date: unclear</span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">Source: 報告與出席注意事項</span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">Notes: 需提醒參加者依照報告場次出席，並請飲食需求未填的人補填資料。</span></li>
           </ol>
 
           <div class="callout-card callout-card--warn">
             <p class="callout-text">
-              <strong>Missing due date — needs human verification.</strong> No Notion task was created.
+              Missing due date — needs human verification
             </p>
           </div>
         </div>
       </details>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion課堂任務管理練習後.png"
+          alt="The 課堂任務管理 database after all four exercises, now holding five rows, with 準備閱讀材料摘要 set to 處理中 and 整理下次課程的練習指令 as the last row"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Figure 10. The database after all four exercises. Compared with Figure 4: the extra fifth row is 「整理下次課程的練習指令」 from Exercise 2, 「準備閱讀材料摘要」 moved from 待確認 to 處理中 in Exercise 3, and Exercise 4 added nothing at all.</figcaption>
+      </figure>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -1087,7 +1594,17 @@ if __name__ == "__main__":
           <span class="role-item__label role-item__label--ord">5.</span>
           <span class="role-item__desc"><strong>New tasks are always created with status「待確認」.</strong> Stops the AI from declaring a brand-new task as done.</span>
         </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">6.</span>
+          <span class="role-item__desc"><strong>Creating a task can't be undone, and it can be repeated.</strong> Run the same prompt twice and you get two rows; the AI won't warn you that one already looks like it exists. Since the tool only creates and never deletes, a mistake has to be cleaned up by hand in Notion.</span>
+        </li>
       </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Point 6 is also why <strong>reads come before writes</strong> — a bad read is fixed by reading again, a bad write is yours to clean up. In testing, simply re-running one prompt to adjust a date left a duplicate row behind in Notion.
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -1614,6 +2131,28 @@ if __name__ == "__main__":
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
     letter-spacing: 0.05em;
+  }
+
+  /* Figure / Image */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    margin-inline: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   .details-card {

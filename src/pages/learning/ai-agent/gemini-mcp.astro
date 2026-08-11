@@ -568,6 +568,7 @@ Get-Content .gemini\.env</code></pre>
             <pre class="code-block"><code>/mcp auth notion</code></pre>
             <p class="step-desc">Check once more: notion should now show as connected, with the full tool list.</p>
             <pre class="code-block"><code>/mcp list</code></pre>
+            <p class="step-desc step-desc--alert">For safety, the connection isn't permanent — if it's been idle for a while, you'll need to authorize again before using Notion.</p>
           </div>
         </li>
       </ol>
@@ -1098,6 +1099,11 @@ Get-Content .gemini\.env</code></pre>
 
   .step-desc strong {
     color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .step-desc--alert {
+    color: #dc2626;
     font-weight: 600;
   }
 
