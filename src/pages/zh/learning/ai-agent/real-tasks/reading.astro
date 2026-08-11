@@ -84,7 +84,15 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">建立專案資料夾</h2>
       </div>
       <p class="detail-paragraph">
-        請在 VS Code 裡建立一個新的專案資料夾 <code>reading-writing-agent</code>，資料夾結構可以先長這樣：
+        整個過程都在 <strong>PowerShell</strong> 裡完成，<strong>不需要特定的編輯器</strong>。先建立專案資料夾：
+      </p>
+
+      <pre class="code-block" is:raw><code>New-Item -ItemType Directory -Path "$HOME\reading-writing-agent\data" -Force
+New-Item -ItemType Directory -Path "$HOME\reading-writing-agent\.gemini" -Force
+cd "$HOME\reading-writing-agent"</code></pre>
+
+      <p class="detail-paragraph">
+        資料夾結構會長這樣：
       </p>
 
       <pre class="code-block" is:raw><code>reading-writing-agent
@@ -93,13 +101,47 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
    ├─ assignment.txt
    └─ draft_v1.txt</code></pre>
 
+      <p class="detail-paragraph">
+        <code>.gemini\.env</code> 用來存放 API 金鑰與模型設定，與前兩頁相同，若已建過可沿用。
+      </p>
+
       <!-- STEP 2 -->
       <div class="case-header">
         <p class="case-label">STEP 2</p>
         <h2 class="case-title">範例資料一：練習用文章</h2>
       </div>
       <p class="detail-paragraph">
-        請在 <code>article.txt</code> 裡放入以下內容：
+        接著建立練習用文章。<strong>整段複製、貼進 PowerShell 執行就好</strong>，一次寫入，不用另外開編輯器：
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+社群媒體與公共討論
+
+近年來，社群媒體已經成為許多人獲取資訊、表達意見和參與公共討論的重要空間。和傳統媒體相比，社群媒體的門檻較低，使用者可以快速發布訊息，也可以即時回應他人的看法。這讓公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。
+
+然而，社群媒體也帶來一些新的問題。首先，資訊傳播速度很快，但查證速度不一定跟得上。當一則未經確認的消息被大量轉發時，錯誤資訊可能在短時間內擴散。其次，平台演算法常常會根據使用者過去的點擊、停留時間和互動紀錄，推薦相似的內容。這可能讓使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。
+
+此外，社群媒體上的討論容易受到情緒影響。簡短、強烈、容易引起反應的內容，往往比細緻、複雜、需要花時間理解的內容更容易被看見。這不代表所有社群媒體討論都是不好的，而是提醒我們，在使用社群媒體參與公共議題時，需要更注意資訊來源、表達方式與討論品質。
+
+如果使用得當，社群媒體仍然可以成為公共參與的重要工具。例如，一些社會議題可以透過社群媒體被更多人看見，弱勢群體也可能透過網路平台發聲。問題不在於社群媒體本身一定好或壞，而在於使用者、平台和社會如何共同建立更好的資訊判斷方式與討論規則。
+
+因此，面對社群媒體上的公共討論，我們不應只問「要不要使用社群媒體」，而應該進一步思考：如何判斷資訊是否可靠？如何避免只接觸單一觀點？如何在快速回應的環境中保留思考空間？這些問題，會影響我們能否把社群媒體變成更有品質的公共討論場域。
+'@ | Set-Content -Path "data\article.txt" -Encoding UTF8</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <code>-Encoding UTF8</code> <strong>不可省略</strong>。Windows PowerShell 預設編碼會讓中文變成亂碼。
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          結尾的 <code>'@</code> <strong>必須頂格</strong>，前面不能有任何空白。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        文章全文也可以展開對照：
       </p>
 
       <details class="details-card">
@@ -138,7 +180,29 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">範例資料二：報告要求</h2>
       </div>
       <p class="detail-paragraph">
-        請在 <code>assignment.txt</code> 裡放入以下內容：
+        同樣用 PowerShell 一次寫入。這份檔案是<strong>純文字</strong>，不要帶 Markdown 星號：
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+報告任務：根據指定文章，撰寫一份短篇閱讀報告。
+報告長度：約 800 到 1200 字。
+
+報告需要包含：
+1. 文章主題簡介：說明文章主要討論什麼問題。
+2. 文章重點整理：整理文章中的主要觀點，不需要逐段摘要。
+3. 個人觀點：說明你同意、不同意，或想進一步討論的地方。
+4. 延伸問題：提出 1 到 2 個可以繼續思考的問題。
+
+注意事項：
+1. 不要只複製文章內容。
+2. 不要把 AI 產生的內容直接當成最後版本。
+3. 如果使用文章中的說法，要確認是否真的來自文章。
+4. 報告要有清楚段落。
+5. 結論不要太突然，要回到前面的討論。
+'@ | Set-Content -Path "data\assignment.txt" -Encoding UTF8</code></pre>
+
+      <p class="detail-paragraph">
+        報告要求全文也可以展開對照：
       </p>
 
       <details class="details-card">
@@ -184,7 +248,21 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">範例資料三：草稿範例</h2>
       </div>
       <p class="detail-paragraph">
-        請在 <code>draft_v1.txt</code> 裡放入以下內容：
+        第三份檔案，一樣用 PowerShell 寫入：
+      </p>
+
+      <pre class="code-block" is:raw><code>@'
+社群媒體現在很重要，很多人都會用社群媒體看新聞和表達自己的想法。這篇文章主要是在說社群媒體對公共討論有很大的影響。
+
+我覺得社群媒體有好處也有壞處。好處是大家都可以發表意見，不一定只有記者或專家可以說話。這樣很多議題就可以被更多人看到。可是壞處是網路上也有很多假消息，而且大家常常只看自己想看的東西，這樣可能會讓討論變得不理性。
+
+文章也提到演算法會推薦使用者喜歡看的內容，所以人們可能一直看到差不多的觀點。我覺得這是一個問題，因為如果大家都只看自己同意的東西，就不容易理解其他人的想法。
+
+總之，社群媒體是一個有用的工具，但是也有很多問題。我們應該要小心使用，不要亂相信網路上的資訊，也要多看不同的觀點。
+'@ | Set-Content -Path "data\draft_v1.txt" -Encoding UTF8</code></pre>
+
+      <p class="detail-paragraph">
+        草稿全文也可以展開對照：
       </p>
 
       <details class="details-card">
@@ -219,12 +297,45 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         後面會請 AI 幫忙檢查這份草稿。
       </p>
 
-      <!-- ============ Section: read files ============ -->
-      <h2 class="detail-heading">在 VS Code 裡用 Gemini CLI 讀取檔案</h2>
+      <!-- ============ Section: 建檔後的檢查 ============ -->
+      <h2 class="detail-heading">確認三個檔案沒有壞掉</h2>
       <p class="detail-paragraph">
-        這裡的練習<strong>不是把文章直接貼進指令裡</strong>，而是讓 Gemini CLI 讀取本機檔案。請先用 VS Code 開啟 <code>reading-writing-agent</code>，接著開啟終端機（<strong>Terminal → New Terminal</strong>），輸入：
+        中文編碼出錯的時候，<strong>錯誤會等到 AI 讀檔時才浮現</strong>，而且不容易看出來 —— 回覆照樣工整，只是內容跟你以為的不一樣。所以先檢查一次：
       </p>
-      <pre class="code-block" is:raw><code>gemini</code></pre>
+
+      <pre class="code-block" is:raw><code>Get-ChildItem data | Select-Object Name, Length
+Get-Content "data\article.txt" -Encoding UTF8 | Select-Object -First 3</code></pre>
+
+      <p class="detail-paragraph">
+        如果看到亂碼或問號，請重新執行前面的建檔指令，<strong>不要往下進行</strong>。
+      </p>
+
+      <!-- ============ Section: read files ============ -->
+      <h2 class="detail-heading">用 Gemini CLI 讀取本機檔案</h2>
+      <p class="detail-paragraph">
+        這裡的練習<strong>不是把文章直接貼進指令裡</strong>，而是讓 Gemini CLI 讀取本機檔案。請在專案資料夾內啟動：
+      </p>
+      <pre class="code-block" is:raw><code>npx @google/gemini-cli</code></pre>
+
+      <p class="detail-paragraph">
+        啟動時會依序遇到三個畫面：
+      </p>
+
+      <ol class="numbered-list">
+        <li>
+          <span class="numbered-list__num">1</span>
+          <span class="numbered-list__text"><strong>詢問是否信任這個資料夾</strong>：必須選 <code>1. Trust folder</code>。選不信任會讀不到 <code>.env</code>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">2</span>
+          <span class="numbered-list__text"><strong>若出現驗證選單</strong>：不要選 <strong>Sign in with Google</strong>。</span>
+        </li>
+        <li>
+          <span class="numbered-list__num">3</span>
+          <span class="numbered-list__text"><strong>確認模型</strong>：看畫面<strong>右下角的狀態列</strong>，應顯示 <code>gemini-3.5-flash-lite</code>。不要按 <code>/model</code>。</span>
+        </li>
+      </ol>
+
       <p class="detail-paragraph">
         進入 Gemini CLI 後，後面的練習會用這些檔案路徑：
       </p>
@@ -302,37 +413,35 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
           <p class="detail-paragraph">社群媒體與公共討論</p>
 
           <h4 class="example-heading">主要問題</h4>
-          <p class="detail-paragraph">（根據文章內容歸納）社群媒體對公共討論帶來哪些轉變與挑戰？我們該如何因應，以提升社群媒體上的公共參與品質？</p>
+          <p class="detail-paragraph">社群媒體作為資訊獲取、意見表達和公共討論的空間，帶來了資訊查證不及、同溫層效應（演算法推薦相似內容）、以及討論容易受情緒影響（簡短強烈內容較易被看見）等問題。</p>
 
           <h4 class="example-heading">文章重點</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">社群媒體<strong>降低了公共討論的門檻</strong>，讓資訊傳遞更快速，參與者也更廣泛。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">社群媒體的資訊傳播與平台演算法，可能導致<strong>錯誤資訊擴散</strong>及<strong>觀點單一化</strong>（迴聲室效應）。</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">社群媒體上的討論容易受<strong>情緒影響</strong>，簡短、強烈的內容往往比細緻複雜的論述更容易獲得關注。</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">社群媒體門檻低、傳播快速，讓公共討論更快速且讓更多人參與。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">存在錯誤資訊快速擴散、演算法導致較少接觸不同觀點、以及討論易受情緒影響等現象。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">若使用得當，社群媒體可成為公共參與的重要工具，使社會議題被更多人看見並讓弱勢群體發聲。</span></li>
           </ol>
 
           <h4 class="example-heading">文章提到的好處</h4>
           <ul class="check-list">
-            <li>獲取資訊與表達意見的<strong>門檻較低</strong></li>
-            <li>資訊發布與回應十分<strong>即時、快速</strong></li>
-            <li>讓更多人有機會參與原本不易接近的議題</li>
-            <li>有利於社會議題被大眾看見</li>
-            <li>提供<strong>弱勢群體發聲的管道</strong></li>
+            <li>獲取資訊、表達意見和參與公共討論的門檻較低，使用者能快速發布訊息並即時回應他人的想法。</li>
+            <li>讓公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。</li>
+            <li>社會議題可以透過社群媒體被更多人看見。</li>
+            <li>弱勢群體可能透過網路平台發聲。</li>
           </ul>
 
           <h4 class="example-heading">文章提到的問題</h4>
           <ul class="check-list">
-            <li>資訊查證速度跟不上傳播速度，<strong>錯誤資訊容易快速擴散</strong></li>
-            <li>平台演算法推薦相似內容，導致使用者較少接觸不同觀點</li>
-            <li>討論容易受到情緒影響</li>
-            <li>細緻、複雜且需時理解的內容較不易被看見</li>
+            <li>資訊傳播速度很快，但查證速度不一定跟得上，未經確認的消息被大量轉發時，錯誤資訊可能在短時間內擴散。</li>
+            <li>平台演算法根據使用者過去的點擊、停留時間和互動紀錄推薦相似內容，可能讓使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。</li>
+            <li>討論容易受到情緒影響，簡短、強烈、容易引起反應的內容，往往比細緻、複雜、需要花時間理解的內容更容易被看見。</li>
           </ul>
 
-          <h4 class="example-heading">可以延伸思考的問題</h4>
+          <h4 class="example-heading">可以延伸思考的問題（根據文章內容歸納）</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">如何<strong>判斷資訊是否可靠</strong>？</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">如何<strong>避免只接觸單一觀點</strong>？</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如何在快速回應的環境中<strong>保留思考空間</strong>？</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">如何判斷資訊是否可靠？</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">如何避免只接觸單一觀點？</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如何在快速回應的環境中保留思考空間？</span></li>
           </ol>
         </div>
       </details>
@@ -389,78 +498,111 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         </summary>
         <div class="details-card__body">
           <h4 class="example-heading">報告題目建議</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">數位時代的公共對話：社群媒體對公共討論的機遇與挑戰</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">演算法、情緒與參與：社群媒體作為公共討論場域的反思</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">如何在快速傳播中守護討論品質？論社群媒體與公共參與的未來</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>走向更高品質的公共討論：社群媒體的機遇與挑戰</li>
+            <li>網路時代的公共參與：社群媒體如何影響公共討論</li>
+          </ul>
 
           <h4 class="example-heading">整體寫作方向</h4>
           <p class="detail-paragraph">
-            以「<strong>工具的正反面影響</strong>」為核心，分析社群媒體如何改變公共討論的型態，並探討在使用該工具時，個人與社會應如何建立判斷準則與規則。
+            本報告以「社群媒體與公共討論」為核心，探討社群媒體在降低公共參與門檻的同時，所帶來的查證速度落差、演算法同溫層與情緒化討論等挑戰。文章旨在引導讀者思考如何建立更好的資訊判斷方式與討論規則，而非單純討論是否使用社群媒體。寫作時應避免直接抄錄原文，而是將重點與挑戰進行綜合整理，並在個人觀點中提供多向思考方向，最後透過總結反思呼應前文的提問。
           </p>
 
-          <h4 class="example-heading">第一段：文章主題簡介</h4>
+          <h4 class="example-heading">段落大綱</h4>
+
+          <h4 class="example-heading">第一段：前言與主題引入</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">寫作目的</span>
-              <span class="role-item__desc">引出討論背景，說明社群媒體在現代公共生活中的角色。</span>
+              <span class="role-item__desc">引介文章核心主題，點出社群媒體在現代公共討論中所扮演的角色與雙面特性。</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">可以寫的內容</span>
-              <span class="role-item__desc">描述社群媒體已成為大眾獲取資訊、表達意見的主要空間；指出文章探討的核心問題：社群媒體的特性如何影響公共參與？</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>說明社群媒體已成為獲取資訊、表達意見與參與公共討論的重要空間。</li>
+                  <li>對比傳統媒體，點出社群媒體門檻較低、傳播快速、能讓更多人參與的特點。</li>
+                  <li>點出雖然社群媒體帶來便利，但也伴隨資訊查證、同溫層及情緒化討論等挑戰。</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
-          <h4 class="example-heading">第二段：文章重點整理</h4>
+          <h4 class="example-heading">第二段：文章重點整理：社群媒體帶來的挑戰</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">寫作目的</span>
-              <span class="role-item__desc">歸納文章對社群媒體公共討論特性的觀察。</span>
+              <span class="role-item__desc">歸納文章中指出社群媒體所面臨的三大問題，釐清其對公共討論帶來的負面影響。</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">可以寫的內容</span>
-              <span class="role-item__desc"><strong>優點</strong>：門檻降低、即時回應、弱勢群體的發聲機會。<strong>問題</strong>：資訊查證滯後、演算法導致的單一觀點推薦、情緒化內容排擠細緻論述。<strong>小結</strong>：社群媒體本質非絕對好壞，端看如何運用。</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>資訊傳播快速但查證不及，未經確認消息容易快速擴散。</li>
+                  <li>演算法推薦相似內容造成的同溫層效應，使人較少接觸不同觀點。</li>
+                  <li>討論易受情緒影響，簡短強烈內容比細緻複雜內容更容易被看見。</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
-          <h4 class="example-heading">第三段：個人觀點（可選方向）</h4>
+          <h4 class="example-heading">第三段：文章重點整理：社群媒體的價值與可能性</h4>
           <ul class="role-list role-list--compact">
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">寫作目的</span>
-              <span class="role-item__desc">針對文章提出的論點進行深入探討或表達立場。</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">方向 A</span>
-              <span class="role-item__desc">進一步討論「演算法」對資訊接收的限制 —— 「只看見自己想看見的」是否正削弱公共討論的基礎？</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">方向 B</span>
-              <span class="role-item__desc">討論「情緒與內容品質」的矛盾 —— 「強烈內容更容易被看見」對公共參與是助力還是阻力？</span>
-            </li>
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">方向 C</span>
-              <span class="role-item__desc">討論「使用者、平台與社會」的共同責任 —— 在建立討論規則的過程中，哪一方角色最為關鍵？</span>
-            </li>
-          </ul>
-
-          <h4 class="example-heading">第四段：結論與延伸思考</h4>
-          <ul class="role-list role-list--compact">
-            <li class="role-item">
-              <span class="role-item__label role-item__label--ord">寫作目的</span>
-              <span class="role-item__desc">總結全文論點，並提出能引發後續思考的問題。</span>
+              <span class="role-item__desc">說明社群媒體在正向使用下的潛在價值，並釐清問題本質。</span>
             </li>
             <li class="role-item">
               <span class="role-item__label role-item__label--ord">可以寫的內容</span>
-              <span class="role-item__desc">回應文章結語：不應只討論「要不要用」，而應學習「如何有品質地使用」；提出延伸問題收束。</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>強調社群媒體本身並非絕對好或壞，若使用得當仍可成為公共參與的重要工具。</li>
+                  <li>舉例說明社會議題能被更多人看見，弱勢群體也能透過網路平台發聲。</li>
+                  <li>指出問題核心在於使用者、平台和社會如何共同建立資訊判斷方式與討論規則。</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">第四段：個人觀點（可選方向）</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">提供讀者針對文章內容進行深度思考與表態的方向，供撰寫時自由選擇立場。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">可以寫的內容<br/>（可選方向）</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>方向一（偏向制度與平台責任）：探討平台演算法與機制是否應負起主要責任，例如透過技術或規則調整來改善同溫層與情緒化討論。</li>
+                  <li>方向二（偏向個人素養與行為）：強調使用者自身在面對快速資訊與情緒化內容時，如何主動加強資訊查證與保持多元觀點。</li>
+                  <li>方向三（平衡發展）：認為改善公共討論品質需要使用者、平台與社會三方共同協力，並無單一解方。</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="example-heading">第五段：結論與延伸問題</h4>
+          <ul class="role-list role-list--compact">
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">寫作目的</span>
+              <span class="role-item__desc">總結全文討論，避免結論過於突然，並引導讀者進行後續延伸思考。</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label role-item__label--ord">可以寫的內容</span>
+              <div class="role-item__desc">
+                <ul class="prose-list">
+                  <li>呼應前文，重申不應只問「要不要使用社群媒體」，而應關注如何提升公共討論品質。</li>
+                  <li>提出 1 到 2 個延伸思考問題（例如：我們該如何判斷資訊是否可靠？如何在快速回應的環境中保留思考空間？）。</li>
+                </ul>
+              </div>
             </li>
           </ul>
 
           <h4 class="example-heading">還需要自己補充或確認的地方</h4>
           <ul class="check-list">
-            <li><strong>字數分配</strong>：報告要求 800–1200 字，由於文章內容較精簡，需要在「個人觀點」段落多論述。</li>
-            <li><strong>段落銜接</strong>：第三段（個人觀點）如何順暢地銜接回第四段（結論），須特別注意。</li>
-            <li><strong>確認內容來源</strong>：文章未提及具體平台名稱（如 Facebook、Twitter），撰寫時應避免使用具體案例。</li>
+            <li>決定個人觀點的最終立場（同意、不同意或想進一步探討的方向）。</li>
+            <li>依據 800 至 1200 字的篇幅要求，調整各段落的文字細節與論述深度。</li>
           </ul>
         </div>
       </details>
@@ -510,37 +652,44 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">
-            字數控制在約 750 字，預留空間供您後續擴充以符合報告任務要求的 800–1200 字範圍。
-          </p>
-
           <h4 class="example-heading">報告草稿初版</h4>
           <article class="prose-card">
-            <p><strong>題目</strong>：數位時代的公共對話：論社群媒體對公共參與的影響與省思</p>
+            <p><strong>題目</strong>：社群媒體與公共討論的機遇與挑戰</p>
 
-            <p><strong>一、文章主題簡介</strong></p>
-            <p>本文主要探討社群媒體在現代公共討論中所扮演的角色及其帶來的轉變。隨著資訊科技的發展，社群媒體已不再僅是社交工具，更成為大眾獲取資訊、表達意見與參與公共議題的重要場域。文章核心在於分析社群媒體如何透過其低門檻與高效率的特性改變討論型態，並同時指出這些特性背後隱藏的挑戰。</p>
+            <p>近年來，社群媒體已成為許多人獲取資訊、表達意見和參與公共討論的重要空間。相較於傳統媒體，社群媒體的門檻較低，使用者可以快速發布訊息並即時回應他人看法，這使得公共討論變得更快速，也讓更多人有機會參與原本不容易接近的議題。</p>
 
-            <p><strong>二、文章重點整理</strong></p>
-            <p>根據文章所述，社群媒體對公共討論的貢獻主要體現在「近用性」與「即時性」。相較於傳統媒體，社群媒體降低了參與門檻，讓使用者能快速發布並回應訊息，使許多原本難以接近的議題能被更多人看見，甚至為弱勢群體提供了發聲的管道。</p>
-            <p>然而，這些特性也伴隨了顯著的問題：「查證與速度的落差」使錯誤資訊可能短時間擴散；「演算法的限制」使使用者較少接觸多元觀點；社群媒體上的討論「容易受情緒驅動」，簡短強烈的內容往往比細緻論述更容易獲得關注，這可能影響整體的討論品質。</p>
+            <p>然而，社群媒體在帶來便利的同時，也伴隨著一些新的問題。首先是資訊傳播速度快，但查證速度不一定跟得上，未經確認的消息若被大量轉發，錯誤資訊可能在短時間內擴散。其次，平台演算法會根據使用者的點擊、停留時間與互動紀錄推薦相似內容，這可能使使用者經常看到與自己立場接近的資訊，而較少接觸不同觀點。此外，社群媒體上的討論也容易受到情緒影響，簡短、強烈且容易引起反應的內容，往往比細緻、複雜、需要時間理解的內容更容易被看見。</p>
 
-            <p><strong>三、個人觀點</strong></p>
-            <p>針對文章提出的論點，我認為「使用品質」確實是當前公共參與中最值得關注的環節。文章提到，社群媒體的特性並非絕對的好與壞，這種觀點相對務實。在「資訊傳播」方面，我認同文章所說的查證風險；關於演算法造成的觀點單一化，這確實可能讓公共對話演變成同溫層內的取暖。我也進一步思考，<strong>「建立討論規則與判斷方式」不應只是使用者的責任，平台方與社會整體的規範也同樣關鍵</strong>。</p>
+            <p>儘管如此，這並不代表社群媒體上的討論都是不好的。如果使用得當，社群媒體仍然可以成為公共參與的重要工具。例如，社會議題可以透過社群媒體被更多人看見，弱勢群體也可能透過網路平台發聲。問題不在於社群媒體本身絕對的好壞，而在於使用者、平台和社會如何共同建立更好的資訊判斷方式與討論規則。</p>
 
-            <p><strong>四、結論與延伸問題</strong></p>
-            <p>總結而言，社群媒體提供了一個快速且民主的參與空間，但也對資訊的判斷力與討論的品質提出了嚴峻挑戰。我們應從「如何判斷資訊可靠性」、「如何突破單一觀點」以及「如何在快速環境中保留思考」等面向著手，共同將社群媒體轉化為更有品質的公共場域。</p>
+            <p>就個人觀點而言，社群媒體既是促進公共參與的助力，也是影響討論品質的挑戰。我們或許可以思考，在享受社群媒體帶來的便利與快速參與之餘，如何在日常使用中保持警覺，並嘗試理解不同的聲音。</p>
+
+            <p>總結來說，面對社群媒體上的公共討論，我們不應只問「要不要使用社群媒體」，而應該進一步思考如何判斷資訊是否可靠、如何避免只接觸單一觀點，以及如何在快速回應的環境中保留思考空間。這些問題將影響我們能否把社群媒體變成更有品質的公共討論場域。</p>
           </article>
 
           <h4 class="example-heading">需要自己修改的地方</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>字數擴充</strong>：目前約 750 字，距離 800–1200 字仍有差距。建議在「個人觀點」段落加入更多您的思考。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>文字修飾</strong>：草稿語氣較中規中矩。可依照自己的寫作風格調整語句修飾。</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>銜接與轉折</strong>：可增加更多承上啟下的過渡句，讓文章讀起來更自然。</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>確認引用</strong>：定稿前請再次核對草稿中標註「根據文章所述」的部分是否與原文相符。</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">檢查字數是否符合 800 到 1200 字的範圍（目前篇幅較精簡，若需增加字數可再補充對文章內容的細節闡述）。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">個人觀點部分目前寫法較為保守中立，可依個人實際想法調整或增減具體感受。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">確保所有論述均完全符合文章內容，無引入外部未提及之資料。</span></li>
           </ol>
         </div>
       </details>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>請仔細比對這份草稿和原文</strong>
+        </p>
+        <p class="callout-text">
+          這份草稿讀起來很完整，但如果把它和 <code>article.txt</code> 逐句對照，會發現大部分句子只是換了幾個詞。原文寫「和傳統媒體相比」，草稿寫「相較於傳統媒體」；原文寫「也可以即時回應他人的看法」，草稿寫「並即時回應他人看法」。最後一段的三個問題，更是直接來自文章結尾。
+        </p>
+        <p class="callout-text">
+          但 <code>assignment.txt</code> 的注意事項第一條就寫著「不要只複製文章內容」。
+        </p>
+        <p class="callout-text">
+          AI 沒有故意騙人，它只是在資料有限的情況下，選了最安全的做法：貼近原文。這正是為什麼草稿只能是草稿。<strong>這一步的產物不能交出去，它只是讓你有東西可以改。</strong>
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -604,36 +753,34 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <div class="details-card__body">
           <h4 class="example-heading">草稿優點</h4>
           <ul class="check-list">
-            <li><strong>主題明確</strong>：清晰指出文章核心是社群媒體對公共討論的影響</li>
-            <li><strong>立場平衡</strong>：注意到「好處與壞處」的雙面性，符合文章基本觀點</li>
-            <li><strong>符合部分要求</strong>：包含個人觀點（針對假消息、演算法的看法）</li>
+            <li>語言口語自然，閱讀起來通順流暢。</li>
+            <li>包含了文章的主題、正反兩面重點以及個人觀點。</li>
+            <li>沒有加入文章未提及的外部資料。</li>
           </ul>
 
           <h4 class="example-heading">結構問題</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>段落不完整</strong>：報告要求四個部分，但草稿將「重點整理」與「個人觀點」混在一起，且<strong>缺少「延伸問題」</strong>。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>結論銜接感不足</strong>：結論略顯匆促，沒有深入總結前面提到的具體問題。</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>段落較為鬆散簡短，未明確劃分出「文章主題簡介」、「重點整理」、「個人觀點」與「延伸問題」等完整區塊。</li>
+            <li>缺少針對文章結尾提出的具體延伸思考問題，未完全對應任務要求中的「延伸問題」項目。</li>
+          </ul>
 
           <h4 class="example-heading">內容問題</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>字數嚴重不足</strong>：報告要求 800–1200 字，目前約 250 字。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>重點整理不夠具體</strong>：「討論門檻降低」、「弱勢群體發聲」、「情緒化內容排擠細緻論述」等細節未被充分整理。</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>個人觀點過於淺白</strong>：缺乏具體的「為什麼同意/不同意」邏輯推導。</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>字數偏短（約 350 字左右），未達到作業要求的 800 到 1200 字長度。</li>
+            <li>重點整理部分較為簡略，對文章中提到的「查證速度跟不上」、「情緒化內容容易被看見」和「使用者、平台與社會的共同責任」等細節闡述不夠完整。</li>
+          </ul>
 
           <h4 class="example-heading">表達問題</h4>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>口語化過重</strong>：「很重要」「很多人都會用」「有好處也有壞處」等較口語的表達。建議改為：「扮演關鍵角色」、「潛在優勢與衍生的挑戰」。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>句式重複</strong>：「…是…」、「我覺得…」、「…也提到…」結構單一。</span></li>
-          </ol>
+          <ul class="check-list">
+            <li>部分句型較為單一（如頻繁使用「我覺得」、「這是一個問題」等主觀連接詞），學術或正式報告的語氣可再加強。</li>
+            <li>段落之間的銜接可以更緊密，讓結論能更自然地扣回前面的討論與文章核心提問。</li>
+          </ul>
 
           <h4 class="example-heading">建議修改順序</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>補齊架構</strong>：先依照要求分出四個段落，補上「延伸問題」。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>擴展內容</strong>：把文章中的具體觀點補進「重點整理」段落，這會快速增加字數。</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>深化觀點</strong>：選定一個點（如演算法或假消息），寫出為什麼是當前最重要的挑戰。</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>精煉文字</strong>：把口語的語句改寫成正式的書面語。</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">補充延伸問題：依據文章結尾的提問，補上 1 到 2 個可以繼續思考的具體問題。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">擴充重點整理與長度：將文章中的三大挑戰（查證不及、演算法同溫層、情緒化討論）以及解方（使用者、平台、社會的共同責任）補充得更完整，以拉近至 800 到 1200 字的目標長度。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">優化段落結構與語氣：重新梳理段落層次，使主題簡介、重點整理、個人觀點與延伸問題區塊分明，並修飾口語化表達，讓結論自然收尾。</span></li>
           </ol>
         </div>
       </details>
@@ -641,6 +788,14 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
       <div class="callout-card">
         <p class="callout-text">
           這個練習的重點是：<strong>先診斷，再修改。不要一開始就叫 AI 重寫整篇</strong>。
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          這份回覆從頭到尾沒有交出改寫版本，只列出問題。<br/>
+          指令說了「不要直接幫我重寫整篇」，它就真的沒有寫。<br/>
+          <strong>指令講清楚，AI 是聽得懂的。</strong>
         </p>
       </div>
 
@@ -695,48 +850,44 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">
-            這是修改後的 <code>draft_v2</code>，將原本較為口語的表達轉換為正式的報告語氣，並依任務要求補齊結構，同時在不加入外部資料的前提下深化文章內部的邏輯。
-          </p>
-
           <h4 class="example-heading">修訂版草稿</h4>
           <article class="prose-card">
-            <p><strong>題目</strong>：社群媒體與公共對話：論資訊傳播的機遇與挑戰</p>
+            <p><strong>題目</strong>：社群媒體與公共討論的機遇與挑戰</p>
 
-            <p><strong>一、文章主題簡介</strong></p>
-            <p>本文旨在探討社群媒體如何改變當代公共討論的型態。隨著科技發展，社群媒體已成為大眾獲取資訊、表達個人見解的主要空間。文章核心在於分析社群媒體相較於傳統媒體的特性 —— 如低參與門檻、即時回應性等 —— 如何一方面促進了公共參與的廣度，另一方面卻也對討論品質、資訊真偽及觀點多樣性提出了嚴峻的挑戰。</p>
+            <p>近年來，社群媒體已逐漸成為大眾獲取資訊、表達意見以及參與公共討論的重要核心空間。相較於傳統媒體，社群媒體具有較低的參與門檻，使用者不僅能快速發布訊息，也能即時回應他人的觀點。這樣的特性使公共討論的節奏變得更加快速，同時也讓更多人有機會參與原本不易接觸的社會議題。</p>
 
-            <p><strong>二、文章重點整理</strong></p>
-            <p>社群媒體對公共參與具有顯著的正面意義。其「門檻較低」的特性，使更多人能快速發布訊息並即時回應他人觀點，讓原本不易接近的社會議題獲得曝光，並提供弱勢群體發聲的渠道。</p>
-            <p>然而，文章也指出伴隨而來的多重問題：「資訊查證的落差」使未經證實的錯誤資訊迅速擴散；「演算法的限制」使使用者陷入特定立場，減少接觸多元觀點的機會；「討論品質的質變」使強烈訴諸情緒的內容易被看見，而細緻具複雜度的論述容易被邊緣化。</p>
+            <p>然而，在社群媒體帶來便利與普及性的同時，也伴隨著諸多新的問題。首先，資訊雖然傳播迅速，但查證速度往往無法同步跟上，導致未經確認的消息在大量轉發下，可能在短時間內造成錯誤資訊的擴散。其次，平台演算法會依據使用者的點擊、停留時間及互動紀錄來推薦相似內容，這容易使使用者長期處於與自身立場相近的資訊環境中，減少接觸不同觀點的機會。此外，社群媒體上的討論也容易受到情緒驅動，相較於細緻、複雜且需花時間理解的內容，簡短、強烈且易引起反應的資訊往往更容易獲得關注。</p>
 
-            <p><strong>三、個人觀點</strong></p>
-            <p>我認為「在快速環境中保留思考空間」是數位公民最關鍵的課題。我非常認同文章所述，問題不在於「要不要使用」，而是我們如何應對。特別是在演算法的部分，當我們習慣於接收立場接近的資訊時，對於相異觀點的理解力與包容度便會隨之下降。建立一套透明且能提升討論品質的「規則」，<strong>不僅是使用者的責任，更是社群平台與整體社會必須共同面對的結構性問題</strong>。</p>
+            <p>儘管如此，這並不意味著社群媒體上的所有討論皆為負面。若能妥善運用，社群媒體依然能成為推動公共參與的有力工具。舉例而言，許多社會議題藉由網路平台得以被大眾看見，弱勢群體也因此獲得了發聲的管道。文章指出，問題的關鍵不在於社群媒體本身具有絕對的好壞，而在於使用者、平台與社會如何共同建立更健全的資訊判斷方式與討論規則。</p>
 
-            <p><strong>四、結論與延伸問題</strong></p>
-            <p>綜上所述，社群媒體雖然降低了參與門檻並促進了弱勢發聲，但若缺乏完善的資訊判斷力與良性的討論機制，其對公共領域的傷害亦不容忽視。我們應從被動的訊息接收者，轉向更具自覺的數位公民。</p>
-            <p>針對本文所引發的後續反思，提出兩個延伸問題：</p>
-            <ol class="prose-list">
-              <li>在追求即時性與流量的平台機制下，我們應如何設計或建立更有利於「細緻、複雜內容」被看見的討論規則？</li>
-              <li>除了個人自律，社會與平台方可以透過哪些機制，降低演算法導致的「單一觀點推薦」對公共討論造成的負面影響？</li>
-            </ol>
+            <p>就個人觀點而言，社群媒體在公共討論中扮演著雙面刃的角色。它一方面開拓了多元參與的管道，另一方面也帶來了資訊真偽與同溫層等考驗。我們在享有便利的同時，或許也應反思如何在日常使用中提升資訊素養，避免過度依賴單一立場的資訊。</p>
+
+            <p>總結來說，面對社群媒體所形塑的公共討論環境，我們不應僅停留在「要不要使用社群媒體」的二分法思考，而應進一步深入探討：第一，我們該如何有效判斷資訊的可靠性？第二，如何在日常資訊接觸中避免落入單一觀點的侷限？這些思考方向，將是決定能否把社群媒體轉化為更高品質公共討論場域的關鍵所在。</p>
           </article>
 
           <h4 class="example-heading">主要修改說明</h4>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text"><strong>結構調整</strong>：嚴格依照任務要求的四個段落（簡介、重點整理、個人觀點、延伸問題）重新排列。</span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text"><strong>語氣正式化</strong>：「很重要」→「扮演主要空間/關鍵角色」、「有好處也有壞處」→「具有正面意義…也伴隨多重問題」。</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text"><strong>內容擴充（不加外部資料）</strong>：透過重複利用文章中的關鍵字進行內部的邏輯延伸。</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text"><strong>補齊缺項</strong>：新增原本缺少的「延伸問題」段落。</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">結構重整：將草稿擴寫並劃分為清楚的段落，依序涵蓋主題簡介、重點整理（挑戰與機遇）、個人觀點以及結合文章結尾的延伸問題。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">語氣提升：將原草稿較為口語化的表達（如「很多人都會用」、「我覺得」）調整為更適合正式報告的客觀敘事語氣。</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">補充內容與延伸問題：依據文章內容補足了演算法同溫層、情緒化內容以及使用者、平台與社會共同責任等重點，並在結尾納入 2 個具體的延伸思考問題。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">嚴守限制：全程僅使用文章內提及的觀點與說例，未加入任何外部資料。</span></li>
           </ol>
 
           <h4 class="example-heading">仍需要人工確認的地方</h4>
-          <ul class="check-list">
-            <li><strong>字數確認</strong>：修訂後約 650–700 字，仍未達 800–1200 字。建議在「個人觀點」中針對你同意或不同意的部分多寫一至兩段。</li>
-            <li><strong>立場確認</strong>：「個人觀點」中使用了較多「認同」「關鍵」等詞彙。如果有其他不同意文章的地方，請替換。</li>
-          </ul>
+          <ol class="numbered-list">
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">請確認字數與報告長度需求是否合適（若有字數上限或下限要求，可依個人需要增減篇幅）。</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">個人觀點部分是否符合個人真實立場，若需調整可自行微調語氣或補充個人看法。</span></li>
+          </ol>
         </div>
       </details>
+
+      <p class="detail-paragraph">
+        這份 draft_v2 <strong>只會顯示在畫面上，不會自動存成檔案</strong>。<code>@</code> 這個語法只能讀取檔案，不會寫入。如果要保留這個版本，請自己複製下來另存新檔 —— <code>data</code> 資料夾裡仍然只有原本的三個檔案。
+      </p>
+
+      <p class="detail-paragraph">
+        另外值得注意的是：修改說明第 1 點寫「劃分為清楚的段落」，但實際輸出並沒有加上小標題。<strong>AI 對自己做了什麼的描述，也需要你去核對。</strong>
+      </p>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -1046,6 +1197,10 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
   }
 
   .highlight-card {

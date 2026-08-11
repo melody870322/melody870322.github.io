@@ -568,6 +568,7 @@ Get-Content .gemini\.env</code></pre>
             <pre class="code-block"><code>/mcp auth notion</code></pre>
             <p class="step-desc">再查看一次，應該會看到 notion 的狀態變為連接，並列出完整工具清單。</p>
             <pre class="code-block"><code>/mcp list</code></pre>
+            <p class="step-desc step-desc--alert">為安全起見，不會永久連接，因此，一段時間沒用的話，使用 Notion 前都需要重新授權連接。</p>
           </div>
         </li>
       </ol>
@@ -1098,6 +1099,11 @@ Get-Content .gemini\.env</code></pre>
 
   .step-desc strong {
     color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .step-desc--alert {
+    color: #dc2626;
     font-weight: 600;
   }
 

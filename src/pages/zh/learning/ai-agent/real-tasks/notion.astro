@@ -73,42 +73,82 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
       <!-- STEP 1 -->
       <div class="case-header">
         <p class="case-label">STEP 1</p>
-        <h2 class="case-title">建立一個新頁面</h2>
+        <h2 class="case-title">建立資料庫頁面</h2>
       </div>
       <p class="detail-paragraph">
-        打開 Notion，在左側選單中點選「<strong>資料庫</strong>」。頁面名稱可以輸入：
+        打開 Notion，依序做四件事：
       </p>
-      <pre class="code-block" is:raw><code>課堂任務管理</code></pre>
-      <p class="detail-paragraph">
-        這個頁面會用來放後面要操作的任務資料。
-      </p>
+
+      <ol class="numbered-list">
+        <li><span class="numbered-list__num">1</span><span class="numbered-list__text">在側邊欄「<strong>私人</strong>」區塊右側點 <code>+</code>，或用左上角的新頁面按鈕，建立一個新頁面</span></li>
+        <li><span class="numbered-list__num">2</span><span class="numbered-list__text">標題輸入 <code>課堂任務管理</code></span></li>
+        <li><span class="numbered-list__num">3</span><span class="numbered-list__text">在標題下方的空白內文中，輸入 <code>/資料庫</code></span></li>
+        <li><span class="numbered-list__num">4</span><span class="numbered-list__text">選單跳出來後，選「<strong>資料庫 - 整頁</strong>」</span></li>
+      </ol>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion側邊欄無資料庫入口.png"
+          alt="Notion 側邊欄現況，只有首頁、對話、收件匣、搜尋與各頁面清單，沒有「資料庫」這個項目"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖一、Notion 側邊欄的現況。上方只有首頁、對話、收件匣與搜尋，下面接的是各個頁面清單 —— 已經沒有「資料庫」這個入口，要從新頁面的內文用斜線指令建立。</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion斜線資料庫選單.png"
+          alt="在 Notion 頁面內文輸入斜線加「資」之後的篩選結果選單，列出資料庫 - 內嵌、資料庫 - 整頁，以及表格、看板、圖庫、列表、動態、儀表板、日曆等瀏覽模式"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖二、輸入 /資 之後的篩選結果。最上面兩項才是建立資料庫，這裡要選第二項「資料庫 - 整頁」。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>選單裡有很多長得很像的項目，只有「資料庫 - 整頁」是這一頁要的。</strong><br/>
+          ・「資料庫 - 內嵌」也可以用，但它會和頁面內容混在一起，練習時比較不好對照。<br/>
+          ・「表格瀏覽模式」、「看板瀏覽模式」、「圖庫瀏覽模式」等一長串項目<strong>是檢視方式，不是建立新資料庫</strong>。<br/>
+          ・最下方的「資料來源的連結瀏覽模式」是連到<strong>已經存在的</strong>資料來源，更不要選。
+        </p>
+      </div>
 
       <!-- STEP 2 -->
       <div class="case-header">
         <p class="case-label">STEP 2</p>
-        <h2 class="case-title">建立 Table 資料庫</h2>
+        <h2 class="case-title">確認資料庫與標題欄名稱</h2>
       </div>
       <p class="detail-paragraph">
-        打開新頁面，下方選擇<strong>「開始使用資料庫」</strong>，並選擇畫面上的<strong>「空白資料庫」</strong>選項。
+        建立後有<strong>兩個名稱</strong>要確認，兩個都要改：
       </p>
 
-      <!-- STEP 3 -->
-      <div class="case-header">
-        <p class="case-label">STEP 3</p>
-        <h2 class="case-title">確認資料庫名稱</h2>
-      </div>
+      <h4 class="example-heading">一、資料庫名稱</h4>
       <p class="detail-paragraph">
-        建立後，請確認資料庫名稱是「<strong>課堂任務管理</strong>」。如果 Notion 自動建立了一個沒有名稱的資料庫，請把資料庫標題改成這個名稱。
+        新建立的資料庫預設叫「<strong>新資料庫</strong>」，請把它改成「<strong>課堂任務管理</strong>」。
       </p>
+
+      <h4 class="example-heading">二、標題欄名稱</h4>
+      <p class="detail-paragraph">
+        新資料庫預設<strong>只有一個欄位</strong>，就是標題欄，名稱是「<strong>名稱</strong>」，前面標示為 <code>Aa</code>。請點這個欄位，把它<strong>重新命名為「任務名稱」</strong>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          標題欄的<strong>型別不能更改</strong>，但名稱可以，而且一定要改。程式裡讀的是 <code>get_title(properties, "任務名稱")</code>，名稱不一致就讀不到，後面三個工具全部會拿到空白的任務名稱。
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
           這個名稱主要是<strong>給人看的</strong>。後面程式真正會用到的，是 Notion 的 <code>data_source_id</code>，不是資料庫名稱。
         </p>
       </div>
 
-      <!-- STEP 4 -->
+      <!-- STEP 3 -->
       <div class="case-header">
-        <p class="case-label">STEP 4</p>
+        <p class="case-label">STEP 3</p>
         <h2 class="case-title">建立欄位</h2>
       </div>
       <p class="detail-paragraph">
@@ -144,13 +184,23 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>「狀態」這一欄的型別，一定要選「選取 / Select」，不要選「狀態 / Status」。</strong>Notion 新建資料庫時常常預設給你 Status 欄位，名字看起來一樣，但兩者的 API 結構不同 —— Status 走的是 <code>"status"</code> 而不是 <code>"select"</code>。選錯了程式會回 400 錯誤，而且從畫面上完全看不出差別。這是這一頁最常見的卡關原因。
+          <strong>新增「狀態」欄位時要特別小心：欄位名稱叫「狀態」，但屬性要選「選取」。</strong>不是選單裡那個也叫「狀態」的屬性。這兩項在選單裡上下相鄰、圖示又相似，但 API 結構完全不同 —— Status 走的是 <code>"status"</code>，Select 走的是 <code>"select"</code>。選錯了程式會回報錯誤，而且從畫面上完全看不出差別，這是這一頁最常見的卡關原因。
         </p>
       </div>
 
-      <!-- STEP 5 -->
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion屬性類型選取與狀態.png"
+          alt="Notion 新增欄位時的屬性類型選單，左欄由上而下是文字、選取、狀態、人員、核取方塊、電話，右欄是數字、多選、日期、檔案和媒體、網址、電子郵件"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖三、新增欄位時的屬性類型選單。左欄的「選取」與「狀態」上下相鄰，圖示也相似 —— 這一頁要的是「選取」。</figcaption>
+      </figure>
+
+      <!-- STEP 4 -->
       <div class="case-header">
-        <p class="case-label">STEP 5</p>
+        <p class="case-label">STEP 4</p>
         <h2 class="case-title">設定「選取」選項</h2>
       </div>
       <p class="detail-paragraph">
@@ -187,9 +237,9 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- STEP 6 -->
+      <!-- STEP 5 -->
       <div class="case-header">
-        <p class="case-label">STEP 6</p>
+        <p class="case-label">STEP 5</p>
         <h2 class="case-title">新增範例資料</h2>
       </div>
       <p class="detail-paragraph">
@@ -210,13 +260,23 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
             </tr>
           </thead>
           <tbody>
-            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-03-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
-            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-03-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
-            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-03-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
-            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-03-18</td><td>活動報名表</td><td>已確認名單</td></tr>
+            <tr><td>確認下週課堂公告</td><td>教學準備</td><td>待確認</td><td>高</td><td>2026-09-20</td><td>課程安排</td><td>需要確認教室、時間與提醒內容</td></tr>
+            <tr><td>整理學生提問</td><td>學生回覆</td><td>處理中</td><td>中</td><td>2026-09-22</td><td>課堂回饋</td><td>先整理重複問題</td></tr>
+            <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>待確認</td><td>中</td><td>2026-09-25</td><td>閱讀清單</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+            <tr><td>回覆活動證明申請</td><td>行政事項</td><td>已完成</td><td>低</td><td>2026-09-18</td><td>活動報名表</td><td>已確認名單</td></tr>
           </tbody>
         </table>
       </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion課堂任務管理範例資料.png"
+          alt="Notion 課堂任務管理資料庫的表格畫面，欄位依序為任務名稱、類型、狀態、優先順序、截止日、來源、備註，共四筆範例資料"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖四、PART 1 完成後的樣子。七個欄位都建好、四筆範例資料都填好，「類型」「狀態」「優先順序」三欄都是有顏色的選取標籤。到這裡 Notion 端就準備好了。</figcaption>
+      </figure>
 
       <p class="detail-paragraph">
         這幾筆資料是後面練習會用到的資料。它不大，但很適合練習 —— 因為裡面有<strong>不同狀態、不同類型、不同優先順序</strong>，也有可以更新的任務。
@@ -269,26 +329,116 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <h2 class="case-title">建立 Notion connection</h2>
       </div>
       <p class="detail-paragraph">
-        要讓 Python 程式連到 Notion，必須先建立一個 connection。點選 Notion 頁面左上角「XXX 的空間」中的：
+        要讓 Python 程式連到 Notion，必須先建立一個 connection。點選 Notion 頁面左上角「XXX 的空間」，進入<strong>設定 → 連接</strong>。
       </p>
-      <pre class="code-block" is:raw><code>設定 → 連接 → 開發或管理連接 → 在內部連接中建立新的連接</code></pre>
       <p class="detail-paragraph">
-        這個 connection 可以先命名成 <code>Classroom Tool</code>，接著確認它至少有這幾個能力：
+        這個頁面上方有「探索」、「已安裝」、「管理」三個分頁，但要點的<strong>不是</strong>這三個，而是<strong>右邊的「前往開發人員入口網站 ↗」</strong>。
       </p>
 
-      <ul class="check-list">
-        <li>讀取內容</li>
-        <li>更新內容</li>
-        <li>插入內容</li>
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion設定連接頁面.png"
+          alt="Notion 設定裡的連接頁面，上方有探索、已安裝、管理三個分頁，下方列出 Google Calendar、Slack 等連接器，右上角有前往開發人員入口網站的連結"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖五、設定 → 連接 的畫面。中間那一大片是現成的連接器，這裡都用不到；要點的是右邊的「前往開發人員入口網站 ↗」。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        進到開發人員入口網站後建立新連接，「<strong>新連接</strong>」對話框有三個地方要填：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">連接名稱</span>
+          <span class="role-item__desc">填 <code>Classroom Tool</code></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">驗證方式</span>
+          <span class="role-item__desc">選「<strong>存取權杖</strong>」—— 協作者共享的工作空間範圍靜態 API 權杖，限 1 個工作空間</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">可以安裝</span>
+          <span class="role-item__desc">選自己的工作空間</span>
+        </li>
       </ul>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion新連接對話框.png"
+          alt="Notion 的新連接對話框，連接名稱填入 Classroom Tool，驗證方式有存取權杖與 OAuth 兩個選項，已選擇存取權杖"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖六、新連接對話框。驗證方式選上面那個「存取權杖」。</figcaption>
+      </figure>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          另一個選項「<strong>OAuth</strong>」是給要上架 Marketplace、支援多個工作空間的應用程式用的，這裡不需要。<br/><br/>
+          這兩種驗證方式的差別，正好呼應前面「基礎觀念」講過的：<strong>授帳號不代表就授權杖</strong>。OAuth 是讓每個登入的使用者各自授權、權限跟著人走；存取權杖則是一把固定的鑰匙，誰拿到誰就能用 —— 所以它才必須放進 <code>.env</code>，不能寫進程式。
+        </p>
+      </div>
+
+      <!-- STEP B -->
+      <div class="case-header">
+        <p class="case-label">STEP B</p>
+        <h2 class="case-title">設定 connection 的權限</h2>
+      </div>
+      <p class="detail-paragraph">
+        建立完<strong>不會自動進入設定頁</strong>。請從<strong>左側選單的「連接」</strong>點進剛剛建立的 <code>Classroom Tool</code>，才看得到權杖與功能設定。
+      </p>
+      <p class="detail-paragraph">
+        設定頁的「<strong>功能</strong>」區塊分成三組，三組都要看過：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">內容功能</span>
+          <span class="role-item__desc">讀取內容、更新內容、插入內容 —— <strong>預設已勾選，維持即可</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">留言功能</span>
+          <span class="role-item__desc">讀取留言、插入留言 —— <strong>維持不勾</strong></span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">使用者功能</span>
+          <span class="role-item__desc">三選一，預設是「<strong>讀取使用者資訊（含電子郵件地址）</strong>」—— <strong>必須手動改成最上面的「沒有使用者資訊」</strong></span>
+        </li>
+      </ul>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion連接功能權限設定.png"
+          alt="Classroom Tool 連接的設定頁，功能區塊分成內容功能、留言功能與使用者功能，使用者功能的三個選項中預設選中讀取使用者資訊含電子郵件地址"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖七、連接設定頁的「功能」區塊。內容功能三項預設已勾好，留言功能維持不勾；下方「使用者功能」的三個選項由窄到寬排列，Notion 預設選的是最寬的那一個。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>「使用者功能」預設是開最寬的，一定要自己手動收窄。</strong>這個工具完全不需要使用者資料 —— 它只讀寫「課堂任務管理」這個資料庫的欄位，不需要知道誰是誰，更不需要電子郵件地址。請改成「<strong>沒有使用者資訊</strong>」。
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          三個選項由窄到寬並排在同一個畫面上，<br/>
+          預設卻不是最窄的那一個。<br/>
+          <strong>哪一個該選？為什麼預設不是最窄的？</strong>
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         這裡<strong>先不要開太多權限</strong>。因為這裡只需要讀取、建立、更新任務，不需要刪除資料，也不需要管理整個工作空間。
       </p>
 
-      <!-- STEP B -->
+      <!-- STEP C -->
       <div class="case-header">
-        <p class="case-label">STEP B</p>
+        <p class="case-label">STEP C</p>
         <h2 class="case-title">把資料庫分享給 connection</h2>
       </div>
       <p class="detail-paragraph">
@@ -297,7 +447,10 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
       <p class="detail-paragraph">
         請在 Notion 裡打開「課堂任務管理」，然後找到：
       </p>
-      <pre class="code-block" is:raw><code>右上角 ⋯ → 連接 → 選擇 Classroom Tool</code></pre>
+      <pre class="code-block" is:raw><code>右上角 ⋯ → 連接 → 選擇 Classroom Tool → 新增至頁面</code></pre>
+      <p class="detail-paragraph">
+        最後那個「<strong>新增至頁面</strong>」要按下去才算完成，只選到 <code>Classroom Tool</code> 是不夠的。
+      </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
@@ -305,9 +458,9 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- STEP C -->
+      <!-- STEP D -->
       <div class="case-header">
-        <p class="case-label">STEP C</p>
+        <p class="case-label">STEP D</p>
         <h2 class="case-title">找到 data source ID</h2>
       </div>
       <p class="detail-paragraph">
@@ -328,37 +481,88 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <span class="part-text">寫一個小型 MCP Server</span>
       </div>
 
+      <h2 class="detail-heading">開始之前：確認 uv 可以用</h2>
+      <p class="detail-paragraph">
+        這一段開始都在 PowerShell 裡操作，而且需要 <code>uv</code>。請先確認它裝好了：
+      </p>
+      <pre class="code-block" is:raw><code>uv --version</code></pre>
+      <p class="detail-paragraph">
+        如果指令找不到，先安裝：
+      </p>
+      <pre class="code-block" is:raw><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          實測安裝約 <strong>30 秒</strong>，<strong>不需要管理員權限</strong>，會裝在 <code>%USERPROFILE%\.local\bin</code>。裝完可能要<strong>重新開一個 PowerShell 視窗</strong>才找得到指令。
+        </p>
+      </div>
+
       <!-- STEP I -->
       <div class="case-header">
         <p class="case-label">STEP I</p>
         <h2 class="case-title">建立專案資料夾</h2>
       </div>
       <p class="detail-paragraph">
-        請在 VS Code 裡建立一個新的專案資料夾 <code>notion-classroom-tool</code>，資料夾結構可以先長這樣：
+        在 PowerShell 裡依序輸入：
+      </p>
+
+      <pre class="code-block" is:raw><code>cd $HOME
+mkdir notion-classroom-tool
+cd notion-classroom-tool
+uv init</code></pre>
+
+      <p class="detail-paragraph">
+        <code>uv init</code> 跑完之後，資料夾會長這樣：
       </p>
 
       <pre class="code-block" is:raw><code>notion-classroom-tool
-├─ notion_classroom_server.py
-├─ .env
-└─ .gitignore</code></pre>
+├─ .git/            ← uv init 會順便建立 git 儲存庫
+├─ .gitignore       ← uv 自己寫的
+├─ .python-version
+├─ README.md
+├─ main.py          ← 這次用不到，留著就好
+└─ pyproject.toml</code></pre>
+
+      <p class="detail-paragraph">
+        後面跑 <code>uv add</code> 之後，還會再多出 <code>.venv/</code> 和 <code>uv.lock</code>。<code>main.py</code> 是 <code>uv init</code> 附的範例檔，這一頁不會用到，<strong>不用刪也不用改</strong>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          請打開 <code>pyproject.toml</code>，看 <code>requires-python</code> 這一行。<strong>它的值會跟著你電腦上的 Python 版本跑</strong> —— 實測看過 <code>&gt;=3.14</code>，也看過 <code>&gt;=3.10</code>。<strong>如果不是 <code>&gt;=3.10</code>，請改成 <code>&gt;=3.10</code></strong>，避免下一步裝套件時發生版本衝突。
+        </p>
+      </div>
 
       <!-- STEP II -->
       <div class="case-header">
         <p class="case-label">STEP II</p>
-        <h2 class="case-title">建立 .env 與 .gitignore</h2>
+        <h2 class="case-title">建立三個設定檔</h2>
       </div>
       <p class="detail-paragraph">
-        請在 <code>.env</code> 裡放入：
+        這一步要建立三個檔案：<code>.env</code>、<code>.gitignore</code>、<code>.gemini\.env</code>。<strong>三個都建完再往下走</strong>，後面就不用再回頭補。
       </p>
 
-      <pre class="code-block" is:raw><code>NOTION_API_KEY=你的 Notion_connection_token
-NOTION_DATA_SOURCE_ID=你的 data_source_id
-NOTION_VERSION=2026-03-11</code></pre>
+      <h4 class="example-heading">一、設定 .env</h4>
+      <p class="detail-paragraph">
+        準備兩個值：
+      </p>
 
       <ul class="check-list">
         <li><code>Notion_connection_token</code> 可以在建立完 Classroom Tool 後的頁面中找到「<strong>安裝存取權杖</strong>」，請先按「顯示」，才能複製</li>
-        <li><code>data_source_id</code> 則前往剛剛 STEP C 的步驟複製</li>
+        <li><code>data_source_id</code> 則前往剛剛 STEP D 的步驟複製</li>
       </ul>
+
+      <p class="detail-paragraph">
+        用 PowerShell 建立檔案：
+      </p>
+
+      <pre class="code-block" is:raw><code>Set-Content -Path ".env" -Value "NOTION_API_KEY=你的權杖`nNOTION_DATA_SOURCE_ID=你的ID`nNOTION_VERSION=2026-03-11"</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>不要用記事本建 <code>.env</code>。</strong>記事本存檔時會偷偷加上 <code>.txt</code>，變成 <code>.env.txt</code>，程式就讀不到了。
+        </p>
+      </div>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
@@ -369,13 +573,40 @@ NOTION_VERSION=2026-03-11</code></pre>
         </p>
       </div>
 
+      <h4 class="example-heading">NOTION_VERSION 是固定代號，不是今天的日期</h4>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <code>NOTION_VERSION</code> 看起來像日期，但它<strong>不是「今天」</strong>，而是 Notion 官方發佈過的 <strong>API 版本代號</strong>。目前合法的只有幾個值，填任何其他日期都會被擋，<strong>包括未來的日期</strong>。請照抄 <code>2026-03-11</code>（這是目前最新的，也是支援 <code>data_source_id</code> 寫法的版本）。
+        </p>
+      </div>
+
+      <h4 class="example-heading">二、.gitignore</h4>
       <p class="detail-paragraph">
-        <code>.gitignore</code> 可以寫：
+        <code>uv init</code> 已經幫你寫了一個 <code>.gitignore</code>，但<strong>裡面沒有 <code>.env</code></strong>。用下面這行覆蓋掉，把三個該忽略的都放進去：
       </p>
 
-      <pre class="code-block" is:raw><code>.env
-.venv/
-__pycache__/</code></pre>
+      <pre class="code-block" is:raw><code>Set-Content -Path ".gitignore" -Value ".env`n.venv/`n__pycache__/"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這一步不是可有可無的 —— <code>uv init</code> 順手做了 <code>git init</code>，這個資料夾<strong>已經是一個 git 儲存庫了</strong>。如果沒把 <code>.env</code> 加進 <code>.gitignore</code> 就 commit，權杖會直接進版本紀錄。
+        </p>
+      </div>
+
+      <h4 class="example-heading">三、.gemini\.env</h4>
+      <p class="detail-paragraph">
+        這個專案資料夾<strong>也要有自己的 Gemini 金鑰與模型設定</strong>，否則後面啟動 CLI 時會跳出認證選單：
+      </p>
+
+      <pre class="code-block" is:raw><code>mkdir .gemini
+Set-Content -Path ".gemini\.env" -Value "GEMINI_API_KEY=你的金鑰`nGEMINI_MODEL=gemini-3.5-flash-lite"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          實測確認：有這個檔案時，CLI 啟動畫面會直接顯示 <code>Authenticated with gemini-api-key</code>，<strong>不會出現認證選單</strong>。如果出現了，代表這個檔案沒建好或路徑不對。
+        </p>
+      </div>
 
       <!-- STEP III -->
       <div class="case-header">
@@ -383,13 +614,35 @@ __pycache__/</code></pre>
         <h2 class="case-title">安裝需要的套件</h2>
       </div>
       <p class="detail-paragraph">
-        在 VS Code 終端機中，先初始化專案：
+        專案在 STEP I 已經用 <code>uv init</code> 初始化過了，這裡直接安裝套件。<strong>請完整照抄，包含後面的版本範圍</strong>：
       </p>
-      <pre class="code-block" is:raw><code>uv init</code></pre>
+      <pre class="code-block" is:raw><code>uv add "mcp[cli]&gt;=1.0,&lt;2.0" python-dotenv requests</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>為什麼要鎖版本？</strong><br/><br/>
+          不寫版本範圍的話，<code>uv add</code> 每次都會拉最新的。mcp 這個套件在 2.0 把 <code>mcp.server.fastmcp</code> 整個移掉了，程式第 5 行的 import 會直接失敗，錯誤訊息是 <code>ModuleNotFoundError: No module named 'mcp.server.fastmcp'</code>。<br/><br/>
+          這種錯誤最難自己查，因為看起來像是打錯字。實際上程式一個字都沒錯，是<strong>套件改版了</strong>。<br/><br/>
+          鎖低版本範圍，等於告訴電腦：這份教材是用 1.x 寫的，請幫我裝 1.x。
+        </p>
+      </div>
+
       <p class="detail-paragraph">
-        啟動虛擬環境後，安裝套件：
+        裝完<strong>立刻確認裝對版本</strong>，不要等到跑程式才發現：
       </p>
-      <pre class="code-block" is:raw><code>uv add "mcp[cli]" python-dotenv requests</code></pre>
+
+      <pre class="code-block" is:raw><code>uv pip show mcp
+uv run python -c "from mcp.server.fastmcp import FastMCP; print('ok')"</code></pre>
+
+      <p class="detail-paragraph">
+        第一行看版本號是不是 1 開頭，第二行印出 <code>ok</code> 就代表 import 得到。<strong>兩個都過才往下走。</strong>
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>如果這裡出現 <code>requires-python</code> 衝突</strong>（訊息大意是找不到同時滿足 <code>mcp&lt;2.0</code> 與你的 Python 版本的組合），代表 STEP I 那個 <code>pyproject.toml</code> 還沒改。回去把 <code>requires-python</code> 改成 <code>&gt;=3.10</code>，再跑一次 <code>uv add</code>。
+        </p>
+      </div>
 
       <!-- STEP IV -->
       <div class="case-header">
@@ -424,7 +677,13 @@ __pycache__/</code></pre>
         <h2 class="case-title">建立 MCP Server 程式</h2>
       </div>
       <p class="detail-paragraph">
-        請在 <code>notion_classroom_server.py</code> 裡放入以下程式：
+        程式碼約 220 行，用 PowerShell 一行一行貼會很痛苦。這裡直接開記事本：
+      </p>
+
+      <pre class="code-block" is:raw><code>notepad notion_classroom_server.py</code></pre>
+
+      <p class="detail-paragraph">
+        跳出「是否建立新檔案」選<strong>是</strong>，把下面的完整程式碼貼進去，存檔關閉。
       </p>
 
       <details class="details-card">
@@ -615,7 +874,7 @@ def create_classroom_task(
     title 是任務名稱。
     category 可以是：教學準備、學生回覆、行政事項、閱讀材料。
     priority 可以是：高、中、低。
-    due_date 請使用 YYYY-MM-DD 格式，例如 2026-03-20。
+    due_date 請使用 YYYY-MM-DD 格式，例如 2026-09-20。
     """
     if not NOTION_DATA_SOURCE_ID:
         return {
@@ -754,28 +1013,48 @@ if __name__ == "__main__":
 
       <div class="callout-card">
         <p class="callout-text">
-          Notion 的新版 <strong>Create page API</strong> 可以把新頁面建立在既有 page 或 data source 底下；若新頁面是 data source 的子項目，送出的 properties 必須符合該 data source 的欄位結構。<strong>Update page API</strong> 則可以更新 data source 子頁面的 properties，例如這裡示範的「狀態」欄位。
+          前面 STEP II 說「不要用記事本建 <code>.env</code>」，這裡卻用記事本建 <code>.py</code>，兩者不衝突：<strong>記事本只會對「沒有主檔名」的檔案動手腳</strong>。<code>.env</code> 整個名字都是副檔名，會被存成 <code>.env.txt</code>；<code>notion_classroom_server.py</code> 有主檔名，存出來就是原本的名字。
         </p>
       </div>
+
+      <p class="detail-paragraph">
+        貼完存檔後，回到 PowerShell 確認檔案真的寫進去了：
+      </p>
+
+      <pre class="code-block" is:raw><code>Get-Content notion_classroom_server.py -TotalCount 3</code></pre>
+
+      <p class="detail-paragraph">
+        應該會看到 <code>from typing import Optional</code> 開頭的前三行。如果是空的或亂碼，回去重存一次。
+      </p>
 
       <!-- STEP VI -->
       <div class="case-header">
         <p class="case-label">STEP VI</p>
-        <h2 class="case-title">把 MCP Server 接到 Gemini CLI</h2>
+        <h2 class="case-title">寫 settings.json</h2>
       </div>
       <p class="detail-paragraph">
-        請在專案資料夾裡建立 <code>.gemini/settings.json</code>。資料夾結構會變成：
+        <code>.gemini</code> 資料夾在 STEP II 已經建好了，現在要在裡面補上第二個檔案。資料夾結構會變成：
       </p>
 
       <pre class="code-block" is:raw><code>notion-classroom-tool
 ├─ .gemini
-│  └─ settings.json
+│  ├─ .env           ← STEP II 建的
+│  └─ settings.json  ← 這一步要建的
 ├─ notion_classroom_server.py
 ├─ .env
 └─ .gitignore</code></pre>
 
       <p class="detail-paragraph">
-        <code>settings.json</code> 可以先寫成：
+        <strong>先取得這個資料夾的絕對路徑</strong>，等一下要填進去：
+      </p>
+      <pre class="code-block" is:raw><code>(Get-Location).Path</code></pre>
+      <p class="detail-paragraph">
+        把輸出的路徑記下來，例如 <code>C:\Users\你的帳號\notion-classroom-tool</code>。接著開記事本：
+      </p>
+      <pre class="code-block" is:raw><code>notepad .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">
+        貼入下面的內容，並<strong>把 <code>cwd</code> 換成剛剛查到的路徑</strong>：
       </p>
 
       <pre class="code-block" is:raw><code class="lang-json">{
@@ -783,7 +1062,7 @@ if __name__ == "__main__":
     "notion-classroom": {
       "command": "uv",
       "args": ["run", "python", "notion_classroom_server.py"],
-      "cwd": "C:\\完整絕對路徑\\notion-classroom-server",
+      "cwd": "C:\\Users\\你的帳號\\notion-classroom-tool",
       "trust": false
     }
   }
@@ -791,21 +1070,124 @@ if __name__ == "__main__":
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>這兩行不能寫成 <code>python</code> 和 <code>"."</code>，會直接失敗。</strong>前面 PART 3 是用 <code>uv init</code> + <code>uv add</code> 裝套件的，它們裝在專案的 <code>.venv</code> 裡；直接叫 <code>python</code> 會用到系統的 Python，找不到 <code>mcp</code>、<code>dotenv</code>、<code>requests</code>，必然是 <code>ModuleNotFoundError</code>。而 <code>"cwd": "."</code> 是相對於 Gemini CLI 的啟動位置，不是相對於這個資料夾，<code>.env</code> 也可能一起讀不到 —— 所以請填<strong>完整絕對路徑</strong>。
+          <strong>路徑裡每一個反斜線都要寫成兩個。</strong><code>(Get-Location).Path</code> 印出來的是 <code>C:\Users\你的帳號\notion-classroom-tool</code>，貼進 JSON 要變成 <code>C:\\Users\\你的帳號\\notion-classroom-tool</code>。少寫一個，JSON 就解析不了。
+        </p>
+      </div>
+
+      <!-- STEP VII -->
+      <div class="case-header">
+        <p class="case-label">STEP VII</p>
+        <h2 class="case-title">先單獨啟動看看</h2>
+      </div>
+      <p class="detail-paragraph">
+        接到 Gemini CLI 之前，先<strong>單獨把程式跑起來</strong>，確認它本身沒問題：
+      </p>
+      <pre class="code-block" is:raw><code>uv run python notion_classroom_server.py</code></pre>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>正常結果是：沒有任何輸出，游標卡住不動。</strong><br/>
+          按 Ctrl+C 結束即可。
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          什麼都沒發生才是對的。MCP Server 啟動後就一直等 Gemini CLI 來連線，本來就不會印東西。<br/><br/>
+          如果這裡跳出 <code>ModuleNotFoundError</code>，代表<strong>套件有問題</strong>；跳出 <code>ValueError: 缺少 NOTION_API_KEY</code>，代表 <code>.env</code> <strong>沒讀到</strong>。<strong>先在這裡解決，再往下走。</strong>
+        </p>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>不要跳過這一步。</strong>如果直接去接 Gemini CLI，出問題時只會看到 <code>/mcp list</code> 是空的，完全無從判斷原因 —— 是套件？是 <code>.env</code>？還是 <code>settings.json</code> 寫錯？在這裡先測，一次只排除一種可能。
+        </p>
+      </div>
+
+      <!-- STEP VIII -->
+      <div class="case-header">
+        <p class="case-label">STEP VIII</p>
+        <h2 class="case-title">啟動 CLI 驗收</h2>
+      </div>
+      <p class="detail-paragraph">
+        在專案資料夾裡啟動：
+      </p>
+      <pre class="code-block" is:raw><code>npx @google/gemini-cli</code></pre>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          啟動時會問你信不信任這個資料夾，<strong>要選 <code>1. Trust folder</code></strong>。這是一個新資料夾，所以會再問一次。選錯的話 <code>settings.json</code> 不會被載入，<code>/mcp list</code> 就會是空的 —— 而且畫面不會告訴你原因。
         </p>
       </div>
 
       <p class="detail-paragraph">
-        接著在 VS Code 終端機輸入：
-      </p>
-      <pre class="code-block" is:raw><code>gemini</code></pre>
-      <p class="detail-paragraph">
-        進入 Gemini CLI 後，輸入：
+        接著確認<strong>右下角的狀態列</strong>顯示的是 <code>gemini-3.5-flash-lite</code>，然後輸入：
       </p>
       <pre class="code-block" is:raw><code>/mcp list</code></pre>
       <p class="detail-paragraph">
         如果設定成功，應該可以看到 <code>notion-classroom</code> 這個 MCP Server，以及剛剛建立的<strong>三個工具</strong>。
       </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion練習mcp清單.png"
+          alt="Gemini CLI 的 mcp list 畫面，列出 notion 與 notion-classroom 兩個 MCP Server，後者標示 Ready 並列出三個工具"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖八、<code>/mcp list</code> 的畫面。<code>notion-classroom</code> 顯示 Ready (3 tools)，下面列出三個工具的完整名稱。畫面上那個 <code>notion</code> 是官方的 Notion MCP，因為這台電腦先做過「Gemini CLI 入門與 MCP 初次串接」才會出現 —— 沒做過那一頁的話，這裡只會看到 <code>notion-classroom</code> 一個，那是正常的。</figcaption>
+      </figure>
+
+      <h2 class="detail-heading">為什麼會看到兩個 MCP Server</h2>
+      <p class="detail-paragraph">
+        Gemini CLI 的 MCP 設定<strong>有兩層</strong>，兩層會疊加，不是後者取代前者：
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>層級</th>
+              <th>路徑</th>
+              <th>這一頁的 server</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>使用者層</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>官方 <code>notion</code>（<code>url</code> + <code>type: http</code> + <code>includeTools</code>）</td></tr>
+            <tr><td>專案層</td><td><code>專案\.gemini\settings.json</code></td><td>自製 <code>notion-classroom</code>（<code>command</code> + <code>args</code> + <code>cwd</code>）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>這一頁的練習，建議先暫時停用官方的 <code>notion</code>。</strong>因為兩個都在的時候，模型可能改用官方工具去完成任務 —— 結果任務確實做完了，但<strong>自製工具其實沒接好，你卻看不出來</strong>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        停用方式是把使用者層的設定檔改名：
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json" -NewName "settings.json.bak"</code></pre>
+      <p class="detail-paragraph">
+        練習做完要復原時，改回來就好：
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json.bak" -NewName "settings.json"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          改名前<strong>要先完全關閉 Gemini CLI</strong>，否則檔案會被占用、改不動。
+        </p>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          順帶一提，這正好是個對照的好時機：<br/>
+          官方 Notion MCP 未限制時有 <strong>28 個工具</strong>，<br/>
+          我們自己做的只有 <strong>3 個</strong>。<br/>
+          工具越少，<strong>要讀的說明越少，每次呼叫花的 token 也越少</strong>。
+        </p>
+      </div>
 
       <!-- ============ PART 4 ============ -->
       <div class="part-divider">
@@ -842,6 +1224,25 @@ if __name__ == "__main__":
         </div>
       </details>
 
+      <p class="detail-paragraph">
+        實測時如果把前面指令中的 <code>NOTION_VERSION</code> 填成當天日期 <code>2026-09-21</code>，這個練習就回報錯誤，如下圖九。
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-json">"code": "missing_version",
+"message": "Notion-Version header failed validation: Notion-Version header should be
+\"2021-05-11\", \"2021-05-13\", \"2021-08-16\", \"2022-02-22\", \"2022-06-28\",
+\"2025-09-03\", or \"2026-03-11\", instead was \"2026-09-21\"."</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/NotionVersion版本錯誤.png"
+          alt="Gemini CLI 畫面顯示 list_classroom_tasks 工具回傳 400 錯誤，錯誤代碼 missing_version，訊息列出七個合法的 Notion-Version 值"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖九、版本代號填錯時的畫面。工具回傳 ok: false 與 status_code 400，下方 Gemini 把錯誤代碼、錯誤訊息與詳細原因分三行整理出來。</figcaption>
+      </figure>
+
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
@@ -849,7 +1250,38 @@ if __name__ == "__main__":
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">以下是 Notion 中狀態為「待確認」的課堂任務：</p>
+          <p class="detail-paragraph">模型呼叫的工具：</p>
+          <pre class="code-block" is:raw><code>list_classroom_tasks {"status":"待確認"}</code></pre>
+
+          <p class="detail-paragraph">工具回傳：</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "count": 2,
+  "tasks": [
+    {
+      "page_id": "3b84757f-c450-8002-83dc-f6bf37215b68",
+      "任務名稱": "準備閱讀材料摘要",
+      "類型": "閱讀材料",
+      "狀態": "待確認",
+      "優先順序": "中",
+      "截止日": "2026-09-25",
+      "來源": "閱讀清單",
+      "備註": "先產生摘要草稿，不直接發給學生"
+    },
+    {
+      "page_id": "3b84757f-c450-80c5-97f6-d9fb0fbce2b5",
+      "任務名稱": "確認下週課堂公告",
+      "類型": "教學準備",
+      "狀態": "待確認",
+      "優先順序": "高",
+      "截止日": "2026-09-20",
+      "來源": "課程安排",
+      "備註": "需要確認教室、時間與提醒內容"
+    }
+  ]
+}</code></pre>
+
+          <p class="detail-paragraph">模型接著輸出的表格：</p>
 
           <div class="csv-table-wrapper">
             <table class="csv-table">
@@ -857,11 +1289,23 @@ if __name__ == "__main__":
                 <tr><th>任務名稱</th><th>類型</th><th>優先順序</th><th>截止日</th><th>備註</th></tr>
               </thead>
               <tbody>
-                <tr><td>確認下週課堂公告</td><td>教學準備</td><td>高</td><td>2026-03-20</td><td>需要確認教室、時間與提醒內容</td></tr>
-                <tr><td>準備閱讀材料摘要</td><td>閱讀材料</td><td>中</td><td>2026-03-25</td><td>先產生摘要草稿，不直接發給學生</td></tr>
+                <tr>
+                  <td>準備閱讀材料摘要<br/>確認下週課堂公告</td>
+                  <td>閱讀材料<br/>教學準備</td>
+                  <td>中<br/>高</td>
+                  <td>2026-09-25<br/>2026-09-20</td>
+                  <td>先產生摘要草稿，不直接發給學生<br/>需要確認教室、時間與提醒內容</td>
+                </tr>
               </tbody>
             </table>
           </div>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              <strong>內容是對的，但表格呈現有點歪掉</strong> —— 兩筆任務被擠進同一列，每一格裡塞了兩行文字，而不是分成兩列。這是輕量模型常見的狀況，重點是資料本身正確。
+            </p>
+          </div>
+
         </div>
       </details>
 
@@ -895,7 +1339,7 @@ if __name__ == "__main__":
             任務名稱：整理下次課程的練習指令<br/>
             類型：教學準備<br/>
             優先順序：中<br/>
-            截止日：2026-03-28<br/>
+            截止日：2026-09-28<br/>
             來源：課程規劃<br/>
             備註：先整理成草稿，發布前需要人工確認<br/><br/>
             建立後請回覆：<br/>
@@ -914,12 +1358,25 @@ if __name__ == "__main__":
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">新課堂任務已建立：</p>
+          <p class="detail-paragraph">模型呼叫的工具：</p>
+          <pre class="code-block" is:raw><code>create_classroom_task {"title":"整理下次課程的練習指令","priority":"中","source":"課程規劃","category":"教學準備", ...}</code></pre>
+
+          <p class="detail-paragraph">工具回傳：</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "message": "已建立 Notion 任務。",
+  "page_id": "3b84757f-c450-8199-9f69-f83bc28b73d5",
+  "url": "https://app.notion.com/p/3b84757fc45081999f69f83bc28b73d5",
+  "任務名稱": "整理下次課程的練習指令",
+  "狀態": "待確認"
+}</code></pre>
+
+          <p class="detail-paragraph">模型回覆：</p>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">是否建立成功：<strong>是</strong></span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">任務名稱：<strong>整理下次課程的練習指令</strong></span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">狀態：<strong>待確認</strong></span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion 頁面連結：點此開啟 Notion</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">是否建立成功：是</span></li>
+            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">任務名稱：整理下次課程的練習指令</span></li>
+            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">狀態：待確認</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">Notion 頁面連結：https://app.notion.com/p/3b84757fc45081999f69f83bc28b73d5</span></li>
           </ol>
         </div>
       </details>
@@ -944,6 +1401,14 @@ if __name__ == "__main__":
         請先用<strong>練習 1</strong> 列出任務，找到你想更新的任務。工具回傳資料中會包含 <code>page_id</code>，接著再請 AI 更新狀態。
       </p>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>下面指令裡的 page_id 那一行，一定要自己換掉。</strong><br/><br/>
+          如果你沒有換，AI 很可能<strong>不會回頭問你</strong>，而是自己去查一遍再動手。實測時它就是這樣：自己呼叫 <code>list_classroom_tasks</code>、用任務名稱比對、找出 <code>page_id</code>，然後更新成功。<br/><br/>
+          這次它猜對了，但工具<strong>只檢查 <code>page_id</code> 的格式，不會檢查那是不是你真正想改的那一筆</strong>。資料庫裡如果有兩筆名稱相近的任務，它可能改到錯的那一筆，而回覆看起來一模一樣。
+        </p>
+      </div>
+
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
@@ -953,7 +1418,7 @@ if __name__ == "__main__":
         <div class="details-card__body">
           <blockquote class="prompt-example">
             請使用 notion-classroom 工具，把「準備閱讀材料摘要」這筆任務的狀態更新為「處理中」。<br/><br/>
-            page_id：請填入剛剛工具回傳的 page_id<br/><br/>
+            page_id：（把這一行換成練習 1 回傳的 page_id，格式像 3b84757f-c450-8002-83dc-f6bf37215b68）<br/><br/>
             請注意：<br/>
             1. 只更新狀態。<br/>
             2. 不要修改任務名稱。<br/>
@@ -970,12 +1435,39 @@ if __name__ == "__main__":
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">任務狀態更新結果：</p>
-          <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">是否更新成功：<strong>是</strong></span></li>
-            <li><span class="numbered-list__num">2</span><span class="numbered-list__text">page_id：3564757f-c450-800c-a921-f095a8ffaec2</span></li>
-            <li><span class="numbered-list__num">3</span><span class="numbered-list__text">更新後狀態：<strong>處理中</strong></span></li>
-          </ol>
+          <p class="detail-paragraph">模型呼叫的工具：</p>
+          <pre class="code-block" is:raw><code>update_task_status {"new_status":"處理中","page_id":"3b84757f-c450-8002-83dc-f6bf37215b68"}</code></pre>
+
+          <p class="detail-paragraph">工具回傳：</p>
+          <pre class="code-block" is:raw><code class="lang-json">{
+  "ok": true,
+  "message": "已更新任務狀態。",
+  "page_id": "3b84757f-c450-8002-83dc-f6bf37215b68",
+  "new_status": "處理中"
+}</code></pre>
+
+          <p class="detail-paragraph">模型回覆：</p>
+          <blockquote class="prompt-example">
+            已成功將「準備閱讀材料摘要」任務的狀態更新為「處理中」。<br/><br/>
+            更新結果：<br/>
+            ・任務名稱：準備閱讀材料摘要<br/>
+            ・Page ID：3b84757f-c450-8002-83dc-f6bf37215b68<br/>
+            ・更新後狀態：處理中
+          </blockquote>
+
+          <h4 class="example-heading">回 Notion 驗收</h4>
+          <p class="detail-paragraph">
+            改完之後回 Notion 對一遍，應該只有狀態變了：
+          </p>
+          <ul class="check-list">
+            <li>狀態<strong>改為「處理中」</strong></li>
+            <li>任務名稱<strong>未變</strong></li>
+            <li>類型<strong>未變</strong></li>
+            <li>優先順序<strong>未變</strong></li>
+            <li>截止日 2026-09-25 <strong>未變</strong></li>
+            <li>來源<strong>未變</strong></li>
+            <li>備註<strong>未變</strong></li>
+          </ul>
         </div>
       </details>
 
@@ -1035,23 +1527,39 @@ if __name__ == "__main__":
           <span class="details-card__hint">點擊展開示範回覆</span>
         </summary>
         <div class="details-card__body">
-          <p class="detail-paragraph">根據您提供的文字，整理如下：</p>
+          <div class="callout-card">
+            <p class="callout-text">
+              這一題<strong>沒有呼叫 <code>create_classroom_task</code></strong>，Notion 資料庫維持五筆、沒有增加。
+            </p>
+          </div>
+
+          <p class="detail-paragraph">模型回覆：</p>
           <ol class="numbered-list">
-            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">任務名稱：提醒參加者出席並補填飲食需求</span></li>
+            <li><span class="numbered-list__num">1</span><span class="numbered-list__text">任務名稱：提醒參加者依報名場次出席並補填飲食需求資料</span></li>
             <li><span class="numbered-list__num">2</span><span class="numbered-list__text">類型：行政事項</span></li>
             <li><span class="numbered-list__num">3</span><span class="numbered-list__text">優先順序：中</span></li>
-            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">截止日：<strong>下週（具體日期不明）</strong></span></li>
-            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">來源：（無）</span></li>
-            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">備註：下週要提醒參加者依照報名場次出席，並請飲食需求未填的人補填資料。</span></li>
+            <li><span class="numbered-list__num">4</span><span class="numbered-list__text">截止日：不明確</span></li>
+            <li><span class="numbered-list__num">5</span><span class="numbered-list__text">來源：報告與出席注意事項</span></li>
+            <li><span class="numbered-list__num">6</span><span class="numbered-list__text">備註：需提醒參加者依照報告場次出席，並請飲食需求未填的人補填資料。</span></li>
           </ol>
 
           <div class="callout-card callout-card--warn">
             <p class="callout-text">
-              <strong>缺少截止日，需要人工確認</strong> —— 不建立 Notion 任務。
+              缺少截止日，需要人工確認
             </p>
           </div>
         </div>
       </details>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion課堂任務管理練習後.png"
+          alt="Notion 課堂任務管理資料庫在四個練習做完之後的表格畫面，共五筆任務，準備閱讀材料摘要的狀態為處理中，最後一筆是整理下次課程的練習指令"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">圖十、四個練習做完之後的資料庫。和圖四對照：多出來的第五筆是練習 2 建立的「整理下次課程的練習指令」，「準備閱讀材料摘要」的狀態被練習 3 從待確認改成了處理中，練習 4 則沒有再新增任何一筆。</figcaption>
+      </figure>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -1087,7 +1595,17 @@ if __name__ == "__main__":
           <span class="role-item__label role-item__label--ord">第五</span>
           <span class="role-item__desc"><strong>新增任務時，狀態一律是「待確認」。</strong>避免 AI 自己把新任務判定為已完成。</span>
         </li>
+        <li class="role-item">
+          <span class="role-item__label role-item__label--ord">第六</span>
+          <span class="role-item__desc"><strong>建立任務的動作不能取消，而且可以重複。</strong>同一句指令跑兩次就會建立兩筆，AI 不會提醒你「這筆好像已經存在了」。因為工具只有新增沒有刪除功能，建錯了只能自己回 Notion 手動刪。</span>
+        </li>
       </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          第六點也是為什麼要<strong>先讀後寫</strong> —— 讀錯了重讀就好，寫錯了要自己收拾。實測時只是因為想改一下日期而重跑了一次指令，Notion 就多出一筆重複資料。
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -1614,6 +2132,28 @@ if __name__ == "__main__":
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
     letter-spacing: 0.05em;
+  }
+
+  /* Figure / Image */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    margin-inline: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   .details-card {
