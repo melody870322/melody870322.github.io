@@ -16,7 +16,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           You've just finished something important: installing Gemini CLI, opening it, and connecting your first off-the-shelf MCP. From here on, we're <strong>not just confirming it "connects" — we're going to have it actually complete one full round of work</strong>.
         </p>
-        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.55.1. npx always pulls the latest version, so the version number you see may be newer than the one here — small differences on screen are normal.</p>
       </header>
 
       <div class="callout-card callout-card--warn">
@@ -99,7 +99,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
         <article class="sample-card">
           <p class="sample-tag">Page 2</p>
-          <h4 class="sample-title">Course Announcement | Week 1 Make-up Class</h4>
+          <h4 class="sample-title">Course Announcement | Week 3 Make-up Class</h4>
           <pre class="code-block"><code>Class on 10/8 is cancelled; the make-up session moves to the afternoon of 10/15.</code></pre>
         </article>
 
@@ -112,13 +112,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       <div class="callout-card">
         <p class="callout-text">
-          <strong>These three are designed this way on purpose.</strong> Searching for "course" should find the first two and should not find the third — which is exactly what STEP 1 below asks you to watch for. And Page 1 deliberately carries three kinds of information (assignment, requirements, deadlines) so STEP 4's "reorganize into three short sections" has real material to work with.
+          <strong>These three are designed this way on purpose.</strong> When you search for "course", the titles of the first two match directly; Page 3's content is about Tools, Resources, and Prompts and contains no mention of "course" at all, so it won't be found — which is exactly what STEP 1 below asks you to watch for. And Page 1 deliberately carries three kinds of information (assignment, requirements, deadlines) so STEP 4's "reorganize into three sections" has real material to work with.
+        </p>
+        <p class="callout-text">
+          You may well see more than two results, and that's normal. Notion searches <strong>titles and content together</strong>, so other pages in your workspace that mention "course" will show up too; and if you created these three under some other page, that <strong>parent page</strong> usually gets pulled in as well. The point isn't whether the count is right — it's <strong>whether what should have been found was found, and whether anything clearly unrelated got mixed in</strong>.
         </p>
       </div>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          After creating the pages, <strong>wait a moment before starting</strong>. Notion takes anywhere from seconds to minutes to index new pages, so running STEP 1 immediately may turn up nothing — that isn't your mistake.
+          Once the pages are created you can start right away. In most cases a new page is searchable immediately — Notion's indexing takes seconds at worst. If your first search turns up nothing, just wait a moment and try again; that isn't your mistake.
         </p>
       </div>
 
@@ -161,6 +164,74 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         The point of this step isn't to have it do many things at once. It's to <strong>first see whether it can find the right pages</strong>.
       </p>
 
+      <h3 class="sub-heading">The first time it calls a tool, it asks you first</h3>
+      <p class="detail-paragraph">
+        After you send your instruction, nothing starts happening right away — a yellow confirmation box appears first:
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/工具執行確認框.png"
+          alt="Gemini CLI asking whether to allow a Notion MCP tool to run"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The authorization prompt on the first call to a given tool</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        <strong>This isn't an error, and it isn't stuck.</strong> This is Gemini CLI telling you which tool the AI intends to use and what arguments it's carrying, and asking you to confirm. That line in the box — <code is:raw>notion-search {"query":"課程","query_type":"internal"}</code> — is the full payload it's about to send. It's worth a glance: this is your only chance to stop it.
+      </p>
+
+      <p class="detail-paragraph">
+        The four options differ like this:
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>What it actually does</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Allow once</strong></td>
+              <td>Allows <strong>this one call</strong> only. The next call to the same tool asks again.</td>
+            </tr>
+            <tr>
+              <td><strong>2. Allow tool for this session</strong></td>
+              <td>This tool stops asking for the rest of the session, but a different tool still asks.</td>
+            </tr>
+            <tr>
+              <td><strong>3. Allow all server tools for this session</strong></td>
+              <td>Allows <strong>all 28 tools</strong> under this server; nothing asks again for the rest of the session.</td>
+            </tr>
+            <tr>
+              <td><strong>4. No, suggest changes (esc)</strong></td>
+              <td>Doesn't run it, and hands control back to you so you can revise the instruction and try again.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        "Session" here means <strong>this stretch of time with Gemini CLI open</strong>. Close and reopen it, or run <code>/clear</code>, and permissions start over.
+      </p>
+
+      <p class="detail-paragraph">
+        Three things worth knowing:
+      </p>
+      <ul class="check-list">
+        <li><strong>Option 3 costs more than it looks.</strong> You only wanted it to search, but that one keypress also allows deleting, moving, and creating databases — tools you have no use for today. Convenient, but the scope goes to maximum in one step.</li>
+        <li><strong>Option 4 is the real brake.</strong> Many people assume the only choice is between "agree" and "quit". When the arguments look wrong — a mistyped keyword, the wrong page about to be edited — pick 4. That option exists precisely for you to use.</li>
+        <li><strong>The four steps on this page use four different tools</strong>, so even if you pick 2 every time, the next step will still ask again when it reaches a new tool. Each prompt is a checkpoint on "what is the AI about to do" — don't click through too fast.</li>
+      </ul>
+      <p class="detail-paragraph">
+        I'd suggest picking <strong>1</strong> the first time, so you get a feel for what "asks every time" is like, and <strong>2</strong> for the steps after that.
+      </p>
+
       <h3 class="sub-heading">What to look for when searching</h3>
       <p class="detail-paragraph">
         On your first search, don't just check "did it give me a list of answers." What you should look at:
@@ -168,7 +239,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <ul class="check-list">
         <li>Are the pages it found <strong>ones you actually recognize</strong></li>
         <li>Are the keywords it picked up reasonable</li>
-        <li>Did it pull in irrelevant things too</li>
+        <li>Did it pull in irrelevant things too (a parent page tagging along is normal — what to watch for is a result whose content is clearly unrelated)</li>
         <li>Did it respect your instruction to "<strong>search only, don't modify</strong>"</li>
       </ul>
 
@@ -206,6 +277,40 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <blockquote class="prompt-example">
         Please read the page I just mentioned and tell me what points it contains that are related to the final report requirements.
       </blockquote>
+
+      <h3 class="sub-heading">Two blocks show up on screen — don't let the first one scare you</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/notion-fetch原始回傳.png"
+          alt="The raw response from notion-fetch, with the model's organized summary below it"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The top half is the tool's raw response; the bottom half is what the model organized for you</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        That big messy-looking block inside the box — <code>\n</code>, <code>&lt;page&gt;</code>, <code>&lt;properties&gt;</code>, <code>&lt;content&gt;</code>, <code>&lt;empty-block/&gt;</code> — is <strong>the raw data the Notion tool handed back untouched</strong>. That format is written for the model to read, not for you. You don't need to make sense of it.
+      </p>
+      <p class="detail-paragraph">
+        The part outside the box, the one starting with a purple star, is <strong>the model's answer after it finished reading</strong>.
+      </p>
+      <p class="detail-paragraph">
+        This distinction is useful. On the previous page we separated "PowerShell" from "inside the CLI"; here we're separating "the tool's output" from "the model's answer". When a result isn't what you expected, this tells you which half went wrong — the tool finding nothing at all, and the tool finding it but the model summarizing it badly, are two completely different problems, and they call for different fixes.
+      </p>
+
+      <h3 class="sub-heading">You don't need to go hunting for the page ID</h3>
+      <p class="detail-paragraph">
+        <code>notion-fetch</code> needs to know which page to fetch, but you don't have to copy a long ID out of Notion yourself. The results from the previous step already carry each page's URL, and the model passes that URL straight through as the argument — in the confirmation box you'll see something like <code is:raw>{"id":"https://app.notion.com/p/..."}</code>.
+      </p>
+      <p class="detail-paragraph">
+        This is why the order "search first, then read" is meaningful: <strong>the output of step one is exactly the input of step two</strong>.
+      </p>
+
+      <p class="detail-paragraph">
+        One thing worth mentioning in passing: the response contains an <code>ancestor-path</code> section, which hands over the <strong>title and URL of this page's parent</strong> as well. You only asked it to read one page, but the page's location went out with it. This isn't a bug — it's how the tool is designed, and the Least Privilege &amp; Security Boundaries page later on comes back to exactly this: <strong>what goes out is usually more than you assumed</strong>.
+      </p>
 
       <p class="detail-paragraph">
         The point of this step is to get AI <strong>not just to "find the page," but to actually do something based on the page's content</strong>.
@@ -249,16 +354,31 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <blockquote class="prompt-example">
         Based on the content of that page, create a new Notion page titled "Final Report Key Points" — start with a bullet-list draft.
       </blockquote>
-      <p class="detail-paragraph">Or:</p>
-      <blockquote class="prompt-example">
-        Based on what you just read, create a new class note — keep only the key points, don't make it too long.
-      </blockquote>
 
       <div class="highlight-card">
         <p class="highlight-text">
           This step gives you your first clear sense that: <strong>AI isn't just looking at data — it's actually producing new content for you.</strong>
         </p>
       </div>
+
+      <h3 class="sub-heading">Once it's created, go find where it landed</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/新頁面在私人區.png"
+          alt="The Notion sidebar, with the newly created page at the top of the Private section"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The new page doesn't land under the page you started from. What matters here is the location in the sidebar on the left — the content on the right is already the STEP 4 version</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Many people instinctively assume the new page will sit next to "Course Outline", and then can't find it where they expected. Because the instruction didn't specify a parent, Notion creates it as a <strong>top-level private page</strong> — look under the "Private" section of the sidebar. The page title also carries a "Private" lock marker beside it.
+      </p>
+      <p class="detail-paragraph">
+        If you want it somewhere specific, say so in the instruction — for example, "create it under the Course Outline page."
+      </p>
 
       <h3 class="sub-heading">For the first time, smaller is better</h3>
       <p class="detail-paragraph">
@@ -304,10 +424,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </p>
 
       <blockquote class="prompt-example">
-        Please update the "Final Report Key Points" page you just created:<br/>
-        1. Add a summary of 50 characters or less at the top<br/>
-        2. Organize the bullet list into three small sections: "Topic, Requirements, Deadline"<br/>
-        3. Don't delete too much of the original content
+        Please do three things to the "Final Report Key Points" page you just created: add a summary of 50 characters or less at the top, reorganize the content into three sections — "Topic", "Requirements", and "Deadline" — and don't delete the original bullet list.
       </blockquote>
 
       <p class="detail-paragraph">
@@ -319,6 +436,22 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <li>Whether AI only touched the scope you specified</li>
       </ul>
 
+      <h3 class="sub-heading">Why "don't delete the original content" has to be written down</h3>
+      <p class="detail-paragraph">
+        In the confirmation box you'll see that <code>notion-update-page</code> takes a <code>new_str</code> argument — <strong>what it sends is the complete rewritten content of the whole page, not just the few lines you wanted changed</strong>.
+      </p>
+      <p class="detail-paragraph">
+        That means something: the original bullets are still there because <strong>the model retyped the old content and wrote it all back</strong>, not because the tool protected them for you. If the model drops a section, that section is simply gone — and there's no warning of any kind.
+      </p>
+      <p class="detail-paragraph">
+        This is why the "read" in STEP 2 can't be skipped. It has to read the page in full before it has any way to write it back in full.
+      </p>
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Read first, then write</strong> — this is what that phrase is actually about.
+        </p>
+      </div>
+
       <h3 class="sub-heading">When updating, more specific = safer</h3>
       <p class="detail-paragraph">
         For a first update, the thing to fear isn't that it won't make changes — it's that <strong>it changes too much</strong>. So when writing your instruction, spell out three things:
@@ -328,22 +461,6 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <li>Which paragraph to modify</li>
         <li>Which places not to touch</li>
       </ul>
-
-      <p class="detail-paragraph">For example:</p>
-
-      <blockquote class="prompt-example">
-        Please only modify the first paragraph of the page you just created — leave the other paragraphs alone for now.
-      </blockquote>
-      <p class="detail-paragraph">Or:</p>
-      <blockquote class="prompt-example">
-        Please rewrite the original bullet list to be easier to read, but don't change the original meaning.
-      </blockquote>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          Instructions like these are more appropriate for a first update. Because the goal on the first round <strong>isn't to let it improvise freely — it's to let you see whether it follows the rules</strong>.
-        </p>
-      </div>
 
       <!-- Section: When it goes wrong -->
       <h2 class="detail-heading">If It Gets It Wrong, That Doesn't Mean the Approach Is Broken</h2>
@@ -658,6 +775,83 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     font-weight: 600;
   }
 
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  /* Screenshots */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Comparison table */
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .csv-table td strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
   /* Highlight card (key takeaway) */
   .highlight-card {
     margin: var(--space-4) 0 var(--space-6);
@@ -917,6 +1111,15 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
     .code-block {
       padding: var(--space-3) var(--space-4);
       font-size: 0.8rem;
+    }
+
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
     }
   }
 </style>

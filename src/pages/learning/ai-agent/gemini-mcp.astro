@@ -23,7 +23,7 @@ if ($userPath -notlike "*$npmPath*") {
         <p class="detail-subtitle">
           By now you already understand roughly how the LLM, Gemini CLI, MCP, and API divide their work. Next, we'll move forward one step: install Gemini CLI, open it, know where you're operating, then connect your first off-the-shelf MCP and confirm it works. As for OAuth, permissions, and deeper config-file edits — those can wait. Gemini CLI is Google's open-source AI agent designed to work with Gemini directly in the terminal, with built-in MCP extension support.
         </p>
-        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.55.1. npx always pulls the latest version, so the version number you see may be newer than the one here — small differences on screen are normal.</p>
       </header>
 
       <!-- Section: Prep -->
@@ -177,7 +177,7 @@ npm install express</code></pre>
           alt="PowerShell error showing npm.ps1 cannot be loaded because running scripts is disabled on this system"
           loading="lazy"
         />
-        <figcaption class="figure__caption">Figure 1. The error npm returns when script execution is disabled</figcaption>
+        <figcaption class="figure__caption">The error npm returns when script execution is disabled</figcaption>
       </figure>
 
       <p class="detail-paragraph">
@@ -225,6 +225,23 @@ gemini --version</code></pre>
           </p>
           <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            The first npx run asks whether you want to download the package:
+          </p>
+
+          <figure class="figure">
+            <img
+              class="figure__img"
+              src="/learning/agent/npx首次執行確認.png"
+              alt="npx asking whether to download the package on its first run"
+              loading="lazy"
+            />
+            <figcaption class="figure__caption">The download confirmation on the first npx run</figcaption>
+          </figure>
+
+          <p class="install-desc">
+            Type <code>y</code> and press Enter to start the download. This only appears the first time — after that the cache means it launches straight away.
+          </p>
           <p class="install-desc">
             Wherever the rest of this material shows a <code>gemini</code> command, substitute <code>npx @google/gemini-cli</code> — the subcommand syntax is identical.
           </p>
@@ -347,7 +364,12 @@ Get-Content .gemini\.env</code></pre>
       <p class="detail-paragraph">
         Once that's ready, you can simply type:
       </p>
-      <pre class="code-block"><code>gemini</code></pre>
+      <pre class="code-block"><code>gemini                      # Route A
+npx @google/gemini-cli      # Route B</code></pre>
+
+      <p class="detail-paragraph">
+        The first time you launch inside this folder, a confirmation box appears: <strong>Do you trust the files in this folder?</strong>
+      </p>
 
       <figure class="figure">
         <img
@@ -356,24 +378,55 @@ Get-Content .gemini\.env</code></pre>
           alt="Gemini CLI asking whether you trust the files in this folder on first launch"
           loading="lazy"
         />
-        <figcaption class="figure__caption">Figure 2. The folder-trust prompt on first launch inside a folder</figcaption>
+        <figcaption class="figure__caption">The folder-trust prompt on first launch inside a folder</figcaption>
       </figure>
 
       <p class="detail-paragraph">
-        Pick the folder you just created — "Trust folder (gemini-class-test)".
+        The box lists which settings from this folder will be loaded. <strong>Right now it's empty</strong>, because we haven't added any MCP yet. Once you've finished "Add Your First Off-the-Shelf MCP" below and come back to this screen, there'll be an extra line — <code>MCP Servers (1): notion</code> — and that's when you'll see concretely what "trusting this folder" actually means.
       </p>
+      <p class="detail-paragraph">
+        Of the three options, pick <strong>1. Trust folder (gemini-class-test)</strong>.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If you pick 3 (Don't trust), the CLI won't read the <code>.env</code> or the MCP settings in this folder, and every step after this will fail.
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         Next, you'll see three authentication options:
       </p>
       <ol class="login-list">
-        <li><span class="login-letter">a</span><span class="login-text">Sign in with Google</span></li>
-        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API Key</span></li>
-        <li><span class="login-letter">c</span><span class="login-text">Vertex AI</span></li>
+        <li><span class="login-letter">1</span><span class="login-text">Sign in with Google</span></li>
+        <li><span class="login-letter">2</span><span class="login-text">Use Gemini API Key</span></li>
+        <li><span class="login-letter">3</span><span class="login-text">Vertex AI</span></li>
       </ol>
       <p class="detail-paragraph">
-        Pick <strong>b</strong>. The first option is still on screen, but it no longer serves free personal accounts — choosing it just leads down a path that doesn't go anywhere. The <code>.env</code> you set up earlier exists precisely for this step.
+        Pick <strong>2. Use Gemini API Key</strong>. The first option is still on screen, but it no longer serves free personal accounts — choosing it just leads down a path that doesn't go anywhere. The <code>.env</code> you set up earlier exists precisely for this step.
       </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/驗證方式選單.png"
+          alt="Gemini CLI's authentication method menu"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">
+          The authentication menu. The line below it, <code>Existing API key detected (GEMINI_API_KEY)</code>, means the CLI has already read the <code>.env</code> you just created
+        </figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        After you choose, one more confirmation screen appears — and it <strong>prints your API Key straight onto the screen</strong>. Press Enter to finish.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          One reminder while we're here: the key is shown in plain text. If you're projecting, recording, or sharing your screen with someone, switch away for this step. A leaked key means someone else can spend your quota — and you won't notice right away.
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -384,15 +437,21 @@ Get-Content .gemini\.env</code></pre>
       <figure class="figure">
         <img
           class="figure__img"
-          src="/learning/agent/成功進入Gemini CLI.png"
-          alt="Terminal screen after successfully entering Gemini CLI"
+          src="/learning/agent/成功進入GeminiCLI.png"
+          alt="Terminal screen after successfully entering Gemini CLI, with the workspace, sandbox and model status bar along the bottom"
           loading="lazy"
         />
-        <figcaption class="figure__caption">Figure 3. Successfully entering Gemini CLI</figcaption>
+        <figcaption class="figure__caption">Successfully entering Gemini CLI</figcaption>
       </figure>
 
       <p class="detail-paragraph">
-        Check the model in the bottom-right corner. If it reads <code>gemini-3.5-flash-lite</code> — the one you set earlier — your configuration has taken effect.
+        Check the model in the bottom-right corner. If it reads <code>gemini-3.5-flash-lite</code> — the one you set earlier — your <code>.env</code> has taken effect.
+      </p>
+      <p class="detail-paragraph">
+        That bottom row carries two more pieces of information: on the left is your current working folder, in the middle is the sandbox status. <strong>Check that the path on the left is <code>C:\gemini-class-test</code></strong> — if it isn't, you launched from a different folder, and neither the <code>.env</code> nor the MCP settings you add later will be read.
+      </p>
+      <p class="detail-paragraph">
+        The <code>1 MCP server</code> in the top right of the screenshot is there because this image was captured after the MCP steps further down were already done. Yours should still be empty at this point; it'll show up once you finish the next section.
       </p>
 
       <div class="faq-list">
@@ -530,7 +589,12 @@ Get-Content .gemini\.env</code></pre>
       <p class="detail-paragraph">
         So using Notion as our first example, and given that Notion's official MCP endpoint is <code>https://mcp.notion.com/mcp</code>, you can do this:
       </p>
-      <pre class="code-block"><code>gemini mcp add --transport http notion https://mcp.notion.com/mcp</code></pre>
+      <pre class="code-block"><code>gemini mcp add --transport http notion https://mcp.notion.com/mcp                      # Route A
+npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp      # Route B</code></pre>
+
+      <p class="detail-paragraph">
+        This line goes in <strong>PowerShell</strong>, not inside Gemini CLI. If you're not sure where you are, look back at the "where you're typing right now" table above.
+      </p>
 
       <ol class="step-list">
         <li class="step-item">
@@ -538,17 +602,21 @@ Get-Content .gemini\.env</code></pre>
           <div class="step-body">
             <h3 class="step-title">Finish adding</h3>
             <p class="step-desc">
-              On success, you'll see:
+              On success you'll see <code>MCP server "notion" added to project settings. (http)</code>. You can then read the config file yourself to confirm what was written:
             </p>
+            <pre class="code-block"><code>Get-Content .gemini\settings.json</code></pre>
             <figure class="figure">
               <img
                 class="figure__img"
-                src="/learning/agent/新增MCP成功.png"
-                alt="The success message from gemini mcp add, and the settings.json contents read back with Get-Content"
+                src="/learning/agent/新增MCP成功_npx.png"
+                alt="The success message from mcp add, and the settings.json contents read back with Get-Content"
                 loading="lazy"
               />
-              <figcaption class="figure__caption">Figure 4. After adding the Notion MCP, there's content, and the config landed in the project-level settings.json</figcaption>
+              <figcaption class="figure__caption">The config really did land in the project-level <code>.gemini\settings.json</code></figcaption>
             </figure>
+            <p class="step-desc">
+              Note the <code>"type": "http"</code> — the CLI generates that for you, you don't write it by hand. Some older tutorials online write <code>"httpUrl"</code> instead; that's the old syntax and it won't connect any more.
+            </p>
           </div>
         </li>
         <li class="step-item">
@@ -564,11 +632,46 @@ Get-Content .gemini\.env</code></pre>
           <span class="step-num">3</span>
           <div class="step-body">
             <h3 class="step-title">Complete OAuth, then check the MCP status again</h3>
-            <p class="step-desc">It jumps to your browser for OAuth — authorize with your test Notion account.</p>
             <pre class="code-block"><code>/mcp auth notion</code></pre>
-            <p class="step-desc">Check once more: notion should now show as connected, with the full tool list.</p>
+            <p class="step-desc">This line goes inside Gemini CLI. Running it opens your browser automatically:</p>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/Notion授權畫面.png"
+                alt="The Notion MCP browser authorization screen"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption">The Notion MCP authorization screen</figcaption>
+            </figure>
+            <p class="step-desc">Three things on this screen deserve attention:</p>
+            <ul class="check-list check-list--compact">
+              <li><strong>Pick the workspace at the top first.</strong> If your Notion account has more than one workspace, picking the wrong one means you'll find nothing later.</li>
+              <li><strong>The four lines in the middle are the permissions you're granting</strong> — worth pausing on. It isn't just "read your pages": it also covers acting on your behalf, and viewing workspace members and their email addresses. This is what we'll come back to when we talk about least privilege.</li>
+              <li><strong>The <code>I recognize and trust this URL</code> checkbox in the yellow box must be ticked.</strong> Without it the Continue button below stays grey and can't be clicked. The <code>localhost:52850</code> number in that box differs per person and per run — it doesn't need to match the screenshot.</li>
+            </ul>
+
+            <p class="step-desc">Once authorization is done, check again:</p>
             <pre class="code-block"><code>/mcp list</code></pre>
-            <p class="step-desc step-desc--alert">For safety, the connection isn't permanent — if it's been idle for a while, you'll need to authorize again before using Notion.</p>
+            <p class="step-desc">The status goes from Disconnected to Ready, followed by the full list of tools this MCP provides.</p>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/MCP工具清單.png"
+                alt="/mcp list showing notion as ready, with 28 tools and 2 resources listed"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption"><code>/mcp list</code> after authorization</figcaption>
+            </figure>
+            <p class="step-desc">Two things here are worth a look.</p>
+            <p class="step-desc">
+              First, tool names in the list take the form <code>mcp_notion_notion-search</code>. The first two layers are prefixes Gemini CLI adds itself (<code>mcp_</code> means it came from an MCP, <code>notion_</code> means which server it came from). The tool's own name is the last part — <code>notion-search</code>. Later material refers to tools simply as <code>notion-search</code> or <code>notion-fetch</code>; they're the same things you're seeing here.
+            </p>
+            <p class="step-desc">
+              Second, what you just connected in one go is <strong>28 tools</strong>. That's far more than this course will use, and the description of every one of them is sent to the model alongside each question you ask. In "Least Privilege &amp; Security Boundaries" we'll look at how to narrow this down to just the few you actually need.
+            </p>
+            <p class="step-desc step-desc--alert">
+              One last reminder: this connection isn't permanent. For safety, it expires after a period of disuse. If notion shows as Disconnected next time you open up, you haven't done anything wrong — just run <code>/mcp auth notion</code> again.
+            </p>
           </div>
         </li>
       </ol>
@@ -739,7 +842,9 @@ Get-Content .gemini\.env</code></pre>
   :global(.faq-answer) code:not(.code-block code),
   :global(.callout-text) code,
   :global(.info-table) td code,
-  :global(.trouble-list) code {
+  :global(.trouble-list) code,
+  :global(.check-list) code,
+  :global(.figure__caption) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.9em;
@@ -776,6 +881,11 @@ Get-Content .gemini\.env</code></pre>
     font-size: var(--text-sm);
     line-height: 1.7;
     margin-bottom: var(--space-1);
+  }
+
+  .check-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
   }
 
   /* Callout card */
@@ -1242,13 +1352,15 @@ Get-Content .gemini\.env</code></pre>
     line-height: 1.6;
   }
 
-  /* Figures sitting inside a step card need tighter vertical rhythm,
-     but keep the centred caption the other figures use */
-  .step-body .figure {
+  /* Figures sitting inside a step or install card need tighter vertical
+     rhythm, but keep the centred caption the other figures use */
+  .step-body .figure,
+  .install-card .figure {
     margin: var(--space-3) 0;
   }
 
-  .step-body .figure__caption {
+  .step-body .figure__caption,
+  .install-card .figure__caption {
     margin-top: var(--space-2);
   }
 

@@ -165,7 +165,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
             </tr>
           </thead>
           <tbody>
-            <tr><td>任務名稱</td><td>Text</td><td>The task name</td></tr>
+            <tr><td>任務名稱</td><td>Title (already renamed in STEP 2 — <strong>don't create it again</strong>)</td><td>The task name</td></tr>
             <tr><td>類型</td><td>Select</td><td>Which category the task belongs to</td></tr>
             <tr><td>狀態</td><td>Select</td><td>Current processing status</td></tr>
             <tr><td>優先順序</td><td>Select</td><td>High / Medium / Low</td></tr>
@@ -174,6 +174,13 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
             <tr><td>備註</td><td>Text</td><td>Additional notes</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Skip the first row of that table.</strong>「任務名稱」 is the title column you already renamed back in STEP 2 — it was there all along, it just has a different name now. It's listed here so you can see the complete set of columns.<br/><br/>
+          Create it a second time and the database ends up with two columns called 「任務名稱」 — one the title column, one a new text column. The program reads the title column, so all three tools come back with a blank task name, and nothing in the error message points at this. <strong>The columns you actually need to create are the six from the second row down.</strong>
+        </p>
       </div>
 
       <div class="callout-card callout-card--warn">
@@ -1135,10 +1142,10 @@ if __name__ == "__main__":
           alt="The Gemini CLI mcp list screen showing two MCP servers, notion and notion-classroom, the latter marked Ready with three tools listed"
           loading="lazy"
         />
-        <figcaption class="figure__caption">Figure 8. The <code>/mcp list</code> screen. <code>notion-classroom</code> shows Ready (3 tools) with the full name of each tool below it. The <code>notion</code> entry above it is the official Notion MCP, present only because this machine had already worked through "Getting started with Gemini CLI and MCP" — if you haven't done that page, you'll see just <code>notion-classroom</code>, and that's fine.</figcaption>
+        <figcaption class="figure__caption">Figure 8. The <code>/mcp list</code> screen. <code>notion-classroom</code> shows Ready (3 tools) with the full name of each tool below it. The <code>notion</code> entry above it is the official Notion MCP; whether it shows up depends on which layer it was installed at — seeing only <code>notion-classroom</code> is perfectly normal too.</figcaption>
       </figure>
 
-      <h2 class="detail-heading">Why there are two MCP servers</h2>
+      <h2 class="detail-heading">If you see two MCP servers</h2>
       <p class="detail-paragraph">
         Gemini CLI reads MCP configuration from <strong>two layers</strong>, and they stack rather than replace one another:
       </p>
@@ -1149,36 +1156,62 @@ if __name__ == "__main__":
             <tr>
               <th>Layer</th>
               <th>Path</th>
-              <th>Server on this page</th>
+              <th>When it has anything in it</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>User</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>Official <code>notion</code> (<code>url</code> + <code>type: http</code> + <code>includeTools</code>)</td></tr>
-            <tr><td>Project</td><td><code>project\.gemini\settings.json</code></td><td>Our own <code>notion-classroom</code> (<code>command</code> + <code>args</code> + <code>cwd</code>)</td></tr>
+            <tr><td>User</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>Only if you once set an MCP server up at this level by hand</td></tr>
+            <tr><td>Project</td><td><code>project-folder\.gemini\settings.json</code></td><td>Where <code>gemini mcp add</code> writes by default — and it only applies inside that folder</td></tr>
           </tbody>
         </table>
       </div>
 
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>For this page's exercises, temporarily disable the official <code>notion</code> server.</strong> With both present, the model may reach for the official tools instead — the task gets done, but <strong>your own tool was never actually wired up correctly and you can't tell</strong>.
-        </p>
-      </div>
+      <p class="detail-paragraph">
+        So the <code>/mcp list</code> you just ran <strong>may not look the same for everyone</strong>:
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">Just one</span>
+          <span class="role-item__desc">Only <code>notion-classroom</code> — the simplest case, so <strong>go straight on to the exercises</strong>. If the official Notion MCP you connected earlier was written into a different project folder, it won't load in this one.</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">Both of them</span>
+          <span class="role-item__desc">Both <code>notion</code> and <code>notion-classroom</code> — meaning the official one sits at the user layer, or you once installed it in this project too. <strong>Disable it temporarily</strong> before going on.</span>
+        </li>
+      </ul>
+
+      <h4 class="example-heading">If both are present, why disable the official one first</h4>
+      <p class="detail-paragraph">
+        Because with two sets of tools that can both act on Notion, the model may reach for the official one. The task does get done and the Notion data does look right — but <strong>your own tool was never actually wired up correctly, and you can't tell</strong>. The point of this page is to verify the thing you built, so set the other one aside first.
+      </p>
+
+      <h4 class="example-heading">How to disable it</h4>
+      <p class="detail-paragraph">
+        <strong>Fully close Gemini CLI first</strong>, or the file will be locked and the rename will fail. Then look at both paths to find where <code>notion</code> is actually configured:
+      </p>
+      <pre class="code-block" is:raw><code>Get-Content "$HOME\.gemini\settings.json"
+Get-Content ".gemini\settings.json"</code></pre>
 
       <p class="detail-paragraph">
-        Disable it by renaming the user-layer config:
+        Whichever file contains <code>"notion"</code> is the one to change. <strong>Usually it's the first</strong>:
       </p>
       <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json" -NewName "settings.json.bak"</code></pre>
-      <p class="detail-paragraph">
-        Rename it back when you're done:
-      </p>
-      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json.bak" -NewName "settings.json"</code></pre>
 
-      <div class="callout-card">
+      <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>Fully close Gemini CLI before renaming</strong>, or the file will be locked and the rename will fail.
+          If it's at the <strong>project layer</strong> (the second file), <strong>don't rename the whole thing</strong> — that file also holds the <code>notion-classroom</code> you just wrote, and renaming takes both out. In that case open the file directly, delete the <code>notion</code> block, and leave <code>notion-classroom</code> in place.
         </p>
       </div>
+
+      <p class="detail-paragraph">
+        Restart the CLI afterwards and run <code>/mcp list</code> to confirm only <code>notion-classroom</code> remains.
+      </p>
+
+      <p class="detail-paragraph">
+        Rename it back when you're done with the exercises:
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json.bak" -NewName "settings.json"</code></pre>
 
       <div class="highlight-card">
         <p class="highlight-text">
