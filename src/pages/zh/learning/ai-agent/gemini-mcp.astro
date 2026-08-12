@@ -23,7 +23,7 @@ if ($userPath -notlike "*$npmPath*") {
         <p class="detail-subtitle">
           前面你已經知道大語言模型、Gemini CLI、MCP、API 這幾個角色大概是怎麼分工的。接著我們要繼續往前走一步：先把 Gemini CLI 裝好、打開、知道自己在哪裡操作，再把第一個現成 MCP 接進來，並確認它能用。至於 OAuth、權限、設定檔進一步修改，之後再學就好。Gemini CLI 是 Google 的開源 AI agent，主打直接在終端機裡和 Gemini 工作，並且支援 MCP 擴充。
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.55.1 實測驗證。npx 每次都會抓最新版本，你看到的版本號可能比這裡新，畫面若有小差異是正常的。</p>
       </header>
 
       <!-- Section: Prep -->
@@ -177,7 +177,7 @@ npm install express</code></pre>
           alt="PowerShell 因為執行原則被停用而無法載入 npm.ps1 的錯誤訊息"
           loading="lazy"
         />
-        <figcaption class="figure__caption">圖一、執行原則被停用時，npm 指令會出現的錯誤訊息</figcaption>
+        <figcaption class="figure__caption">執行原則被停用時，npm 指令會出現的錯誤訊息</figcaption>
       </figure>
 
       <p class="detail-paragraph">
@@ -225,6 +225,23 @@ gemini --version</code></pre>
           </p>
           <pre class="code-block"><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 npx @google/gemini-cli</code></pre>
+          <p class="install-desc">
+            第一次執行 npx 會先問你要不要下載套件：
+          </p>
+
+          <figure class="figure">
+            <img
+              class="figure__img"
+              src="/learning/agent/npx首次執行確認.png"
+              alt="npx 第一次執行時詢問是否下載套件的畫面"
+              loading="lazy"
+            />
+            <figcaption class="figure__caption">npx 首次執行時的下載確認</figcaption>
+          </figure>
+
+          <p class="install-desc">
+            按 <code>y</code> 再按 Enter 就會開始下載。這一步只有第一次會出現，之後有快取就會直接啟動。
+          </p>
           <p class="install-desc">
             後續教材中出現 <code>gemini</code> 指令的地方，一律代換為 <code>npx @google/gemini-cli</code>，子指令的語法完全相同。
           </p>
@@ -347,7 +364,12 @@ Get-Content .gemini\.env</code></pre>
       <p class="detail-paragraph">
         準備到這裡，就可以直接輸入：
       </p>
-      <pre class="code-block"><code>gemini</code></pre>
+      <pre class="code-block"><code>gemini                      # 路線 A
+npx @google/gemini-cli      # 路線 B</code></pre>
+
+      <p class="detail-paragraph">
+        第一次在這個資料夾啟動時，會先跳出一個確認框：<strong>Do you trust the files in this folder?</strong>（你信任這個資料夾裡的檔案嗎？）
+      </p>
 
       <figure class="figure">
         <img
@@ -356,24 +378,55 @@ Get-Content .gemini\.env</code></pre>
           alt="Gemini CLI 第一次在資料夾裡啟動時，詢問是否信任這個資料夾的畫面"
           loading="lazy"
         />
-        <figcaption class="figure__caption">圖二、第一次在資料夾裡啟動時的信任提示</figcaption>
+        <figcaption class="figure__caption">第一次在資料夾裡啟動時的信任提示</figcaption>
       </figure>
 
       <p class="detail-paragraph">
-        請選擇我們剛剛建立的資料夾「Trust folder (gemini-class-test)」。
+        框裡會列出這個資料夾有哪些設定會被載入。<strong>現在還是空的</strong>，因為我們還沒加任何 MCP。等一下做完下面的「把第一個現成 MCP 加進來」，再回到這個畫面時，就會多出一行 <code>MCP Servers (1): notion</code> —— 那時候你就會很具體地看到，所謂「信任這個資料夾」到底是在信任什麼。
       </p>
+      <p class="detail-paragraph">
+        三個選項請選 <strong>1. Trust folder (gemini-class-test)</strong>。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          如果選了 3（Don't trust），CLI 不會讀取這個資料夾裡的 <code>.env</code> 和 MCP 設定，後面每一步都會失敗。
+        </p>
+      </div>
 
       <p class="detail-paragraph">
         接著，你會看到三種驗證選項：
       </p>
       <ol class="login-list">
-        <li><span class="login-letter">a</span><span class="login-text">Sign in with Google</span></li>
-        <li><span class="login-letter">b</span><span class="login-text">Use Gemini API Key</span></li>
-        <li><span class="login-letter">c</span><span class="login-text">Vertex AI</span></li>
+        <li><span class="login-letter">1</span><span class="login-text">Sign in with Google</span></li>
+        <li><span class="login-letter">2</span><span class="login-text">Use Gemini API Key</span></li>
+        <li><span class="login-letter">3</span><span class="login-text">Vertex AI</span></li>
       </ol>
       <p class="detail-paragraph">
-        請選 <strong>b</strong>。第一個選項雖然還留在畫面上，但對免費個人帳號已經不再提供服務，選下去只會走進一條走不通的路。你前面建立的 <code>.env</code>，就是為了這一步。
+        請選 <strong>2. Use Gemini API Key</strong>。第一個選項雖然還留在畫面上，但對免費個人帳號已經不再提供服務，選下去只會走進一條走不通的路。你前面建立的 <code>.env</code>，就是為了這一步。
       </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/驗證方式選單.png"
+          alt="Gemini CLI 詢問驗證方式的選單畫面"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">
+          驗證方式選單。下方那行 <code>Existing API key detected (GEMINI_API_KEY)</code> 表示 CLI 已經讀到你剛剛建立的 <code>.env</code>
+        </figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        選下去之後還有一個確認畫面，會<strong>直接把你的 API Key 顯示在螢幕上</strong>，按 Enter 才算真的完成。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          這裡順便提醒一件事：金鑰是明文顯示的。如果你正在投影、錄影或和別人共用螢幕，這一步記得先切走畫面。金鑰外流等於別人可以用你的額度，而且你不會馬上發現。
+        </p>
+      </div>
 
       <div class="callout-card">
         <p class="callout-text">
@@ -384,15 +437,21 @@ Get-Content .gemini\.env</code></pre>
       <figure class="figure">
         <img
           class="figure__img"
-          src="/learning/agent/成功進入Gemini CLI.png"
-          alt="成功進入 Gemini CLI 的終端機畫面"
+          src="/learning/agent/成功進入GeminiCLI.png"
+          alt="成功進入 Gemini CLI 的終端機畫面，底部有 workspace、sandbox 與模型狀態列"
           loading="lazy"
         />
-        <figcaption class="figure__caption">圖三、成功進入 Gemini CLI</figcaption>
+        <figcaption class="figure__caption">成功進入 Gemini CLI</figcaption>
       </figure>
 
       <p class="detail-paragraph">
-        看右下角的模型是否為我們剛剛設定的 <code>gemini-3.5-flash-lite</code>，若有，表示我們的設定已生效。
+        看右下角的模型是不是我們剛剛設定的 <code>gemini-3.5-flash-lite</code>。是的話，表示 <code>.env</code> 已經生效。
+      </p>
+      <p class="detail-paragraph">
+        底部那一列還有兩個資訊：左邊是目前的工作資料夾，中間是 sandbox 狀態。<strong>確認左邊的路徑是 <code>C:\gemini-class-test</code></strong> —— 如果不是，代表你在別的資料夾啟動，<code>.env</code> 和之後的 MCP 設定都不會被讀到。
+      </p>
+      <p class="detail-paragraph">
+        圖中右上方顯示 <code>1 MCP server</code>，是因為這張圖拍攝時已經做完後面的 MCP 新增步驟。你現在這裡應該還是空的，做完下一節就會出現。
       </p>
 
       <div class="faq-list">
@@ -530,7 +589,12 @@ Get-Content .gemini\.env</code></pre>
       <p class="detail-paragraph">
         那我們用 Notion 當第一次示範，而 Notion 官方提供的 MCP 端點是 <code>https://mcp.notion.com/mcp</code>，就可以這樣做：
       </p>
-      <pre class="code-block"><code>gemini mcp add --transport http notion https://mcp.notion.com/mcp</code></pre>
+      <pre class="code-block"><code>gemini mcp add --transport http notion https://mcp.notion.com/mcp                      # 路線 A
+npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp      # 路線 B</code></pre>
+
+      <p class="detail-paragraph">
+        這一行要打在 <strong>PowerShell 裡</strong>，不是打在 Gemini CLI 裡面。如果不確定自己在哪裡，回頭看上面那張「你現在在哪裡打字」的表。
+      </p>
 
       <ol class="step-list">
         <li class="step-item">
@@ -538,17 +602,21 @@ Get-Content .gemini\.env</code></pre>
           <div class="step-body">
             <h3 class="step-title">完成新增</h3>
             <p class="step-desc">
-              成功後會出現：
+              成功後會出現 <code>MCP server "notion" added to project settings. (http)</code>，接著可以自己讀一次設定檔確認寫進去的內容：
             </p>
+            <pre class="code-block"><code>Get-Content .gemini\settings.json</code></pre>
             <figure class="figure">
               <img
                 class="figure__img"
-                src="/learning/agent/新增MCP成功.png"
-                alt="執行 gemini mcp add 後的成功訊息，以及 Get-Content 讀出的 settings.json 內容"
+                src="/learning/agent/新增MCP成功_npx.png"
+                alt="執行 mcp add 後的成功訊息，以及 Get-Content 讀出的 settings.json 內容"
                 loading="lazy"
               />
-              <figcaption class="figure__caption">圖四、新增 Notion MCP 後，表示有內容，且設定寫進了專案層級的 settings.json</figcaption>
+              <figcaption class="figure__caption">設定確實寫進了專案層級的 <code>.gemini\settings.json</code></figcaption>
             </figure>
+            <p class="step-desc">
+              注意那個 <code>"type": "http"</code> —— 是 CLI 幫你產生的，不用自己手寫。網路上有些舊教學會寫成 <code>"httpUrl"</code>，那是舊版語法，現在用會連不上。
+            </p>
           </div>
         </li>
         <li class="step-item">
@@ -564,11 +632,46 @@ Get-Content .gemini\.env</code></pre>
           <span class="step-num">3</span>
           <div class="step-body">
             <h3 class="step-title">做 OAuth 驗證並再次查看目前的 MCP 狀態</h3>
-            <p class="step-desc">跳轉瀏覽器 OAuth，用測試 Notion 帳號授權。</p>
             <pre class="code-block"><code>/mcp auth notion</code></pre>
-            <p class="step-desc">再查看一次，應該會看到 notion 的狀態變為連接，並列出完整工具清單。</p>
+            <p class="step-desc">這一行打在 Gemini CLI 裡面。執行後會自動跳出瀏覽器：</p>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/Notion授權畫面.png"
+                alt="Notion MCP 的瀏覽器授權畫面"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption">Notion MCP 的授權畫面</figcaption>
+            </figure>
+            <p class="step-desc">這個畫面有三個地方要注意：</p>
+            <ul class="check-list check-list--compact">
+              <li><strong>上面要先選 workspace</strong>。如果你的 Notion 帳號底下不只一個工作區，選錯了等一下會什麼都搜不到。</li>
+              <li><strong>中間那四行是你正在授權出去的權限</strong>，值得停下來看一眼。它不只是「讀你的頁面」，還包括代替你執行動作、以及查看工作區成員與他們的 email。這是我們之後談最小權限時會回來看的東西。</li>
+              <li><strong>黃色框裡的 <code>I recognize and trust this URL</code> 一定要勾</strong>，不勾的話下面的 Continue 是灰的，按不下去。框裡那個 <code>localhost:52850</code> 的數字每個人、每次都不一樣，不用跟圖上一致。</li>
+            </ul>
+
+            <p class="step-desc">授權完成後再查一次：</p>
             <pre class="code-block"><code>/mcp list</code></pre>
-            <p class="step-desc step-desc--alert">為安全起見，不會永久連接，因此，一段時間沒用的話，使用 Notion 前都需要重新授權連接。</p>
+            <p class="step-desc">狀態會從 Disconnected 變成 Ready，後面接著列出這個 MCP 提供的完整工具清單。</p>
+            <figure class="figure">
+              <img
+                class="figure__img"
+                src="/learning/agent/MCP工具清單.png"
+                alt="/mcp list 顯示 notion 已就緒並列出 28 個工具與 2 個資源"
+                loading="lazy"
+              />
+              <figcaption class="figure__caption">授權完成後的 <code>/mcp list</code></figcaption>
+            </figure>
+            <p class="step-desc">這裡有兩件事值得看一下。</p>
+            <p class="step-desc">
+              第一，清單裡的工具名稱是 <code>mcp_notion_notion-search</code> 這種格式，前面兩層是 Gemini CLI 自己加的前綴（<code>mcp_</code> 表示來自 MCP，<code>notion_</code> 表示來自哪一個 server）。工具本身的名字是後面那一段，也就是 <code>notion-search</code>。之後的教材提到工具時會直接用 <code>notion-search</code>、<code>notion-fetch</code> 這種寫法，跟你在這裡看到的是同一個東西。
+            </p>
+            <p class="step-desc">
+              第二，一口氣接進來的是 <strong>28 個工具</strong>。這比你這堂課會用到的多很多，而每一個工具的說明都會在你每次提問時一起送給模型。之後在〈最小權限與安全邊界〉會談怎麼把它限縮到你真正需要的那幾個。
+            </p>
+            <p class="step-desc step-desc--alert">
+              最後提醒：這個連線不是永久的。為了安全，一段時間沒用就會失效。下次你開起來如果看到 notion 是 Disconnected，不是你做錯了，重跑一次 <code>/mcp auth notion</code> 就好。
+            </p>
           </div>
         </li>
       </ol>
@@ -739,7 +842,9 @@ Get-Content .gemini\.env</code></pre>
   :global(.faq-answer) code:not(.code-block code),
   :global(.callout-text) code,
   :global(.info-table) td code,
-  :global(.trouble-list) code {
+  :global(.trouble-list) code,
+  :global(.check-list) code,
+  :global(.figure__caption) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.9em;
@@ -776,6 +881,11 @@ Get-Content .gemini\.env</code></pre>
     font-size: var(--text-sm);
     line-height: 1.7;
     margin-bottom: var(--space-1);
+  }
+
+  .check-list strong {
+    color: var(--color-heading);
+    font-weight: 600;
   }
 
   /* Callout card */
@@ -1242,13 +1352,15 @@ Get-Content .gemini\.env</code></pre>
     line-height: 1.6;
   }
 
-  /* Figures sitting inside a step card need tighter vertical rhythm,
-     but keep the centred caption the other figures use */
-  .step-body .figure {
+  /* Figures sitting inside a step or install card need tighter vertical
+     rhythm, but keep the centred caption the other figures use */
+  .step-body .figure,
+  .install-card .figure {
     margin: var(--space-3) 0;
   }
 
-  .step-body .figure__caption {
+  .step-body .figure__caption,
+  .install-card .figure__caption {
     margin-top: var(--space-2);
   }
 

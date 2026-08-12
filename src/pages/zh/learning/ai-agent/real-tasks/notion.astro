@@ -165,7 +165,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
             </tr>
           </thead>
           <tbody>
-            <tr><td>任務名稱</td><td>文字</td><td>這筆任務的名稱</td></tr>
+            <tr><td>任務名稱</td><td>標題（STEP 2 已改好，<strong>不用再建</strong>）</td><td>這筆任務的名稱</td></tr>
             <tr><td>類型</td><td>選取</td><td>任務屬於哪一類</td></tr>
             <tr><td>狀態</td><td>選取</td><td>目前處理狀態</td></tr>
             <tr><td>優先順序</td><td>選取</td><td>高、中、低</td></tr>
@@ -174,6 +174,13 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
             <tr><td>備註</td><td>文字</td><td>補充說明</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>表格第一列不用再做。</strong>「任務名稱」就是 STEP 2 那個已經改好名字的標題欄，它本來就在，只是換了名字。這裡列出來是為了讓你看到完整的欄位清單。<br/><br/>
+          如果照著再建立一次，資料庫裡會出現兩個「任務名稱」—— 一個是標題欄，一個是新建的文字欄。程式讀的是標題欄，所以後面三個工具都會回傳空白的任務名稱，而且錯誤訊息不會告訴你問題出在這裡。<strong>要新建的是第二列以後的六個欄位。</strong>
+        </p>
       </div>
 
       <div class="callout-card callout-card--warn">
@@ -1135,12 +1142,12 @@ if __name__ == "__main__":
           alt="Gemini CLI 的 mcp list 畫面，列出 notion 與 notion-classroom 兩個 MCP Server，後者標示 Ready 並列出三個工具"
           loading="lazy"
         />
-        <figcaption class="figure__caption">圖八、<code>/mcp list</code> 的畫面。<code>notion-classroom</code> 顯示 Ready (3 tools)，下面列出三個工具的完整名稱。畫面上那個 <code>notion</code> 是官方的 Notion MCP，因為這台電腦先做過「Gemini CLI 入門與 MCP 初次串接」才會出現 —— 沒做過那一頁的話，這裡只會看到 <code>notion-classroom</code> 一個，那是正常的。</figcaption>
+        <figcaption class="figure__caption">圖八、<code>/mcp list</code> 的畫面。<code>notion-classroom</code> 顯示 Ready (3 tools)，下面列出三個工具的完整名稱。上面那個 <code>notion</code> 是官方的 Notion MCP，會不會出現要看它裝在哪一層 —— 你只看到 <code>notion-classroom</code> 一個也是正常的。</figcaption>
       </figure>
 
-      <h2 class="detail-heading">為什麼會看到兩個 MCP Server</h2>
+      <h2 class="detail-heading">如果你看到兩個 MCP Server</h2>
       <p class="detail-paragraph">
-        Gemini CLI 的 MCP 設定<strong>有兩層</strong>，兩層會疊加，不是後者取代前者：
+        Gemini CLI 的 MCP 設定<strong>有兩層</strong>，兩層會疊加，不是後者代替前者：
       </p>
 
       <div class="csv-table-wrapper">
@@ -1149,36 +1156,62 @@ if __name__ == "__main__":
             <tr>
               <th>層級</th>
               <th>路徑</th>
-              <th>這一頁的 server</th>
+              <th>什麼時候會有東西</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>使用者層</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>官方 <code>notion</code>（<code>url</code> + <code>type: http</code> + <code>includeTools</code>）</td></tr>
-            <tr><td>專案層</td><td><code>專案\.gemini\settings.json</code></td><td>自製 <code>notion-classroom</code>（<code>command</code> + <code>args</code> + <code>cwd</code>）</td></tr>
+            <tr><td>使用者層</td><td><code>%USERPROFILE%\.gemini\settings.json</code></td><td>你曾經去手動把 MCP 設在這個層級才會用</td></tr>
+            <tr><td>專案層</td><td><code>專案資料夾\.gemini\settings.json</code></td><td><code>gemini mcp add</code> 預設寫這裡，只有在那個資料夾裡才生效</td></tr>
           </tbody>
         </table>
       </div>
 
+      <p class="detail-paragraph">
+        所以剛剛 <code>/mcp list</code> 的結果，<strong>每個人可能不一樣</strong>：
+      </p>
+
+      <ul class="role-list">
+        <li class="role-item">
+          <span class="role-item__label">只有一個</span>
+          <span class="role-item__desc">只看到 <code>notion-classroom</code> —— 這是最單純的情況，<strong>直接往下做練習就好</strong>。之前接的官方 Notion MCP 如果是寫在別的專案資料夾裡，在這個資料夾就不會載入。</span>
+        </li>
+        <li class="role-item">
+          <span class="role-item__label">兩個都在</span>
+          <span class="role-item__desc">同時看到 <code>notion</code> 和 <code>notion-classroom</code> —— 代表官方那個裝在使用者層，或是你曾經也在這個專案裡裝了。<strong>建議先把它暫時停用</strong>，再往下做。</span>
+        </li>
+      </ul>
+
+      <h4 class="example-heading">兩個都在的話，為什麼要先停用官方的</h4>
+      <p class="detail-paragraph">
+        因為模型看到兩套工具都能操作 Notion，可能會改用官方的去完成任務。結果是任務確實做完了，Notion 裡資料也對 —— 但<strong>你自製的工具其實沒接好，你卻看不出來</strong>。這一頁的目的是驗收自己做的東西，所以要先把另一個放邊。
+      </p>
+
+      <h4 class="example-heading">停用方式</h4>
+      <p class="detail-paragraph">
+        先<strong>完全關閉 Gemini CLI</strong>，否則檔案被占用改不動。接著把兩個路徑都看一遍，找出 <code>notion</code> 寫在哪裡：
+      </p>
+      <pre class="code-block" is:raw><code>Get-Content "$HOME\.gemini\settings.json"
+Get-Content ".gemini\settings.json"</code></pre>
+
+      <p class="detail-paragraph">
+        哪一個檔案裡出現 <code>"notion"</code>，就改哪一個。<strong>通常是第一個</strong>：
+      </p>
+      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json" -NewName "settings.json.bak"</code></pre>
+
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>這一頁的練習，建議先暫時停用官方的 <code>notion</code>。</strong>因為兩個都在的時候，模型可能改用官方工具去完成任務 —— 結果任務確實做完了，但<strong>自製工具其實沒接好，你卻看不出來</strong>。
+          如果是在<strong>專案層</strong>（第二個檔案），<strong>不要整份改名</strong> —— 那份裡面也有你剛剛寫的 <code>notion-classroom</code>，改名就全沒了。這種情況請直接開檔案，把 <code>notion</code> 那一段刪掉，只留下 <code>notion-classroom</code>。
         </p>
       </div>
 
       <p class="detail-paragraph">
-        停用方式是把使用者層的設定檔改名：
+        改完重開 CLI，用 <code>/mcp list</code> 確認只剩 <code>notion-classroom</code>。
       </p>
-      <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json" -NewName "settings.json.bak"</code></pre>
+
       <p class="detail-paragraph">
         練習做完要復原時，改回來就好：
       </p>
       <pre class="code-block" is:raw><code>Rename-Item -Path "$HOME\.gemini\settings.json.bak" -NewName "settings.json"</code></pre>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          改名前<strong>要先完全關閉 Gemini CLI</strong>，否則檔案會被占用、改不動。
-        </p>
-      </div>
 
       <div class="highlight-card">
         <p class="highlight-text">

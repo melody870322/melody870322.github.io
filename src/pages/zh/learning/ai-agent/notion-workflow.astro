@@ -16,7 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           剛剛你已經完成一件很重要的事：把 Gemini CLI 裝好、打開，並且把第一個現成 MCP 接進來。這裡開始，我們<strong>不只是確認它「有連上」，而是要真的讓它做一輪完整的事情</strong>。
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.55.1 實測驗證。npx 每次都會抓最新版本，你看到的版本號可能比這裡新，畫面若有小差異是正常的。</p>
       </header>
 
       <div class="callout-card callout-card--warn">
@@ -99,7 +99,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
         <article class="sample-card">
           <p class="sample-tag">頁面二</p>
-          <h4 class="sample-title">課程公告｜第一週補課通知</h4>
+          <h4 class="sample-title">課程公告｜第三週補課通知</h4>
           <pre class="code-block"><code>原訂 10/8 停課，補課時間改為 10/15 下午。</code></pre>
         </article>
 
@@ -112,13 +112,16 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
       <div class="callout-card">
         <p class="callout-text">
-          <strong>這三頁是刻意這樣設計的。</strong>搜尋「課程」時，應該找到前兩頁、不該找到第三頁 —— 這正好對應下面 STEP 1 要你觀察的四件事。而頁面一同時包含題目、要求、截止時間三類資訊，是為了讓 STEP 4 的「整理成三個小段落」有真的素材可以整理。
+          <strong>這三頁是刻意這樣設計的。</strong>搜尋「課程」時，前兩頁的標題直接命中；第三頁的內容講的是 Tools、Resources、Prompts，完全沒有「課程」兩個字，所以不會被找到 —— 這正好對應下面 STEP 1 要你觀察的四件事。而頁面一同時包含題目、要求、截止時間三類資訊，是為了讓 STEP 4 的「改成三段」有真的素材可以整理。
+        </p>
+        <p class="callout-text">
+          你實際看到的筆數可能比兩筆多，這是正常的。Notion 的搜尋是<strong>標題和內容一起比對</strong>，所以工作區裡其他提到「課程」的頁面也會出現；如果你把這三頁建在某一頁底下，那個<strong>父頁面</strong>通常也會一起被帶出來。重點不是筆數對不對，而是<strong>該被找到的有沒有找到、明顯不相干的有沒有被亂塞</strong>。
         </p>
       </div>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          建好頁面後<strong>先等一下再開始</strong>。Notion 需要幾秒到幾分鐘替新頁面建立索引，馬上執行 STEP 1 很可能什麼都搜不到，那不是你做錯了。
+          建好頁面後就可以直接開始。多數情況下新頁面馬上就搜得到，畢竟 Notion 建索引最慢也才幾秒；如果第一次搜尋什麼都沒找到，等一下再試一次就好，那不是你做錯了。
         </p>
       </div>
 
@@ -161,6 +164,74 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         這一步的重點不是叫它一次做很多事，而是<strong>先看它能不能找到對的頁面</strong>。
       </p>
 
+      <h3 class="sub-heading">第一次呼叫工具時，它會先問你</h3>
+      <p class="detail-paragraph">
+        你送出指令之後，畫面不會馬上開始做事，而是會先跳出一個黃色的確認框：
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/工具執行確認框.png"
+          alt="Gemini CLI 詢問是否允許執行 Notion MCP 工具的確認畫面"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">第一次呼叫某個工具時的授權確認</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        <strong>這不是出錯，也不是卡住。</strong>這是 Gemini CLI 在告訴你：AI 現在打算用哪一個工具、帶什麼參數去做事，請你確認。框裡那一行 <code is:raw>notion-search {"query":"課程","query_type":"internal"}</code> 就是它準備送出的完整內容 —— 值得看一眼，這是你唯一能攔下來的時機。
+      </p>
+
+      <p class="detail-paragraph">
+        四個選項的差別如下：
+      </p>
+
+      <div class="csv-table-wrapper">
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>選項</th>
+              <th>實際效果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Allow once</strong></td>
+              <td>只放行<strong>這一次</strong>。下一次同一個工具還是會再問一遍。</td>
+            </tr>
+            <tr>
+              <td><strong>2. Allow tool for this session</strong></td>
+              <td>這個工具在本次 session 不再問，但換別的工具還是會問。</td>
+            </tr>
+            <tr>
+              <td><strong>3. Allow all server tools for this session</strong></td>
+              <td>這個 server 底下<strong>全部 28 個工具</strong>都放行，本次 session 不再問任何一個。</td>
+            </tr>
+            <tr>
+              <td><strong>4. No, suggest changes (esc)</strong></td>
+              <td>不執行，把控制權交回給你，可以改完指令再試一次。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        這裡的「session」指的是<strong>這次 Gemini CLI 開著的期間</strong>。關掉重開，或是下 <code>/clear</code>，權限就會重來一次。
+      </p>
+
+      <p class="detail-paragraph">
+        三件值得知道的事：
+      </p>
+      <ul class="check-list">
+        <li><strong>選 3 的代價比你想的大。</strong>你只是想讓它搜尋，但這一下等於一併放行了刪除、移動、建立資料庫這些你今天根本用不到的工具。方便，但範圍一次拉滿。</li>
+        <li><strong>選項 4 才是真正的煞車。</strong>很多人以為只能在「同意」和「離開」之間二選一。看到參數不對 —— 打錯關鍵字、要改的不是那一頁 —— 就選 4，這個選項本來就是設計給你用的。</li>
+        <li><strong>本頁的四個步驟會用到四個不同的工具</strong>，所以就算你每次都選 2，下一步走到新工具時仍會被再問一次。每一次都是一個「AI 現在要做什麼」的檢查點，不要按太快。</li>
+      </ul>
+      <p class="detail-paragraph">
+        建議第一次選 <strong>1</strong>，親自感受「每次都問」是什麼樣子；接下來的步驟都選 <strong>2</strong>。
+      </p>
+
       <h3 class="sub-heading">搜尋頁面時，你要看什麼</h3>
       <p class="detail-paragraph">
         第一次搜尋，不要只看「它有沒有回你一串答案」，你要看的是：
@@ -168,7 +239,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <ul class="check-list">
         <li>它找到的頁面是不是<strong>你真的認得</strong></li>
         <li>它抓到的關鍵字是不是合理</li>
-        <li>它有沒有把不相干的東西也一起拉進來</li>
+        <li>它有沒有把不相干的東西也一起拉進來（父頁面被一起帶出來是正常的，內容明顯無關的才要留意）</li>
         <li>它有沒有先照你的要求「<strong>只搜尋，不修改</strong>」</li>
       </ul>
 
@@ -206,6 +277,40 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <blockquote class="prompt-example">
         請讀取剛剛那一頁，告訴我裡面有哪些和期末報告要求有關的重點。
       </blockquote>
+
+      <h3 class="sub-heading">畫面上會出現兩段東西，不要被前面那段嚇到</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/notion-fetch原始回傳.png"
+          alt="notion-fetch 的原始回傳內容，以及下方模型整理後的重點"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">上半是工具的原始回傳，下半才是模型整理給你的內容</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        框框裡那一大段看起來很亂的東西 —— <code>\n</code>、<code>&lt;page&gt;</code>、<code>&lt;properties&gt;</code>、<code>&lt;content&gt;</code>、<code>&lt;empty-block/&gt;</code> —— 是 <strong>Notion 這個工具原封不動回來的原始資料</strong>，格式是給模型讀的，不是給你讀的。你不需要看懂它。
+      </p>
+      <p class="detail-paragraph">
+        框框外面、紫色星星開頭那一段，才是<strong>模型讀完之後整理給你的回答</strong>。
+      </p>
+      <p class="detail-paragraph">
+        這個分辨很有用，上一頁我們分過「PowerShell 和 CLI 裡面」，這裡分的是「工具的輸出」和「模型的回答」。當結果不如預期時，你才知道是哪一段出問題 —— 工具根本沒抓到東西，跟工具抓到了但模型整理得不好，是兩種完全不同的毛病，處理方式也不一樣。
+      </p>
+
+      <h3 class="sub-heading">你不用去找頁面 ID</h3>
+      <p class="detail-paragraph">
+        <code>notion-fetch</code> 需要知道要抓哪一頁，但你不必自己去 Notion 複製一長串 ID。上一步搜尋的結果裡已經有每一頁的網址，模型會直接拿那個網址當參數丟出去 —— 你在確認框裡會看到類似 <code is:raw>{"id":"https://app.notion.com/p/..."}</code> 的內容。
+      </p>
+      <p class="detail-paragraph">
+        這就是為什麼「先搜尋、再讀取」這個順序有意義：<strong>第一步的產出，正好是第二步的輸入</strong>。
+      </p>
+
+      <p class="detail-paragraph">
+        順帶提一件事：回傳內容裡有一段 <code>ancestor-path</code>，會把這一頁的<strong>父頁面標題和網址</strong>一起交出來。你只請它讀一頁，但頁面的所在位置也跟著出去了。這不是錯誤，是這個工具的設計，之後在〈最小權限與安全邊界〉那一頁會再回來談：<strong>你送出去的東西通常比你以為的多</strong>。
+      </p>
 
       <p class="detail-paragraph">
         這一步的重點，是讓 AI <strong>不只是「找到頁面」，而是真的根據頁面內容往下做事</strong>。
@@ -249,16 +354,31 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <blockquote class="prompt-example">
         根據剛剛那一頁的內容，幫我建立一個新的 Notion 頁面，標題叫做「期末報告重點整理」，先整理成條列式草稿。
       </blockquote>
-      <p class="detail-paragraph">或者：</p>
-      <blockquote class="prompt-example">
-        請根據剛剛讀到的內容，建立一篇新的課堂筆記，只保留重點，不要寫太長。
-      </blockquote>
 
       <div class="highlight-card">
         <p class="highlight-text">
           這一步會讓你第一次明確感受到：<strong>AI 不只是看資料，而是真的幫你生出一份新內容。</strong>
         </p>
       </div>
+
+      <h3 class="sub-heading">建好之後，回去找它在哪裡</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/新頁面在私人區.png"
+          alt="Notion 側邊欄，新建立的頁面出現在「私人」分區上方"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">新頁面不會出現在原本那一頁底下。這裡要看的是左邊側邊欄的位置，右邊的內容已經是 STEP 4 更新過的樣子了</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        很多人會下意識以為新頁面會跟「課程大綱」放在一起，然後在原本的位置找不到它。因為指令裡沒有指定 parent，Notion 會把它建成一個<strong>頂層的私人頁面</strong> —— 請往側邊欄的「私人」分區底下看，頁面標題旁邊也會有一個「私人」的鎖頭標記。
+      </p>
+      <p class="detail-paragraph">
+        如果你希望它建在特定位置，指令裡就要講清楚，例如「建在『課程大綱』這一頁底下」。
+      </p>
 
       <h3 class="sub-heading">第一次建立頁面，越小越好</h3>
       <p class="detail-paragraph">
@@ -304,10 +424,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       </p>
 
       <blockquote class="prompt-example">
-        請把剛剛建立的「期末報告重點整理」頁面更新一下：<br/>
-        1. 開頭加上一句 50 字內的摘要<br/>
-        2. 把條列整理成「題目、要求、截止時間」三個小段落<br/>
-        3. 不要刪掉原本內容太多
+        請幫我把剛剛建立的「期末報告重點整理」頁面做三件事：在開頭加上一段 50 字以內的摘要、把內容改成「題目」「要求」「截止時間」三段、不要刪掉原本的條列。
       </blockquote>
 
       <p class="detail-paragraph">
@@ -319,6 +436,22 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <li>AI 是不是照你的要求只改指定範圍</li>
       </ul>
 
+      <h3 class="sub-heading">為什麼「不要刪掉原本內容」這句話一定要寫</h3>
+      <p class="detail-paragraph">
+        你在確認框裡會看到 <code>notion-update-page</code> 的參數是 <code>new_str</code> —— <strong>它送出去的是整頁改寫後的完整內容，不是只送你要改的那幾行</strong>。
+      </p>
+      <p class="detail-paragraph">
+        這代表一件事：原本的條列之所以還在，是因為<strong>模型自己把舊內容重新打了一遍寫回去</strong>，不是因為工具幫你保護了它。模型如果漏掉了一段，那一段就直接消失了，而且不會有任何警告。
+      </p>
+      <p class="detail-paragraph">
+        這就是為什麼 STEP 2 的「讀取」不能跳過。它必須先讀完整這一頁，才有辦法完整地寫回去。
+      </p>
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>先讀後寫</strong>這句話，講的就是這件事。
+        </p>
+      </div>
+
       <h3 class="sub-heading">更新頁面時，越具體越安全</h3>
       <p class="detail-paragraph">
         第一次做更新，最怕的不是它改不動，而是<strong>它改太多</strong>。所以你在下指令時，最好講清楚三件事：
@@ -328,22 +461,6 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <li>要改哪一段</li>
         <li>不要改哪些地方</li>
       </ul>
-
-      <p class="detail-paragraph">例如：</p>
-
-      <blockquote class="prompt-example">
-        請只修改剛剛建立頁面的第一段，其他段落先不要動。
-      </blockquote>
-      <p class="detail-paragraph">或者：</p>
-      <blockquote class="prompt-example">
-        請把原本的條列改得更好讀，但不要改掉原本的意思。
-      </blockquote>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          這樣的指令比較適合第一次做更新。因為第一次的目標<strong>不是讓它自由發揮，而是讓你知道它有沒有照規則做事</strong>。
-        </p>
-      </div>
 
       <!-- Section: When it goes wrong -->
       <h2 class="detail-heading">如果它做錯了，不代表這條路線沒用</h2>
@@ -658,6 +775,83 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     font-weight: 600;
   }
 
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  /* Screenshots */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Comparison table */
+  .csv-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .csv-table th,
+  .csv-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.6;
+    vertical-align: middle;
+  }
+
+  .csv-table th:last-child,
+  .csv-table td:last-child {
+    border-right: none;
+  }
+
+  .csv-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .csv-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .csv-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .csv-table td strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
   /* Highlight card (key takeaway) */
   .highlight-card {
     margin: var(--space-4) 0 var(--space-6);
@@ -919,6 +1113,15 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
     .code-block {
       padding: var(--space-3) var(--space-4);
       font-size: 0.8rem;
+    }
+
+    .csv-table {
+      font-size: 0.78rem;
+    }
+
+    .csv-table th,
+    .csv-table td {
+      padding: var(--space-2);
     }
   }
 </style>
