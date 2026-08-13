@@ -1,0 +1,644 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Quota, Cost & Request Count — AI Agent Puzzle"
+  description="Once the MCP is wired up and you've run a full workflow, the first thing that really stops you isn't features — it's quota. This page uses measured /stats numbers to show where your requests go, why quota is counted separately per model, and what you can do about it."
+  lang="en"
+>
+  <section class="section">
+    <div class="container ai-agent-quota-and-cost">
+      <a class="back-link" href="/">&larr; Back to Home</a>
+
+      <header class="detail-header">
+        <h1 class="detail-title">Why You Run Out of Quota After Just a Few Prompts</h1>
+        <p class="detail-subtitle">
+          You've connected Notion and run through a complete workflow. The next thing that actually stops you usually isn't a missing feature — it's <strong>running out of quota</strong>. This page is about exactly that: understanding where the requests go, and which tools can help.
+        </p>
+        <p class="version-note">The steps and screens on this page were verified against <strong>Gemini CLI v0.55.1</strong>. The CLI updates frequently, so your version number may be newer and small details of the screens may differ.</p>
+      </header>
+
+      <!-- Section 1: /stats -->
+      <h2 class="detail-heading">First, Make the Cost Visible: <code>/stats</code></h2>
+      <p class="detail-paragraph">
+        Type <code>/stats</code> inside Gemini CLI to see how many requests and tokens this session has used. That's where the whole page starts — <strong>you can't economize on something you can't see</strong>.
+      </p>
+      <pre class="code-block"><code>/stats</code></pre>
+
+      <p class="detail-paragraph">
+        Here's the same summarization prompt, measured under two different tool configurations:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th></th><th>All 28 tools open</th><th>Limited to 4 tools</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Requests</td><td>3</td><td><strong>2</strong></td></tr>
+            <tr><td>Input tokens</td><td>121,554</td><td><strong>41,353</strong></td></tr>
+            <tr><td>Average per request</td><td>40,518</td><td><strong>20,677</strong></td></tr>
+            <tr><td>Runs available within 250K TPM</td><td>~6</td><td><strong>~12</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          Here's the crux: <strong>every request sends the entire conversation history along with it.</strong> So the longer the conversation, the more each individual request costs — it doesn't get cheaper as you go, it gets more expensive.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        On top of that there's a fixed cost coming from the CLI's own system prompt and built-in tools — <strong>somewhere over ten thousand tokens</strong>, and you can't turn it off. It's also a useful reminder: none of your prompts start from zero.
+      </p>
+
+      <!-- Section 2: one instruction != one request -->
+      <h2 class="detail-heading">One Instruction Is Not One Request</h2>
+      <p class="detail-paragraph">
+        This is the easiest thing to underestimate. You type "summarize this Notion note for me" and it feels like one action, but behind the scenes the agent runs:
+      </p>
+
+      <ol class="callout-list">
+        <li>Sends the instruction → request 1</li>
+        <li>Model decides to call <code>notion-search</code> → request 2 (search results go back to the model)</li>
+        <li>Model decides to call <code>notion-fetch</code> → request 3</li>
+      </ol>
+
+      <p class="detail-paragraph">
+        The summary is the <strong>reply</strong> to request 3, not a fourth request.
+      </p>
+
+      <p class="detail-paragraph">
+        So a single sentence can easily be <strong>3–10 requests</strong>. That lines up with the table above — the same summarization prompt measured at 3 requests with all 28 tools open. Measured across the full four-step Notion workflow from earlier: 9 requests and 5 tool calls in total.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>TPM usually runs out before RPM does.</strong> Because every request resends the whole conversation history as input, the longer the conversation, the more tokens each single request eats. People often assume they hit the "15 per minute" ceiling when they actually hit the token ceiling.
+        </p>
+      </div>
+
+      <!-- Section 3: three limits -->
+      <h2 class="detail-heading">Three Separate Quota Limits</h2>
+      <p class="detail-paragraph">
+        The free tier has three independent limits. What differs is <strong>how long you have to wait</strong>:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Abbrev.</th><th>Meaning</th><th>Quota</th><th>How it resets</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>RPM</td><td>Requests per minute</td><td>15</td><td>Rolling 60 seconds</td></tr>
+            <tr><td>TPM</td><td>Input tokens per minute</td><td>250,000</td><td>Rolling 60 seconds</td></tr>
+            <tr><td>RPD</td><td>Requests per day</td><td>500</td><td>Midnight Pacific time</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        RPM and TPM use a <strong>rolling 60-second window</strong>, not a reset on the minute mark — run out at 14:30:10 and you're clear again at 14:31:10. In practice, "if you hit it, wait a minute" is all you need to remember. RPD resets at midnight Pacific, which is <strong>15:00 Taiwan time</strong> (16:00 from November through March, because of the US time change). Hit RPD and you're waiting until tomorrow.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Quota is counted per project, not per key</strong>, so issuing several keys under the same Google Cloud project doesn't help — they share the same quota. Which means everyone must <strong>use their own Google account and create their own project</strong>.
+        </p>
+      </div>
+
+      <!-- Section 4: quota is per model -->
+      <h2 class="detail-heading">Every Model Gets Its Own Quota</h2>
+      <p class="detail-paragraph">
+        There's one thing those three limits don't tell you: <strong>each model gets its own separate allowance.</strong>
+      </p>
+      <p class="detail-paragraph">
+        Look at the usage page in AI Studio and every model is different:
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/quota-aistudio-limits.png"
+          alt="AI Studio usage page listing separate RPM, TPM and RPD figures for 3.5 Flash Lite, 3.5 Flash and 3.1 Flash Lite"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The free-tier usage page in AI Studio. Same day, same account — RPM, TPM and RPD are counted separately for each model.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        3.5 Flash Lite has used 75/500 RPD and 3.1 Flash Lite has used 9/500 RPD — <strong>those two 500s are separate</strong>. Those 9 calls on 3.1 don't eat into 3.5's quota.
+      </p>
+
+      <p class="detail-paragraph">
+        That explains why the models the CLI quietly calls behind the scenes don't affect you: they're charged to a different account.
+      </p>
+
+      <!-- Section 5: three models in /stats -->
+      <h2 class="detail-heading"><code>/stats</code> Shows More Than One Model</h2>
+      <p class="detail-paragraph">
+        Looking at the Model Usage table in <code>/stats</code>, you'll notice more than one model. Measured after one complete session:
+      </p>
+
+      <pre class="code-block"><code>gemini-3.1-flash-lite      1 req    ⟶ utility_summarizer
+gemini-3.5-flash-lite     15 reqs   ⟶ main
+gemini-3-flash-preview    25 reqs   ⟶ utility_tool</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/quota-stats-three-models.png"
+          alt="The /stats Session Stats screen, with a Model Usage table listing three models: gemini-3.1-flash-lite, gemini-3.5-flash-lite and gemini-3-flash-preview"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><code>/stats</code> from a single session.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Only <code>main</code> is your conversation. The other two are models the CLI calls internally for chores — generating conversation titles, writing summaries, and the like.
+      </p>
+
+      <p class="detail-paragraph">
+        Note that <code>utility_tool</code> ran 25 times, more than the main conversation did. But it doesn't eat your quota: as the previous section explained, quota is counted separately per model — and this model doesn't even appear on the AI Studio usage table.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The teaching value: <strong>an agent isn't one model doing everything — there's a division of labour behind it.</strong>
+        </p>
+      </div>
+
+      <!-- Section 6: lock the model -->
+      <h2 class="detail-heading">Which Is Why You Must Lock the Model</h2>
+      <p class="detail-paragraph">
+        On that same usage table, one number stands out:
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>3.5 Flash: 4 / 20 RPD</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Note that's 3.5 <strong>Flash</strong>, not Flash Lite. Its free allowance is <strong>20 per day</strong>, not 500. Four requests already ate a fifth of it.
+      </p>
+
+      <p class="detail-paragraph">
+        Where did those 4 come from? A new folder was opened for testing and <code>.gemini\.env</code> wasn't copied across — the model lock stopped working, the CLI routed itself to Auto, and Auto picked 3.5 Flash.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/quota-auto-model.png"
+          alt="Gemini CLI started in a new folder, with the status bar bottom-right showing Auto instead of gemini-3.5-flash-lite"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The bottom right of the status bar reads <code>Auto</code>, not <code>gemini-3.5-flash-lite</code>. That one field is the warning sign.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Check the bottom right every time you launch.</strong> If you see <code>Auto</code>, or any name that isn't <code>gemini-3.5-flash-lite</code>, you're burning a different pool — and that pool may only hold 20 calls. The most common cause is <strong>switching folders without copying <code>.gemini\.env</code> along</strong>.
+        </p>
+      </div>
+
+      <!-- Section 7: don't use /model to check quota -->
+      <h2 class="detail-heading">Don't Use <code>/model</code> to Check Quota</h2>
+      <p class="detail-paragraph">
+        The <code>/stats</code> screen prints a line of advice: <code>Use /model to view model quota information</code> (it's visible in the earlier <code>/stats</code> screenshot).
+      </p>
+
+      <p class="detail-paragraph">
+        <strong>Don't follow it.</strong> <code>/model</code> opens the model picker, and a single Enter can switch you to Auto — exactly the 20-call trap from the previous section.
+      </p>
+
+      <p class="detail-paragraph">
+        Two safe alternatives:
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">Inside the CLI</p>
+          <h3 class="method-title"><code>/stats model</code></h3>
+          <p class="method-desc">
+            <code>/stats</code> supports three subcommands: <code>session</code>, <code>model</code> and <code>tools</code>.
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">In the browser</p>
+          <h3 class="method-title">AI Studio usage page</h3>
+          <p class="method-desc">
+            The most complete picture, and the only place you can see each model's quota broken out separately.
+          </p>
+        </article>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/quota-stats-subcommands.png"
+          alt="Autocomplete while typing /stats in Gemini CLI, showing Usage: /stats [session|model|tools]"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The autocomplete hint while typing <code>/stats</code> shows the three subcommands it supports.</figcaption>
+      </figure>
+
+      <!-- Section 8: /clear + GEMINI.md -->
+      <h2 class="detail-heading">What Actually Works: <code>/clear</code> plus <code>GEMINI.md</code></h2>
+      <p class="detail-paragraph">
+        Since the cost comes from resending the whole history, the way to save is clear: <strong>throw away history you don't need, and put what you do need into a file</strong>.
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">Drop the history</p>
+          <h3 class="method-title"><code>/clear</code></h3>
+          <p class="method-desc">
+            Wipes the conversation context. It's a <strong>purely local operation — no request, and it can't fail</strong>. Your next prompt starts from a clean slate.
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">Keep what matters</p>
+          <h3 class="method-title"><code>GEMINI.md</code></h3>
+          <p class="method-desc">
+            Project-level long-term memory. It lives in a file rather than the conversation context, so it's <strong>version-controllable and shareable with a whole class</strong>.
+          </p>
+        </article>
+      </div>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          A good classroom rhythm: <strong>run <code>/clear</code> after finishing each exercise</strong>, and write anything worth keeping into <code>GEMINI.md</code>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        How to write <code>GEMINI.md</code>, where the memory file actually lives, and how it can be modified by the agent without you realising — those are covered on <a href="/learning/ai-agent/session-context">"Sessions &amp; Memory Management"</a>.
+      </p>
+
+      <!-- Section 9: /compress -->
+      <h2 class="detail-heading"><code>/compress</code> Currently Doesn't Work</h2>
+      <p class="detail-paragraph">
+        Faced with a quota problem, most people's first instinct is to compress the conversation history. That road is currently closed.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Measured on v0.54.4: both a 41K and a 373K context hang forever on "Compressing chat history".</strong> Esc does nothing; the only way out is Ctrl+C twice or closing the terminal. Issue #16213 on the official repo reports the same symptom.<br />
+          <strong>Not re-verified on v0.55.1 — this course continues to avoid it.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <strong>Keep it out of classroom exercises.</strong> That said, it's worth telling students about — a feature the official docs describe perfectly well is, in practice, broken. <strong>Don't assume something works just because the documentation says it does.</strong> That attitude applies to every tool.
+      </p>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ai-agent-quota-and-cost {
+    max-width: 52rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-8);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Header */
+  .detail-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    line-height: 1.3;
+  }
+
+  .detail-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Section headings */
+  .detail-heading {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-heading);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-heading code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  .detail-paragraph {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-paragraph strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .detail-paragraph a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  /* Inline code */
+  :global(.detail-paragraph) code,
+  :global(.detail-subtitle) code,
+  :global(.callout-text) code,
+  :global(.highlight-text) code,
+  :global(.method-desc) code,
+  :global(.method-title) code,
+  :global(.callout-list) code,
+  :global(.figure__caption) code,
+  :global(.info-table) td code {
+    padding: 0.1em 0.4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border-radius: var(--border-radius);
+  }
+
+  /* Code block */
+  .code-block {
+    margin: var(--space-3) 0;
+    padding: var(--space-4) var(--space-6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--color-heading);
+  }
+
+  .code-block code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-size: inherit;
+  }
+
+  /* Callout card */
+  .callout-card {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-6) var(--space-8);
+    border-left: 4px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+  }
+
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
+  .callout-text {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.9;
+    margin: 0;
+  }
+
+  .callout-text strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Ordered list used for the request breakdown */
+  .callout-list {
+    margin: var(--space-4) 0 var(--space-6);
+    padding-left: var(--space-6);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.9;
+  }
+
+  .callout-list li {
+    margin-bottom: var(--space-1);
+  }
+
+  .callout-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    margin: var(--space-4) 0 var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--border-radius);
+    background-color: var(--color-tag-bg);
+  }
+
+  .highlight-text {
+    font-size: var(--text-base);
+    color: var(--color-heading);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .highlight-text strong {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table tbody td:first-child {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  /* Method grid (two-column comparison cards) */
+  .method-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .method-card {
+    min-width: 0;
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-secondary);
+    transition: border-color var(--transition);
+  }
+
+  .method-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .method-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-tag-bg);
+    border-radius: var(--border-radius);
+    letter-spacing: 0.05em;
+  }
+
+  .method-title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-bottom: var(--space-3);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  .method-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 0;
+  }
+
+  .method-desc strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Figure */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .method-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .method-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .callout-card,
+    .highlight-card {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .code-block {
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.8rem;
+    }
+
+    .info-table {
+      font-size: 0.78rem;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: var(--space-2);
+    }
+  }
+</style>

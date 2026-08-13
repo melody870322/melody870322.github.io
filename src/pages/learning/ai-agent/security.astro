@@ -16,7 +16,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           What we did earlier was important: you got Gemini CLI connected to Notion and actually ran through a full workflow, so you know AI can help you search pages, read content, create new pages, and even update pages. What you'll learn here is the next, more important question.
         </p>
-        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+        <p class="version-note">The steps and screens on this page were verified against <strong>Gemini CLI v0.55.1</strong>. The CLI updates frequently, so your version number may be newer than this one and screen details may differ slightly.</p>
       </header>
 
       <div class="highlight-card">
@@ -107,16 +107,18 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <div class="info-table-wrapper">
         <table class="info-table">
           <thead>
-            <tr><th></th><th>Wide open (28 tools)</th><th>Least privilege (4 tools)</th></tr>
+            <tr><th></th><th>Wide open (28 tools)</th><th>Down to 4 tools (measured)</th></tr>
           </thead>
           <tbody>
             <tr><td>Requests to finish the same task</td><td>3</td><td><strong>2</strong></td></tr>
             <tr><td>Tokens per request</td><td>40,518</td><td><strong>20,677</strong></td></tr>
-            <tr><td>Requests you can run per minute</td><td>~6</td><td><strong>~12</strong></td></tr>
+            <tr><td>Requests per minute under 250K TPM</td><td>~6</td><td><strong>~12</strong></td></tr>
             <tr><td>Blast radius</td><td>Can move pages, alter database structure, list every private page</td><td>Search, read, create, update only</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p class="version-note">These numbers were measured with 4 tools enabled (including page updates). The configuration later on this page is stricter — only 3 — so the numbers only go lower.</p>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -167,7 +169,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
       <div class="highlight-card">
         <p class="highlight-text">
-          Look at that table and ask yourself one question: <strong>of those 28, how many does this course actually need?</strong> Four. Going from 28 down to 4 makes the case for least privilege on its own.
+          Look at that table and ask yourself one question: <strong>of those 28, how many does this course actually need?</strong><br/>
+          The answer is <strong>4</strong> — the top row.<br/>
+          And today we're going one step more conservative: turning "update page" off too, leaving <strong>only 3</strong>.
         </p>
       </div>
 
@@ -207,43 +211,78 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       </ul>
 
       <p class="detail-paragraph">
-        The reason is simple. For beginners, <strong>"search, read, create draft" is already enough to finish a lot of useful work</strong>, and the risk is much lower than "update existing pages." Update isn't off limits forever — it just belongs in a later step, once you really know how AI tends to act.
+        Why "update page" specifically? Because you already saw what it really does on the previous page.
+      </p>
+      <p class="detail-paragraph">
+        <code>notion-update-page</code> takes a parameter called <code>new_str</code>, which means <strong>rewrite the whole page</strong>. It isn't "add this new thing in" — it's "replace the entire page with this new content." The reason your old content survives is that the model read it first and then copied it back — <strong>the model remembered to copy it; the tool didn't preserve it for you</strong>. Whatever it missed simply disappears.
+      </p>
+      <p class="detail-paragraph">
+        Get "search, read, create draft" wrong and the worst case is one junk page. Get "update page" wrong and existing work is gone. So for your first configuration, turn it off.
       </p>
 
       <h3 class="sub-heading">Where does the config file live?</h3>
       <p class="detail-paragraph">
-        Gemini CLI's config file has two common locations, and <strong>project-level settings override user-level</strong>:
+        Gemini CLI's config file has two common locations. Look carefully at how the two layers relate — this is where it's easiest to misunderstand:
       </p>
 
       <div class="scope-grid">
         <article class="scope-card">
           <p class="scope-card__label">User level</p>
-          <p class="scope-card__path"><code>~/.gemini/settings.json</code></p>
+          <p class="scope-card__path"><code>%USERPROFILE%\.gemini\settings.json</code></p>
           <p class="scope-card__desc">
             Applies to every project on your machine.
           </p>
         </article>
         <article class="scope-card">
           <p class="scope-card__label">Project level</p>
-          <p class="scope-card__path"><code>.gemini/settings.json</code></p>
+          <p class="scope-card__path"><code>.gemini\settings.json</code></p>
           <p class="scope-card__desc">
-            Applies only to the current folder.
+            Applies only to the current folder. In the CLI it's called <strong>Workspace Settings</strong>.
           </p>
         </article>
       </div>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The two layers are "merged," not "replaced."</strong><br/>
+          Servers defined in each location are <strong>added together</strong> — both take effect. Only when a server with the <strong>same name</strong> appears in both does the project-level one win.
+        </p>
+        <p class="callout-text">
+          Why does this matter? If you still have another server sitting at the user level, the tool restrictions you set at the project level <strong>don't reach it</strong>. You think you've locked things down, but you've only locked half. To confirm what's actually in effect, open the CLI and run <code>/mcp list</code> — that's what counts.
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
-          I suggest starting with the <strong>project-level</strong> <code>.gemini/settings.json</code>. It's safer to practice on a small scope first, rather than applying a rule across every project from day one.
+          I suggest starting with the <strong>project-level</strong> <code>.gemini\settings.json</code> (called <strong>Workspace Settings</strong> in the CLI). It's safer to practice on a small scope first, rather than applying a rule across every project from day one.
         </p>
       </div>
 
       <h3 class="sub-heading">How to edit it: generate first, then look</h3>
       <p class="detail-paragraph">
+        You already did this step in week 4. If your <code>.gemini\settings.json</code> is still there, you can skip command 1 and just open the file.
+      </p>
+      <p class="detail-paragraph">
         Don't hand-write the JSON from scratch — it's far too easy to drop a comma or a quote. The steadier approach is to <strong>let the command generate the file, then open it and see what it wrote</strong>. In PowerShell:
       </p>
+
+      <div class="scope-grid">
+        <article class="scope-card">
+          <p class="scope-card__label">Home laptop (installed)</p>
+          <p class="scope-card__path"><code>gemini</code></p>
+        </article>
+        <article class="scope-card">
+          <p class="scope-card__label">Classroom PC (no install)</p>
+          <p class="scope-card__path"><code>npx @google/gemini-cli</code></p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        Every command below works either way. On the classroom PCs use the right-hand form — replace <code>gemini</code> with <code>npx @google/gemini-cli</code>; the arguments after it are identical.
+      </p>
+
       <pre class="code-block"><code># 1. Let the command generate the config
-gemini mcp add --transport http notion https://mcp.notion.com/mcp
+npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp
 
 # 2. Open the file and see what it wrote
 Get-Content .gemini\settings.json</code></pre>
@@ -262,6 +301,31 @@ Get-Content .gemini\settings.json</code></pre>
           This order isn't just about avoiding typos. <strong>Running it once and then reading the file teaches you both "how to do it" and "what happens when you do"</strong>; copying a block of JSON only teaches the first.
         </p>
       </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Once it's configured, don't run <code>mcp add</code> again.</strong><br/>
+          Its behavior is to overwrite the entire block for a server of the same name, and the <code>includeTools</code> you added <strong>disappears along with it</strong>. All the screen says is "updated in project settings" — it won't tell you your restrictions were removed.
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-mcpadd-overwrite.png"
+          alt="After re-running mcp add, the includeTools block is gone from settings.json"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Measured: with a 3-tool whitelist already in place, running <code>mcp add</code> once more reports "is already configured" and "updated" — reassuring enough. But the file it prints back holds only <code>url</code> and <code>type</code>. The whole <code>includeTools</code> block is gone.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        So once you're done configuring, back the file up:
+      </p>
+      <pre class="code-block"><code>Copy-Item .gemini\settings.json .gemini\settings.backup.json</code></pre>
+      <p class="detail-paragraph">
+        The classroom machines get rebuilt every week, so this backup file belongs alongside your project folder anyway.
+      </p>
 
       <h3 class="sub-heading">Method 1: Whitelist (includeTools)</h3>
       <p class="detail-paragraph">
@@ -310,7 +374,7 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="test-item">
           <span class="test-num">1</span>
           <div class="test-body">
-            <p class="test-desc"><strong>Exit Gemini CLI completely, then relaunch.</strong> Press Ctrl+C twice to quit, then type <code>gemini</code> again. Closing just the chat view isn't enough — settings won't be re-read.</p>
+            <p class="test-desc"><strong>Exit Gemini CLI completely, then relaunch.</strong> The config file is read once, at startup. Type <code>/quit</code> to leave (or press Ctrl+C twice), then start it again.<br/><strong>Note: <code>/clear</code> only clears the conversation — settings are not re-read.</strong></p>
           </div>
         </li>
         <li class="test-item">
@@ -344,15 +408,15 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="test-item">
           <span class="test-num">3</span>
           <div class="test-body">
-            <p class="test-desc">Based on those points, please create a new Notion page titled "Final Report Key Points" — present it as a bullet list first.</p>
+            <p class="test-desc">Based on those points, please create a new Notion page titled "<strong>Final Report Key Points (Permission Test)</strong>" — present it as a bullet list first.</p>
             <p class="test-tag test-tag--ok">Works</p>
           </div>
         </li>
-        <li class="test-item test-item--blocked">
+        <li class="test-item">
           <span class="test-num">4</span>
           <div class="test-body">
-            <p class="test-desc">Please update the page you just created: add a short summary at the top and organize the content under three subheadings.</p>
-            <p class="test-tag test-tag--blocked">Can't do it</p>
+            <p class="test-desc">Please update the "<strong>Final Report Key Points (Permission Test)</strong>" page you just created: add a short summary at the top and organize the content under three subheadings.</p>
+            <p class="test-tag test-tag--detour">It took a detour</p>
           </div>
         </li>
       </ol>
@@ -363,9 +427,104 @@ Get-Content .gemini\settings.json</code></pre>
         </p>
       </div>
 
+      <h3 class="sub-heading">What actually happened at step 4</h3>
+      <p class="detail-paragraph">
+        I expected step 4 to produce a line like "I can't do that." That isn't what happened.
+      </p>
+      <p class="detail-paragraph">
+        What <code>includeTools</code> does is make the tool <strong>disappear from the list the model can see</strong> — it doesn't intercept anything. So from the model's side the situation isn't "I'm forbidden," it's "that isn't in my toolbox." It doesn't know this is a limit you deliberately set — it only knows it has to find a way to finish what you asked.
+      </p>
+      <p class="detail-paragraph">
+        So it started looking for a route.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-search-shell.png"
+          alt="The model finds the page with notion-search, then calls Shell to run a one-line node command"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>Step one: it left itself a note via Shell.</strong> It found the page with <code>notion-search</code> (still enabled, still usable), then invoked <strong>Shell</strong> to run a one-line node command whose entire output is the sentence "Using update_page or recreating via create_pages if update_page tool is not available." That command does nothing. It was writing down its own decision.</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-fetch-recreate.png"
+          alt="After reading the page the model announces it will recreate instead"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>Step two: read the original, then rebuild.</strong> Having read the page, it announced its own workaround: "Recreating the Notion page with updated structure (summary + 3 subheadings) since there is no direct update_page tool."</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-result.png"
+          alt="The model uses notion-create-pages to make a second page and reports the update as done"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>Step three: the task was "done."</strong> It used <code>notion-create-pages</code> to build a separate page, "Final Report Key Points (Permission Test - Updated)," summary and three subheadings included, then reported: "I've created the updated Notion page for you (with 'Updated' added to the title to distinguish it)."</figcaption>
+      </figure>
+
+      <h3 class="sub-heading">Go look at Notion</h3>
+      <p class="detail-paragraph">
+        This is the habit worth building from this whole page: <strong>don't just read what the CLI says — go back and look at the actual result.</strong>
+      </p>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-notion-original.png"
+            alt="The original Notion page, unmodified"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-notion-newpage.png"
+            alt="The extra 'Updated' page that appeared in Notion"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <p class="figure__caption">
+        Left: the original "Final Report Key Points (Permission Test)" — bullet list, no summary, no subheadings, <strong>exactly as step 3 created it</strong>. Right: the extra "Updated" page — summary and all three subheadings present.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>Least privilege did work — but what it protected was "that document," not "that objective."</strong><br/>
+          Your original page wasn't touched, and that's a real win. But what you asked for was "update that page," and what you got was "now there are two." Locking tools doesn't make an agent abandon its goal; it only makes it change route.
+        </p>
+      </div>
+
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>Step 4 won't produce an error screen.</strong> What <code>includeTools</code> does is make the tool <strong>disappear from the list the model can see</strong> — it doesn't intercept anything. So the AI will usually just tell you it doesn't have that capability, or quietly route around it another way. Nothing turns red. If you're waiting for an error message, you'll wait forever.
+          <strong>It won't announce the detour.</strong><br/>
+          The first line of the report is "I've created the updated Notion page for you." The parenthetical that follows — "with 'Updated' added to the title to distinguish it" — is the only clue, and it's easy to skim past.
+        </p>
+        <p class="callout-text">
+          So check the real result in Notion every time. <strong>The CLI's report is its account of events, not the events.</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Same config, different route each time</h3>
+      <p class="detail-paragraph">
+        Same <code>settings.json</code>, same prompt — I ran it twice and the paths were completely different:
+      </p>
+      <ul class="check-list">
+        <li>First run: it went off to <strong>Google</strong> for Notion's official API docs, trying to find "some other way to update a page," and was still stuck there a while later.</li>
+        <li>Second run: it used <strong>Shell</strong> to record its decision, then went straight to <code>create_pages</code> and rebuilt. Done in two minutes.</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          So we can't write "it will do this." We can only write "<strong>it will definitely look for a route, and which one is never certain</strong>."<br/>
+          That is exactly why boundaries have to be set <strong>up front</strong> rather than handled afterward — you can't predict it, you can only constrain it.
         </p>
       </div>
 
@@ -442,7 +601,7 @@ Get-Content .gemini\settings.json</code></pre>
       </ul>
 
       <p class="detail-paragraph">
-        The simplest form of the wide-open version in your <code>.gemini/settings.json</code> looks like this:
+        The simplest form of the wide-open version in your <code>.gemini\settings.json</code> looks like this:
       </p>
       <pre class="code-block code-block--json"><code>{`{
   "mcpServers": {
@@ -454,31 +613,263 @@ Get-Content .gemini\settings.json</code></pre>
 }`}</code></pre>
 
       <!-- Section: Three layers of permission -->
-      <h2 class="detail-heading">Permissions Have Three Layers — This Page Covered the Middle One</h2>
+      <h2 class="detail-heading">The Part You've Already Granted Away</h2>
       <p class="detail-paragraph">
-        The <code>includeTools</code> we've been discussing governs MCP tools. But Gemini CLI's permissions actually come in three layers, and so far you've only touched the second:
+        Everything so far has been about the part <strong>you can take back</strong> — the tool surface. But there's another part, one you handed over the moment you connected, and most people never look at it again.
+      </p>
+
+      <h3 class="sub-heading">Those four lines on the consent screen</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion授權畫面.png"
+          alt="The Notion MCP browser consent screen listing four permissions and a localhost checkbox"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The Notion MCP consent screen. You clicked "Continue" here once, back in week 4.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Those four lines are worth reading one at a time:
+      </p>
+
+      <p class="detail-paragraph">
+        <strong><code>Respect your page and database access and permissions</code></strong><br/>
+        It reads like a promise that "it will respect your permissions." What it actually means: <strong>what it gets is your permissions</strong>.
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>Take actions on your behalf, based on your access level</code></strong><br/>
+        The plain-language version of the line above. <strong>On the account, it is you</strong> — not "a restricted bot account." Anything you can change, it can change.
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>Search across connected apps (requires Notion AI plan)</code></strong><br/>
+        A free account doesn't have this feature, but the item <strong>is still on the consent list</strong>. Scope of consent isn't the same as current capability — the day you upgrade, this grant takes effect automatically, without asking you again.
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>View workspace's users and their emails</code></strong><br/>
+        You think you're granting "read my notes," and workspace members' email addresses go along with it. This screen says "Free Plan · 1 member," so in a personal workspace you feel nothing. The same checkbox in a company or club workspace means something entirely different.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>And an easier thing to miss: what you're granting access to is "localhost."</strong>
+        </p>
+        <p class="callout-text">
+          The consent page says <code>Grant localhost access to Notion</code>, and the checkbox underneath asks you to confirm "I recognize and trust this URL" yourself.
+        </p>
+        <p class="callout-text">
+          Why does Notion make you confirm it? Because it <strong>can't</strong> confirm it for you. <code>localhost</code> is some program listening on your own machine; Notion only knows something is waiting on that port, not whether it's Gemini CLI. Only you can make that call.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">You think you only authorized once</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-mcp-clients-list.png"
+          alt="Notion settings listing four Gemini CLI MCP Clients, all showing as connected"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Notion Settings → Notion Model Context Protocol (MCP) → Manage workspace clients → view all MCP clients.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        One machine, one CLI — and there are <strong>4</strong> Gemini CLI MCP Clients here, every one of them showing "connected."
+      </p>
+      <p class="detail-paragraph">
+        The reason is that the OAuth callback port differs every time (63758, 55177, 59340, 52850), so Notion treats each as a distinct client. <strong>Every re-authorization adds another entry, and the old ones don't go away.</strong>
+      </p>
+      <p class="detail-paragraph">
+        Week 4 taught you that "the connection isn't permanent" — authorization expires, and you re-run <code>/mcp auth notion</code>. Here's the other half: <strong>what expires is the usable session, not the authorization record.</strong>
+      </p>
+
+      <h3 class="sub-heading">When you want it back</h3>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-manage-clients.png"
+            alt="All options on Notion's manage MCP clients page"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-mcp-client-menu.png"
+            alt="The per-connection three-dot menu offering only Rename"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <div class="figure">
+        <p class="figure__caption">
+          Left: every option on the management page. Right: the "⋯" menu for a single connection.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        On a free personal account, this is everything Notion lets you do:
+      </p>
+      <ul class="check-list">
+        <li><strong>Rename</strong> each connection (the per-item "⋯" offers only "Rename")</li>
+        <li><strong>Disconnect all users</strong> (the red button — everything at once)</li>
+        <li>Upgrade to a paid plan to manage "which clients may connect" (that option carries an upgrade prompt)</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        <strong>There is no middle option.</strong> You can't revoke one entry on its own, can't narrow a connection to read-only, can't scope it to specific pages.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          The scope of control the grant side gives you may be broader than you assumed — all of it, or upgrade.<br/>
+          So <code>includeTools</code> isn't a bonus "extra step for extra safety."<br/>
+          <strong>It's the one layer you genuinely hold, at exactly the right scope.</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">While we're here: what it carries off when it reads one page</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/notion-fetch原始回傳.png"
+          alt="Raw notion-fetch response containing an ancestor-path section"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The raw return from one <code>notion-fetch</code> call.</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        You only asked it to read one page, but the response contains an <code>&lt;ancestor-path&gt;</code> section holding the <strong>parent page's title and URL</strong>.
+      </p>
+      <p class="detail-paragraph">
+        Here the parent is "Start with the personal desktop app!", a Notion built-in onboarding page — harmless. But if your page sits under "Job Applications" or "Medical Notes," that parent title travels into the model along with the content.
+      </p>
+      <p class="detail-paragraph">
+        One more detail: a page created at the top level has no ancestor path (that section comes back empty); one created under something else does. <strong>You won't always remember where your page is filed.</strong>
+      </p>
+
+      <!-- Section: Five layers of permission -->
+      <h2 class="detail-heading">Permissions Have Five Layers — This Page Focuses on the Middle One</h2>
+      <p class="detail-paragraph">
+        The <code>includeTools</code> we've been discussing governs MCP tools. But Gemini CLI's permissions actually come in five layers, and so far you've only touched the third:
       </p>
 
       <div class="info-table-wrapper">
         <table class="info-table">
           <thead>
-            <tr><th>Layer</th><th>What it controls</th><th>How it's set</th></tr>
+            <tr><th>Layer</th><th>What it controls</th><th>Who decides</th><th>How this course handles it</th></tr>
           </thead>
           <tbody>
-            <tr><td>Folder</td><td>Whether local config can be read at all</td><td>The Trust choice at launch</td></tr>
-            <tr><td>MCP tools</td><td>Notion's 28 tools</td><td><code>includeTools</code> in the server block</td></tr>
-            <tr><td>CLI built-in tools</td><td><code>write_file</code>, <code>run_shell_command</code>, and friends</td><td>Top-level <code>coreTools</code> / <code>excludeTools</code></td></tr>
+            <tr><td>1. Grant side</td><td>How much of your Notion account you hand over</td><td>The OAuth consent page</td><td>Read those four lines; a free account can only revoke everything</td></tr>
+            <tr><td>2. Folder</td><td>Whether local config can be read at all</td><td>The Trust choice at launch</td><td>Choose "1. Trust folder"</td></tr>
+            <tr><td>3. <strong>MCP tools</strong></td><td>Notion's 28 tools</td><td><code>includeTools</code> in the server block</td><td><strong>The focus of this page</strong></td></tr>
+            <tr><td>4. CLI built-in tools</td><td><code>write_file</code>, <code>run_shell_command</code>, <code>GoogleSearch</code></td><td>Officially being redesigned</td><td>Know it exists; don't configure it</td></tr>
+            <tr><td>5. Execution time</td><td>Whether to allow this one action</td><td>The confirmation prompt</td><td>Read the command, not the description</td></tr>
           </tbody>
         </table>
       </div>
 
       <p class="detail-paragraph">
-        The third layer deserves a moment. <code>write_file</code> is a <strong>built-in</strong> CLI tool, outside the reach of <code>includeTools</code> — meaning that even after you lock Notion down to three tools, the AI can still write files to your disk.
+        Layer 4 deserves a moment, because you just watched it with your own eyes.
+      </p>
+      <p class="detail-paragraph">
+        <code>run_shell_command</code>, <code>write_file</code>, and <code>GoogleSearch</code> are <strong>built into the CLI</strong>. They don't belong to any MCP server, so <code>includeTools</code> can't reach them. Lock Notion down to three tools and it can still open a Shell, and still write files to your disk.
       </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>The exact syntax for the third layer hasn't been verified for this course.</strong> Treat the <code>coreTools</code> / <code>excludeTools</code> in the table above as a pointer for what to look up, not as config you can copy. Check the current official docs and verify it yourself before relying on it.
+          <strong>This course deliberately doesn't teach the syntax for layer 4.</strong>
+        </p>
+        <p class="callout-text">
+          The way this layer is configured is being redesigned upstream. v0.55.1 throws a warning at startup: the old <code>tools.exclude</code> syntax is deprecated (to be removed in 1.0), replaced by a Policy Engine that needs its own directory and TOML rule files.
+        </p>
+        <p class="callout-text">
+          In other words: any syntax written into course material right now is guaranteed to expire. It's enough to remember that <strong>this layer exists</strong> and that <strong>right now it's guarded by the confirmation prompt</strong>.
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-deprecated-warning.png"
+          alt="Gemini CLI v0.55.1 showing the tools.exclude deprecation warning, with no sandbox in the status bar"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The warning Gemini CLI v0.55.1 throws at startup. Incidentally, the URL in the warning is broken — the correct location is <code>geminicli.com/docs/reference/policy-engine/</code>. <strong>Even the official link expires.</strong></figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Also worth noting: <code>/settings</code> shows <strong>Tool Sandboxing defaults to false</strong>, and the status bar in the screenshot above reads <code>no sandbox</code>. Which means that once you approve a confirmation prompt, that command runs directly on your machine, unisolated.
+      </p>
+
+      <!-- Section: The last line of defense -->
+      <h2 class="detail-heading">The Last Line of Defense Is You</h2>
+      <p class="detail-paragraph">
+        If layer 4 can't be reached, how did that Shell command run at all?
+      </p>
+      <p class="detail-paragraph">
+        It asked you.
+      </p>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-shell-confirm-1.png"
+            alt="Shell execution prompt whose title doesn't match the actual command"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-shell-confirm-2.png"
+            alt="A second Shell execution prompt with only three options"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <div class="figure">
+        <p class="figure__caption">
+          Same prompt, same config, run twice — on the second run it threw two confirmation dialogs.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Three things in these two screenshots are worth seeing.
+      </p>
+
+      <p class="detail-paragraph">
+        <strong>1. The description doesn't match the command.</strong> The title reads <code>Check available Notion tools in the environment</code>, which sounds like taking inventory. The actual command loads a module and then adds a comment — <strong>it does nothing at all</strong>.
+      </p>
+      <p class="detail-paragraph">
+        That description was written by the model. It can write whatever it likes. <strong>Read the command, not the description.</strong>
+      </p>
+      <p class="detail-paragraph">
+        <strong>2. The command contains its own thinking out loud.</strong> <code>Wait, let's check available Notion MCP tools</code>, <code>Wait, is there an update_page tool? Let's check tool declarations in system prompt</code> — stuck on "can I tell whether an update tool exists," it wrote its whole hesitation into a shell comment like scratch paper.
+      </p>
+      <p class="detail-paragraph">
+        This is what an agent actually does once a tool is taken away: <strong>it doesn't come back and ask you, it keeps trying.</strong>
+      </p>
+      <p class="detail-paragraph">
+        <strong>3. This dialog isn't the one from last week.</strong> Last week's MCP tool prompt had 4 options, the third being "allow the whole server" (all 28 tools at once). This Shell prompt has only 3 options, and the cursor sits by default on the safest one, "Allow once."
+      </p>
+      <p class="detail-paragraph">
+        <strong>Neither the number of options nor the default position is fixed.</strong> That's why you can't hit Enter from muscle memory.
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          One more thing: if last week you chose "Allow for this session" or "allow the whole server" on some tool's prompt, then this week <strong>the dialog may not appear at all</strong>.
+        </p>
+        <p class="callout-text">
+          Once something is approved, it stops asking. To reset it, <code>/clear</code> once — covered in detail on <a href="/learning/ai-agent/session-context">"Sessions &amp; Memory Management"</a>.
         </p>
       </div>
 
@@ -489,7 +880,7 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="mistake-item">
           <span class="mistake-num">1</span>
           <div class="mistake-body">
-            <h3 class="mistake-title">Errors when editing <code>.gemini/settings.json</code></h3>
+            <h3 class="mistake-title">Errors when editing <code>.gemini\settings.json</code></h3>
             <p class="mistake-desc">
               If you add only <code>includeTools</code> or <code>excludeTools</code>, <strong>remember to put a comma at the end of the previous line</strong>. JSON is strict about commas — one missing and the whole file won't parse.
             </p>
@@ -501,6 +892,26 @@ Get-Content .gemini\settings.json</code></pre>
             <h3 class="mistake-title">"If I just write careful prompts, I don't need tool restrictions"</h3>
             <p class="mistake-desc mistake-desc--caution">
               Not quite. Because <strong>no matter how careful your prompt is, it doesn't mean you actually added a boundary to the system</strong>. Tool restrictions build a "<strong>structural boundary</strong>" — not a "hope for the best."
+            </p>
+          </div>
+        </li>
+        <li class="mistake-item">
+          <span class="mistake-num">3</span>
+          <div class="mistake-body">
+            <h3 class="mistake-title">"Once I've set it, it stays set"</h3>
+            <p class="mistake-desc mistake-desc--caution">
+              Not necessarily. Re-run <code>mcp add</code> once and <code>includeTools</code> is wiped, with no warning on screen. Someone overwriting the config, a machine reset, or you copying back an older version all produce the same result.<br/>
+              <strong>There's only one way to check</strong>: open the CLI, run <code>/mcp list</code>, and look at the tool count. What the config file says doesn't count; what actually loaded does.
+            </p>
+          </div>
+        </li>
+        <li class="mistake-item">
+          <span class="mistake-num">4</span>
+          <div class="mistake-body">
+            <h3 class="mistake-title">"The confirmation prompts all look alike — just hit that same position"</h3>
+            <p class="mistake-desc mistake-desc--caution">
+              There's more than one kind. The MCP tool prompt has 4 options (including "allow the whole server"); the Shell prompt has only 3, and the cursor's default position differs too.<br/>
+              So don't hit Enter from muscle memory. Every time, look at <strong>what it's actually about to do</strong>.
             </p>
           </div>
         </li>
@@ -593,6 +1004,7 @@ Get-Content .gemini\settings.json</code></pre>
   :global(.mistake-title) code,
   :global(.mistake-desc) code,
   :global(.info-table) td code,
+  :global(.figure__caption) code,
   :global(.test-desc) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -766,6 +1178,11 @@ Get-Content .gemini\settings.json</code></pre>
     color: var(--color-text);
     line-height: 1.9;
     margin: 0;
+  }
+
+  .callout-text a {
+    color: var(--color-accent);
+    text-decoration: underline;
   }
 
   .callout-text strong {
@@ -1096,6 +1513,11 @@ Get-Content .gemini\settings.json</code></pre>
     background-color: var(--color-text-muted);
   }
 
+  .test-tag--detour {
+    color: #fff;
+    background-color: #d97706;
+  }
+
   /* When grid */
   .when-grid {
     display: grid;
@@ -1215,6 +1637,27 @@ Get-Content .gemini\settings.json</code></pre>
   .mistake-desc strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Screenshots */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Mobile */

@@ -3,8 +3,8 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Sessions & Context Management — AI Agent Puzzle"
-  description="Once the MCP is wired up and you've run a full workflow, the first thing that really stops you isn't features — it's quota. This page uses measured /stats numbers to show where your requests go, and what /clear, GEMINI.md, and /resume can each do about it."
+  title="Sessions & Memory Management — AI Agent Puzzle"
+  description="Close the CLI and the conversation is gone — but some things survive, and they follow you into the next project. This page covers what disappears, what persists, where the memory file actually lives, and how the agent rewrites it on its own."
   lang="en"
 >
   <section class="section">
@@ -12,172 +12,83 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/">&larr; Back to Home</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">Why You Run Out of Quota After Just a Few Prompts</h1>
+        <h1 class="detail-title">What It Still Remembers After You Close It</h1>
         <p class="detail-subtitle">
-          You've connected Notion and run through a complete workflow. The next thing that actually stops you usually isn't a missing feature — it's <strong>running out of quota</strong>. This page is about exactly that: understanding where the requests go, and which tools can help.
+          Close the CLI and the conversation is gone — but some things survive, and they follow you into the next project. This page is about what disappears, what stays, where it stays, and how to track it down.
         </p>
-        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+        <p class="version-note">The steps and screens on this page were verified against <strong>Gemini CLI v0.55.1</strong>. The CLI updates frequently, so your version number may be newer and small details of the screens may differ.</p>
       </header>
 
-      <!-- Section 1: /stats -->
-      <h2 class="detail-heading">First, Make the Cost Visible: <code>/stats</code></h2>
+      <!-- Section 1: what is a session -->
+      <h2 class="detail-heading">First, What a Session Actually Is</h2>
       <p class="detail-paragraph">
-        Type <code>/stats</code> inside Gemini CLI to see how many requests and tokens this session has used. That's where the whole page starts — <strong>you can't economize on something you can't see</strong>.
+        We touched on this earlier when covering the confirmation dialog: <strong>a session is simply "the stretch of time this CLI is open".</strong>
       </p>
-      <pre class="code-block"><code>/stats</code></pre>
+      <p class="detail-paragraph">
+        Close the CLI, or type <code>/clear</code>, and this session is over — your next prompt starts from a clean slate.
+      </p>
+      <p class="detail-paragraph">
+        "Clean" includes something most people don't expect: <strong>the tool permissions you clicked through are reset too.</strong>
+      </p>
+
+      <pre class="code-block"><code>/clear</code></pre>
 
       <p class="detail-paragraph">
-        Here's the same summarization prompt, measured under two different tool configurations:
+        If you picked "Allow for this session" in a permission dialog last week, that grant only held for that one session. After <code>/clear</code>, it will ask you again.
       </p>
-
-      <div class="info-table-wrapper">
-        <table class="info-table">
-          <thead>
-            <tr><th></th><th>All 28 tools open</th><th>Limited to 4 tools</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Requests</td><td>3</td><td><strong>2</strong></td></tr>
-            <tr><td>Input tokens</td><td>121,554</td><td><strong>41,353</strong></td></tr>
-            <tr><td>Average per request</td><td>40,518</td><td><strong>20,677</strong></td></tr>
-            <tr><td>Runs available within 250K TPM</td><td>~6</td><td><strong>~12</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          Here's the crux: <strong>every request resends the entire conversation history.</strong> So the longer the conversation, the more each individual request costs — it doesn't get cheaper as you go, it gets more expensive.
+          <code>/clear</code> does more than wipe the screen. What it clears is the <strong>conversation history</strong> plus <strong>the permissions accumulated during this session</strong>. That's what makes it valuable — a genuinely clean restart. And it's a purely local operation: no request, and it can't fail.
         </p>
       </div>
 
       <p class="detail-paragraph">
-        On top of that there's a <strong>fixed cost of roughly 17,000 tokens</strong>, coming from the CLI's own system prompt and built-in tools. You can't turn that off, but it's a useful reminder: none of your prompts start from zero.
+        <code>/clear</code> has a second benefit: the longer the conversation history, the more every request costs. That side of it is covered on <a href="/learning/ai-agent/quota-and-cost">"Quota, Cost &amp; Request Count"</a>.
       </p>
 
-      <!-- Section 2: one instruction != one request -->
-      <h2 class="detail-heading">One Instruction Is Not One Request</h2>
-      <p class="detail-paragraph">
-        This is the easiest thing to underestimate. You type "summarize this Notion note for me" and it feels like one action, but behind the scenes the agent runs:
-      </p>
-
-      <ol class="callout-list">
-        <li>Sends the instruction → request 1</li>
-        <li>Model decides to call <code>notion-search</code> → request 2 (search results go back to the model)</li>
-        <li>Model decides to call <code>notion-fetch</code> → request 3</li>
-        <li>Model reads the content and produces a summary → request 4</li>
-      </ol>
-
-      <p class="detail-paragraph">
-        So a single sentence can easily be <strong>4–10 requests</strong>. Measured across the full four-step Notion workflow from earlier: <strong>9 requests and 5 tool calls</strong> in total.
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>TPM usually runs out before RPM does.</strong> Because every request resends the whole conversation history as input, the longer the conversation, the more tokens each single request eats. People often assume they hit the "15 per minute" ceiling when they actually hit the token ceiling.
-        </p>
-      </div>
-
-      <!-- Section 3: three limits -->
-      <h2 class="detail-heading">Three Separate Quota Limits</h2>
-      <p class="detail-paragraph">
-        The free tier has three independent limits, and exceeding any one of them returns a 429. What differs is <strong>how long you have to wait</strong>:
-      </p>
-
-      <div class="info-table-wrapper">
-        <table class="info-table">
-          <thead>
-            <tr><th>Abbrev.</th><th>Meaning</th><th>Quota</th><th>How it resets</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>RPM</td><td>Requests per minute</td><td>15</td><td>Rolling 60 seconds</td></tr>
-            <tr><td>TPM</td><td>Input tokens per minute</td><td>250,000</td><td>Rolling 60 seconds</td></tr>
-            <tr><td>RPD</td><td>Requests per day</td><td>500</td><td>Midnight Pacific time</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="detail-paragraph">
-        RPM and TPM use a <strong>rolling 60-second window</strong>, not a reset on the minute mark — run out at 14:30:10 and you're clear again at 14:31:10. In practice, "if you hit it, wait a minute" is all you need to remember. RPD resets at midnight Pacific, which is <strong>15:00 Taiwan time</strong> (16:00 from November through March, because of the US time change). Hit RPD and you're waiting until tomorrow.
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>Quota is counted per project, not per key.</strong> Issuing several keys under the same Google Cloud project doesn't help — they share the same quota. Everyone must <strong>use their own Google account and create their own project</strong>, or the whole class eats one shared pool of 500 RPD.
-        </p>
-      </div>
-
-      <!-- Section 4: /clear + GEMINI.md -->
-      <h2 class="detail-heading">What Actually Works: <code>/clear</code> plus <code>GEMINI.md</code></h2>
-      <p class="detail-paragraph">
-        Since the cost comes from resending the whole history, the way to save is clear: <strong>throw away history you don't need, and put what you do need into a file</strong>.
-      </p>
-
-      <div class="method-grid">
-        <article class="method-card">
-          <p class="method-tag">Drop the history</p>
-          <h3 class="method-title"><code>/clear</code></h3>
-          <p class="method-desc">
-            Wipes the conversation context. It's a <strong>purely local operation — no request, and it can't fail</strong>. Your next prompt starts from a clean slate.
-          </p>
-        </article>
-        <article class="method-card">
-          <p class="method-tag">Keep what matters</p>
-          <h3 class="method-title"><code>GEMINI.md</code></h3>
-          <p class="method-desc">
-            Project-level long-term memory. It lives in a file rather than the conversation context, so it's <strong>version-controllable and shareable with a whole class</strong>.
-          </p>
-        </article>
-      </div>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          A good classroom rhythm: <strong>run <code>/clear</code> after finishing each exercise</strong>, and write anything worth keeping into <code>GEMINI.md</code>.
-        </p>
-      </div>
-
-      <p class="detail-paragraph">
-        This isn't some obscure trick. The very first tip on the CLI's launch screen is <code>Create GEMINI.md files to customize your interactions</code>.
-      </p>
-
-      <!-- Section 5: /compress -->
-      <h2 class="detail-heading"><code>/compress</code> Currently Doesn't Work</h2>
-      <p class="detail-paragraph">
-        Faced with a quota problem, most people's first instinct is to compress the conversation history. That road is currently closed.
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>Measured on v0.54.4: both a 41K and a 373K context hang forever on "Compressing chat history".</strong> Esc does nothing; the only way out is Ctrl+C twice or closing the terminal. Issue #16213 on the official repo reports the same symptom.
-        </p>
-      </div>
-
-      <p class="detail-paragraph">
-        <strong>Keep it out of classroom exercises.</strong> That said, it's worth telling students about — a feature the official docs describe perfectly well is, in practice, broken. <strong>Don't assume something works just because the documentation says it does.</strong> That attitude applies to every tool.
-      </p>
-
-      <!-- Section 6: /resume -->
+      <!-- Section 2: /resume -->
       <h2 class="detail-heading">Picking Up Across Sessions: <code>/resume</code></h2>
       <p class="detail-paragraph">
         The CLI saves sessions automatically — you don't have to save anything yourself. In PowerShell:
       </p>
-      <pre class="code-block"><code>gemini --resume
-gemini -r</code></pre>
+      <pre class="code-block"><code>npx @google/gemini-cli --resume
+npx @google/gemini-cli -r</code></pre>
+      <p class="detail-paragraph">
+        On your own laptop, where it's already installed, <code>gemini --resume</code> or <code>gemini -r</code> works the same way.
+      </p>
       <p class="detail-paragraph">
         Or, if you're already inside the CLI:
       </p>
       <pre class="code-block"><code>/resume</code></pre>
 
       <p class="detail-paragraph">
-        Sessions live in <code>~/.gemini/tmp/&lt;project_hash&gt;/chats/</code> and are <strong>project-scoped</strong> — switch folders and the earlier history is no longer visible.
+        Sessions live in <code>%USERPROFILE%\.gemini\tmp\&lt;project_hash&gt;\chats\</code> and are <strong>project-scoped</strong> — switch folders and the earlier history is no longer visible.
       </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          When resuming in a different folder, <strong>absolute file references can break; relative paths are safer</strong>. Also, whether <code>--resume</code> genuinely restores the model's context (rather than just redrawing the transcript) hasn't been verified. Test it yourself before teaching it: new session → tell it something → <code>/quit</code> → <code>gemini --resume</code> → ask about that thing.
+          <strong>Verified by testing: <code>--resume</code> really does restore the model's context, not just redraw the screen.</strong>
+        </p>
+        <p class="callout-text">
+          The test is easy enough to repeat yourself: start a new session → tell it something mentioned only in that session (a codename, say) → <code>/quit</code> → <code>--resume</code> → pick which transcript to continue → ask it about that thing. It answers.
+        </p>
+        <p class="callout-text">
+          One more caution: when resuming in a different folder, <strong>absolute file references can break; relative paths are safer</strong>.
         </p>
       </div>
 
-      <!-- Section 7: /rewind -->
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-resume-restored.png"
+          alt="After resuming with --resume, the CLI still answers with the codename given in the previous conversation"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Measured: after quitting and resuming with <code>--resume</code>, it still remembers the codename given in the previous conversation.</figcaption>
+      </figure>
+
+      <!-- Section 3: /rewind -->
       <h2 class="detail-heading">Going Back a Step: <code>/rewind</code></h2>
       <p class="detail-paragraph">
         Type <code>/rewind</code>, or press <code>Esc</code> twice, and you'll get a list of restore points along with the file changes at each step (for example <code>1 file changed +3</code>, or <code>No files have been changed</code>).
@@ -192,18 +103,113 @@ gemini -r</code></pre>
         </p>
       </div>
 
-      <!-- Section 8: /memory -->
-      <h2 class="detail-heading"><code>/memory</code> Has Changed</h2>
-      <p class="detail-paragraph">
-        Older tutorials show <code>/memory add</code>. <strong>As of v0.54.4 there is no <code>add</code> subcommand</strong> — only <code>show</code>, <code>reload</code>, <code>list</code>, and <code>inbox</code>. Memory is now managed through the <code>GEMINI.md</code> file instead.
-      </p>
-      <pre class="code-block"><code>/memory show     # show the current memory contents
-/memory reload   # reload GEMINI.md</code></pre>
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Esc is not a universal cancel key.</strong>
+        </p>
+        <p class="callout-text">
+          Inside the <code>/rewind</code> list, Esc gets you out. But pressing Esc while the model is Thinking <strong>does nothing</strong> — even though the screen plainly says <code>esc to cancel</code>. In that situation your only options are Ctrl+C twice, or closing the terminal window.
+        </p>
+        <p class="callout-text">
+          The same key behaves differently on different screens, so don't go by muscle memory.
+        </p>
+      </div>
 
-      <!-- Section 9: agent writes its own memory -->
+      <!-- Section 4: where the memory file lives -->
+      <h2 class="detail-heading">Where the Memory File Lives</h2>
+      <p class="detail-paragraph">
+        After the CLI starts, the bottom right of the status bar sometimes reads <code>1 GEMINI.md file</code> and sometimes shows nothing at all. That number counts <strong>how many memory files were loaded at startup</strong>.
+      </p>
+      <p class="detail-paragraph">
+        There are two places a memory file can be:
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">Project level</p>
+          <pre class="code-block"><code>&lt;your project folder&gt;\GEMINI.md</code></pre>
+          <p class="method-desc">
+            Only takes effect inside that folder.
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">Global</p>
+          <pre class="code-block"><code>%USERPROFILE%\.gemini\GEMINI.md</code></pre>
+          <p class="method-desc">
+            Follows you into <strong>every</strong> project.
+          </p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        So if you've searched your project folder and can't find a <code>GEMINI.md</code> anywhere, yet the status bar says <code>1 GEMINI.md file</code> — it's usually the global one doing the work.
+      </p>
+
+      <h3 class="sub-heading">Three States You Need to Tell Apart</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-statusline-emptied.png"
+          alt="After emptying the contents of the global GEMINI.md and restarting, the status bar still shows 1 GEMINI.md file"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>Emptying</strong> the memory file's contents and restarting — the status bar's <code>1 GEMINI.md file</code> is <strong>still there</strong>.</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-statusline-removed.png"
+          alt="After deleting the global GEMINI.md entirely and restarting, the status bar shows no count"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>Deleting</strong> the memory file outright and restarting — the count is gone.</figcaption>
+      </figure>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>File state</th><th>Status bar</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Has contents</td><td><code>1 GEMINI.md file</code></td></tr>
+            <tr><td>Exists, but emptied</td><td><code>1 GEMINI.md file</code> (still there)</td></tr>
+            <tr><td>File deleted</td><td>No count</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Emptying the contents is not the same as removing the memory.</strong> As long as the file exists, the CLI loads it on every startup. To actually make it go away, you have to delete the file itself.
+        </p>
+        <p class="callout-text">
+          So "I deleted the text inside it" doesn't settle the matter. The way to check is <strong>whether the status bar shows a count</strong>, not what's in the file.
+        </p>
+      </div>
+
+      <!-- Section 5: the agent writes its own memory -->
       <h2 class="detail-heading">The Agent Writes Its Own Memory File</h2>
       <p class="detail-paragraph">
-        This section is the one worth pausing on. Tell the CLI "please remember my lucky number is 6" and it will <strong>call <code>write_file</code> on its own to modify <code>MEMORY.md</code></strong> (giving it the heading <code>#&nbsp;Private Project Memory</code> by itself), then show you the full diff for confirmation:
+        This section is the one worth pausing on. Tell the CLI "please remember my lucky number is 4728" and it will <strong>call <code>write_file</code> on its own</strong> to edit the memory file, then show you the full diff for confirmation.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-agent-writes-global.png"
+          alt="The CLI calls write_file on its own to record the lucky number in the global GEMINI.md, reporting that the setting will persist across all future projects"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">It wrote the lucky number into the memory file and reported back on its own: "this setting will persist across each of your future projects."</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        Note which file it wrote to: <strong><code>C:\Users\&lt;your account&gt;\.gemini\GEMINI.md</code> — the global one</strong>, not the copy in the project folder.
+      </p>
+      <p class="detail-paragraph">
+        You made one offhand remark, and it made a <strong>cross-project</strong> decision on your behalf.
       </p>
 
       <pre class="code-block"><code>Apply this change?
@@ -219,7 +225,7 @@ gemini -r</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        Once written, the status bar changes from <code>1 GEMINI.md file</code> to <code>2 GEMINI.md files</code> — and from then on that file <strong>loads into context automatically on every launch</strong>.
+        For comparison: the Shell confirmation dialog on <a href="/learning/ai-agent/security">"Least Privilege &amp; Security Boundaries"</a> has <strong>only 3 options</strong>, and its cursor defaults to 1. <strong>Neither the number of options nor the default position is fixed</strong> — which is exactly why you can't hit Enter from muscle memory.
       </p>
 
       <div class="highlight-card">
@@ -229,26 +235,63 @@ gemini -r</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        So build the habit: <strong>open the memory file periodically and read what's actually in it</strong>. It's how you avoid personal information being written in without you noticing, and then kept forever.
+        So build the habit: <strong>check the memory file regularly</strong>.
+      </p>
+      <p class="detail-paragraph">
+        Not just by opening it to see whether there's text — first check whether the status bar shows a count, then use <code>/memory list</code> from the next section to confirm which file it actually is. It's how you avoid personal information being written in without you noticing, and then kept forever.
       </p>
 
-      <!-- Section: bonus -->
-      <h2 class="detail-heading">Aside: Why <code>/stats</code> Shows Two Models</h2>
+      <!-- Section 6: /memory -->
+      <h2 class="detail-heading"><code>/memory</code> Has Changed</h2>
       <p class="detail-paragraph">
-        Looking at the Model Usage table in <code>/stats</code>, you may notice more than one model:
+        Older tutorials show <code>/memory add</code>. <strong>As of v0.55.1 there is no <code>add</code> subcommand</strong> — only four remain:
       </p>
-      <pre class="code-block"><code>gemini-3.1-flash-lite    1    ⟶ utility_summarizer
-gemini-3.5-flash-lite    9    ⟶ main</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-memory-subcommands.png"
+          alt="The four subcommands listed after typing /memory in Gemini CLI: reload, show, list and inbox"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The subcommand list shown when typing <code>/memory</code> on v0.55.1.</figcaption>
+      </figure>
+
+      <ul class="callout-list">
+        <li><code>show</code> — show the memory contents currently loaded</li>
+        <li><code>reload</code> — reload <code>GEMINI.md</code></li>
+        <li><code>list</code> — list the paths of the <code>GEMINI.md</code> files in use</li>
+        <li><code>inbox</code> — review the skills the CLI has gathered from past sessions</li>
+      </ul>
 
       <p class="detail-paragraph">
-        Internally the CLI calls a separate <strong>utility model</strong> for chores like summarization, distinct from the main model you locked in <code>.env</code>. 3.1 Flash-Lite has the same 15 RPM / 500 RPD quota, so it doesn't affect classroom use.
+        Memory is now managed entirely through the <code>GEMINI.md</code> file. To add something, edit the file directly.
       </p>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          The teaching value: <strong>an agent isn't one model doing everything — there's a division of labour behind it.</strong>
+          <code>list</code> is the useful one. As noted above, the status bar only tells you <em>how many</em> were loaded; <strong><code>/memory list</code> tells you <em>where</em></strong>. When you can't find the memory file, start here.
         </p>
       </div>
+
+      <!-- Section 7: classroom machines -->
+      <h2 class="detail-heading">A Warning About Classroom Machines</h2>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          Almost everything on this page <strong>lives under the user folder</strong> (<code>%USERPROFILE%\.gemini\</code>) — session history and the global memory file are both there.
+        </p>
+        <p class="callout-text">
+          Once a classroom machine is restored or rebooted, all of it is gone. <code>--resume</code> is great on your own laptop; on a classroom machine it <strong>won't be there next week</strong>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So there's only one way to keep something across weeks: <strong>write it into the <code>GEMINI.md</code> inside your project folder, and take the whole project folder with you.</strong>
+      </p>
+      <p class="detail-paragraph">
+        This is also why the course keeps insisting that "you can rebuild it with one command even without a USB stick" — what gets rebuilt is the environment; what you carry away is the content.
+      </p>
 
     </div>
   </section>
@@ -315,6 +358,17 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-size: 0.9em;
   }
 
+  /* Sub heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
   .detail-paragraph {
     font-size: var(--text-base);
     color: var(--color-text);
@@ -327,6 +381,11 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 600;
   }
 
+  .detail-paragraph a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
   /* Inline code */
   :global(.detail-paragraph) code,
   :global(.detail-subtitle) code,
@@ -334,6 +393,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
   :global(.highlight-text) code,
   :global(.method-desc) code,
   :global(.callout-list) code,
+  :global(.figure__caption) code,
   :global(.info-table) td code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -391,7 +451,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 600;
   }
 
-  /* Ordered list used for the request breakdown */
+  /* List used for the /memory subcommands */
   .callout-list {
     margin: var(--space-4) 0 var(--space-6);
     padding-left: var(--space-6);
@@ -484,7 +544,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 700;
   }
 
-  /* Method grid (/clear vs GEMINI.md) */
+  /* Method grid (two-column comparison cards) */
   .method-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -517,14 +577,6 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     letter-spacing: 0.05em;
   }
 
-  .method-title {
-    font-size: var(--text-base);
-    font-weight: 700;
-    color: var(--color-heading);
-    margin-bottom: var(--space-3);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
-
   .method-desc {
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -535,6 +587,27 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
   .method-desc strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Figure */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Mobile */
