@@ -16,7 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           剛剛我們做的事很重要：你已經讓 Gemini CLI 接上 Notion，並且真的跑過一輪工作流，知道 AI 可以幫你搜尋頁面、讀內容、建立新頁面、甚至更新頁面。這裡要學的，是下一個更重要的問題。
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 <strong>Gemini CLI v0.55.1</strong> 實測驗證。CLI 更新頻繁，你看到的版本號可能比這個新，畫面細節也可能略有不同。</p>
       </header>
 
       <div class="highlight-card">
@@ -107,16 +107,18 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <div class="info-table-wrapper">
         <table class="info-table">
           <thead>
-            <tr><th></th><th>全開（28 工具）</th><th>最小權限（4 工具）</th></tr>
+            <tr><th></th><th>全開（28 工具）</th><th>縮到 4 個工具（實測）</th></tr>
           </thead>
           <tbody>
             <tr><td>完成同一件事的請求數</td><td>3</td><td><strong>2</strong></td></tr>
             <tr><td>單次請求 token</td><td>40,518</td><td><strong>20,677</strong></td></tr>
-            <tr><td>每分鐘可跑請求數</td><td>約 6</td><td><strong>約 12</strong></td></tr>
+            <tr><td>250K TPM 下每分鐘可跑幾次</td><td>約 6</td><td><strong>約 12</strong></td></tr>
             <tr><td>風險範圍</td><td>可搬移頁面、改資料庫結構、列出所有私人頁</td><td>只能搜尋、讀取、建立、更新</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p class="version-note">這組數字實測時算的是 4 個工具（含更新頁面）。本頁稍後的設定更嚴、只留 3 個，數字只會更低。</p>
 
       <div class="highlight-card">
         <p class="highlight-text">
@@ -167,7 +169,9 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
       <div class="highlight-card">
         <p class="highlight-text">
-          看完這張表，先問自己一個問題：<strong>這 28 個裡面，這堂課真正需要的有幾個？</strong>答案是 4 個。從 28 縮到 4，最小權限的必要性大概就不用再多解釋了。
+          看完這張表，先問自己一個問題：<strong>這 28 個裡面，這堂課真正需要的有幾個？</strong><br/>
+          答案是 <strong>4 個</strong>，就是最上面那一列。<br/>
+          而今天我們還要更保守一點 —— 連「更新頁面」都先關掉，<strong>只留 3 個</strong>。
         </p>
       </div>
 
@@ -207,43 +211,78 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       </ul>
 
       <p class="detail-paragraph">
-        原因很簡單。對初學者來說，<strong>「搜尋、讀取、建立草稿」已經足夠完成很多有用的工作</strong>，而且風險比「更新既有頁面」低很多。更新頁面不是不能用，而是它比較適合放到下一步，等你真的知道 AI 會怎麼動手時，再慢慢打開。
+        為什麼偏偏是「更新頁面」先關掉？因為上一頁已經看過它的真面目了。
+      </p>
+      <p class="detail-paragraph">
+        <code>notion-update-page</code> 的參數叫 <code>new_str</code>，意思是<strong>整頁改寫</strong>。它不是「把新東西加進去」，而是「拿整頁換成新的內容」。你的舊內容之所以還在，是因為模型先讀了一次，然後把它抄回去 —— <strong>是模型記得抄，不是工具幫你保留</strong>。漏掉的那一段，就這樣消失了。
+      </p>
+      <p class="detail-paragraph">
+        「搜尋、讀取、建立草稿」這三件事，做錯了最多是多一頁垃圾。「更新頁面」做錯了，是舊東西不見。所以第一次設定，先把它關掉。
       </p>
 
       <h3 class="sub-heading">設定檔放在哪裡？</h3>
       <p class="detail-paragraph">
-        Gemini CLI 的設定檔有兩種常見位置，<strong>專案設定會蓋過使用者設定</strong>：
+        Gemini CLI 的設定檔有兩種常見位置。兩層之間的關係要看清楚，這裡最容易誤會：
       </p>
 
       <div class="scope-grid">
         <article class="scope-card">
           <p class="scope-card__label">使用者層級</p>
-          <p class="scope-card__path"><code>~/.gemini/settings.json</code></p>
+          <p class="scope-card__path"><code>%USERPROFILE%\.gemini\settings.json</code></p>
           <p class="scope-card__desc">
             會套到你電腦上所有專案。
           </p>
         </article>
         <article class="scope-card">
           <p class="scope-card__label">專案層級</p>
-          <p class="scope-card__path"><code>.gemini/settings.json</code></p>
+          <p class="scope-card__path"><code>.gemini\settings.json</code></p>
           <p class="scope-card__desc">
-            只會套到當前這個資料夾。
+            只會套到當前這個資料夾。CLI 介面裡叫 <strong>Workspace Settings</strong>。
           </p>
         </article>
       </div>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>兩層是「合併」，不是「取代」。</strong><br/>
+          兩個地方各自定義的 server 會<strong>加在一起</strong>，兩邊的都會生效。只有當<strong>同一個名字</strong>的 server 兩邊都出現時，才由專案層那份勝出。
+        </p>
+        <p class="callout-text">
+          為什麼要在意？如果你在使用者層還留著別的 server，那麼你在專案層做的工具限制<strong>管不到它</strong>。你以為自己鎖好了，其實只鎖了一半。要確認實際生效，開 CLI 打 <code>/mcp list</code> 看到的才算數。
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
-          建議你先用 <strong>project-level</strong> 的 <code>.gemini/settings.json</code>。先在小範圍裡練熟，比一開始就把規則套到全部專案更穩。
+          建議你先用 <strong>project-level</strong> 的 <code>.gemini\settings.json</code>（CLI 介面裡叫 <strong>Workspace Settings</strong>）。先在小範圍裡練熟，比一開始就把規則套到全部專案更穩。
         </p>
       </div>
 
       <h3 class="sub-heading">修改方式：先產生，再檢視</h3>
       <p class="detail-paragraph">
+        這一步第四週已經做過了。如果你的 <code>.gemini\settings.json</code> 還在，可以跳過第 1 道指令，直接打開檔案看。
+      </p>
+      <p class="detail-paragraph">
         不要一開始就手寫 JSON，手寫很容易漏逗號、漏引號。比較穩的做法是<strong>先用指令產生設定檔，再打開來看它寫了什麼</strong>。在 PowerShell 執行：
       </p>
+
+      <div class="scope-grid">
+        <article class="scope-card">
+          <p class="scope-card__label">自宅筆電（已安裝）</p>
+          <p class="scope-card__path"><code>gemini</code></p>
+        </article>
+        <article class="scope-card">
+          <p class="scope-card__label">教室電腦（免安裝）</p>
+          <p class="scope-card__path"><code>npx @google/gemini-cli</code></p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        底下所有指令，兩種寫法都可以。教室電腦請用右邊那種 —— 把 <code>gemini</code> 整個換成 <code>npx @google/gemini-cli</code>，後面的參數完全一樣。
+      </p>
+
       <pre class="code-block"><code># 1. 用指令產生設定檔
-gemini mcp add --transport http notion https://mcp.notion.com/mcp
+npx @google/gemini-cli mcp add --transport http notion https://mcp.notion.com/mcp
 
 # 2. 打開檔案看它寫了什麼
 Get-Content .gemini\settings.json</code></pre>
@@ -262,6 +301,31 @@ Get-Content .gemini\settings.json</code></pre>
           這個順序不只是為了少打錯字。<strong>先跑一次、再看檔案，你同時學到的是「怎麼做」和「做了之後發生什麼」</strong>；直接抄一份 JSON 貼上去，只學得到前者。
         </p>
       </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>設定好之後，就不要再跑 <code>mcp add</code> 了。</strong><br/>
+          它的行為是同名 server 會直接覆蓋整個區塊，你加的 <code>includeTools</code> 會<strong>一起消失</strong>。而且畫面上只會顯示「updated in project settings」，不會告訴你權限被拿掉了。
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-mcpadd-overwrite.png"
+          alt="再次執行 mcp add 後，settings.json 裡的 includeTools 整段消失"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">實測：先設好 3 個工具的白名單，再跑一次 <code>mcp add</code>。它回報「is already configured」「updated」，看起來很溫和 —— 但印出來的檔案只剩 <code>url</code> 和 <code>type</code>，<code>includeTools</code> 整段不見了。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        所以設定完成之後，建議把檔案備份一份：
+      </p>
+      <pre class="code-block"><code>Copy-Item .gemini\settings.json .gemini\settings.backup.json</code></pre>
+      <p class="detail-paragraph">
+        教室電腦每週都要重建環境，這個備份檔本來就該跟著你的專案資料夾一起帶著。
+      </p>
 
       <h3 class="sub-heading">方法一：白名單（includeTools）</h3>
       <p class="detail-paragraph">
@@ -310,7 +374,7 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="test-item">
           <span class="test-num">1</span>
           <div class="test-body">
-            <p class="test-desc"><strong>完全離開 Gemini CLI 再重新啟動。</strong>按兩次 Ctrl+C 退出，再重新輸入 <code>gemini</code>。只關掉對話視窗是不夠的，設定不會重新讀取。</p>
+            <p class="test-desc"><strong>完全離開 Gemini CLI 再重新啟動。</strong>設定檔只在啟動時讀一次。輸入 <code>/quit</code> 離開（或按兩次 Ctrl+C），再重新啟動。<br/><strong>注意：<code>/clear</code> 只是清空對話，設定不會跟著重讀。</strong></p>
           </div>
         </li>
         <li class="test-item">
@@ -344,15 +408,15 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="test-item">
           <span class="test-num">3</span>
           <div class="test-body">
-            <p class="test-desc">請根據剛剛整理出的重點，建立一個新的 Notion 頁面，標題叫做「期末報告重點整理」，內容先用條列式呈現。</p>
+            <p class="test-desc">請根據剛剛整理出的重點，建立一個新的 Notion 頁面，標題叫做「<strong>期末報告重點整理（權限測試）</strong>」，內容先用條列式呈現。</p>
             <p class="test-tag test-tag--ok">能做</p>
           </div>
         </li>
-        <li class="test-item test-item--blocked">
+        <li class="test-item">
           <span class="test-num">4</span>
           <div class="test-body">
-            <p class="test-desc">請把剛剛建立的頁面更新一下，在最前面加一段簡短摘要，並把內容整理成三個小標題。</p>
-            <p class="test-tag test-tag--blocked">做不到</p>
+            <p class="test-desc">請把剛剛建立的「<strong>期末報告重點整理（權限測試）</strong>」更新一下，在最前面加一段簡短摘要，並把內容整理成三個小標題。</p>
+            <p class="test-tag test-tag--detour">它繞了一條路</p>
           </div>
         </li>
       </ol>
@@ -363,9 +427,104 @@ Get-Content .gemini\settings.json</code></pre>
         </p>
       </div>
 
+      <h3 class="sub-heading">第 4 步實際發生的事</h3>
+      <p class="detail-paragraph">
+        我原本也以為第 4 步會出現一句「我做不到」。實測結果不是這樣。
+      </p>
+      <p class="detail-paragraph">
+        <code>includeTools</code> 做的是讓工具<strong>從模型可見的清單中消失</strong>，而不是攔截。所以模型的處境不是「我被禁止了」，而是「我的工具箱裡沒有這個」。它不知道這是你去掉設的限制 —— 它只知道要想辦法完成你交代的事。
+      </p>
+      <p class="detail-paragraph">
+        於是它開始找路。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-search-shell.png"
+          alt="模型先用 notion-search 找到頁面，接著呼叫 Shell 執行一行 node 指令"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>第一步：它先用 Shell 給自己記了一筆。</strong>它先用 <code>notion-search</code> 找到那一頁（這個工具還開著，可以用），接著叫用 <strong>Shell</strong> 執行一行 node 指令 —— 內容只是印出一句「如果 update_page 不能用，就用 create_pages 重建」。這行指令什麼事都沒做，它是在把自己的決定寫下來。</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-fetch-recreate.png"
+          alt="模型讀完頁面後宣告要改用重建的方式"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>第二步：讀原內容，然後重建。</strong>讀完頁面後，它自己宣告了替代方案：「Recreating the Notion page with updated structure (summary + 3 subheadings) since there is no direct update_page tool.」</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-detour-result.png"
+          alt="模型用 notion-create-pages 另外建立一頁並回報已完成更新"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption"><strong>第三步：任務「完成」了。</strong>它用 <code>notion-create-pages</code> 另外建了一頁〈期末報告重點整理（權限測試 - 更新版）〉，摘要和三個小標題都在裡面，然後回報：「我已為您建立更新後的 Notion 頁面（標題加上「更新版」以區隔）」。</figcaption>
+      </figure>
+
+      <h3 class="sub-heading">到 Notion 看一眼</h3>
+      <p class="detail-paragraph">
+        這是整頁最該養成的習慣：<strong>不要只看 CLI 說什麼，回去看實際結果。</strong>
+      </p>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-notion-original.png"
+            alt="Notion 裡原本那頁沒有被修改"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-notion-newpage.png"
+            alt="Notion 裡多出來的更新版頁面"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <p class="figure__caption">
+        左：原本那頁〈期末報告重點整理（權限測試）〉—— 條列格式，沒有摘要，沒有小標題，<strong>和第 3 步建立時一模一樣</strong>。右：多出來的「更新版」—— 摘要和三個小標題都在。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>最小權限確實有效 —— 但它保護的是「那份文件」，不是「那個目標」。</strong><br/>
+          你的原始頁面沒有被改動，這是真的有效。但你要的是「更新那一頁」，拿到的是「多了一頁」。工具鎖住不會讓 agent 放棄目標，只會讓它改道。
+        </p>
+      </div>
+
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>第 4 步不會跳出錯誤畫面。</strong><code>includeTools</code> 做的是讓工具<strong>從模型可見的清單中消失</strong>，而不是攔截。所以 AI 通常會回你一句「我沒有這個能力」，或是自己改用別的方式繞路，畫面上不會出現任何紅字。如果你在等一個錯誤訊息，就會一直等不到。
+          <strong>它不會大聲告訴你它繞路了。</strong><br/>
+          回報的第一句是「我已為您建立更新後的 Notion 頁面」。後面括號裡那句「標題加上『更新版』以區隔」是唯一的線索，滑過去就錯過了。
+        </p>
+        <p class="callout-text">
+          所以每一次都要回 Notion 確認實際結果。<strong>CLI 的回報是它的說法，不是事實。</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">同樣的設定，它每次走的路不一樣</h3>
+      <p class="detail-paragraph">
+        同一份 <code>settings.json</code>、同一句指令，我前後跑了兩次，路徑完全不同：
+      </p>
+      <ul class="check-list">
+        <li>第一次：它跑去 <strong>Google 搜尋</strong> Notion 官方 API 文件，想找出「有沒有別的方法可以更新頁面」，卡了一陣還沒結果。</li>
+        <li>第二次：它用 <strong>Shell</strong> 記下決定，然後直接 <code>create_pages</code> 重建，兩分鐘收工。</li>
+      </ul>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          所以我們不能寫「它會這樣做」，只能寫「<strong>它一定會找路，找哪一條每次不一定</strong>」。<br/>
+          這正是為什麼要<strong>事前</strong>設邊界，而不是事後的處置 —— 你沒辦法預測它，只能限制它。
         </p>
       </div>
 
@@ -442,7 +601,7 @@ Get-Content .gemini\settings.json</code></pre>
       </ul>
 
       <p class="detail-paragraph">
-        而全開的版本，在你的 <code>.gemini/settings.json</code> 裡，最簡單可以長這樣：
+        而全開的版本，在你的 <code>.gemini\settings.json</code> 裡，最簡單可以長這樣：
       </p>
       <pre class="code-block code-block--json"><code>{`{
   "mcpServers": {
@@ -453,32 +612,264 @@ Get-Content .gemini\settings.json</code></pre>
   }
 }`}</code></pre>
 
-      <!-- Section: Three layers of permission -->
-      <h2 class="detail-heading">權限其實有三層，這一頁只講了中間那層</h2>
+      <!-- Section: What you already granted away -->
+      <h2 class="detail-heading">你已經授權出去的那一份</h2>
       <p class="detail-paragraph">
-        前面談的 <code>includeTools</code> 管的是 MCP 工具。但 Gemini CLI 的權限其實分成三層，你到目前為止只碰到了第二層：
+        到目前為止，這一頁講的都是<strong>你能收回來的</strong>部分 —— 工具面。但還有另一份，是你在接上時就交出去的，而且多數人交出去之後就再也沒看過。
+      </p>
+
+      <h3 class="sub-heading">授權頁上那四行</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Notion授權畫面.png"
+          alt="Notion MCP 的瀏覽器授權畫面，列出四行權限與 localhost 勾選框"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Notion MCP 的授權畫面。第四週你按過一次「Continue」。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        那四行值得逐句讀：
+      </p>
+
+      <p class="detail-paragraph">
+        <strong><code>Respect your page and database access and permissions</code></strong><br/>
+        看起來像保證「它會尊重你的權限」。實際意思是：<strong>它拿到的就是你的權限</strong>。
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>Take actions on your behalf, based on your access level</code></strong><br/>
+        上面那句的白話版。<strong>帳號上等於你</strong> —— 它不是「一個受限的機器人帳號」，它是「你」。你能改的它都能改。
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>Search across connected apps (requires Notion AI plan)</code></strong><br/>
+        免費帳號沒有這個功能，但這一項<strong>還是出現在授權清單裡</strong>。授權範圍不等於當下的能力 —— 哪天你升級了，這個授權自動生效，不會再問你一次。
+      </p>
+      <p class="detail-paragraph">
+        <strong><code>View workspace's users and their emails</code></strong><br/>
+        你以為授權的是「讀我的筆記」，實際上連工作區成員的 email 一起給了。這個畫面上寫著「Free Plan · 1 member」，個人工作區只有一個成員，所以無感。同一個勾在公司或社團的工作區裡，意義完全不同。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>還有一個更容易忽略的地方：你授權的對象是「localhost」。</strong>
+        </p>
+        <p class="callout-text">
+          授權頁上寫的是 <code>Grant localhost access to Notion</code>，底下那個勾選框要你自己確認「I recognize and trust this URL」。
+        </p>
+        <p class="callout-text">
+          為什麼 Notion 要你自己確認？因為它<strong>沒辦法</strong>替你確認。<code>localhost</code> 是你自己電腦上某個正在監聽的程式，Notion 只知道有東西在那個 port 等著，不知道那是不是 Gemini CLI。這件事只有你能判斷。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">你以為只授權了一次</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-mcp-clients-list.png"
+          alt="Notion 設定裡列出四個 Gemini CLI MCP Client，全部顯示已連接"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Notion 設定 → Notion 模型上下文協定（MCP）→ Manage workspace clients → 查看所有 MCP 用戶端。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        一台電腦、一個 CLI，這裡卻有 <strong>4 個</strong> Gemini CLI MCP Client，而且全部顯示「已連接」。
+      </p>
+      <p class="detail-paragraph">
+        原因是 OAuth 回呼用的 port 每次都不一樣（63758、55177、59340、52850），Notion 把每一個都當成一個不同的用戶端。<strong>每重新授權一次，就多一筆，舊的不會消失。</strong>
+      </p>
+      <p class="detail-paragraph">
+        第四週學過「連線不是永久的」—— 授權會過期，過期要重跑 <code>/mcp auth notion</code>。這裡補上另一件：<strong>過期的是使用權，不是授權紀錄。</strong>
+      </p>
+
+      <h3 class="sub-heading">想收回來的時候</h3>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-manage-clients.png"
+            alt="Notion 管理 MCP 用戶端頁面的全部選項"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-mcp-client-menu.png"
+            alt="單筆連接的三點選單只有重新命名一個選項"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <div class="figure">
+        <p class="figure__caption">
+          左：管理頁面的全部選項。右：單筆連接的「⋯」選單。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        免費個人帳號在 Notion 端能做的事，只有這些：
+      </p>
+      <ul class="check-list">
+        <li>幫每一筆連接<strong>改名字</strong>（單筆的「⋯」裡只有「重新命名」）</li>
+        <li><strong>解除連接所有使用者</strong>（紅色按鈕，一次全部斷開）</li>
+        <li>升級付費方案，才能管「哪些客戶端可連接」（該選項旁邊有升級提示）</li>
+      </ul>
+
+      <p class="detail-paragraph">
+        <strong>沒有中間選項。</strong>不能單獨撤掉一筆，不能限縮某個連接只讓它讀，不能指定它只能碰哪幾頁。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          授權端給你的控制範圍，可能比你以為的多 —— 要嘛全在，要嘛升級。<br/>
+          所以 <code>includeTools</code> 不是「多做一步比較安全」的加分題。<br/>
+          <strong>它是你唯一真正握在手上、而且範圍剛好的那一層。</strong>
+        </p>
+      </div>
+
+      <h3 class="sub-heading">順便看一眼：它讀一頁的時候，順帶走了什麼</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/notion-fetch原始回傳.png"
+          alt="notion-fetch 的原始回傳，內含 ancestor-path 區段"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">一次 <code>notion-fetch</code> 的原始回傳。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        你只叫它讀一頁，但回傳裡有一段 <code>&lt;ancestor-path&gt;</code>，裡面是<strong>母頁面的標題和網址</strong>。
+      </p>
+      <p class="detail-paragraph">
+        這裡的母頁面叫「從個人桌面版開始吧！」，是 Notion 內建的引導頁，無害。但如果你的頁面掛在「求職紀錄」或「體檢筆記」底下，那個母標題就跟著整段內容進了模型。
+      </p>
+      <p class="detail-paragraph">
+        補充一個細節：建在最外層的頁面沒有母層路徑（這一段會是空的），建在別人底下的就有。<strong>你不會每次都記得自己的頁面掛在哪裡。</strong>
+      </p>
+
+      <!-- Section: Five layers of permission -->
+      <h2 class="detail-heading">權限其實有五層，這一頁主要講中間那層</h2>
+      <p class="detail-paragraph">
+        前面談的 <code>includeTools</code> 管的是 MCP 工具。但 Gemini CLI 的權限其實分成五層，你到目前為止只碰到了第三層：
       </p>
 
       <div class="info-table-wrapper">
         <table class="info-table">
           <thead>
-            <tr><th>層次</th><th>控制對象</th><th>設定方式</th></tr>
+            <tr><th>層次</th><th>控制的是什麼</th><th>誰決定</th><th>本課怎麼處理</th></tr>
           </thead>
           <tbody>
-            <tr><td>資料夾</td><td>能否讀取本地設定</td><td>啟動時的 Trust 選擇</td></tr>
-            <tr><td>MCP 工具</td><td>Notion 的 28 個工具</td><td>server 區塊裡的 <code>includeTools</code></td></tr>
-            <tr><td>CLI 內建工具</td><td><code>write_file</code>、<code>run_shell_command</code> 等</td><td>頂層的 <code>coreTools</code> / <code>excludeTools</code></td></tr>
+            <tr><td>1、授權端授權</td><td>你的 Notion 帳號交出去多少</td><td>OAuth 授權頁</td><td>讀懂那四行；免費帳號只能全部解除</td></tr>
+            <tr><td>2、資料夾</td><td>能不能讀取本地設定</td><td>啟動時的 Trust 選擇</td><td>選「1. Trust folder」</td></tr>
+            <tr><td>3、<strong>MCP 工具</strong></td><td>Notion 的 28 個工具</td><td>server 區塊裡的 <code>includeTools</code></td><td><strong>本頁重點</strong></td></tr>
+            <tr><td>4、CLI 內建工具</td><td><code>write_file</code>、<code>run_shell_command</code>、<code>GoogleSearch</code></td><td>官方正在改版中</td><td>只知道它存在，不設定</td></tr>
+            <tr><td>5、執行當下</td><td>這一次要不要放行</td><td>確認框</td><td>看指令，不要看描述</td></tr>
           </tbody>
         </table>
       </div>
 
       <p class="detail-paragraph">
-        第三層值得特別提一下。<code>write_file</code> 是 CLI <strong>內建的</strong>工具，不在 <code>includeTools</code> 的管轄範圍內 —— 也就是說，就算你把 Notion 的工具鎖到只剩 3 個，AI 還是有能力在你的硬碟上寫檔案。
+        第四層要特別提一下，因為你剛剛已經親眼看過它了。
+      </p>
+      <p class="detail-paragraph">
+        <code>run_shell_command</code>、<code>write_file</code>、<code>GoogleSearch</code> 都是 <strong>CLI 內建的</strong>工具，不屬於任何一個 MCP server，所以 <code>includeTools</code> 管不到它們。你把 Notion 的工具鎖到只剩 3 個，它照樣可以開 Shell、照樣可以在你的硬碟上寫檔案。
       </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          <strong>第三層的確切寫法本課尚未實測。</strong>上表的 <code>coreTools</code> / <code>excludeTools</code> 請當成查找方向，不要當成可以直接複製的設定。真要使用之前，先查一次當前版本的官方文件並實際驗證過。
+          <strong>第四層本課不教設定寫法，這是刻意的。</strong>
+        </p>
+        <p class="callout-text">
+          這一層的設定方式官方正在改版。v0.55.1 啟動時會直接跳警告，舊寫法 <code>tools.exclude</code> 已經 deprecated（1.0 版將移除），要改用 Policy Engine，需要另外建目錄、寫 TOML 規則檔。
+        </p>
+        <p class="callout-text">
+          換句話說：現在教任何一種寫法寫進教材，都保證會過期。你只要記得<strong>這一層存在</strong>、並且<strong>它現在是靠確認框在守</strong>就夠了。
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/security-deprecated-warning.png"
+          alt="Gemini CLI v0.55.1 啟動時顯示 tools.exclude is deprecated 警告，狀態列同時顯示 no sandbox"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">啟動 Gemini CLI v0.55.1 時跳出的警告。順帶一提，警告裡給的網址是壞的，正確位置是 <code>geminicli.com/docs/reference/policy-engine/</code> —— <strong>連官方自己的連結都會過期</strong>。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        另外，<code>/settings</code> 裡可以看到 <strong>Tool Sandboxing 預設是 false</strong>，上圖狀態列也寫著 <code>no sandbox</code>。也就是說，確認框按下去之後，那行指令是直接在你的電腦上跑的，沒有隔離。
+      </p>
+
+      <!-- Section: The last line of defense -->
+      <h2 class="detail-heading">最後一道防線是你自己</h2>
+      <p class="detail-paragraph">
+        第四層管不到，那剛才那個 Shell 是怎麼跑起來的？
+      </p>
+      <p class="detail-paragraph">
+        它問過你了。
+      </p>
+
+      <div class="scope-grid">
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-shell-confirm-1.png"
+            alt="Shell 執行確認框，標題與實際指令不一致"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="figure">
+          <img
+            class="figure__img"
+            src="/learning/agent/security-shell-confirm-2.png"
+            alt="第二個 Shell 執行確認框，只有三個選項"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+      <div class="figure">
+        <p class="figure__caption">
+          同一句指令、同一份設定，跑了兩次，第二次它跳了兩次確認框。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        這兩張圖有三件事值得看。
+      </p>
+
+      <p class="detail-paragraph">
+        <strong>一、描述和實際指令對不上。</strong>標題寫 <code>Check available Notion tools in the environment</code>，聽起來像在盤點工具。實際指令是載入一個模組、然後接一行註解 —— <strong>什麼事都沒做</strong>。
+      </p>
+      <p class="detail-paragraph">
+        那行描述是模型自己寫的，它想寫什麼就寫什麼。<strong>看指令，不要看描述。</strong>
+      </p>
+      <p class="detail-paragraph">
+        <strong>二、指令裡是它的自言自語。</strong><code>Wait, let's check available Notion MCP tools</code>、<code>Wait, is there an update_page tool? Let's check tool declarations in system prompt</code> —— 它卡在「找不出有沒有更新工具」，把整段猶豫當草稿紙寫進了 shell 註解。
+      </p>
+      <p class="detail-paragraph">
+        這就是工具被拿掉之後 agent 的真實反應：<strong>它不會回一句問你，它會一直試。</strong>
+      </p>
+      <p class="detail-paragraph">
+        <strong>三、這個框和上一週那個不一樣。</strong>上週 MCP 工具的確認框有 4 個選項，第 3 個是「放行整個 server」（一次 28 個工具）。這個 Shell 的框只有 3 個選項，而且游標預設停在最安全的「Allow once」。
+      </p>
+      <p class="detail-paragraph">
+        <strong>選項數量和預設位置都不固定。</strong>這就是為什麼不能靠肌肉記憶按 Enter。
+      </p>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          還有一點要注意：上週如果你在某個工具的確認框按了「Allow for this session」或「放行整個 server」，那這一週<strong>這個框可能根本不會出現</strong>。
+        </p>
+        <p class="callout-text">
+          授權過的東西，之後就不再問你。想把它重置，<code>/clear</code> 一次就好 —— 細節在<a href="/zh/learning/ai-agent/session-context">「Session 與記憶管理」</a>那一頁。
         </p>
       </div>
 
@@ -489,7 +880,7 @@ Get-Content .gemini\settings.json</code></pre>
         <li class="mistake-item">
           <span class="mistake-num">1</span>
           <div class="mistake-body">
-            <h3 class="mistake-title">修改 <code>.gemini/settings.json</code> 時出現錯誤</h3>
+            <h3 class="mistake-title">修改 <code>.gemini\settings.json</code> 時出現錯誤</h3>
             <p class="mistake-desc">
               如果你選擇只新增 <code>includeTools</code> 或 <code>excludeTools</code>，<strong>記得在上一行的結尾加上逗號</strong>。JSON 對逗號很嚴格，少一個就整份讀不起來。
             </p>
@@ -501,6 +892,26 @@ Get-Content .gemini\settings.json</code></pre>
             <h3 class="mistake-title">「只要我小心下指令，就不用做工具限制」</h3>
             <p class="mistake-desc mistake-desc--caution">
               不完全正確。因為<strong>指令再小心，也不等於你真的替系統加上邊界</strong>。工具限制做的是「<strong>先天邊界</strong>」，不是「事後祈禱」。
+            </p>
+          </div>
+        </li>
+        <li class="mistake-item">
+          <span class="mistake-num">3</span>
+          <div class="mistake-body">
+            <h3 class="mistake-title">「我設好了，就一直是設好的」</h3>
+            <p class="mistake-desc mistake-desc--caution">
+              不一定。只要重跑一次 <code>mcp add</code>，<code>includeTools</code> 就會被清掉，而且畫面上不會警告你。設定檔被別人覆蓋、換台電腦重置過、或你自己複製了舊版本，都會有同樣結果。<br/>
+              <strong>判斷方式只有一個</strong>：開 CLI 打 <code>/mcp list</code>，看工具數量。設定檔寫了什麼不算數，實際載入了什麼才算數。
+            </p>
+          </div>
+        </li>
+        <li class="mistake-item">
+          <span class="mistake-num">4</span>
+          <div class="mistake-body">
+            <h3 class="mistake-title">「確認框都長得一樣，就是那個位置按下去」</h3>
+            <p class="mistake-desc mistake-desc--caution">
+              確認框不只一種。MCP 工具的確認框有 4 個選項（含「放行整個 server」）；Shell 的確認框只有 3 個，游標的預設位置也不一樣。<br/>
+              所以不要靠肌肉記憶按 Enter。每一次都要看<strong>它到底要做什麼</strong>。
             </p>
           </div>
         </li>
@@ -593,6 +1004,7 @@ Get-Content .gemini\settings.json</code></pre>
   :global(.mistake-title) code,
   :global(.mistake-desc) code,
   :global(.info-table) td code,
+  :global(.figure__caption) code,
   :global(.test-desc) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -765,6 +1177,11 @@ Get-Content .gemini\settings.json</code></pre>
     color: var(--color-text);
     line-height: 1.9;
     margin: 0;
+  }
+
+  .callout-text a {
+    color: var(--color-accent);
+    text-decoration: underline;
   }
 
   .callout-text strong {
@@ -1095,6 +1512,11 @@ Get-Content .gemini\settings.json</code></pre>
     background-color: var(--color-text-muted);
   }
 
+  .test-tag--detour {
+    color: #fff;
+    background-color: #d97706;
+  }
+
   /* When grid (includeTools vs excludeTools usage) */
   .when-grid {
     display: grid;
@@ -1214,6 +1636,27 @@ Get-Content .gemini\settings.json</code></pre>
   .mistake-desc strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Screenshots */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Mobile */

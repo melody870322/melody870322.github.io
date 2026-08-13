@@ -3,8 +3,8 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="Session 與脈絡管理 — AI Agent 拼圖"
-  description="接上 MCP、跑過一輪工作流之後，第一個真正會卡住你的不是功能，而是額度。這一頁用 /stats 的實測數字，帶你看懂請求怎麼被消耗掉，以及 /clear、GEMINI.md、/resume 這些工具各自能幫你什麼。"
+  title="Session 與記憶管理 — AI Agent 拼圖"
+  description="CLI 一關，對話就沒了 —— 但有些東西活了下來，而且會跟著你到下一個專案。這一頁講什麼會消失、什麼會留下、記憶檔實際存在哪裡，以及 agent 會怎麼自己改寫它。"
   lang="zh"
 >
   <section class="section">
@@ -12,172 +12,83 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
       <a class="back-link" href="/zh/">&larr; 返回首頁</a>
 
       <header class="detail-header">
-        <h1 class="detail-title">為什麼跑沒幾句就沒額度了</h1>
+        <h1 class="detail-title">關掉之後，它還記得什麼</h1>
         <p class="detail-subtitle">
-          你已經接上 Notion、跑過一輪完整工作流。接下來第一個真正會卡住你的，通常不是功能不夠，而是<strong>額度用完了</strong>。這一頁要處理的就是這件事：搞清楚請求是怎麼被吃掉的，以及有哪些工具可以救。
+          CLI 一關，對話就沒了 —— 但有些東西活了下來，而且會跟著你到下一個專案。這一頁講的是：什麼會消失、什麼會留下、留在哪裡，以及怎麼把它找出來。
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 <strong>Gemini CLI v0.55.1</strong> 實測驗證。CLI 更新頻繁，你看到的版本號可能比這個更新，畫面細節也可能略有不同。</p>
       </header>
 
-      <!-- Section 1: /stats -->
-      <h2 class="detail-heading">先看得見成本：<code>/stats</code></h2>
+      <!-- Section 1: what is a session -->
+      <h2 class="detail-heading">先講清楚 session 是什麼</h2>
       <p class="detail-paragraph">
-        在 Gemini CLI 裡輸入 <code>/stats</code>，可以看到這次 session 用掉多少請求、多少 token。這是整頁的起點 —— <strong>看不到成本，就沒辦法談節省</strong>。
+        前面講確認框的時候提過一次，<strong>session 就是「這次 CLI 開著的期間」。</strong>
       </p>
-      <pre class="code-block"><code>/stats</code></pre>
+      <p class="detail-paragraph">
+        關掉 CLI，或是輸入 <code>/clear</code>，這次 session 就結束了，下一句話從乾淨的狀態重新開始。
+      </p>
+      <p class="detail-paragraph">
+        「乾淨」包含一件很多人沒想到的事：<strong>你按過的工具授權，也一起重置了。</strong>
+      </p>
+
+      <pre class="code-block"><code>/clear</code></pre>
 
       <p class="detail-paragraph">
-        下面是同一句摘要指令，在兩種工具設定下的實測結果：
+        上週如果你在授權確認框選了「Allow for this session」，那個放行只在那一次 session 有效。<code>/clear</code> 之後，它會重新問你一次。
       </p>
-
-      <div class="info-table-wrapper">
-        <table class="info-table">
-          <thead>
-            <tr><th></th><th>28 個工具全開</th><th>限制成 4 個工具</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>請求數</td><td>3</td><td><strong>2</strong></td></tr>
-            <tr><td>輸入 token</td><td>121,554</td><td><strong>41,353</strong></td></tr>
-            <tr><td>平均每次請求</td><td>40,518</td><td><strong>20,677</strong></td></tr>
-            <tr><td>250K TPM 可跑幾次</td><td>約 6</td><td><strong>約 12</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          關鍵在這裡：<strong>每一次請求，都會把整段對話歷史重新送出去一次。</strong>所以對話越長，單次請求越貴 —— 不是越後面越省，是越後面越貴。
+          <code>/clear</code> 不只是清畫面。它清掉的是<strong>對話歷史</strong>，加上<strong>這次 session 累積的授權</strong>。這是它最有價值的地方 —— 一個乾淨的重來。而且它是純本地操作，不送請求，也不會失敗。
         </p>
       </div>
 
       <p class="detail-paragraph">
-        另外還有一筆<strong>約 1.7 萬 token 的固定成本</strong>，來自 CLI 自己的系統提示和內建工具。這筆你關不掉，但它也提醒了一件事：你的每一句話都不是從零開始算的。
+        <code>/clear</code> 還有另一個好處：對話歷史越長，每一次請求越貴。這一面在<a href="/zh/learning/ai-agent/quota-and-cost">「額度、成本與請求數」</a>那一頁。
       </p>
 
-      <!-- Section 2: one instruction != one request -->
-      <h2 class="detail-heading">一句指令不等於一個請求</h2>
-      <p class="detail-paragraph">
-        這是最容易低估的地方。你打一句「幫我把這頁 Notion 筆記整理成摘要」，感覺上是一次，但背後 agent 會跑：
-      </p>
-
-      <ol class="callout-list callout-list--plain">
-        <li>送出指令 → 請求 1</li>
-        <li>模型決定呼叫 <code>notion-search</code> → 請求 2（把搜尋結果送回模型）</li>
-        <li>模型決定呼叫 <code>notion-fetch</code> → 請求 3</li>
-        <li>模型讀完內容產生摘要 → 請求 4</li>
-      </ol>
-
-      <p class="detail-paragraph">
-        這樣一句話可能就是 <strong>4～10 個請求</strong>。實測跑完前面那套四步 Notion 工作流，總共用掉 <strong>9 個請求、5 次工具呼叫</strong>。
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>TPM 額度通常會比 RPM 額度先用完。</strong>因為每一次請求都會把整段對話歷史當作輸入重送一次，所以對話越長，單次請求吃掉的 token 越多。很多人以為自己是撞到「每分鐘 15 次」的上限，其實是撞到 token 的上限。
-        </p>
-      </div>
-
-      <!-- Section 3: three limits -->
-      <h2 class="detail-heading">額度的三種限制</h2>
-      <p class="detail-paragraph">
-        免費層有三道獨立的限制，任何一道超過都會回 429。差別在於<strong>要等多久</strong>：
-      </p>
-
-      <div class="info-table-wrapper">
-        <table class="info-table">
-          <thead>
-            <tr><th>縮寫</th><th>意義</th><th>額度</th><th>重置方式</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>RPM</td><td>每分鐘請求數</td><td>15</td><td>滾動 60 秒</td></tr>
-            <tr><td>TPM</td><td>每分鐘輸入 token</td><td>250,000</td><td>滾動 60 秒</td></tr>
-            <tr><td>RPD</td><td>每天請求數</td><td>500</td><td>太平洋時間午夜</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="detail-paragraph">
-        RPM 和 TPM 是<strong>滾動 60 秒</strong>，不是整分鐘歸零 —— 14:30:10 用完，要到 14:31:10 才恢復。實務上記得「撞到就等一分鐘」就夠了。RPD 則是以太平洋時間午夜重置，換算成台灣時間是<strong>每天下午 15:00</strong>（11 月到隔年 3 月因為美國時區調整，會變成 16:00）。撞到 RPD 只能等隔天。
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>額度是算在「專案」上，不是算在金鑰上。</strong>所以同一個 Google Cloud 專案底下發幾把金鑰都沒用，額度是共用的。每個人都必須<strong>用自己的 Google 帳號、建自己的專案</strong>，否則整班會共吃同一份 500 RPD。
-        </p>
-      </div>
-
-      <!-- Section 4: /clear + GEMINI.md -->
-      <h2 class="detail-heading">可靠的做法：<code>/clear</code> 加 <code>GEMINI.md</code></h2>
-      <p class="detail-paragraph">
-        既然成本來自「整段對話歷史重送」，那省錢的方向就很清楚：<strong>把不需要的歷史丟掉，把需要的東西寫進檔案</strong>。
-      </p>
-
-      <div class="method-grid">
-        <article class="method-card">
-          <p class="method-tag">丟掉歷史</p>
-          <h3 class="method-title"><code>/clear</code></h3>
-          <p class="method-desc">
-            清空對話脈絡。這是<strong>純本地操作，不送請求，也不會失敗</strong>。下一句話就從乾淨的狀態重新開始。
-          </p>
-        </article>
-        <article class="method-card">
-          <p class="method-tag">留住重點</p>
-          <h3 class="method-title"><code>GEMINI.md</code></h3>
-          <p class="method-desc">
-            專案層級的長期記憶。寫成檔案、不佔對話脈絡，而且<strong>可版控、可發給全班</strong>。
-          </p>
-        </article>
-      </div>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          課堂上的節奏建議是：<strong>每完成一個練習就 <code>/clear</code> 一次</strong>，需要保留的資訊寫進 <code>GEMINI.md</code>。
-        </p>
-      </div>
-
-      <p class="detail-paragraph">
-        這不是什麼偏門技巧。CLI 啟動畫面的第一行提示就是 <code>Create GEMINI.md files to customize your interactions</code>。
-      </p>
-
-      <!-- Section 5: /compress -->
-      <h2 class="detail-heading"><code>/compress</code> 目前不能用</h2>
-      <p class="detail-paragraph">
-        看到額度問題，很多人第一個想到的是壓縮對話歷史。但這條路目前是斷的。
-      </p>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>v0.54.4 實測：41K 和 373K 兩種脈絡規模都卡在「Compressing chat history」永不結束。</strong>按 Esc 無效，只能按兩次 Ctrl+C 或直接關掉終端機。官方 repo 的 issue #16213 有相同症狀的回報。
-        </p>
-      </div>
-
-      <p class="detail-paragraph">
-        <strong>不要放進課堂操作。</strong>不過這件事本身很值得講給學生聽 —— 官方文件寫得好好的功能，實際上有 bug。<strong>不能因為文件說可以，就假設可以。</strong>這是使用任何工具都適用的態度。
-      </p>
-
-      <!-- Section 6: /resume -->
+      <!-- Section 2: /resume -->
       <h2 class="detail-heading">跨次續接：<code>/resume</code></h2>
       <p class="detail-paragraph">
         CLI 會自動儲存 session，不需要你另外存檔。在 PowerShell 執行：
       </p>
-      <pre class="code-block"><code>gemini --resume
-gemini -r</code></pre>
+      <pre class="code-block"><code>npx @google/gemini-cli --resume
+npx @google/gemini-cli -r</code></pre>
+      <p class="detail-paragraph">
+        自備筆電已經安裝過的，<code>gemini --resume</code> 或 <code>gemini -r</code> 也一樣。
+      </p>
       <p class="detail-paragraph">
         或是已經進到 CLI 裡了，輸入：
       </p>
       <pre class="code-block"><code>/resume</code></pre>
 
       <p class="detail-paragraph">
-        Session 存在 <code>~/.gemini/tmp/&lt;project_hash&gt;/chats/</code>，是<strong>專案專屬</strong>的 —— 換一個資料夾，就看不到原本的歷史。
+        Session 存在 <code>%USERPROFILE%\.gemini\tmp\&lt;專案雜湊&gt;\chats\</code>，是<strong>專案專屬</strong>的 —— 換一個資料夾，就看不到原本的歷史。
       </p>
 
       <div class="callout-card callout-card--warn">
         <p class="callout-text">
-          在不同資料夾續接時，<strong>絕對路徑的檔案引用可能會失效，相對路徑比較安全</strong>。另外，<code>--resume</code> 是否真的一併還原模型脈絡（還是只還原畫面顯示）目前尚未驗證，寫進教材前建議自己先測一次：開新 session → 告訴它一件事 → <code>/quit</code> → <code>gemini --resume</code> → 追問那件事。
+          <strong>實測確認：<code>--resume</code> 會還原對話脈絡，不只是還原畫面。</strong>
+        </p>
+        <p class="callout-text">
+          測法很簡單，你也可以自己驗一次：開一個新 session → 告訴它一件只有這次講過的事（例如一個代號）→ <code>/quit</code> → <code>--resume</code> → 選擇要接哪一筆 → 問它那件事。它答得出來。
+        </p>
+        <p class="callout-text">
+          另外一個提醒：在不同資料夾續接時，<strong>絕對路徑的檔案引用可能會失敗，相對路徑比較安全</strong>。
         </p>
       </div>
 
-      <!-- Section 7: /rewind -->
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-resume-restored.png"
+          alt="用 --resume 續接後，CLI 仍答得出上一次對話裡指定的代號「藍色鉛筆」"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">實測：離開後用 <code>--resume</code> 續接，它仍記得上一次對話裡給的代號「藍色鉛筆」。</figcaption>
+      </figure>
+
+      <!-- Section 3: /rewind -->
       <h2 class="detail-heading">回到剛剛的樣子：<code>/rewind</code></h2>
       <p class="detail-paragraph">
         輸入 <code>/rewind</code>，或是連按兩下 <code>Esc</code>，會顯示還原點清單，以及每一步的檔案變更（例如 <code>1 file changed +3</code>，或 <code>No files have been changed</code>）。
@@ -192,18 +103,113 @@ gemini -r</code></pre>
         </p>
       </div>
 
-      <!-- Section 8: /memory -->
-      <h2 class="detail-heading">注意 <code>/memory</code> 已經變了</h2>
-      <p class="detail-paragraph">
-        如果你看過比較舊的教學，會看到 <code>/memory add</code>。<strong>v0.54.4 已經沒有 <code>add</code> 子指令了</strong>，只剩 <code>show</code>、<code>reload</code>、<code>list</code>、<code>inbox</code>。記憶現在統一改用 <code>GEMINI.md</code> 檔案管理。
-      </p>
-      <pre class="code-block"><code>/memory show     # 顯示目前記憶內容
-/memory reload   # 重新載入 GEMINI.md</code></pre>
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>Esc 不是萬用的取消鍵。</strong>
+        </p>
+        <p class="callout-text">
+          在 <code>/rewind</code> 的清單裡按 Esc 可以離開。但模型正在 Thinking 的時候按 Esc <strong>沒有作用</strong> —— 即使畫面上明明寫著 <code>esc to cancel</code>。那種情況只能按兩次 Ctrl+C，或直接關掉終端機視窗。
+        </p>
+        <p class="callout-text">
+          同一個按鍵在不同畫面行為不一樣，所以不要憑肌肉記憶。
+        </p>
+      </div>
 
-      <!-- Section 9: agent writes its own memory -->
+      <!-- Section 4: where the memory file lives -->
+      <h2 class="detail-heading">記憶檔在哪裡</h2>
+      <p class="detail-paragraph">
+        CLI 啟動後，狀態列右下角有時會出現 <code>1 GEMINI.md file</code>，有時什麼都沒有。這個數字算的是<strong>這次啟動載入了幾個記憶檔</strong>。
+      </p>
+      <p class="detail-paragraph">
+        記憶檔有兩個可能的位置：
+      </p>
+
+      <div class="method-grid">
+        <article class="method-card">
+          <p class="method-tag">專案層</p>
+          <pre class="code-block"><code>&lt;你的專案資料夾&gt;\GEMINI.md</code></pre>
+          <p class="method-desc">
+            只在這個資料夾裡生效。
+          </p>
+        </article>
+        <article class="method-card">
+          <p class="method-tag">全域</p>
+          <pre class="code-block"><code>%USERPROFILE%\.gemini\GEMINI.md</code></pre>
+          <p class="method-desc">
+            會跟著你<strong>每一個</strong>專案。
+          </p>
+        </article>
+      </div>
+
+      <p class="detail-paragraph">
+        所以你在專案資料夾裡翻遍了找不到 <code>GEMINI.md</code>，狀態列卻顯示 <code>1 GEMINI.md file</code> —— 通常就是全域那一份在作用。
+      </p>
+
+      <h3 class="sub-heading">三個狀態，一定要分清楚</h3>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-statusline-emptied.png"
+          alt="把全域 GEMINI.md 的內容清空後重新啟動 CLI，狀態列仍顯示 1 GEMINI.md file"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">把記憶檔的內容<strong>清空</strong>後重新啟動 —— 狀態列的 <code>1 GEMINI.md file</code> <strong>還在</strong>。</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-statusline-removed.png"
+          alt="把全域 GEMINI.md 整個刪除後重新啟動 CLI，狀態列已經沒有計數"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">把記憶檔<strong>整個刪掉</strong>後重新啟動 —— 計數消失了。</figcaption>
+      </figure>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>檔案狀態</th><th>狀態列</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>有內容</td><td><code>1 GEMINI.md file</code></td></tr>
+            <tr><td>存在，但內容被清空</td><td><code>1 GEMINI.md file</code>（還在）</td></tr>
+            <tr><td>檔案被刪除</td><td>沒有計數</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>清空內容不等於移除記憶。</strong>只要檔案還在，CLI 每次啟動都會去載入它。要真的讓它消失，得刪掉檔案本身。
+        </p>
+        <p class="callout-text">
+          所以「我把裡面的字刪掉了」不代表結束。檢查的方式是<strong>看狀態列有沒有計數</strong>，不是看檔案內容。
+        </p>
+      </div>
+
+      <!-- Section 5: the agent writes its own memory -->
       <h2 class="detail-heading">Agent 會自己寫記憶檔案</h2>
       <p class="detail-paragraph">
-        這一節是整頁最值得停下來想的地方。實測跟 CLI 說「請記住我的幸運數字是 6」，它會<strong>主動呼叫 <code>write_file</code> 去修改 <code>MEMORY.md</code></strong>（標題自己寫成 <code>#&nbsp;Private Project Memory</code>），並顯示完整 diff 請你確認：
+        這一節是整頁最值得停下來想的地方。實測跟 CLI 說「請記住我的幸運數字是 4728」，它會<strong>主動呼叫 <code>write_file</code></strong> 去改記憶檔，並顯示完整 diff 請你確認。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-agent-writes-global.png"
+          alt="CLI 主動呼叫 write_file 把幸運數字寫進全域 GEMINI.md，並回報此設定會在未來所有專案持續保留"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">它把幸運數字寫進了記憶檔，並自己回報：「此設定將在您未來的各個專案中持續保留。」</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        注意它寫進去的是哪一個檔案：<strong><code>C:\Users\&lt;你的帳號&gt;\.gemini\GEMINI.md</code> —— 全域那一份</strong>，不是專案資料夾裡的那一份。
+      </p>
+      <p class="detail-paragraph">
+        你只是隨口說了一句話，它就替你做了一個<strong>跨專案</strong>的決定。
       </p>
 
       <pre class="code-block"><code>Apply this change?
@@ -219,7 +225,7 @@ gemini -r</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        寫入之後，底部狀態列會從 <code>1 GEMINI.md file</code> 變成 <code>2 GEMINI.md files</code> —— 這個檔案往後<strong>每次啟動都會自動載入脈絡</strong>。
+        順帶對照一下：<a href="/zh/learning/ai-agent/security">「最小權限與安全邊界」</a>那一頁的 Shell 確認框<strong>只有 3 個選項</strong>，而且游標預設停在 1。<strong>選項數量和預設位置都不固定</strong> —— 這就是為什麼不能憑肌肉記憶按 Enter。
       </p>
 
       <div class="highlight-card">
@@ -229,26 +235,63 @@ gemini -r</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        所以請養成一個習慣：<strong>定期打開記憶檔案，看看裡面到底存了什麼</strong>。避免個人資訊被無感地寫入，然後永久保留下來。
+        所以請養成一個習慣：<strong>定期檢查記憶檔</strong>。
+      </p>
+      <p class="detail-paragraph">
+        不只是打開來看有沒有字 —— 先確認狀態列有沒有計數，再用下一節的 <code>/memory list</code> 確認它到底在哪個檔案。避免個人資訊被無感地寫入，然後永久保留下來。
       </p>
 
-      <!-- Section: bonus -->
-      <h2 class="detail-heading">補充：<code>/stats</code> 裡為什麼有兩個模型</h2>
+      <!-- Section 6: /memory -->
+      <h2 class="detail-heading">注意 <code>/memory</code> 已經變了</h2>
       <p class="detail-paragraph">
-        看 <code>/stats</code> 的 Model Usage 表時，你可能會發現不只一個模型：
+        如果你看過比較舊的教學，會看到 <code>/memory add</code>。<strong>v0.55.1 沒有 <code>add</code> 子指令了</strong>，只剩四個：
       </p>
-      <pre class="code-block"><code>gemini-3.1-flash-lite    1    ⟶ utility_summarizer
-gemini-3.5-flash-lite    9    ⟶ main</code></pre>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-memory-subcommands.png"
+          alt="在 Gemini CLI 輸入 /memory 後列出的四個子指令：reload、show、list、inbox"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">v0.55.1 輸入 <code>/memory</code> 時的子指令清單。</figcaption>
+      </figure>
+
+      <ul class="callout-list">
+        <li><code>show</code>｜顯示目前載入的記憶內容</li>
+        <li><code>reload</code>｜重新載入 <code>GEMINI.md</code></li>
+        <li><code>list</code>｜列出使用中的 <code>GEMINI.md</code> 檔案路徑</li>
+        <li><code>inbox</code>｜檢視 CLI 從過去 session 蒐集出來的 skills</li>
+      </ul>
 
       <p class="detail-paragraph">
-        CLI 內部會另外叫一個<strong>工具型模型</strong>去處理摘要之類的雜活，和你在 <code>.env</code> 鎖定的主模型分開。3.1 Flash-Lite 的額度同樣是 15 RPM / 500 RPD，不影響課堂使用。
+        記憶現在統一改用 <code>GEMINI.md</code> 檔案管理。想加東西，就直接編輯檔案。
       </p>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          這件事的教學價值在於：<strong>agent 不是只有一個模型在跑，而是背後有分工。</strong>
+          <code>list</code> 特別有用。前面說過狀態列只告訴你「載入了幾個」，<strong><code>/memory list</code> 會告訴你「在哪」</strong>。找不到記憶檔的時候，先用這個。
         </p>
       </div>
+
+      <!-- Section 7: classroom machines -->
+      <h2 class="detail-heading">教室電腦要注意</h2>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          這一頁講的東西，<strong>大部分存在使用者資料夾底下</strong>（<code>%USERPROFILE%\.gemini\</code>）—— session 歷史、全域記憶檔都在那裡。
+        </p>
+        <p class="callout-text">
+          教室電腦一還原或重開機，這些全部會消失。<code>--resume</code> 在自備筆電上很好用，在教室電腦上<strong>下週就找不到</strong>了。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        所以要跨週保留的東西，辦法只有一個：<strong>寫進專案資料夾裡的 <code>GEMINI.md</code>，然後把整個專案資料夾帶走。</strong>
+      </p>
+      <p class="detail-paragraph">
+        這也是為什麼課程一直強調「沒帶隨身碟也能一個指令重建」 —— 重建的是環境，帶走的是內容。
+      </p>
 
     </div>
   </section>
@@ -315,6 +358,17 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-size: 0.9em;
   }
 
+  /* Sub heading */
+  .sub-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-heading);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 3px solid var(--color-accent);
+  }
+
   .detail-paragraph {
     font-size: var(--text-base);
     color: var(--color-text);
@@ -327,6 +381,11 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 600;
   }
 
+  .detail-paragraph a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
   /* Inline code */
   :global(.detail-paragraph) code,
   :global(.detail-subtitle) code,
@@ -334,6 +393,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
   :global(.highlight-text) code,
   :global(.method-desc) code,
   :global(.callout-list) code,
+  :global(.figure__caption) code,
   :global(.info-table) td code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -391,7 +451,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 600;
   }
 
-  /* Ordered list used for the request breakdown */
+  /* List used for the /memory subcommands */
   .callout-list {
     margin: var(--space-4) 0 var(--space-6);
     padding-left: var(--space-6);
@@ -484,7 +544,7 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     font-weight: 700;
   }
 
-  /* Method grid (/clear vs GEMINI.md) */
+  /* Method grid (two-column comparison cards) */
   .method-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -517,14 +577,6 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
     letter-spacing: 0.05em;
   }
 
-  .method-title {
-    font-size: var(--text-base);
-    font-weight: 700;
-    color: var(--color-heading);
-    margin-bottom: var(--space-3);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
-
   .method-desc {
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -535,6 +587,27 @@ gemini-3.5-flash-lite    9    ⟶ main</code></pre>
   .method-desc strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  /* Figure */
+  .figure {
+    margin: var(--space-6) 0 var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Mobile */
