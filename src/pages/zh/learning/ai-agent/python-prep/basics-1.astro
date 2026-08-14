@@ -16,6 +16,7 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           前面我們已經一路走到這裡了：你看過現成 MCP 怎麼接，也看過怎麼把工具面縮小，現在正準備要做自己的第一個 MCP server。但這時很多人會遇到同一個問題。
         </p>
+        <p class="version-note">本頁操作與畫面，以 <strong>Python 3.13.15</strong> 實測驗證。你看到的版本可能更新，畫面略有差異屬正常。</p>
       </header>
 
       <div class="highlight-card">
@@ -70,120 +71,207 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- Section: Install Python in VS Code -->
+      <!-- Section: Install Python -->
       <h2 class="detail-heading">先安裝 Python 本體</h2>
       <p class="detail-paragraph">
-        這一步很容易被跳過。<strong>VS Code 的 Python 擴充套件不含 Python 本身</strong> —— 它只是編輯器的輔助工具，真正執行程式的直譯器要另外裝。
+        安裝 Python 只需要兩樣東西：<strong>python.org 的安裝檔</strong>，以及 Windows 本來就有的 <strong>PowerShell</strong>。<strong>不需要事先安裝任何編輯器。</strong>整個過程也不需要系統管理員權限，用你自己的帳號就裝得完。
+      </p>
+
+      <h3 class="sub-heading">步驟 1：到 python.org 下載安裝檔</h3>
+      <p class="detail-paragraph">
+        點選 <strong>Downloads</strong> → <strong>View the full list of downloads</strong>，接著進到下載頁之後要注意：請往下捲到 <strong>Files</strong> 表格，注意 <strong>Windows 區塊那顆黃色大按鈕現在是「Download Python install manager」，不是我們要的安裝檔</strong>，因此要選擇標示 <strong>Recommended</strong> 的 <strong>Windows installer (64-bit)</strong>，而版本請選 <strong>3.13</strong> 系列。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python下載頁Files區塊.png"
+          alt="python.org 下載頁：Windows 區塊是一顆黃色的 Download Python install manager 按鈕，下方 Files 表格裡才有標示 Recommended 的 Windows installer (64-bit)"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">要抓的是表格裡標示 <strong>Recommended</strong> 的 <code>Windows installer (64-bit)</code>，不是上方那顆黃色按鈕。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>點到黃色大按鈕會拿到另一套安裝流程</strong>，後面的畫面會跟本頁不一樣。如果你發現畫面對不上，先確認自己抓的是哪一個。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">步驟 2：安裝器第一畫面的兩個勾選框</h3>
+      <p class="detail-paragraph">
+        安裝器第一個畫面的<strong>最下方有兩個勾選框，兩個都要處理</strong>：
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>勾選框</th><th>動作</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Use admin privileges when installing py.exe</code></td><td><strong>不要勾</strong></td></tr>
+            <tr><td><code>Add python.exe to PATH</code></td><td><strong>要勾</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        確認之後點 <strong>Install Now</strong>。畫面上會顯示安裝位置 <code>C:\Users\&lt;你的帳號&gt;\AppData\Local\Programs\Python\Python313</code> —— 這是使用者自己的資料夾，所以不需要管理員權限。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python安裝器第一畫面.png"
+          alt="Python 3.13.15 安裝器的第一個畫面，最下方有 Use admin privileges when installing py.exe 與 Add python.exe to PATH 兩個勾選框"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">下方兩個勾選框：上面那個<strong>不要勾</strong>，下面的 <code>Add python.exe to PATH</code> <strong>要勾</strong>。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          如果勾了 <code>Use admin privileges when installing py.exe</code>，安裝會中斷，並跳出視窗要求輸入<strong>系統管理員的密碼或 PIN</strong>。如果你的電腦不是自己管理的（例如學校或公司的電腦），這一步會直接卡住。遇到的話就<strong>取消安裝</strong>，回到第一畫面把那一項取消勾選，再重跑一次就好。
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/UAC要求管理員密碼.png"
+          alt="Windows 使用者帳戶控制視窗，要求輸入系統管理員的使用者名稱與密碼才能繼續安裝"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">勾了那一項就會看到這個畫面 —— 它要的是<strong>系統管理員</strong>的密碼，不是你自己的。</figcaption>
+      </figure>
+
+      <h3 class="sub-heading">步驟 3：安裝完成畫面</h3>
+      <p class="detail-paragraph">
+        看到 <code>Setup was successful</code> 就完成了，直接按 <strong>Close</strong>。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python安裝完成畫面.png"
+          alt="Python 安裝完成畫面，顯示 Setup was successful，下方有帶盾牌圖示的 Disable path length limit 連結與 Close 按鈕"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">看到 <code>Setup was successful</code>，按 <strong>Close</strong> 就好。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          畫面上的 <strong>Disable path length limit</strong> 前面有一個盾牌圖示，代表它需要管理員權限。<strong>本課程不需要，請不要點。</strong>
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          完成畫面上寫著可以用 <code>py</code> 啟動 Python。<strong>本課程一律使用 <code>python</code></strong>，請忽略那句話。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">步驟 4：開一個新視窗，跑三行驗證</h3>
+      <p class="detail-paragraph">
+        安裝完成後，<strong>從開始功能表搜尋「PowerShell」把它打開</strong>。如果安裝之前就已經開著一個，請<strong>關掉再開一個新的</strong> —— PATH 需要重新載入才會生效。接著依序執行這三行：
+      </p>
+
+      <pre class="code-block code-block--py"><code>where.exe python
+python --version
+python -m pip --version</code></pre>
+
+      <p class="detail-paragraph">三行都要看：</p>
+      <ul class="check-list">
+        <li><code>where.exe python</code>：列出電腦上所有的 python，<strong>第一行必須是剛才安裝的那一個</strong>（路徑含 <code>AppData\Local\Programs\Python\Python313</code>）</li>
+        <li><code>python --version</code>：應該顯示 <code>Python 3.13.15</code></li>
+        <li><code>python -m pip --version</code>：應該顯示 pip 的版本與路徑</li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong><code>python --version</code> 有顯示版本號，不代表環境可以用。</strong>有些電腦上會有其他來源的 Python，它有版本號、但沒有 pip，之後就會裝不了任何套件。實測時就遇過 <code>python --version</code> 正常顯示 3.12.12，但 <code>python -m pip</code> 回報 <code>No module named pip</code>。所以三行都要檢查。
+        </p>
+        <p class="callout-text">
+          另外，如果輸入 <code>python</code> 之後直接彈出 Microsoft Store，代表 <code>Add python.exe to PATH</code> 沒有勾到，請回到步驟 2 重跑一次安裝器。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">如果第一行不是剛裝的那一個</h3>
+      <p class="detail-paragraph">
+        代表電腦上有其他 Python 排在前面，常見於曾經裝過其他開發工具的電腦。安裝器只能把路徑加到「使用者」層，而排在前面的那些通常在「系統」層。
+      </p>
+      <p class="detail-paragraph">
+        <strong>不需要去改系統設定。</strong>在目前這個 PowerShell 視窗執行下面這一行，把新裝的 Python 暫時排到最前面：
+      </p>
+
+      <pre class="code-block code-block--py"><code>$env:Path = "$env:LocalAppData\Programs\Python\Python313;$env:LocalAppData\Programs\Python\Python313\Scripts;" + $env:Path</code></pre>
+
+      <p class="detail-paragraph">
+        執行完再重跑一次上面那三行確認。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/where查詢python排序.png"
+          alt="PowerShell 畫面：where.exe python 一開始把別的 Python 列在第一行，執行調整 PATH 的指令後再查一次，Python313 的路徑就排到最前面"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">上半是調整前 —— 第一行是別的 Python；下半是執行那一行之後，<code>Python313</code> 排到了最前面，後面兩行驗證也跟著正常。</figcaption>
+      </figure>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這一行<strong>只影響目前這個視窗</strong>，關掉就失效。如果後面的步驟中途關過 PowerShell，重新執行這一行即可。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">動手之前：先離開 system32</h3>
+      <p class="detail-paragraph">
+        從開始功能表打開 PowerShell 時，預設位置是 <code>C:\WINDOWS\system32</code>，<strong>這個資料夾不允許一般使用者建立檔案</strong>。動手之前先切換到自己的資料夾：
+      </p>
+
+      <pre class="code-block code-block--py"><code>cd $HOME</code></pre>
+
+      <p class="detail-paragraph">
+        提示字元會從 <code>PS C:\WINDOWS\system32&gt;</code> 變成 <code>PS C:\Users\&lt;你的帳號&gt;&gt;</code>。
+      </p>
+
+      <!-- Section: Create first Python file -->
+      <h2 class="detail-heading">建立第一個 Python 檔案</h2>
+      <p class="detail-paragraph">
+        <strong>寫 Python 不需要特定的編輯器。</strong>PowerShell 就能建立檔案並執行，接下來四行就做完了。
       </p>
 
       <ol class="setup-list">
         <li class="setup-item">
           <span class="setup-num">1</span>
-          <p class="setup-text">前往 <strong>python.org</strong> 的下載頁，抓 Windows 版安裝檔</p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">2</span>
           <div class="setup-body">
-            <p class="setup-text">執行安裝檔，<strong>務必勾選「Add Python to PATH」</strong></p>
-            <p class="setup-text setup-text--muted">這個勾選框在安裝畫面的最下方，很容易漏掉。沒勾的話終端機會找不到 <code>python</code> 指令。</p>
-          </div>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">3</span>
-          <div class="setup-body">
-            <p class="setup-text">安裝完成後，開一個<strong>新的</strong>終端機視窗，輸入：</p>
-            <pre class="code-block code-block--py"><code>python --version</code></pre>
-            <p class="setup-text setup-text--muted">看到版本號就成功了。</p>
-          </div>
-        </li>
-      </ol>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>沒裝直譯器會出現兩種症狀，而且都不像是「沒裝 Python」。</strong>一是等一下的 <code>Python: Select Interpreter</code> 清單會是空的；二是在 Windows 終端機輸入 <code>python</code> 會直接彈出 Microsoft Store。看到這兩種情況，就回來把這一步做完。
-        </p>
-      </div>
-
-      <!-- Section: Install VS Code extension -->
-      <h2 class="detail-heading">再在 VS Code 裡裝 Python 擴充套件</h2>
-
-      <ol class="setup-list">
-        <li class="setup-item">
-          <span class="setup-num">1</span>
-          <p class="setup-text">打開 <strong>VS Code</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">2</span>
-          <p class="setup-text">點左側的 <strong>Extensions</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">3</span>
-          <p class="setup-text">搜尋 <strong>Python</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">4</span>
-          <p class="setup-text">安裝 <strong>Microsoft 出的 Python 擴充套件</strong></p>
-        </li>
-      </ol>
-
-      <!-- Section: Create first Python file -->
-      <h2 class="detail-heading">建立第一個 Python 檔案</h2>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>所有檔案一律用 VS Code 建立與編輯</strong>，並確認右下角的編碼顯示為 <code>UTF-8</code>。不要用記事本建立含中文的檔案 —— 記事本會自作主張存成 <code>.env.txt</code>，而檔案總管預設隱藏副檔名，看起來完全正常。也不要用 PowerShell 的 <code>Set-Content</code>：它在中文 Windows 上預設走 Big5，寫進去的中文在 CLI 裡會變成亂碼。後面「自製 MCP Server」的程式碼有大量中文字串（docstring、回覆訊息、錯誤提示），用錯工具建檔會全部受影響。
-        </p>
-      </div>
-
-      <ol class="setup-list">
-        <li class="setup-item">
-          <span class="setup-num">1</span>
-          <div class="setup-body">
-            <p class="setup-text">在你習慣的位置建立一個檔案，名稱可以叫做：</p>
-            <pre class="code-block code-block--py"><code>hello.py</code></pre>
+            <p class="setup-text">建立一個練習用的資料夾：</p>
+            <pre class="code-block code-block--py"><code>New-Item -ItemType Directory -Path "$HOME\python-練習" -Force</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">2</span>
           <div class="setup-body">
-            <p class="setup-text">在 <code>hello.py</code> 裡貼上：</p>
-            <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+            <p class="setup-text">切換進去：</p>
+            <pre class="code-block code-block--py"><code>cd "$HOME\python-練習"</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">3</span>
           <div class="setup-body">
-            <p class="setup-text">打開 VS Code 的終端機。從上方選單點：</p>
-            <pre class="code-block code-block--py"><code>Terminal → New Terminal</code></pre>
-            <p class="setup-text">中文介面可能會顯示成「終端機 → 新增終端機」。</p>
+            <p class="setup-text">建立 <code>hello.py</code>，內容就是一行 <code>print</code>：</p>
+            <pre class="code-block code-block--py"><code>'print("Hello Python")' | Set-Content hello.py -Encoding ASCII</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">4</span>
-          <p class="setup-text">在 VS Code 打開一個資料夾或一個 <code>.py</code> 檔。這裡的範例做法為打開 <code>hello.py</code>。</p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">5</span>
-          <p class="setup-text">按 <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>（macOS 是 <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>）打開 <strong>Command Palette</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">6</span>
-          <p class="setup-text">輸入並選擇 <code>Python: Select Interpreter</code></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">7</span>
           <div class="setup-body">
-            <p class="setup-text">從列表裡選一個你要用的 Python 版本。</p>
-            <p class="setup-text setup-text--muted">如果你現在還不確定選哪一個，也不用太緊張，<strong>先選推薦的版本即可</strong>。</p>
-          </div>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">8</span>
-          <div class="setup-body">
-            <p class="setup-text">在終端機中輸入：</p>
+            <p class="setup-text">執行它：</p>
             <pre class="code-block code-block--py"><code>python hello.py</code></pre>
-            <p class="setup-text">如果你是 macOS，而且 <code>python</code> 沒有反應，可以試試：</p>
-            <pre class="code-block code-block--py"><code>python3 hello.py</code></pre>
+            <p class="setup-text setup-text--muted">如果你是 macOS，而且 <code>python</code> 沒有反應，可以試試 <code>python3 hello.py</code>。</p>
           </div>
         </li>
       </ol>
@@ -196,9 +284,59 @@ import BaseLayout from '../../../../../layouts/BaseLayout.astro';
         就代表你的第一個 Python 程式成功跑起來了。
       </p>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>用 <code>Set-Content</code> 建立含中文的檔案時，一定要加上 <code>-Encoding UTF8</code>。</strong>不加的話 Windows PowerShell 會用預設編碼，中文會變成亂碼。上面的 <code>hello.py</code> 裡面是純英文，所以用 <code>-Encoding ASCII</code> 就夠了；但後面「自製 MCP Server」的程式碼有大量中文字串（docstring、回覆訊息、錯誤提示），建檔時就要記得改成 <code>-Encoding UTF8</code>。
+        </p>
+        <p class="callout-text">
+          另外，<strong>不要用記事本建立檔案</strong>：它可能自作主張存成 <code>.txt</code> 結尾，而檔案總管預設隱藏副檔名，看起來會完全正常。
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
           這一步很重要。因為之後我們做 MCP Server，<strong>其實也是在寫一個 Python 檔案，然後讓 Gemini CLI 去啟動它。</strong>
+        </p>
+      </div>
+
+      <!-- Section: Install the MCP package -->
+      <h2 class="detail-heading">環境的最後一步：安裝 MCP 套件</h2>
+      <p class="detail-paragraph">
+        趁現在把之後會用到的套件一起裝好。<strong>這個套件現在還用不到</strong>，但先裝起來，之後做自製 MCP Server 時就不會卡在安裝上。
+      </p>
+
+      <pre class="code-block code-block--py"><code>python -m pip install "mcp[cli]&gt;=1.0,&lt;2.0"</code></pre>
+
+      <p class="detail-paragraph">
+        這一步會連帶安裝三十多個相依套件，視網路速度需要一到五分鐘，<strong>畫面停住是正常的</strong>。裝完之後驗證：
+      </p>
+
+      <pre class="code-block code-block--py"><code>python -m pip show mcp
+python -c "from mcp.server.fastmcp import FastMCP; print('ok')"</code></pre>
+
+      <p class="detail-paragraph">
+        <code>pip show</code> 應該顯示 <code>Version: 1.29.0</code>（或其他 1.x 的版本），最後一行應該顯示 <code>ok</code>。
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python環境驗證成功.png"
+          alt="PowerShell 畫面：pip show mcp 顯示 Version 1.29.0，接著執行 import FastMCP 的測試指令並印出 ok"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">兩個指令的結果長這樣：版本是 <code>1.29.0</code>，最後印出 <code>ok</code>。</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          指令中的 <code>&gt;=1.0,&lt;2.0</code> <strong>不可以省略，也不可以自己改</strong>。MCP SDK 2.0 移除了本課程使用的寫法，裝到 2.x 版本的話，後面所有的程式碼都會出現 <code>ImportError</code>。
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          看到 <code>ok</code>，代表你的電腦已經可以做自製 MCP Server 了。
         </p>
       </div>
 
@@ -501,6 +639,36 @@ week3.md</code></pre>
         可以把它理解成：<strong>這個工具把執行結果交回給 AI</strong>。
       </p>
 
+      <!-- Optional appendix: VS Code -->
+      <h2 class="detail-heading">附錄：如果你想用 VS Code</h2>
+      <p class="detail-paragraph">
+        本頁全程用 PowerShell 完成，<strong>不需要 VS Code</strong>。如果你習慣用編輯器寫程式，可以另外安裝：
+      </p>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">安裝 <strong>VS Code</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <p class="setup-text">點左側的 <strong>Extensions</strong>，搜尋 <strong>Python</strong>，安裝 <strong>Microsoft 出的 Python 擴充套件</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">按 <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>（macOS 是 <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>）打開 Command Palette</p>
+            <p class="setup-text">輸入 <code>Python: Select Interpreter</code>，選擇 <code>Python 3.13.15</code></p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          VS Code 的 Python 擴充套件<strong>不包含 Python 本身</strong>，它只是編輯器的輔助工具。如果清單裡看不到任何 Python 版本，請回到前面確認安裝步驟是不是還沒做完。
+        </p>
+      </div>
+
     </div>
   </section>
 </BaseLayout>
@@ -541,6 +709,13 @@ week3.md</code></pre>
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Section headings */
@@ -612,6 +787,8 @@ week3.md</code></pre>
   :global(.callout-text) code,
   :global(.highlight-text) code,
   :global(.setup-text) code,
+  :global(.figure__caption) code,
+  :global(.info-table) td code,
   :global(.diff-card__desc) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -711,6 +888,90 @@ week3.md</code></pre>
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  /* Figure (screenshot) */
+  .figure {
+    /* Shrink to the image's own width so a narrower screenshot and its
+       caption stay aligned instead of the caption spanning the full column. */
+    width: fit-content;
+    max-width: 100%;
+    margin: var(--space-6) auto var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .figure__caption strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
   }
 
   /* Highlight card */
