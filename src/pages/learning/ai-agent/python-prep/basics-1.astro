@@ -16,6 +16,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         <p class="detail-subtitle">
           We've come a long way: you've seen how to plug in off-the-shelf MCPs, how to shrink the tool surface, and now you're getting ready to build your own first MCP server. But this is when many people hit the same problem.
         </p>
+        <p class="version-note">The steps and screenshots on this page were verified against <strong>Python 3.13.15</strong>. Your version may be newer; small differences on screen are normal.</p>
       </header>
 
       <div class="highlight-card">
@@ -70,119 +71,207 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         </p>
       </div>
 
-      <!-- Section: Install Python in VS Code -->
+      <!-- Section: Install Python -->
       <h2 class="detail-heading">First, Install Python Itself</h2>
       <p class="detail-paragraph">
-        This step is easy to skip. <strong>The VS Code Python extension does not include Python</strong> — it's an editor helper, and the interpreter that actually runs your code has to be installed separately.
+        Installing Python takes two things: <strong>the installer from python.org</strong>, and <strong>PowerShell</strong>, which Windows already ships with. <strong>You don't need to install an editor first.</strong> None of this needs administrator rights either — your own account is enough.
+      </p>
+
+      <h3 class="sub-heading">Step 1: Download the installer from python.org</h3>
+      <p class="detail-paragraph">
+        Click <strong>Downloads</strong> → <strong>View the full list of downloads</strong>. Once you're on the downloads page, scroll down to the <strong>Files</strong> table, and note that <strong>the big yellow button in the Windows box is now "Download Python install manager", which is not the installer we want</strong> — so pick the <strong>Windows installer (64-bit)</strong> row marked <strong>Recommended</strong> instead, choosing the <strong>3.13</strong> series.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python下載頁Files區塊.png"
+          alt="The python.org downloads page: the Windows box holds a yellow Download Python install manager button, while the Files table below lists the Windows installer (64-bit) marked Recommended"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">What you want is the <code>Windows installer (64-bit)</code> row marked <strong>Recommended</strong> in the table — not the yellow button above it.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>The yellow button hands you a different installation flow</strong>, and the screens after it won't match this page. If what you see doesn't line up, check which one you downloaded.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Step 2: The two checkboxes on the installer's first screen</h3>
+      <p class="detail-paragraph">
+        At the <strong>very bottom of the installer's first screen there are two checkboxes, and both need attention</strong>:
+      </p>
+
+      <div class="info-table-wrapper">
+        <table class="info-table">
+          <thead>
+            <tr><th>Checkbox</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Use admin privileges when installing py.exe</code></td><td><strong>Leave it unticked</strong></td></tr>
+            <tr><td><code>Add python.exe to PATH</code></td><td><strong>Tick it</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="detail-paragraph">
+        Then click <strong>Install Now</strong>. The screen shows the install location <code>C:\Users\&lt;your-account&gt;\AppData\Local\Programs\Python\Python313</code> — that's your own user folder, which is why no administrator rights are needed.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python安裝器第一畫面.png"
+          alt="The first screen of the Python 3.13.15 installer, with the Use admin privileges when installing py.exe and Add python.exe to PATH checkboxes at the bottom"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">The two checkboxes at the bottom: leave the top one <strong>unticked</strong>, and <strong>tick</strong> <code>Add python.exe to PATH</code>.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          If you tick <code>Use admin privileges when installing py.exe</code>, the install stops and a window asks for an <strong>administrator password or PIN</strong>. On a machine you don't administer yourself — a school or company computer, say — this is where you get stuck. If it happens, <strong>cancel the install</strong>, go back to the first screen, untick that option, and run it again.
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/UAC要求管理員密碼.png"
+          alt="The Windows User Account Control window asking for an administrator username and password before the installation can continue"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Ticking that option gets you this dialog — it wants an <strong>administrator's</strong> password, not your own. (This screenshot comes from the Chinese-language run of the same install.)</figcaption>
+      </figure>
+
+      <h3 class="sub-heading">Step 3: The completion screen</h3>
+      <p class="detail-paragraph">
+        <code>Setup was successful</code> means you're done — just hit <strong>Close</strong>.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python安裝完成畫面.png"
+          alt="The Python setup completion screen showing Setup was successful, with a shield-marked Disable path length limit link and a Close button below"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Once you see <code>Setup was successful</code>, click <strong>Close</strong>.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The <strong>Disable path length limit</strong> line has a shield icon in front of it, which means it needs administrator rights. <strong>This course doesn't need it — don't click it.</strong>
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The completion screen says you can launch Python with <code>py</code>. <strong>This course always uses <code>python</code></strong>, so ignore that sentence.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Step 4: Open a fresh window and run three checks</h3>
+      <p class="detail-paragraph">
+        After the install finishes, <strong>search for "PowerShell" in the Start menu and open it</strong>. If one was already open before you installed, <strong>close it and open a new one</strong> — PATH only takes effect on a reload. Then run these three lines in order:
+      </p>
+
+      <pre class="code-block code-block--py"><code>where.exe python
+python --version
+python -m pip --version</code></pre>
+
+      <p class="detail-paragraph">All three matter:</p>
+      <ul class="check-list">
+        <li><code>where.exe python</code>: lists every python on the machine. <strong>The first line must be the one you just installed</strong> (its path contains <code>AppData\Local\Programs\Python\Python313</code>)</li>
+        <li><code>python --version</code>: should print <code>Python 3.13.15</code></li>
+        <li><code>python -m pip --version</code>: should print pip's version and path</li>
+      </ul>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>A version number from <code>python --version</code> does not mean the environment works.</strong> Some machines carry a Python from another source that reports a version but has no pip — and then nothing can be installed later. In testing, <code>python --version</code> happily printed 3.12.12 while <code>python -m pip</code> reported <code>No module named pip</code>. So check all three.
+        </p>
+        <p class="callout-text">
+          Also, if typing <code>python</code> pops open the Microsoft Store, <code>Add python.exe to PATH</code> wasn't ticked — go back to step 2 and run the installer again.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">If the first line isn't the one you just installed</h3>
+      <p class="detail-paragraph">
+        That means another Python sits ahead of it — common on machines that have had other developer tools installed. The installer can only add its path at the "user" level, while the ones ahead of it usually live at the "system" level.
+      </p>
+      <p class="detail-paragraph">
+        <strong>You don't need to touch any system settings.</strong> Run this single line in the PowerShell window you have open, to push the new Python to the front for now:
+      </p>
+
+      <pre class="code-block code-block--py"><code>$env:Path = "$env:LocalAppData\Programs\Python\Python313;$env:LocalAppData\Programs\Python\Python313\Scripts;" + $env:Path</code></pre>
+
+      <p class="detail-paragraph">
+        Then run the three lines above again to confirm.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/where查詢python排序.png"
+          alt="PowerShell: where.exe python first lists a different Python at the top; after running the PATH adjustment, the Python313 path moves to the first line"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">Top half is before — the first line is a different Python. Bottom half is after running that line: <code>Python313</code> comes first, and the two remaining checks pass.</figcaption>
+      </figure>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          That line <strong>only affects the window you're in</strong>; close it and the change is gone. If you close PowerShell partway through the steps below, just run it again.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Before you start: leave system32</h3>
+      <p class="detail-paragraph">
+        When PowerShell opens from the Start menu it starts in <code>C:\WINDOWS\system32</code>, and <strong>that folder doesn't let ordinary users create files</strong>. Switch to your own folder first:
+      </p>
+
+      <pre class="code-block code-block--py"><code>cd $HOME</code></pre>
+
+      <p class="detail-paragraph">
+        The prompt changes from <code>PS C:\WINDOWS\system32&gt;</code> to <code>PS C:\Users\&lt;your-account&gt;&gt;</code>.
+      </p>
+
+      <!-- Section: Create first Python file -->
+      <h2 class="detail-heading">Create Your First Python File</h2>
+      <p class="detail-paragraph">
+        <strong>Writing Python doesn't require a particular editor.</strong> PowerShell can create the file and run it — four lines and you're done.
       </p>
 
       <ol class="setup-list">
         <li class="setup-item">
           <span class="setup-num">1</span>
-          <p class="setup-text">Go to the <strong>python.org</strong> downloads page and grab the Windows installer</p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">2</span>
           <div class="setup-body">
-            <p class="setup-text">Run the installer and <strong>be sure to tick "Add Python to PATH"</strong></p>
-            <p class="setup-text setup-text--muted">That checkbox sits at the very bottom of the installer screen and is easy to miss. Without it, your terminal won't find the <code>python</code> command.</p>
-          </div>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">3</span>
-          <div class="setup-body">
-            <p class="setup-text">After installing, open a <strong>fresh</strong> terminal window and run:</p>
-            <pre class="code-block code-block--py"><code>python --version</code></pre>
-            <p class="setup-text setup-text--muted">A version number means you're set.</p>
-          </div>
-        </li>
-      </ol>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>Missing the interpreter produces two symptoms, neither of which looks like "Python isn't installed".</strong> First, the <code>Python: Select Interpreter</code> list further down will be empty. Second, typing <code>python</code> in a Windows terminal pops open the Microsoft Store. If you see either, come back and finish this step.
-        </p>
-      </div>
-
-      <!-- Section: Install VS Code extension -->
-      <h2 class="detail-heading">Then Install the Python Extension in VS Code</h2>
-
-      <ol class="setup-list">
-        <li class="setup-item">
-          <span class="setup-num">1</span>
-          <p class="setup-text">Open <strong>VS Code</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">2</span>
-          <p class="setup-text">Click <strong>Extensions</strong> on the left sidebar</p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">3</span>
-          <p class="setup-text">Search for <strong>Python</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">4</span>
-          <p class="setup-text">Install the <strong>Python extension by Microsoft</strong></p>
-        </li>
-      </ol>
-
-      <!-- Section: Create first Python file -->
-      <h2 class="detail-heading">Create Your First Python File</h2>
-
-      <div class="callout-card callout-card--warn">
-        <p class="callout-text">
-          <strong>Create and edit every file in VS Code</strong>, and check that the encoding indicator in the bottom-right reads <code>UTF-8</code>. Don't use Notepad for files containing Chinese — it silently saves as <code>.env.txt</code>, and File Explorer hides extensions by default, so it looks perfectly fine. Don't use PowerShell's <code>Set-Content</code> either: on a Chinese Windows install it defaults to Big5, and the text comes out garbled in the CLI. The "build your own MCP Server" pages later on are full of Chinese strings (docstrings, response messages, error text), so the wrong tool here affects all of them.
-        </p>
-      </div>
-
-      <ol class="setup-list">
-        <li class="setup-item">
-          <span class="setup-num">1</span>
-          <div class="setup-body">
-            <p class="setup-text">Create a file in a location you like. Name it something like:</p>
-            <pre class="code-block code-block--py"><code>hello.py</code></pre>
+            <p class="setup-text">Create a folder to practise in:</p>
+            <pre class="code-block code-block--py"><code>New-Item -ItemType Directory -Path "$HOME\mcp-test" -Force</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">2</span>
           <div class="setup-body">
-            <p class="setup-text">Paste this into <code>hello.py</code>:</p>
-            <pre class="code-block code-block--py"><code>print("Hello Python")</code></pre>
+            <p class="setup-text">Move into it:</p>
+            <pre class="code-block code-block--py"><code>cd "$HOME\mcp-test"</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">3</span>
           <div class="setup-body">
-            <p class="setup-text">Open VS Code's terminal. From the top menu:</p>
-            <pre class="code-block code-block--py"><code>Terminal → New Terminal</code></pre>
+            <p class="setup-text">Create <code>hello.py</code> with a single <code>print</code> in it:</p>
+            <pre class="code-block code-block--py"><code>'print("Hello Python")' | Set-Content hello.py -Encoding ASCII</code></pre>
           </div>
         </li>
         <li class="setup-item">
           <span class="setup-num">4</span>
-          <p class="setup-text">In VS Code, open a folder or a <code>.py</code> file. For this example, just open <code>hello.py</code>.</p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">5</span>
-          <p class="setup-text">Press <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd> (on macOS, <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>) to open the <strong>Command Palette</strong></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">6</span>
-          <p class="setup-text">Type and select <code>Python: Select Interpreter</code></p>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">7</span>
           <div class="setup-body">
-            <p class="setup-text">Pick a Python version from the list.</p>
-            <p class="setup-text setup-text--muted">If you aren't sure which to choose yet, don't worry — <strong>just pick the recommended one</strong>.</p>
-          </div>
-        </li>
-        <li class="setup-item">
-          <span class="setup-num">8</span>
-          <div class="setup-body">
-            <p class="setup-text">In the terminal, type:</p>
+            <p class="setup-text">Run it:</p>
             <pre class="code-block code-block--py"><code>python hello.py</code></pre>
-            <p class="setup-text">If you're on macOS and <code>python</code> doesn't respond, try:</p>
-            <pre class="code-block code-block--py"><code>python3 hello.py</code></pre>
+            <p class="setup-text setup-text--muted">If you're on macOS and <code>python</code> doesn't respond, try <code>python3 hello.py</code>.</p>
           </div>
         </li>
       </ol>
@@ -195,9 +284,59 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
         That means your first Python program ran successfully.
       </p>
 
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>When you use <code>Set-Content</code> to create a file containing Chinese, you must add <code>-Encoding UTF8</code>.</strong> Without it, Windows PowerShell falls back to its default encoding and the Chinese comes out as mojibake. The <code>hello.py</code> above is pure English, so <code>-Encoding ASCII</code> is enough — but the "build your own MCP Server" pages later are full of Chinese strings (docstrings, response messages, error text), so remember to switch to <code>-Encoding UTF8</code> when creating those.
+        </p>
+        <p class="callout-text">
+          Also, <strong>don't create files with Notepad</strong>: it may decide to save them with a <code>.txt</code> ending, and File Explorer hides extensions by default, so everything looks perfectly fine.
+        </p>
+      </div>
+
       <div class="callout-card">
         <p class="callout-text">
           This step matters. Because when we build an MCP Server later, <strong>we'll really just be writing a Python file and letting Gemini CLI launch it.</strong>
+        </p>
+      </div>
+
+      <!-- Section: Install the MCP package -->
+      <h2 class="detail-heading">The Last Step: Install the MCP Package</h2>
+      <p class="detail-paragraph">
+        While you're here, install the package you'll need later. <strong>You won't use it yet</strong>, but getting it in place now means the install won't be what holds you up when you build your own MCP Server.
+      </p>
+
+      <pre class="code-block code-block--py"><code>python -m pip install "mcp[cli]&gt;=1.0,&lt;2.0"</code></pre>
+
+      <p class="detail-paragraph">
+        This pulls in thirty-odd dependencies and takes one to five minutes depending on your connection — <strong>a stalled-looking screen is normal</strong>. Once it finishes, verify:
+      </p>
+
+      <pre class="code-block code-block--py"><code>python -m pip show mcp
+python -c "from mcp.server.fastmcp import FastMCP; print('ok')"</code></pre>
+
+      <p class="detail-paragraph">
+        <code>pip show</code> should report <code>Version: 1.29.0</code> (or another 1.x release), and the last line should print <code>ok</code>.
+      </p>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/Python環境驗證成功.png"
+          alt="PowerShell: pip show mcp reports Version 1.29.0, followed by the import FastMCP test command printing ok"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">What both commands look like when they work: version <code>1.29.0</code>, and <code>ok</code> at the end.</figcaption>
+      </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          The <code>&gt;=1.0,&lt;2.0</code> part <strong>must not be dropped or changed</strong>. MCP SDK 2.0 removed the style this course uses, so a 2.x install turns every later code sample into an <code>ImportError</code>.
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Once you see <code>ok</code>, your machine is ready to build its own MCP Server.
         </p>
       </div>
 
@@ -500,6 +639,36 @@ week3.md</code></pre>
         You can read it as: <strong>this tool hands its execution result back to AI</strong>.
       </p>
 
+      <!-- Optional appendix: VS Code -->
+      <h2 class="detail-heading">Appendix: If You'd Rather Use VS Code</h2>
+      <p class="detail-paragraph">
+        This page runs entirely on PowerShell — <strong>VS Code isn't required</strong>. If you're used to writing code in an editor, you can install it separately:
+      </p>
+
+      <ol class="setup-list">
+        <li class="setup-item">
+          <span class="setup-num">1</span>
+          <p class="setup-text">Install <strong>VS Code</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">2</span>
+          <p class="setup-text">Click <strong>Extensions</strong> on the left sidebar, search for <strong>Python</strong>, and install the <strong>Python extension by Microsoft</strong></p>
+        </li>
+        <li class="setup-item">
+          <span class="setup-num">3</span>
+          <div class="setup-body">
+            <p class="setup-text">Press <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd> (on macOS, <kbd class="kbd">Cmd</kbd> + <kbd class="kbd">Shift</kbd> + <kbd class="kbd">P</kbd>) to open the Command Palette</p>
+            <p class="setup-text">Type <code>Python: Select Interpreter</code> and choose <code>Python 3.13.15</code></p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The VS Code Python extension <strong>does not include Python itself</strong> — it's an editor helper. If the list shows no Python versions at all, go back and check whether the install steps finished.
+        </p>
+      </div>
+
     </div>
   </section>
 </BaseLayout>
@@ -540,6 +709,13 @@ week3.md</code></pre>
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     line-height: 1.7;
+  }
+
+  .version-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
 
   /* Section headings */
@@ -611,6 +787,8 @@ week3.md</code></pre>
   :global(.callout-text) code,
   :global(.highlight-text) code,
   :global(.setup-text) code,
+  :global(.figure__caption) code,
+  :global(.info-table) td code,
   :global(.diff-card__desc) code {
     padding: 0.1em 0.4em;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -710,6 +888,90 @@ week3.md</code></pre>
   .callout-text strong {
     color: var(--color-heading);
     font-weight: 600;
+  }
+
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
+  }
+
+  /* Figure (screenshot) */
+  .figure {
+    /* Shrink to the image's own width so a narrower screenshot and its
+       caption stay aligned instead of the caption spanning the full column. */
+    width: fit-content;
+    max-width: 100%;
+    margin: var(--space-6) auto var(--space-8);
+    text-align: center;
+  }
+
+  .figure__img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .figure__caption {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .figure__caption strong {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+
+  /* Info table */
+  .info-table-wrapper {
+    margin: var(--space-4) 0 var(--space-6);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg);
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .info-table th,
+  .info-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    color: var(--color-text);
+    line-height: 1.8;
+    vertical-align: top;
+  }
+
+  .info-table th:last-child,
+  .info-table td:last-child {
+    border-right: none;
+  }
+
+  .info-table thead th {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+
+  .info-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .info-table tbody tr:hover {
+    background-color: var(--color-tag-bg);
+  }
+
+  .info-table strong {
+    color: var(--color-heading);
+    font-weight: 700;
   }
 
   /* Highlight card */

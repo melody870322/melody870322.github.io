@@ -765,7 +765,7 @@ A good MCP server is one where every tool, every piece of reference material, an
 
 <BaseLayout
   title="Building Your Own MCP Server: Implementation Steps — AI Agent Puzzle"
-  description="Turn the previous page's design into runnable code: create the project folder, install uv, write a minimal server.py, hook it up to Gemini CLI, add the full toolset, and run a complete reflection-draft flow. Each step ships with full commands and safety boundaries."
+  description="Turn the previous page's design into runnable code: create the project folder in PowerShell, install mcp, write a minimal server.py, register it with Gemini CLI, swap in the full toolset, and run a complete reflection-draft flow — plus three things that went wrong in testing and the safety boundaries that caught them."
   lang="en"
 >
   <section class="section">
@@ -777,8 +777,15 @@ A good MCP server is one where every tool, every piece of reference material, an
         <p class="detail-subtitle">
           On the previous page we sketched out the tool surface: four tools, one resource, one prompt. This page <strong>builds it</strong>. Each step ships with full commands. If a step doesn't pass, stop and fix it before moving on.
         </p>
-        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.54.4.</p>
+        <p class="version-note">The steps and screens on this page were verified against Gemini CLI v0.55.1, Python 3.13.15, and mcp SDK 1.29.0 on Windows PowerShell.</p>
       </header>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The main track on this page is the <strong>classroom-machine route</strong>: PowerShell, no VS Code, no administrator rights.<br/>
+          If you're on your own laptop and prefer to manage the project with uv, every step has a collapsible alternative.
+        </p>
+      </div>
 
       <!-- ============ Part 1: Get a minimal version running ============ -->
       <div class="part-divider">
@@ -789,35 +796,93 @@ A good MCP server is one where every tool, every piece of reference material, an
       <!-- STEP 1 -->
       <div class="case-header">
         <p class="case-label">STEP 1</p>
-        <h2 class="case-title">Create a Project Folder in VS Code</h2>
+        <h2 class="case-title">Create a Project Folder in PowerShell</h2>
       </div>
 
       <p class="detail-paragraph">
-        Create a folder somewhere convenient, named <code>my-first-mcp-server</code>. Then open VS Code and choose <strong>File → Open Folder</strong>, and pick the folder you just created.
+        Open a <strong>fresh</strong> PowerShell window, step out of any system folder, and confirm the Python environment:
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">cd $HOME</code></pre>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">$env:Path = "$env:LocalAppData\Programs\Python\Python313;$env:LocalAppData\Programs\Python\Python313\Scripts;" + $env:Path</code></pre>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">where.exe python
+python --version
+python -m pip --version</code></pre>
 
       <p class="detail-paragraph">
-        Once it's open, create the following folders and files in the file explorer:
+        Check three things: the first line from <code>where.exe</code> is the <code>…\Programs\Python\Python313</code> one, Python reports 3.13.x, and pip reports a version.
       </p>
 
-      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
-├─ server.py
-├─ class_notes/
-│  ├─ ai_agent_basics.md
-│  └─ mcp_tools_resources_prompts.md
-└─ drafts/</code></pre>
+      <div class="callout-card">
+        <p class="callout-text">
+          That second PATH command only affects the current PowerShell window. Close the window and reopen it, and you have to paste it again.
+        </p>
+      </div>
 
-      <ul class="check-list">
-        <li><code>server.py</code> — our MCP server program</li>
-        <li><code>class_notes/</code> — holds the original class notes</li>
-        <li><code>drafts/</code> — holds reflection drafts the AI creates</li>
-      </ul>
+      <p class="detail-paragraph">Now create the project folder:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path "$HOME\mcp-test" -Force
+cd "$HOME\mcp-test"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If you already created <code>mcp-test</code>, just run the second line, <code>cd</code>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">Create two subfolders:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path "class_notes" -Force
+New-Item -ItemType Directory -Path "drafts" -Force</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If you already have <code>class_notes</code> and <code>drafts</code>, skip these two lines — <code>dir</code> will confirm.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Finally, drop in a class note so the tools have something to read later. <strong>Everything from <code>@'</code> to <code>'@</code> is one unit: copy the whole block, and the closing <code>'@</code> must sit at the start of its line</strong>:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+MCP is the bridge between a model and its tools.
+'@ | Set-Content class_notes\week1.md -Encoding UTF8</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          If <code>class_notes</code> already has <code>week1.md</code>, skip this block. Always add <code>-Encoding UTF8</code> for files containing non-ASCII text.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">The resulting layout:</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>mcp-test/
+├─ server.py          (created in the next step)
+├─ class_notes/
+│  └─ week1.md
+└─ drafts/</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
           The point: <strong>scope what the AI can touch to this folder.</strong> Don't let it read your whole machine on day one, and don't point it at anything important right away.
         </p>
       </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Own laptop: if you'd rather use VS Code</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            You can open <code>mcp-test</code> with VS Code's <strong>File → Open Folder</strong> and run every command above in the integrated terminal — the effect is identical. The classroom machines don't have VS Code, so this page's main track uses PowerShell throughout.
+          </p>
+        </div>
+      </details>
 
       <!-- STEP 2 -->
       <div class="case-header">
@@ -826,66 +891,62 @@ A good MCP server is one where every tool, every piece of reference material, an
       </div>
 
       <p class="detail-paragraph">
-        Time to install the MCP Python SDK. Two options.
+        Install the MCP Python SDK. This course pins the 1.x line:
       </p>
 
-      <h3 class="sub-heading">Option 1: Install with uv (recommended)</h3>
-      <p class="detail-paragraph">
-        With uv, first make sure VS Code has <code>my-first-mcp-server</code> open. Then in VS Code's integrated terminal, run:
-      </p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-uv init</code></pre>
-
-      <p class="detail-paragraph">
-        The first command is uv's official Windows installer. The second <strong>initializes the current folder as a uv project</strong>.
-      </p>
-
-      <p class="detail-paragraph">Then run:</p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">uv add "mcp[cli]"</code></pre>
-
-      <p class="detail-paragraph">
-        This adds the MCP packages to the project.
-      </p>
+      <pre class="code-block" is:raw><code class="lang-powershell">python -m pip install "mcp[cli]>=1.0,<2.0"</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
-          Two reasons to use uv: (1) it keeps the project's environment together, so when Gemini CLI starts the MCP server it can do so via <code>uv run</code>; (2) it makes <strong>package and virtual-env management cleaner and more consistent</strong>, so different projects don't clobber each other.
+          Already installed? Skip it. Run <code>python -m pip show mcp</code> first — if you see <code>Version: 1.29.0</code>, there's nothing to do.
         </p>
       </div>
+
+      <p class="detail-paragraph">Confirm the install:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">python -m pip show mcp</code></pre>
+
+      <p class="detail-paragraph">Verified output (excerpt):</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Name: mcp
+Version: 1.29.0
+Summary: Model Context Protocol SDK
+Location: C:\Users\your-account\AppData\Local\Programs\Python\Python313\Lib\site-packages</code></pre>
+
+      <p class="detail-paragraph">
+        Writing <code>python -m pip</code> rather than bare <code>pip</code> means: <strong>use the current Python</strong> to run pip. Machines often have more than one Python, and bare <code>pip</code> may install into an environment you didn't expect.
+      </p>
 
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">Option 2: Install with pip</span>
+          <span class="details-card__title">Own laptop, alternative: manage the project with uv</span>
           <span class="details-card__hint">Click to expand</span>
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            With pip, in VS Code's integrated terminal:
+            uv gives each project its own isolated environment, which suits your own laptop. If you go the uv route, the <code>command</code> and <code>args</code> values in STEP 5 will differ from what's shown there. This page doesn't cover that — see uv's official documentation.
           </p>
-          <pre class="code-block" is:raw><code class="lang-shell">python -m venv .venv</code></pre>
           <p class="detail-paragraph">
-            This creates a <code>.venv</code> virtual environment in the project. Then activate it.
+            Make sure you're inside the <code>mcp-test</code> folder, then run:
           </p>
-          <p class="detail-paragraph">On Windows PowerShell:</p>
-          <pre class="code-block" is:raw><code class="lang-shell">.venv\Scripts\Activate.ps1</code></pre>
-          <p class="detail-paragraph">On macOS or Linux:</p>
-          <pre class="code-block" is:raw><code class="lang-shell">source .venv/bin/activate</code></pre>
-          <p class="detail-paragraph">Once activated, install MCP:</p>
-          <pre class="code-block" is:raw><code class="lang-shell">python -m pip install "mcp[cli]"</code></pre>
+          <pre class="code-block" is:raw><code class="lang-powershell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv init</code></pre>
           <p class="detail-paragraph">
-            What this means: <strong>use the current Python</strong> to run pip install. Avoid plain <code>pip install "mcp[cli]"</code> — sometimes there are multiple Pythons on a machine and bare <code>pip</code> may install into an environment you didn't expect.
+            The first command is uv's official Windows installer. The second <strong>initializes the current folder as a uv project</strong>.
           </p>
+          <p class="detail-paragraph">Then run:</p>
+          <pre class="code-block" is:raw><code class="lang-powershell">uv add "mcp[cli]>=1.0,<2.0"</code></pre>
+          <p class="detail-paragraph">
+            This adds the MCP packages to the project.
+          </p>
+          <div class="callout-card">
+            <p class="callout-text">
+              Two reasons to use uv: (1) it keeps the project's environment together, so when Gemini CLI starts the MCP server it can do so via <code>uv run</code>; (2) it makes <strong>package and virtual-env management cleaner and more consistent</strong>, so different projects don't clobber each other.
+            </p>
+          </div>
         </div>
       </details>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          This guide <strong>uses Option 1</strong> because it teaches a useful habit: a dedicated virtual environment per project. Every step below assumes Option 1.
-        </p>
-      </div>
 
       <!-- STEP 3 -->
       <div class="case-header">
@@ -894,22 +955,22 @@ uv init</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        Open <code>server.py</code> and drop this in:
+        Run this in PowerShell (copy the whole block; the closing <code>'@</code> must sit at the start of its line):
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-python">from mcp.server.fastmcp import FastMCP
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Course Notes Assistant")
-
 
 @mcp.tool()
 def hello() -> str:
     """Confirm the class-notes MCP server is up."""
     return "Class-notes MCP server is running."
 
-
 if __name__ == "__main__":
-    mcp.run()</code></pre>
+    mcp.run()
+'@ | Set-Content server.py -Encoding UTF8</code></pre>
 
       <p class="detail-paragraph">
         This program has <strong>one tool</strong>, <code>hello</code>. It doesn't read files. It doesn't create drafts. It just returns one line.
@@ -930,90 +991,309 @@ if __name__ == "__main__":
         </p>
       </div>
 
-      <!-- STEP 4 -->
+      <!-- STEP 3.5 -->
       <div class="case-header">
-        <p class="case-label">STEP 4</p>
-        <h2 class="case-title">Connect the MCP Server to Gemini CLI</h2>
+        <p class="case-label">STEP 3.5</p>
+        <h2 class="case-title">Run It Once Directly: Learn to Read "Hanging"</h2>
       </div>
 
       <p class="detail-paragraph">
-        Now Gemini CLI needs to know where this MCP server lives. In VS Code's file explorer, create a <code>.gemini</code> folder, then create <code>settings.json</code> inside it:
+        Before wiring it to Gemini CLI, run it ourselves to confirm the program is alive:
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-json">{
-  "mcpServers": {
-    "course-notes": {
-      "command": "uv",
-      "args": ["run", "python", "server.py"],
-      "cwd": "Replace with the full path to your project folder",
-      "timeout": 30000,
-      "trust": false,
-      "includeTools": ["hello"]
-    }
-  }
-}</code></pre>
+      <pre class="code-block" is:raw><code class="lang-powershell">python server.py</code></pre>
 
       <p class="detail-paragraph">
-        What this says: in the folder pointed to by <code>cwd</code>, run <code>uv run python server.py</code>. That is, <strong>start the MCP server using uv's project environment</strong>.
+        A warning prints first, and then it <strong>sits there doing nothing</strong>:
       </p>
 
-      <p class="detail-paragraph">
-        <code>cwd</code> examples:
-      </p>
-      <ul class="check-list">
-        <li>Windows: <code>"cwd": "C:/Users/your-name/Desktop/my-first-mcp-server"</code></li>
-        <li>macOS: <code>"cwd": "/Users/your-name/Desktop/my-first-mcp-server"</code></li>
-      </ul>
-
-      <p class="detail-paragraph">The final layout looks at least like this:</p>
-
-      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
-├─ .gemini/
-│  └─ settings.json
-├─ server.py
-├─ class_notes/
-└─ drafts/</code></pre>
+      <pre class="code-block" is:raw><code class="lang-text">C:\Users\your-account\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic_settings\sources\utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
-          Gemini CLI finds MCP servers via the <code>mcpServers</code> entry in <code>settings.json</code>. For stdio, it uses <code>command</code>, <code>args</code>, <code>cwd</code>, and similar fields.
+          That warning comes from inside the mcp SDK. It has <strong>nothing to do with your code, and it doesn't affect execution</strong>.<br/>
+          The screen going quiet after the warning <strong>is the success case</strong> — the server is standing by, waiting for someone to talk to it.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Press <code>Ctrl+C</code> to exit.
+      </p>
+
+      <p class="detail-paragraph">
+        When Gemini CLI starts it later, this warning won't appear on your screen, because the server is launched in the background.
+      </p>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">Prepare the API Key</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Create a <code>.gemini</code> folder in the project to hold Gemini CLI's config:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path ".gemini" -Force</code></pre>
+
+      <p class="detail-paragraph">
+        <strong>Replace "paste-your-key-here" on the first line with your own AI Studio key, then copy the whole block</strong> (<code>.env</code> holds ASCII only, so no <code>-Encoding UTF8</code> needed):
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+GEMINI_API_KEY=paste-your-key-here
+'@ | Set-Content .gemini\.env</code></pre>
+
+      <p class="detail-paragraph">Confirm it was written:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Get-Content .gemini\.env</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>.env</code> holds your private key. Don't upload it, and don't paste it into a group chat.
         </p>
       </div>
 
       <!-- STEP 5 -->
       <div class="case-header">
         <p class="case-label">STEP 5</p>
-        <h2 class="case-title">Verify the MCP Server Connected</h2>
+        <h2 class="case-title">Register the MCP Server</h2>
       </div>
 
       <p class="detail-paragraph">
-        With the config in place, start Gemini CLI from VS Code's integrated terminal:
+        Don't hand-write the config file. Generate it with a Gemini CLI command, then open it and see what it wrote — that way you can't fat-finger a bracket.
       </p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
-
-      <p class="detail-paragraph">Once inside Gemini CLI, type:</p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
 
       <p class="detail-paragraph">
-        If <code>course-notes</code> shows up as connected, ask Gemini to try the tool:
+        <strong>Make sure you're inside the <code>mcp-test</code> folder</strong>, then run:
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli mcp add course-notes python server.py</code></pre>
+
+      <p class="detail-paragraph">Success prints one line:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">MCP server "course-notes" added to project settings. (stdio)</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          A few blue <code>npm notice</code> lines may follow, telling you a newer npm is available.<br/>
+          <strong>That's npx printing its own message. It has nothing to do with us — ignore it, and don't run the update.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        That <code>(stdio)</code> tells us the CLI recognized this as a <strong>local stdio server</strong> — it will start a Python program on your machine and talk to it over standard input and output, rather than reaching out to a URL.
+      </p>
+
+      <p class="detail-paragraph">Open the generated file and see what it wrote:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">notepad .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">The verified output:</p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ]
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">Only two fields — far simpler than you'd expect:</p>
+
+      <ul class="check-list">
+        <li><code>command</code> is "what program to run" — here, <code>python</code></li>
+        <li><code>args</code> is "what to feed it" — here, <code>server.py</code></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        Together that's <code>python server.py</code> — exactly the line you ran by hand in STEP 3.5. The only difference: this time Gemini CLI runs it for you.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>args</code> says <code>server.py</code>, which is a <strong>relative path</strong> — no full folder location.<br/>
+          Which means: <strong>you must start Gemini CLI from inside the <code>mcp-test</code> folder</strong>, or it won't find <code>server.py</code>.<br/>
+          From now on, the first thing you do in every class is <code>cd "$HOME\mcp-test"</code>.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        Now add the allowed-tools list. There's only one tool, <code>hello</code>, so that's all we expose. <strong>Copy the whole block to overwrite the file</strong> (ASCII only, so no <code>-Encoding UTF8</code>):
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ],
+      "includeTools": [
+        "hello"
+      ]
+    }
+  }
+}
+'@ | Set-Content .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">Confirm:</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Get-Content .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">
+        <code>includeTools</code> means: <strong>of the tools in this server, only the ones on the list can be used.</strong> With a single tool it looks redundant, but this is a habit worth forming on day one.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The <code>mcp add</code> command <strong>overwrites</strong> any existing <code>includeTools</code> setting, and it won't warn you.<br/>
+          So the order is always: <strong>run <code>mcp add</code> first, then add <code>includeTools</code></strong> — never the other way round.
+        </p>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">Start Gemini CLI and Call Your First Tool</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        <strong>Make sure you're inside the <code>mcp-test</code> folder</strong>, then start the CLI:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">
+        The <code>--model</code> flag pins the model to <code>gemini-3.5-flash-lite</code>. After startup, the status bar in the bottom right shows the model name, so you can confirm it.
+      </p>
+
+      <h3 class="sub-heading">Gate 1: Trust this folder</h3>
+
+      <p class="detail-paragraph">
+        The first time you start in this folder, a line appears near the top:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Skipping project agents due to untrusted folder. To enable, ensure that the project root is trusted.</code></pre>
+
+      <p class="detail-paragraph">Then a prompt appears:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Do you trust the files in this folder?
+
+Trusting a folder allows Gemini CLI to load its local configurations, including
+custom commands, hooks, MCP servers, agent skills, and settings. These
+configurations could execute code on your behalf or change the behavior of the CLI.
+
+This folder contains:
+  • MCP Servers (1):
+    - course-notes
+
+  1. Trust folder (mcp-test)
+  2. Trust parent folder (yw446)
+  3. Don't trust</code></pre>
+
+      <p class="detail-paragraph">
+        Note those middle lines: the CLI is telling you, unprompted, that "<strong>this folder contains one MCP server, named course-notes</strong>" — precisely the one you just registered. It's asking whether to let it through.
+      </p>
+
+      <p class="detail-paragraph">
+        <strong>Choose 1. Trust folder.</strong> The CLI then restarts itself:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Gemini CLI is restarting to apply the trust changes...</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Without trusting the folder, <strong>nothing in <code>.gemini</code> loads</strong> — the MCP server won't appear, and the key won't be read either.<br/>
+          The prompt only shows the first time; the CLI remembers. But classroom machines reset on every reboot, so you'll pick it again each class.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Gate 2: Check the status bar</h3>
+
+      <p class="detail-paragraph">After the restart, the status bar at the bottom:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">workspace (/directory)          sandbox                    /model
+~\mcp-test                      no sandbox        gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">
+        On the left is the working folder (should be <code>~\mcp-test</code>); on the right, the model (should be <code>gemini-3.5-flash-lite</code>). Further right it also shows <code>1 MCP server</code>.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          Confirm the model by reading the status bar — that's all. <strong>Don't type the <code>/model</code> command</strong>: pressing Enter on that screen can switch you to auto-routing, which sends you to a model we have no free quota for.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Gate 3: Check the tool connected</h3>
+
+      <p class="detail-paragraph">Type:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/mcp list</code></pre>
+
+      <p class="detail-paragraph">Verified screen:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Configured MCP servers:
+
+🟢 course-notes – Ready (1 tool)
+  Tools:
+  - mcp_course-notes_hello</code></pre>
+
+      <p class="detail-paragraph">
+        A green <code>Ready</code> means it's connected. The tool's full name gained an <code>mcp_course-notes_</code> prefix, added automatically by the CLI to distinguish same-named tools across servers.
+      </p>
+
+      <h3 class="sub-heading">Call it</h3>
+
+      <p class="detail-paragraph">Type this:</p>
 
       <blockquote class="prompt-example">
         Please call the hello tool from course-notes.
       </blockquote>
 
-      <p class="detail-paragraph">If it replies:</p>
+      <p class="detail-paragraph">
+        Gemini explains what it intends to do, then a confirmation box appears:
+      </p>
 
-      <blockquote class="prompt-example">
-        Class-notes MCP server is running.
-      </blockquote>
+      <pre class="code-block" is:raw><code class="lang-text">Action Required
+
+?  hello (course-notes MCP Server) {}
+
+MCP Server: course-notes
+Tool: hello
+
+Allow execution of MCP tool "hello" from server "course-notes"?
+
+  1. Allow once
+  2. Allow tool for this session
+  3. Allow all server tools for this session
+  4. No, suggest changes (esc)</code></pre>
+
+      <p class="detail-paragraph"><strong>Choose 1. Allow once.</strong></p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This box is the <strong>last line of defence</strong>. It spells out exactly which tool the AI wants to use and what arguments it's carrying.<br/>
+          This course always picks <code>1. Allow once</code> — look at it every single time. You'll see shortly why that matters.
+        </p>
+      </div>
+
+      <p class="detail-paragraph">The reply:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  hello (course-notes MCP Server) {}
+
+Class-notes MCP server is running.</code></pre>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          That's the first step done.<br/>
-          <strong>The minimal version runs inside Gemini CLI.</strong>
+          <strong>The minimal version runs inside Gemini CLI.</strong><br/>
+          That line came back from Python code you wrote yourself.
         </p>
       </div>
 
@@ -1023,15 +1303,25 @@ if __name__ == "__main__":
         <span class="part-text">Add the Real Tools</span>
       </div>
 
-      <!-- STEP 6 -->
+      <!-- STEP 7 -->
       <div class="case-header">
-        <p class="case-label">STEP 6</p>
-        <h2 class="case-title">Upgrade server.py to the Full Version</h2>
+        <p class="case-label">STEP 7</p>
+        <h2 class="case-title">Swap server.py for the Full Version</h2>
       </div>
 
+      <p class="detail-paragraph">First, leave Gemini CLI:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/quit</code></pre>
+
       <p class="detail-paragraph">
-        With <code>hello</code> working, we can start adding tools that do real work. Replace <code>server.py</code> with this version:
+        Put the full <code>server.py</code> your instructor provides into the <code>mcp-test</code> folder, replacing the minimal version. Drag it in with File Explorer, or use a command (adjust the source path to wherever the file actually is):
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Copy-Item "$HOME\Downloads\server.py" -Destination "$HOME\mcp-test\server.py" -Force</code></pre>
+
+      <p class="detail-paragraph">Confirm it's the full version (should be 129 lines):</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">(Get-Content server.py).Count</code></pre>
 
       <details class="details-card details-card--code">
         <summary class="details-card__summary">
@@ -1063,22 +1353,34 @@ if __name__ == "__main__":
         </p>
       </div>
 
-      <!-- STEP 7 -->
+      <!-- STEP 8 -->
       <div class="case-header">
-        <p class="case-label">STEP 7</p>
-        <h2 class="case-title">Update Gemini CLI's Allowed-Tools List</h2>
+        <p class="case-label">STEP 8</p>
+        <h2 class="case-title">Update the Allowed-Tools List</h2>
       </div>
 
       <p class="detail-paragraph">
-        Earlier, <code>settings.json</code> only exposed <code>hello</code>. Now we have more tools, so update <code>includeTools</code> to:
+        There are four tools now, so fill out the list. Copy the whole block to overwrite the file:
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-json">"includeTools": [
-  "hello",
-  "list_notes",
-  "read_note",
-  "create_reflection_draft"
-]</code></pre>
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ],
+      "includeTools": [
+        "hello",
+        "list_notes",
+        "read_note",
+        "create_reflection_draft"
+      ]
+    }
+  }
+}
+'@ | Set-Content .gemini\settings.json</code></pre>
 
       <p class="detail-paragraph">
         We're keeping <code>includeTools</code>. The reason:
@@ -1095,89 +1397,325 @@ if __name__ == "__main__":
         Expose only what's needed right now. When you add riskier tools later (delete a file, modify the originals, hit an external API), this discipline matters even more.
       </p>
 
-      <!-- STEP 8 -->
-      <div class="case-header">
-        <p class="case-label">STEP 8</p>
-        <h2 class="case-title">Drop In Two Sample Notes</h2>
-      </div>
-
-      <p class="detail-paragraph">
-        For <code>list_notes</code> and <code>read_note</code> to have something to work with, we put two sample notes inside <code>class_notes/</code>.
-      </p>
-
-      <details class="details-card details-card--code">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">ai_agent_basics.md sample content</span>
-          <span class="details-card__hint">Click to expand (copy as a whole)</span>
-        </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
-        </div>
-      </details>
-
-      <details class="details-card details-card--code">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">mcp_tools_resources_prompts.md sample content</span>
-          <span class="details-card__hint">Click to expand (copy as a whole)</span>
-        </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
-        </div>
-      </details>
-
       <!-- STEP 9 -->
       <div class="case-header">
         <p class="case-label">STEP 9</p>
-        <h2 class="case-title">Run Your First Full Flow</h2>
+        <h2 class="case-title">Confirm the Note Is Still There</h2>
       </div>
 
       <p class="detail-paragraph">
-        Test it inside Gemini CLI. Start with:
+        <code>list_notes</code> and <code>read_note</code> need something to read. We created <code>week1.md</code> back in STEP 1 — confirm it's still there:
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">dir class_notes</code></pre>
+
+      <p class="detail-paragraph">
+        If you see <code>week1.md</code>, carry on. (Classroom machines reset on every reboot, so this is where you'd re-run STEP 1's file-creation command.)
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">Optional extra: two longer sample notes</span>
+          <span class="details-card__hint">Click to expand</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            <strong>These two notes are not part of the class flow — they're for anyone who wants to run a few more rounds on their own.</strong> Class only uses <code>week1.md</code>.
+          </p>
+          <p class="detail-paragraph">
+            To try them, save the contents as <code>class_notes\ai_agent_basics.md</code> and <code>class_notes\mcp_tools_resources_prompts.md</code>, and <code>list_notes</code> will list them alongside.
+          </p>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">ai_agent_basics.md sample content</span>
+              <span class="details-card__hint">Click to expand (copy as a whole)</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
+            </div>
+          </details>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">mcp_tools_resources_prompts.md sample content</span>
+              <span class="details-card__hint">Click to expand (copy as a whole)</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <!-- STEP 10 -->
+      <div class="case-header">
+        <p class="case-label">STEP 10</p>
+        <h2 class="case-title">Run One Complete Round</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        Restart the CLI (<strong>remember: from inside the <code>mcp-test</code> folder</strong>):
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">First confirm all four tools came up:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/mcp list</code></pre>
+
+      <p class="detail-paragraph">Verified screen:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Configured MCP servers:
+
+🟢 course-notes – Ready (4 tools, 1 prompt, 1 resource)
+  Tools:
+  - mcp_course-notes_create_reflection_draft
+  - mcp_course-notes_hello
+  - mcp_course-notes_list_notes
+  - mcp_course-notes_read_note
+  Prompts:
+  - draft_reflection
+  Resources:
+  - reflection_rules (course://reflection-rules) [text/plain]</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The three things from the previous page — <strong>tools, resource, prompt</strong> — all show up at once on this screen.<br/>
+          Tools are sorted alphabetically, which is why <code>create_reflection_draft</code> comes first rather than in the order you wrote them.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Line 1: confirm the server is alive</h3>
+
+      <blockquote class="prompt-example">
+        Please call the hello tool from course-notes.
+      </blockquote>
+
+      <p class="detail-paragraph">
+        Reply: <code>Class-notes MCP server is running.</code>
+      </p>
+
+      <h3 class="sub-heading">Line 2: list the notes</h3>
 
       <blockquote class="prompt-example">
         Please list the class notes I currently have.
       </blockquote>
 
       <p class="detail-paragraph">
-        If it works, Gemini calls <code>list_notes</code> and shows the <code>.md</code> files inside <code>class_notes</code>. Next:
+        Gemini states its intent first ("list all class notes in the class_notes folder"), you pick <code>1. Allow once</code> in the confirmation box, and then:
       </p>
 
+      <pre class="code-block" is:raw><code class="lang-text">✓  list_notes (course-notes MCP Server) {}
+
+Available class notes:
+week1.md</code></pre>
+
+      <h3 class="sub-heading">Line 3: read the note</h3>
+
       <blockquote class="prompt-example">
-        Please read ai_agent_basics.md and pull out three key points.
+        Please read the contents of week1.md.
       </blockquote>
 
+      <p class="detail-paragraph">This time the confirmation box carries an argument:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">?  read_note (course-notes MCP Server) {"filename":"week1.md"}</code></pre>
+
+      <p class="detail-paragraph">Reply:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">MCP is the bridge between a model and its tools.</code></pre>
+
       <p class="detail-paragraph">
-        Now Gemini calls <code>read_note</code>, reads the chosen note, and organizes the content. Then:
+        The argument <code>&#123;"filename":"week1.md"&#125;</code> is something the AI worked out from your sentence on its own — you said "week1.md", so it dropped that string into the tool's <code>filename</code> field.
       </p>
 
+      <h3 class="sub-heading">Line 4: produce a draft — but confirm first</h3>
+
       <blockquote class="prompt-example">
-        Based on ai_agent_basics.md, with "my understanding of MCP" as the topic, please draft a class reflection for me.<br/>
+        Based on week1.md, with "my understanding of MCP" as the topic, please draft a class reflection for me.<br/>
         <strong>Don't create the file yet — show me the draft so I can confirm.</strong>
       </blockquote>
 
       <p class="detail-paragraph">
-        The important part: <strong>"Don't create the file yet — show me the draft so I can confirm."</strong> That keeps a human in the loop. The AI can read, organize, and draft; whether to actually write the file should still get a human checkpoint.
+        <strong>There's an important requirement in that sentence: "Don't create the file yet — show me the draft so I can confirm."</strong>
       </p>
 
       <p class="detail-paragraph">
-        Once the draft looks good:
-      </p>
-
-      <blockquote class="prompt-example">
-        Looks good. Please save it as a reflection draft titled "My Understanding of MCP."
-      </blockquote>
-
-      <p class="detail-paragraph">
-        Now Gemini can call <code>create_reflection_draft</code>.
+        What happened next is in the following section.
       </p>
 
       <!-- ============ Part 3: Boundaries and debugging ============ -->
       <div class="part-divider">
         <span class="part-label">PART 3</span>
         <span class="part-text">Boundaries and Debugging</span>
+      </div>
+
+      <!-- Tested: the AI wrote the file anyway -->
+      <h2 class="detail-heading">Tested: The AI Wrote the File Anyway</h2>
+
+      <p class="detail-paragraph">
+        In that last line of the previous section, we explicitly asked it not to create the file yet, and to show us the draft first.
+      </p>
+
+      <p class="detail-paragraph">
+        Gemini's summary line read "draft a reflection based on the contents of week1.md, <strong>for the user to confirm</strong>" — so it understood.
+      </p>
+
+      <p class="detail-paragraph">But the tool it then called was:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">?  create_reflection_draft (course-notes MCP Server) {"content":"Through the first week of the course, I learned that Model Context Protocol (MCP) is what connects large language models to ex…</code></pre>
+
+      <p class="detail-paragraph">
+        <code>create_reflection_draft</code> is the tool that <strong>actually writes a file</strong>. Press <code>Allow once</code> in the confirmation box and the file is created:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  Draft created: My_understanding_of_MCP.md</code></pre>
+
+      <p class="detail-paragraph">
+        And only then does it ask you: "Please confirm whether this content meets your needs."
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The file was already written before it asked whether you wanted it.</strong>
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This isn't a bug in the program, and it isn't a problem with MCP. This is what AI agents actually do:<br/>
+          <strong>they misjudge, they skip steps, and they act even when you said "not yet."</strong><br/><br/>
+          The only thing that can stop it is that confirmation box.<br/>
+          The box says <code>create_reflection_draft</code> in plain sight — one glance tells you it's about to write a file.<br/>
+          The right choice at that moment is <strong><code>4. No, suggest changes</code></strong>.<br/><br/>
+          This is exactly why this course always teaches <code>1. Allow once</code> rather than "allow for this session."<br/>
+          The moment you press "allow everything," nobody is watching this step any more.
+        </p>
+      </div>
+
+      <!-- Tested: the overwrite guard held, then the AI went around it -->
+      <h2 class="detail-heading">Tested: The Overwrite Guard Held, Then the AI Went Around It</h2>
+
+      <p class="detail-paragraph">
+        Next we said, "Looks good. Please save it as a reflection draft titled 'My understanding of MCP'."
+      </p>
+
+      <p class="detail-paragraph">
+        Gemini called the tool again with the same title, and hit the guard in the code:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  create_reflection_draft (course-notes MCP Server) {"title":"My understanding of MCP", …
+
+Draft already exists: My_understanding_of_MCP.md. I did not overwrite it. Please use a different title.</code></pre>
+
+      <p class="detail-paragraph">
+        <strong>The boundary held.</strong> The original file was not clobbered.
+      </p>
+
+      <p class="detail-paragraph">
+        But the story doesn't end there. Having seen that reply, Gemini <strong>changed the title to "My deeper understanding of MCP" on its own</strong> and called again — and this time it worked:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  Draft created: My_deeper_understanding_of_MCP.md</code></pre>
+
+      <p class="detail-paragraph">
+        It never asked whether you wanted a different title; it decided. (The confirmation box did still appear — it just showed the new title.)
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          The code's boundary blocked <strong>overwriting</strong>, which is what it was built to do, and it did it.<br/>
+          But the AI got around it by changing the title — because "rename it and create another one" is a perfectly legal operation.<br/><br/>
+          A boundary can block "actions that shouldn't happen." It cannot block "the AI reaching its own conclusion by legal means."<br/>
+          That gap still needs a human reading the confirmation box.
+        </p>
+      </div>
+
+      <!-- Tested: a resource has to be mentioned before it gets read -->
+      <h2 class="detail-heading">Tested: Reading the Resource vs. Not Reading It</h2>
+
+      <p class="detail-paragraph">
+        <code>course://reflection-rules</code> holds five rules. Rule 3 requires the draft to contain three sections: what I understood, where I'm still stuck, how I might apply this.
+      </p>
+
+      <p class="detail-paragraph">
+        But that draft above has <strong>none of them</strong> — it's one continuous block of prose. Rule 4, "if the source material is thin, flag it to the user, don't fill in gaps," wasn't followed either: <code>week1.md</code> is a single sentence, yet the AI expanded it into claims like "safely and in a standardised way, broadening the situations a model can be applied to" — content that simply isn't in the source.
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>The resource was sitting right there, and it was not read automatically.</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        So we asked the AI to go check this server's state. It did the following:
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  List MCP Resources    List MCP resources
+Listed 1 resources.
+
+✓  Read MCP Resource    Read MCP resource "reflection_rules" from server "course-notes"
+Successfully read resource "reflection_rules" from server "course-notes"</code></pre>
+
+      <p class="detail-paragraph">
+        (<code>List MCP Resources</code> and <code>Read MCP Resource</code> are Gemini CLI's own built-in tools, not ours. That's how a resource gets read in.)
+      </p>
+
+      <p class="detail-paragraph">The draft produced after reading it looked like this:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">I have read and followed the reflection rules in course://reflection-rules,
+and rebuilt a compliant draft for you (covering "What I understood", "Where I'm still stuck",
+and "How I might apply this"):
+
+- Filename: Week_1_class_reflection.md
+- Content:
+  - What I understood
+    Model Context Protocol (MCP) is an important bridge connecting large language models
+    to external tools and data sources.
+  - Where I'm still stuck
+    I still need more hands-on experience with how MCP handles fine-grained permission
+    control and state synchronisation in a genuinely complex, multi-server setup.
+  - How I might apply this
+    When building custom tools or extending a model's capabilities in future, I can use
+    MCP to interface with all kinds of external resources in a standardised way.</code></pre>
+
+      <p class="detail-paragraph">Three tidy sections.</p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          So the nature of a resource is: <strong>a reference book on a shelf, not something memorised.</strong><br/>
+          The AI will go look it up when it needs to, but it won't look it up automatically every time.<br/><br/>
+          Which is exactly why prompts exist — <strong>a prompt's job is to write "consult course://reflection-rules first" explicitly into the flow</strong>, so that "going to the shelf" no longer depends on the AI's mood.
+        </p>
+      </div>
+
+      <!-- Tested: the prompt registers, but this CLI version has no entry point -->
+      <h2 class="detail-heading">Tested: The Prompt Registers, but This CLI Version Has No Entry Point</h2>
+
+      <p class="detail-paragraph">
+        On the <code>/mcp list</code> screen, <code>draft_reflection</code> is listed plainly under <code>Prompts:</code>. The server really is offering it.
+      </p>
+
+      <p class="detail-paragraph">
+        But in Gemini CLI v0.55.1, we could not find a way to invoke it:
+      </p>
+
+      <ul class="cross-list">
+        <li>The autocomplete list after typing <code>/</code> contains only built-in CLI commands (<code>clear</code>, <code>compress</code>, <code>directory</code>, <code>docs</code>, <code>rewind</code>…) — no <code>draft_reflection</code></li>
+        <li>Typing <code>/course-notes</code> isn't treated as a command; it's sent to Gemini as an ordinary sentence</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This is not a mistake in your code. The prompt is registered correctly and visible in the listing —<br/>
+          <strong>this version of Gemini CLI simply doesn't offer a way to call it</strong>.<br/><br/>
+          What a prompt is, why you'd want one, and how it differs from a tool: you already understand that.<br/>
+          Whether there's a button to press is the tool's problem, not yours.
+        </p>
       </div>
 
       <!-- Why creating new files is safer than modifying old ones -->
@@ -1226,6 +1764,29 @@ if __name__ == "__main__":
         Restricts reads to Markdown notes.
       </p>
 
+      <p class="detail-paragraph">Try it for real. Type:</p>
+
+      <blockquote class="prompt-example">
+        Please read week1.txt.
+      </blockquote>
+
+      <p class="detail-paragraph">Reply:</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  read_note (course-notes MCP Server) {"filename":"week1.txt"}
+
+Only .md notes are allowed for now.</code></pre>
+
+      <p class="detail-paragraph">
+        Note the <strong>green check</strong> in front, not a red error. The tool <strong>ran successfully</strong> — it just returned a sentence declining the request.
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          This is what "speak plainly when something goes wrong" looks like: not a screenful of red, but one readable sentence.<br/>
+          Gemini relays it back to you too: "I can't read week1.txt, because that tool currently only allows reading .md note files."
+        </p>
+      </div>
+
       <h3 class="sub-heading">Boundary 3: Don't overwrite</h3>
       <pre class="code-block" is:raw><code class="lang-python">if path.exists():
     return f"Draft already exists: {filename}. I did not overwrite it. Please use a different title."</code></pre>
@@ -1250,11 +1811,10 @@ if __name__ == "__main__":
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            Check that <code>settings.json</code> is in the right place. For project-level config, it should live at:
+            The most common cause is <strong>starting from the wrong place</strong>. The <code>args</code> in <code>settings.json</code> says <code>server.py</code>, a relative path, so you <strong>must start Gemini CLI from inside the <code>mcp-test</code> folder</strong>.
           </p>
-          <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/.gemini/settings.json</code></pre>
           <p class="detail-paragraph">
-            Then check that <code>cwd</code> points to your actual project folder. <strong>Often the code isn't wrong — Gemini CLI just doesn't know where to launch server.py from.</strong>
+            Run <code>cd "$HOME\mcp-test"</code> before starting; the bottom-left of the status bar should read <code>~\mcp-test</code>. Also confirm <code>.gemini\settings.json</code> really is under <code>mcp-test</code>.
           </p>
         </div>
       </details>
@@ -1262,17 +1822,15 @@ if __name__ == "__main__":
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">2. I installed via uv, but Gemini CLI can't find mcp</span>
+          <span class="details-card__title">2. It started, but all the tools are gone</span>
           <span class="details-card__hint">Click for the checklist</span>
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            Make sure <code>settings.json</code> is using the uv version:
+            Check whether you picked <code>1. Trust folder</code> at the trust prompt on startup.
           </p>
-          <pre class="code-block" is:raw><code class="lang-json">"command": "uv",
-"args": ["run", "python", "server.py"]</code></pre>
           <p class="detail-paragraph">
-            That way Gemini CLI launches the server through uv's project environment. Also confirm <code>cwd</code> points to the right folder — uv needs to find the project config there.
+            Without trusting the folder, <strong>nothing in <code>.gemini</code> loads</strong> — the MCP server won't appear, and the key in <code>.env</code> won't be read either. Restart and choose to trust it this time.
           </p>
         </div>
       </details>
@@ -1314,6 +1872,22 @@ if __name__ == "__main__":
               That's <strong>not a bug</strong> — it's a deliberate safety boundary.
             </p>
           </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">5. The filename on screen doesn't match the real filename</span>
+          <span class="details-card__hint">Click for the checklist</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            The CLI renders its messages as Markdown, so an underscore sitting next to a non-word character can be swallowed and turned into italics. With a Chinese title, for instance, the screen shows 「我對<em>MCP</em>的理解.md」 while the real filename is <code>我對_MCP_的理解.md</code>.
+          </p>
+          <p class="detail-paragraph">
+            <strong>The underscores are really in the filename.</strong> Check with <code>dir drafts</code> in PowerShell and you'll see the correct name.
+          </p>
         </div>
       </details>
 
