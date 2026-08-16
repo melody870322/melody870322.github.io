@@ -765,7 +765,7 @@ Prompt 是可以重複使用的工作流程。
 
 <BaseLayout
   title="自製 MCP Server：實作步驟 — AI Agent 拼圖"
-  description="把上一頁的觀念變成可以跑的程式：建專案資料夾、裝 uv、寫最小 server.py、接上 Gemini CLI、加上完整工具、跑一輪反思草稿流程。每一步都附上完整指令與安全邊界說明。"
+  description="把上一頁的觀念變成可以跑的程式：用 PowerShell 建專案資料夾、安裝 mcp、寫最小 server.py、註冊到 Gemini CLI、換成完整版工具、跑一輪反思草稿流程，並附上三段實測意外與安全邊界說明。"
   lang="zh"
 >
   <section class="section">
@@ -777,8 +777,15 @@ Prompt 是可以重複使用的工作流程。
         <p class="detail-subtitle">
           上一頁我們把工具面想清楚了：四個 tools、一個 resource、一個 prompt。這一頁開始<strong>動手把它做出來</strong>。每一步都會附上完整指令；如果中途某一步沒過，先停下來把它修好，再往下走。
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.55.1、Python 3.13.15、mcp SDK 1.29.0 於 Windows PowerShell 實測驗證。</p>
       </header>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這一頁的主線是<strong>教室電腦路線</strong>：PowerShell、不需要 VS Code、不需要管理員權限。<br/>
+          自備筆電、想用 uv 管理專案的同學，每一步都附有摺疊的替代做法。
+        </p>
+      </div>
 
       <!-- ============ Part 1: 先做一個能跑的最小版本 ============ -->
       <div class="part-divider">
@@ -789,35 +796,93 @@ Prompt 是可以重複使用的工作流程。
       <!-- STEP 1 -->
       <div class="case-header">
         <p class="case-label">STEP 1</p>
-        <h2 class="case-title">在 VS Code 建立專案資料夾</h2>
+        <h2 class="case-title">在 PowerShell 建立專案資料夾</h2>
       </div>
 
       <p class="detail-paragraph">
-        先在你習慣的位置建立一個資料夾，名稱叫做 <code>my-first-mcp-server</code>。接著打開 VS Code，選擇 <strong>File → Open Folder</strong>（中文介面：檔案 → 開啟資料夾），然後選剛剛建立的資料夾。
+        開啟一個<strong>新的</strong> PowerShell 視窗，先離開系統資料夾、確認 Python 環境：
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">cd $HOME</code></pre>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">$env:Path = "$env:LocalAppData\Programs\Python\Python313;$env:LocalAppData\Programs\Python\Python313\Scripts;" + $env:Path</code></pre>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">where.exe python
+python --version
+python -m pip --version</code></pre>
 
       <p class="detail-paragraph">
-        打開之後，請在 VS Code 左側檔案總管中建立下面這些資料夾和檔案：
+        檢查三件事：<code>where.exe</code> 的第一行要是 <code>…\Programs\Python\Python313</code> 那一個、Python 顯示 3.13.x、pip 要有版本號。
       </p>
 
-      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
-├─ server.py
-├─ class_notes/
-│  ├─ ai_agent_basics.md
-│  └─ mcp_tools_resources_prompts.md
-└─ drafts/</code></pre>
+      <div class="callout-card">
+        <p class="callout-text">
+          第二行 PATH 指令只影響目前這個 PowerShell 視窗。關掉視窗再開，要重貼一次。
+        </p>
+      </div>
 
-      <ul class="check-list">
-        <li><code>server.py</code> 是我們的 MCP Server 程式</li>
-        <li><code>class_notes/</code> 放原始課堂筆記</li>
-        <li><code>drafts/</code> 放 AI 幫我們建立的反思草稿</li>
-      </ul>
+      <p class="detail-paragraph">接著建立專案資料夾：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path "$HOME\mcp-test" -Force
+cd "$HOME\mcp-test"</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          已經建立過 <code>mcp-test</code> 的人，只要執行第二行 <code>cd</code> 就好。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">建立兩個子資料夾：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path "class_notes" -Force
+New-Item -ItemType Directory -Path "drafts" -Force</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          已經有 <code>class_notes</code> 和 <code>drafts</code> 的人跳過這兩行，用 <code>dir</code> 可以確認。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        最後放一份課堂筆記進去，讓之後的工具有東西可讀。<strong>從 <code>@'</code> 到 <code>'@</code> 是一個整體，整段複製，結尾的 <code>'@</code> 必須頂在行首</strong>：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+MCP 是模型與工具之間的橋樑。
+'@ | Set-Content class_notes\week1.md -Encoding UTF8</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>class_notes</code> 裡已經有 <code>week1.md</code> 的人跳過這一段。含中文的檔案一律加 <code>-Encoding UTF8</code>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">完成後的結構：</p>
+
+      <pre class="code-block code-block--tree" is:raw><code>mcp-test/
+├─ server.py          （下一步建立）
+├─ class_notes/
+│  └─ week1.md
+└─ drafts/</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
           這裡的重點是：<strong>先把 AI 能碰的範圍縮在這個資料夾裡。</strong>不要一開始就讓它讀整台電腦，也不要一開始就讓它碰很重要的資料。
         </p>
       </div>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">自備筆電：想用 VS Code 的話</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            可以用 VS Code 的 <strong>File → Open Folder</strong>（中文介面：檔案 → 開啟資料夾）開啟 <code>mcp-test</code>，在內建終端機執行上面所有指令，效果相同。教室電腦沒有 VS Code，本頁主線一律用 PowerShell。
+          </p>
+        </div>
+      </details>
 
       <!-- STEP 2 -->
       <div class="case-header">
@@ -826,66 +891,62 @@ Prompt 是可以重複使用的工作流程。
       </div>
 
       <p class="detail-paragraph">
-        接下來要安裝 MCP Python SDK。這裡提供兩種做法。
+        安裝 MCP Python SDK。本課程鎖定 1.x 版：
       </p>
 
-      <h3 class="sub-heading">做法一：使用 uv 安裝（推薦）</h3>
-      <p class="detail-paragraph">
-        如果你使用 uv，請先確認 VS Code 已經打開 <code>my-first-mcp-server</code> 這個資料夾。然後在 VS Code 內建終端機中執行：
-      </p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-uv init</code></pre>
-
-      <p class="detail-paragraph">
-        第一個指令是 uv 官方文件提供的 Windows 安裝方式。第二個指令會把目前資料夾<strong>初始化成一個 uv 專案</strong>。
-      </p>
-
-      <p class="detail-paragraph">接著執行：</p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">uv add "mcp[cli]"</code></pre>
-
-      <p class="detail-paragraph">
-        這個指令會把 MCP 需要的套件加到專案裡。
-      </p>
+      <pre class="code-block" is:raw><code class="lang-powershell">python -m pip install "mcp[cli]>=1.0,<2.0"</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
-          使用 uv 的好處是：第一，它會把專案環境整理在一起，之後 Gemini CLI 啟動 MCP Server 時，可以透過 <code>uv run</code> 執行；第二，讓 Python 專案的<strong>套件與虛擬環境管理更乾淨、更一致</strong>，避免不同專案之間的套件版本互相影響。
+          已經裝過的人跳過。先跑 <code>python -m pip show mcp</code>，看到 <code>Version: 1.29.0</code> 就不用再裝。
         </p>
       </div>
+
+      <p class="detail-paragraph">確認安裝結果：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">python -m pip show mcp</code></pre>
+
+      <p class="detail-paragraph">實測輸出（節錄）：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Name: mcp
+Version: 1.29.0
+Summary: Model Context Protocol SDK
+Location: C:\Users\你的帳號\AppData\Local\Programs\Python\Python313\Lib\site-packages</code></pre>
+
+      <p class="detail-paragraph">
+        寫成 <code>python -m pip</code> 而不是單獨的 <code>pip</code>，意思是：請用<strong>目前這個 Python</strong> 來執行 pip。電腦裡有時候不只一個 Python，單獨用 <code>pip</code> 可能會裝到沒有預期的環境。
+      </p>
 
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">做法二：使用 pip 安裝</span>
+          <span class="details-card__title">自備筆電替代做法：使用 uv 管理專案</span>
           <span class="details-card__hint">點擊展開</span>
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            如果你使用 pip，請在 VS Code 內建終端機中執行：
+            uv 會為每個專案建立獨立環境，適合自己的筆電。使用 uv 的話，後面 STEP 5 註冊 MCP Server 時，<code>command</code> 與 <code>args</code> 的內容會不一樣，本頁不涵蓋，請參考 uv 官方文件。
           </p>
-          <pre class="code-block" is:raw><code class="lang-shell">python -m venv .venv</code></pre>
           <p class="detail-paragraph">
-            這會在專案資料夾裡建立一個 <code>.venv</code> 虛擬環境。接著啟動它。
+            請先確認自己人在 <code>mcp-test</code> 這個資料夾裡，然後執行：
           </p>
-          <p class="detail-paragraph">如果你是 Windows PowerShell：</p>
-          <pre class="code-block" is:raw><code class="lang-shell">.venv\Scripts\Activate.ps1</code></pre>
-          <p class="detail-paragraph">如果你是 macOS 或 Linux：</p>
-          <pre class="code-block" is:raw><code class="lang-shell">source .venv/bin/activate</code></pre>
-          <p class="detail-paragraph">啟動後，再安裝 MCP：</p>
-          <pre class="code-block" is:raw><code class="lang-shell">python -m pip install "mcp[cli]"</code></pre>
+          <pre class="code-block" is:raw><code class="lang-powershell">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+uv init</code></pre>
           <p class="detail-paragraph">
-            它的意思是：請用<strong>目前這個 Python</strong> 來執行 pip 安裝。這裡不建議只寫 <code>pip install "mcp[cli]"</code>，因為有時候電腦裡會有很多個 Python，單純使用 <code>pip</code> 可能會裝到你沒有預期的環境。
+            第一個指令是 uv 官方文件提供的 Windows 安裝方式。第二個指令會把目前資料夾<strong>初始化成一個 uv 專案</strong>。
           </p>
+          <p class="detail-paragraph">接著執行：</p>
+          <pre class="code-block" is:raw><code class="lang-powershell">uv add "mcp[cli]>=1.0,<2.0"</code></pre>
+          <p class="detail-paragraph">
+            這個指令會把 MCP 需要的套件加到專案裡。
+          </p>
+          <div class="callout-card">
+            <p class="callout-text">
+              使用 uv 的好處是：第一，它會把專案環境整理在一起，之後 Gemini CLI 啟動 MCP Server 時，可以透過 <code>uv run</code> 執行；第二，讓 Python 專案的<strong>套件與虛擬環境管理更乾淨、更一致</strong>，避免不同專案之間的套件版本互相影響。
+            </p>
+          </div>
         </div>
       </details>
-
-      <div class="callout-card">
-        <p class="callout-text">
-          這份教學<strong>選擇做法一</strong>，因為可以幫助使用者建立一個重要觀念：為每個專案建立專屬的虛擬環境。後面所有步驟都基於做法一接續做。
-        </p>
-      </div>
 
       <!-- STEP 3 -->
       <div class="case-header">
@@ -894,22 +955,22 @@ uv init</code></pre>
       </div>
 
       <p class="detail-paragraph">
-        打開 <code>server.py</code>，先放入下面這段程式：
+        在 PowerShell 執行（整段複製，結尾 <code>'@</code> 頂在行首）：
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-python">from mcp.server.fastmcp import FastMCP
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Course Notes Assistant")
-
 
 @mcp.tool()
 def hello() -> str:
     """確認課堂筆記 MCP Server 已經啟動。"""
     return "課堂筆記 MCP Server 已經啟動。"
 
-
 if __name__ == "__main__":
-    mcp.run()</code></pre>
+    mcp.run()
+'@ | Set-Content server.py -Encoding UTF8</code></pre>
 
       <p class="detail-paragraph">
         這段程式只有<strong>一個 tool</strong>，叫做 <code>hello</code>。它沒有讀檔案，也沒有建立草稿。它只回傳一句話。
@@ -930,90 +991,309 @@ if __name__ == "__main__":
         </p>
       </div>
 
-      <!-- STEP 4 -->
+      <!-- STEP 3.5 -->
       <div class="case-header">
-        <p class="case-label">STEP 4</p>
-        <h2 class="case-title">把 MCP Server 接到 Gemini CLI</h2>
+        <p class="case-label">STEP 3.5</p>
+        <h2 class="case-title">先直接跑一次：看懂「卡住」</h2>
       </div>
 
       <p class="detail-paragraph">
-        接下來要讓 Gemini CLI 知道這個 MCP Server 在哪裡。在 VS Code 左側檔案總管中，建立 <code>.gemini</code> 資料夾，然後在裡面建立 <code>settings.json</code>：
+        在接上 Gemini CLI 之前，我們先自己跑一次，確認這支程式活著：
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-json">{
-  "mcpServers": {
-    "course-notes": {
-      "command": "uv",
-      "args": ["run", "python", "server.py"],
-      "cwd": "請改成你的專案資料夾完整路徑",
-      "timeout": 30000,
-      "trust": false,
-      "includeTools": ["hello"]
-    }
-  }
-}</code></pre>
+      <pre class="code-block" is:raw><code class="lang-powershell">python server.py</code></pre>
 
       <p class="detail-paragraph">
-        這裡的意思是：請 Gemini CLI 在 <code>cwd</code> 指定的資料夾中，執行 <code>uv run python server.py</code>，也就是<strong>用 uv 管理的專案環境來啟動 MCP Server</strong>。
+        畫面會先出現一段警告，然後<strong>停住不動</strong>：
       </p>
 
-      <p class="detail-paragraph">
-        <code>cwd</code> 範例：
-      </p>
-      <ul class="check-list">
-        <li>Windows：<code>"cwd": "C:/Users/你的名字/Desktop/my-first-mcp-server"</code></li>
-        <li>macOS：<code>"cwd": "/Users/你的名字/Desktop/my-first-mcp-server"</code></li>
-      </ul>
-
-      <p class="detail-paragraph">最後位置至少會長這樣：</p>
-
-      <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/
-├─ .gemini/
-│  └─ settings.json
-├─ server.py
-├─ class_notes/
-└─ drafts/</code></pre>
+      <pre class="code-block" is:raw><code class="lang-text">C:\Users\你的帳號\AppData\Local\Programs\Python\Python313\Lib\site-packages\pydantic_settings\sources\utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
-          Gemini CLI 會透過 <code>settings.json</code> 裡的 <code>mcpServers</code> 設定來找到 MCP Server；stdio 的設定會使用 <code>command</code>、<code>args</code>、<code>cwd</code> 這類欄位。
+          這段警告來自 mcp SDK 內部，<strong>與你的程式無關，也不影響執行</strong>。<br/>
+          警告印完之後畫面停住不動，<strong>這就是成功</strong>——server 正在待命，等著有人跟它說話。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        按 <code>Ctrl+C</code> 離開。
+      </p>
+
+      <p class="detail-paragraph">
+        之後由 Gemini CLI 啟動時，這段警告不會出現在你的畫面上，因為 server 是在背景被叫起來的。
+      </p>
+
+      <!-- STEP 4 -->
+      <div class="case-header">
+        <p class="case-label">STEP 4</p>
+        <h2 class="case-title">準備 API 金鑰</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        在專案裡建立 <code>.gemini</code> 資料夾，放 Gemini CLI 要用的設定：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">New-Item -ItemType Directory -Path ".gemini" -Force</code></pre>
+
+      <p class="detail-paragraph">
+        <strong>先把下面第一行的「貼上你的金鑰」換成你自己的 AI Studio 金鑰，再整段複製</strong>（<code>.env</code> 只放英數字，不需要 <code>-Encoding UTF8</code>）：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+GEMINI_API_KEY=貼上你的金鑰
+'@ | Set-Content .gemini\.env</code></pre>
+
+      <p class="detail-paragraph">確認寫進去了：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Get-Content .gemini\.env</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>.env</code> 裡是你的私人金鑰，不要上傳、不要貼在群組裡。
         </p>
       </div>
 
       <!-- STEP 5 -->
       <div class="case-header">
         <p class="case-label">STEP 5</p>
-        <h2 class="case-title">檢查 MCP Server 有沒有接成功</h2>
+        <h2 class="case-title">註冊 MCP Server</h2>
       </div>
 
       <p class="detail-paragraph">
-        設定完成後，請在 VS Code 內建終端機中啟動 Gemini CLI：
+        不要自己手寫設定檔。用 Gemini CLI 的指令產生，再打開來看它寫了什麼——這樣不會打錯標點符號。
       </p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">gemini</code></pre>
-
-      <p class="detail-paragraph">進入 Gemini CLI 之後，輸入：</p>
-
-      <pre class="code-block" is:raw><code class="lang-shell">/mcp list</code></pre>
 
       <p class="detail-paragraph">
-        如果你看到 <code>course-notes</code> 有成功連上，就可以請 Gemini 試試看：
+        <strong>確認你人在 <code>mcp-test</code> 資料夾裡</strong>，然後執行：
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli mcp add course-notes python server.py</code></pre>
+
+      <p class="detail-paragraph">成功會回一行：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">MCP server "course-notes" added to project settings. (stdio)</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這行之後可能還會跟著幾行藍色的 <code>npm notice</code>，提示 npm 有新版本可以更新。<br/>
+          <strong>那是 npx 順帶印出來的訊息，和我們無關，不用理它，也不要去更新。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        <code>(stdio)</code> 這個字告訴我們：CLI 認得這是一個<strong>本機的 stdio server</strong>——它會在你的電腦裡啟動一個 Python 程式，用標準輸入輸出跟它溝通，不是去連一個網址。
+      </p>
+
+      <p class="detail-paragraph">打開產生的檔案，看看它寫了什麼：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">notepad .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">實測產生的內容：</p>
+
+      <pre class="code-block" is:raw><code class="lang-json">{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ]
+    }
+  }
+}</code></pre>
+
+      <p class="detail-paragraph">只有兩個欄位，比想像中簡單很多：</p>
+
+      <ul class="check-list">
+        <li><code>command</code> 是「要執行什麼程式」——這裡是 <code>python</code></li>
+        <li><code>args</code> 是「要餵給它的參數」——這裡是 <code>server.py</code></li>
+      </ul>
+
+      <p class="detail-paragraph">
+        合起來就是 <code>python server.py</code>，跟你剛剛在 STEP 3.5 手動跑的那一行，一模一樣。差別只在於：這次是 Gemini CLI 幫你跑。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>args</code> 裡寫的是 <code>server.py</code>，是<strong>相對路徑</strong>——沒有寫完整的資料夾位置。<br/>
+          這代表：<strong>你必須在 <code>mcp-test</code> 資料夾裡啟動 Gemini CLI</strong>，否則它會找不到 <code>server.py</code>。<br/>
+          之後每次上課，第一件事都是 <code>cd "$HOME\mcp-test"</code>。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        接著加上工具開放清單。現在只有 <code>hello</code> 一個工具，我們就只開放它。<strong>整段複製覆蓋</strong>（純英數字，不需要 <code>-Encoding UTF8</code>）：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ],
+      "includeTools": [
+        "hello"
+      ]
+    }
+  }
+}
+'@ | Set-Content .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">確認：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Get-Content .gemini\settings.json</code></pre>
+
+      <p class="detail-paragraph">
+        <code>includeTools</code> 的意思是：<strong>這個 server 裡的工具，只有清單上的可以用。</strong>現在只有一個工具，看起來多此一舉，但這個習慣要從第一天養成。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          <code>mcp add</code> 指令會<strong>直接覆蓋</strong>既有的 <code>includeTools</code> 設定，而且不會提醒你。<br/>
+          所以順序一定是：<strong>先跑 <code>mcp add</code>，再加 <code>includeTools</code></strong>，不能反過來。
+        </p>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="case-header">
+        <p class="case-label">STEP 6</p>
+        <h2 class="case-title">啟動 Gemini CLI，呼叫第一個工具</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        <strong>確認你人在 <code>mcp-test</code> 資料夾裡</strong>，啟動 CLI：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">
+        <code>--model</code> 這個旗標把模型鎖在 <code>gemini-3.5-flash-lite</code>。啟動後右下角狀態列會顯示模型名稱，可以確認。
+      </p>
+
+      <h3 class="sub-heading">第一關：信任這個資料夾</h3>
+
+      <p class="detail-paragraph">
+        第一次在這個資料夾啟動，畫面上方會先出現一行提示：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Skipping project agents due to untrusted folder. To enable, ensure that the project root is trusted.</code></pre>
+
+      <p class="detail-paragraph">接著跳出詢問框：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Do you trust the files in this folder?
+
+Trusting a folder allows Gemini CLI to load its local configurations, including
+custom commands, hooks, MCP servers, agent skills, and settings. These
+configurations could execute code on your behalf or change the behavior of the CLI.
+
+This folder contains:
+  • MCP Servers (1):
+    - course-notes
+
+  1. Trust folder (mcp-test)
+  2. Trust parent folder (yw446)
+  3. Don't trust</code></pre>
+
+      <p class="detail-paragraph">
+        注意畫面中間那幾行：CLI 主動告訴你「<strong>這個資料夾裡有一個 MCP Server，名字叫 course-notes</strong>」——正是你剛剛註冊的那個。它在問你要不要放行。
+      </p>
+
+      <p class="detail-paragraph">
+        <strong>選 1. Trust folder。</strong>選了之後 CLI 會自己重啟一次：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Gemini CLI is restarting to apply the trust changes...</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          沒有選信任，<code>.gemini</code> 裡的設定<strong>全部不會載入</strong>——MCP Server 不會出現、金鑰也讀不到。<br/>
+          這個框只有第一次會出現，CLI 會記住。但教室電腦每次開機都會還原，所以每堂課都要重選一次。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">第二關：確認狀態列</h3>
+
+      <p class="detail-paragraph">重啟後畫面下方的狀態列：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">workspace (/directory)          sandbox                    /model
+~\mcp-test                      no sandbox        gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">
+        左邊是工作資料夾（要是 <code>~\mcp-test</code>），右邊是模型（要是 <code>gemini-3.5-flash-lite</code>）。右側還會顯示 <code>1 MCP server</code>。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          模型只用眼睛看狀態列確認就好。<strong>不要輸入 <code>/model</code> 指令</strong>——那個畫面按下 Enter 會誤切到自動路由，切到我們沒有免費額度的模型。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">第三關：確認工具接上了</h3>
+
+      <p class="detail-paragraph">輸入：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/mcp list</code></pre>
+
+      <p class="detail-paragraph">實測畫面：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Configured MCP servers:
+
+🟢 course-notes – Ready (1 tool)
+  Tools:
+  - mcp_course-notes_hello</code></pre>
+
+      <p class="detail-paragraph">
+        綠燈 <code>Ready</code> 就是接上了。工具的完整名字前面被加上了 <code>mcp_course-notes_</code> 這串前綴，是 CLI 自動加的，用來區分不同 server 的同名工具。
+      </p>
+
+      <h3 class="sub-heading">呼叫它</h3>
+
+      <p class="detail-paragraph">輸入這一句：</p>
 
       <blockquote class="prompt-example">
         請使用 course-notes 的 hello 工具。
       </blockquote>
 
-      <p class="detail-paragraph">如果它回覆：</p>
+      <p class="detail-paragraph">
+        Gemini 會先說明它打算做什麼，然後跳出確認框：
+      </p>
 
-      <blockquote class="prompt-example">
-        課堂筆記 MCP Server 已經啟動。
-      </blockquote>
+      <pre class="code-block" is:raw><code class="lang-text">Action Required
+
+?  hello (course-notes MCP Server) {}
+
+MCP Server: course-notes
+Tool: hello
+
+Allow execution of MCP tool "hello" from server "course-notes"?
+
+  1. Allow once
+  2. Allow tool for this session
+  3. Allow all server tools for this session
+  4. No, suggest changes (esc)</code></pre>
+
+      <p class="detail-paragraph"><strong>選 1. Allow once。</strong></p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這個框是<strong>最後一道防線</strong>。它清清楚楚寫著 AI 現在要用哪一個工具、帶什麼參數。<br/>
+          本課程一律選 <code>1. Allow once</code>——每一次都自己看一眼。後面你會看到為什麼這很重要。
+        </p>
+      </div>
+
+      <p class="detail-paragraph">回覆：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  hello (course-notes MCP Server) {}
+
+課堂筆記 MCP Server 已經啟動。</code></pre>
 
       <div class="highlight-card">
         <p class="highlight-text">
-          代表第一步成功。<br/>
-          <strong>最小版本已經能在 Gemini CLI 裡跑了。</strong>
+          <strong>最小版本已經能在 Gemini CLI 裡跑了。</strong><br/>
+          這句話是從你自己寫的 Python 程式回來的。
         </p>
       </div>
 
@@ -1023,15 +1303,25 @@ if __name__ == "__main__":
         <span class="part-text">加上真正的工具</span>
       </div>
 
-      <!-- STEP 6 -->
+      <!-- STEP 7 -->
       <div class="case-header">
-        <p class="case-label">STEP 6</p>
-        <h2 class="case-title">把 server.py 改成完整版</h2>
+        <p class="case-label">STEP 7</p>
+        <h2 class="case-title">把 server.py 換成完整版</h2>
       </div>
 
+      <p class="detail-paragraph">先離開 Gemini CLI：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/quit</code></pre>
+
       <p class="detail-paragraph">
-        確認 <code>hello</code> 成功之後，我們可以開始加入真正有用的工具。請把 <code>server.py</code> 改成下面這個版本：
+        把老師提供的完整版 <code>server.py</code> 放進 <code>mcp-test</code> 資料夾，覆蓋原本的最小版。可以用檔案總管拖曳，或用指令（來源路徑依實際位置調整）：
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">Copy-Item "$HOME\Downloads\server.py" -Destination "$HOME\mcp-test\server.py" -Force</code></pre>
+
+      <p class="detail-paragraph">確認是完整版（應該是 129 行）：</p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">(Get-Content server.py).Count</code></pre>
 
       <details class="details-card details-card--code">
         <summary class="details-card__summary">
@@ -1063,22 +1353,34 @@ if __name__ == "__main__":
         </p>
       </div>
 
-      <!-- STEP 7 -->
+      <!-- STEP 8 -->
       <div class="case-header">
-        <p class="case-label">STEP 7</p>
-        <h2 class="case-title">更新 Gemini CLI 的工具開放清單</h2>
+        <p class="case-label">STEP 8</p>
+        <h2 class="case-title">更新工具開放清單</h2>
       </div>
 
       <p class="detail-paragraph">
-        剛剛的 <code>settings.json</code> 只開放了 <code>hello</code>。現在我們有更多工具，可以把 <code>includeTools</code> 改成：
+        現在有四個工具了，把清單補齊。整段複製覆蓋：
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-json">"includeTools": [
-  "hello",
-  "list_notes",
-  "read_note",
-  "create_reflection_draft"
-]</code></pre>
+      <pre class="code-block" is:raw><code class="lang-powershell">@'
+{
+  "mcpServers": {
+    "course-notes": {
+      "command": "python",
+      "args": [
+        "server.py"
+      ],
+      "includeTools": [
+        "hello",
+        "list_notes",
+        "read_note",
+        "create_reflection_draft"
+      ]
+    }
+  }
+}
+'@ | Set-Content .gemini\settings.json</code></pre>
 
       <p class="detail-paragraph">
         這裡我們仍然保留 <code>includeTools</code>。原因是：
@@ -1095,89 +1397,321 @@ if __name__ == "__main__":
         現在需要哪些工具，就開哪些工具。以後如果新增更危險的工具（例如刪除檔案、修改原始筆記、呼叫外部 API），就更需要小心控制。
       </p>
 
-      <!-- STEP 8 -->
-      <div class="case-header">
-        <p class="case-label">STEP 8</p>
-        <h2 class="case-title">製作兩份範本筆記</h2>
-      </div>
-
-      <p class="detail-paragraph">
-        為了讓 <code>list_notes</code>、<code>read_note</code> 真的有東西可以讀，我們先在 <code>class_notes/</code> 放兩份範本筆記。
-      </p>
-
-      <details class="details-card details-card--code">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">ai_agent_basics.md 範本內容</span>
-          <span class="details-card__hint">點擊展開（可整段複製）</span>
-        </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
-        </div>
-      </details>
-
-      <details class="details-card details-card--code">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">mcp_tools_resources_prompts.md 範本內容</span>
-          <span class="details-card__hint">點擊展開（可整段複製）</span>
-        </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
-        </div>
-      </details>
-
       <!-- STEP 9 -->
       <div class="case-header">
         <p class="case-label">STEP 9</p>
-        <h2 class="case-title">試跑第一個完整流程</h2>
+        <h2 class="case-title">確認筆記還在</h2>
       </div>
 
       <p class="detail-paragraph">
-        接下來在 Gemini CLI 裡測試。先問：
+        <code>list_notes</code> 和 <code>read_note</code> 需要有東西可以讀。我們在 STEP 1 已經建立了 <code>week1.md</code>，確認它還在：
       </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">dir class_notes</code></pre>
+
+      <p class="detail-paragraph">
+        看到 <code>week1.md</code> 就可以往下走。（教室電腦每次開機會還原，這一步要重做 STEP 1 的建檔指令。）
+      </p>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">課後延伸：兩份較長的範本筆記</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            <strong>這兩份筆記不在課堂流程中，是給想自己多練幾輪的人用的。</strong>課堂只用 <code>week1.md</code>。
+          </p>
+          <p class="detail-paragraph">
+            想試的話，把內容存成 <code>class_notes\ai_agent_basics.md</code> 和 <code>class_notes\mcp_tools_resources_prompts.md</code>，<code>list_notes</code> 就會一起列出來。
+          </p>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">ai_agent_basics.md 範本內容</span>
+              <span class="details-card__hint">點擊展開（可整段複製）</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{aiAgentBasicsMd}</code></pre>
+            </div>
+          </details>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">mcp_tools_resources_prompts.md 範本內容</span>
+              <span class="details-card__hint">點擊展開（可整段複製）</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details code-block--md"><code class="lang-markdown">{mcpPrimitivesMd}</code></pre>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <!-- STEP 10 -->
+      <div class="case-header">
+        <p class="case-label">STEP 10</p>
+        <h2 class="case-title">跑一輪完整流程</h2>
+      </div>
+
+      <p class="detail-paragraph">
+        重新啟動 CLI（<strong>記得要在 <code>mcp-test</code> 資料夾裡</strong>）：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-powershell">npx @google/gemini-cli --model gemini-3.5-flash-lite</code></pre>
+
+      <p class="detail-paragraph">先確認四個工具都上來了：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">/mcp list</code></pre>
+
+      <p class="detail-paragraph">實測畫面：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">Configured MCP servers:
+
+🟢 course-notes – Ready (4 tools, 1 prompt, 1 resource)
+  Tools:
+  - mcp_course-notes_create_reflection_draft
+  - mcp_course-notes_hello
+  - mcp_course-notes_list_notes
+  - mcp_course-notes_read_note
+  Prompts:
+  - draft_reflection
+  Resources:
+  - reflection_rules (course://reflection-rules) [text/plain]</code></pre>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          上一頁講的三種東西——<strong>tools、resource、prompt</strong>——在這個畫面上一次全部出現了。<br/>
+          工具是照英文字母排序的，所以 <code>create_reflection_draft</code> 排在最前面，不是照你寫的順序。
+        </p>
+      </div>
+
+      <h3 class="sub-heading">第一句：確認 server 活著</h3>
+
+      <blockquote class="prompt-example">
+        請使用 course-notes 的 hello 工具。
+      </blockquote>
+
+      <p class="detail-paragraph">
+        回覆：<code>課堂筆記 MCP Server 已經啟動。</code>
+      </p>
+
+      <h3 class="sub-heading">第二句：列出筆記</h3>
 
       <blockquote class="prompt-example">
         請列出目前有哪些課堂筆記。
       </blockquote>
 
       <p class="detail-paragraph">
-        如果成功，Gemini 應該會呼叫 <code>list_notes</code>，然後列出 <code>class_notes</code> 裡面的 <code>.md</code> 檔案。接著問：
+        Gemini 會先說明意圖（「列出 class_notes 資料夾中的所有課堂筆記清單」），確認框選 <code>1. Allow once</code>，然後回：
       </p>
 
+      <pre class="code-block" is:raw><code class="lang-text">✓  list_notes (course-notes MCP Server) {}
+
+目前可以讀取的課堂筆記：
+week1.md</code></pre>
+
+      <h3 class="sub-heading">第三句：讀取筆記</h3>
+
       <blockquote class="prompt-example">
-        請讀取 ai_agent_basics.md，整理出三個重點。
+        請讀取 week1.md 的內容。
       </blockquote>
 
+      <p class="detail-paragraph">這次確認框上多了參數：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">?  read_note (course-notes MCP Server) {"filename":"week1.md"}</code></pre>
+
+      <p class="detail-paragraph">回覆：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">MCP 是模型與工具之間的橋樑。</code></pre>
+
       <p class="detail-paragraph">
-        這時 Gemini 應該會呼叫 <code>read_note</code>，讀取指定筆記，再根據內容整理。再來可以問：
+        參數 <code>&#123;"filename":"week1.md"&#125;</code> 是 AI 自己從你的話裡判斷出來的——你說了「week1.md」，它就把這個字串填進工具的 <code>filename</code> 欄位。
       </p>
 
+      <h3 class="sub-heading">第四句：產生草稿——但要先確認</h3>
+
       <blockquote class="prompt-example">
-        請根據 ai_agent_basics.md，以「我對 MCP 的理解」為主題，先幫我產生一份課堂反思草稿。<br/>
+        請根據 week1.md，以「我對 MCP 的理解」為主題，先幫我產生一份課堂反思草稿。<br/>
         <strong>不要直接建立檔案，先讓我確認內容。</strong>
       </blockquote>
 
       <p class="detail-paragraph">
-        這句話裡有一個很重要的地方：<strong>「不要直接建立檔案，先讓我確認內容。」</strong>這表示人還會在流程裡。AI 可以幫你讀資料、整理內容、產生草稿；但要不要寫入檔案，最好還是先讓人確認。
+        <strong>這一句話裡有一個很重要的要求：「不要直接建立檔案，先讓我確認內容。」</strong>
       </p>
 
       <p class="detail-paragraph">
-        確認草稿內容可以之後，再說：
-      </p>
-
-      <blockquote class="prompt-example">
-        可以，請把這份內容建立成反思草稿，標題是「我對 MCP 的理解」。
-      </blockquote>
-
-      <p class="detail-paragraph">
-        這時 Gemini 才適合呼叫 <code>create_reflection_draft</code>。
+        接下來發生的事，請看下一節。
       </p>
 
       <!-- ============ Part 3: 安全邊界與除錯 ============ -->
       <div class="part-divider">
         <span class="part-label">PART 3</span>
         <span class="part-text">安全邊界與除錯</span>
+      </div>
+
+      <!-- 實測：AI 直接把檔案寫下去了 -->
+      <h2 class="detail-heading">實測：AI 直接把檔案寫下去了</h2>
+
+      <p class="detail-paragraph">
+        上一節最後那句話，我們明確要求「不要直接建立檔案，先讓我確認內容」。
+      </p>
+
+      <p class="detail-paragraph">
+        Gemini 的說明列寫著「根據 week1.md 的內容草擬一份反思草稿，<strong>供使用者確認</strong>」——它理解了。
+      </p>
+
+      <p class="detail-paragraph">但它接著呼叫的工具是：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">?  create_reflection_draft (course-notes MCP Server) {"content":"透過第一週的課程，我了解到 Model Context Protocol (MCP) 是連接大型語言模型與外…</code></pre>
+
+      <p class="detail-paragraph">
+        <code>create_reflection_draft</code> 是<strong>會真的寫入檔案</strong>的那個工具。確認框按下 <code>Allow once</code> 之後，檔案就建好了：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  已建立草稿：我對_MCP_的理解.md</code></pre>
+
+      <p class="detail-paragraph">
+        然後它才問你：「請確認這份內容是否符合您的需求？」
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>檔案已經寫下去了，才問你要不要。</strong>
+        </p>
+      </div>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這不是程式的錯誤，也不是 MCP 的問題。這就是 AI Agent 的真實行為：<br/>
+          <strong>它會誤判、會跳步驟、會在你說「先不要」的時候還是動手。</strong><br/><br/>
+          而攔得住它的，只有那個確認框。<br/>
+          框上清清楚楚寫著 <code>create_reflection_draft</code>——只要看一眼，就知道它要寫檔了。<br/>
+          這時候該選的是 <strong><code>4. No, suggest changes</code></strong>。<br/><br/>
+          這就是為什麼本課程一律教 <code>1. Allow once</code>，而不是「這個 session 都允許」。<br/>
+          一旦按下「全部允許」，這一步就沒有人看著了。
+        </p>
+      </div>
+
+      <!-- 實測：防覆蓋擋下了，然後 AI 繞過去了 -->
+      <h2 class="detail-heading">實測：防覆蓋擋下了，然後 AI 繞過去了</h2>
+
+      <p class="detail-paragraph">
+        接著我們說「可以，請把這份內容建立成反思草稿，標題是『我對 MCP 的理解』」。
+      </p>
+
+      <p class="detail-paragraph">
+        Gemini 用同一個標題再呼叫一次，撞上了程式裡的防護：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  create_reflection_draft (course-notes MCP Server) {"title":"我對 MCP 的理解", …
+
+草稿已存在：我對_MCP_的理解.md。我沒有覆蓋它，請換一個標題。</code></pre>
+
+      <p class="detail-paragraph">
+        <strong>邊界守住了。</strong>原本的檔案沒有被蓋掉。
+      </p>
+
+      <p class="detail-paragraph">
+        但故事還沒完。Gemini 看到這個回覆之後，<strong>自己把標題改成「我對 MCP 的深刻理解」</strong>，再呼叫一次——這次成功了：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  已建立草稿：我對_MCP_的深刻理解.md</code></pre>
+
+      <p class="detail-paragraph">
+        它沒有問你要不要換標題，是自己決定的。（確認框還是有跳，但框上寫的是新標題。）
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          程式的邊界擋住了<strong>覆蓋</strong>這個動作，這是它該做的事，它做到了。<br/>
+          但 AI 換一個標題就繞過去了——因為「換標題再建一份」本來就是合法的操作。<br/><br/>
+          邊界能擋住的是「不該發生的動作」，擋不住「AI 用合法的方式達成它自己的判斷」。<br/>
+          這中間的空隙，還是要靠人看確認框。
+        </p>
+      </div>
+
+      <!-- 實測：resource 讀了與沒讀，成品差很多 -->
+      <h2 class="detail-heading">實測：resource 讀了與沒讀，成品差很多</h2>
+
+      <p class="detail-paragraph">
+        <code>course://reflection-rules</code> 裡寫了五條規則，其中第 3 條要求草稿必須包含三段：我理解了什麼、我還卡在哪裡、我可以怎麼應用。
+      </p>
+
+      <p class="detail-paragraph">
+        但上面那份草稿，<strong>一段都沒有</strong>——它只是一整段散文。第 4 條「資料不足要先提醒使用者，不要自己亂補」也沒遵守：<code>week1.md</code> 只有一句話，AI 卻自行擴寫出「安全且標準化地擴充模型的應用場景」這種原文沒有的內容。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>resource 掛在那裡，但沒有被自動讀取。</strong>
+        </p>
+      </div>
+
+      <p class="detail-paragraph">
+        接著我們讓 AI 去查一下這個 server 的狀態。它做了三件事：
+      </p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  List MCP Resources    List MCP resources
+Listed 1 resources.
+
+✓  Read MCP Resource    Read MCP resource "reflection_rules" from server "course-notes"
+Successfully read resource "reflection_rules" from server "course-notes"</code></pre>
+
+      <p class="detail-paragraph">
+        （<code>List MCP Resources</code> 和 <code>Read MCP Resource</code> 是 Gemini CLI 內建的工具，不是我們寫的。resource 就是靠它們被讀進去的。）
+      </p>
+
+      <p class="detail-paragraph">讀完之後產生的草稿，長這樣：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">我已讀取並遵循了 course://reflection-rules 中的反思規則，
+為您重新建立了符合規範（包含「我理解了什麼」、「我還卡在哪裡」、「我可以怎麼應用」三段）的反思草稿：
+
+- 檔案名稱： 第一週課堂反思.md
+- 內容：
+  - 我理解了什麼
+    Model Context Protocol (MCP) 是連接大型語言模型與外部工具、資料來源的重要橋樑。
+  - 我還卡在哪裡
+    目前對於 MCP 如何在實際複雜的多伺服器環境中進行精細的權限管控與狀態同步，還需要更多實作經驗。
+  - 我可以怎麼應用
+    未來在開發自訂工具或擴充模型能力時，可以運用 MCP 標準化地介接各種外部資源。</code></pre>
+
+      <p class="detail-paragraph">三段整整齊齊。</p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          所以 resource 的性質是：<strong>擺在架上的參考書，不是背在腦子裡的東西。</strong><br/>
+          AI 需要的時候會去翻，但不會每次都自動翻。<br/><br/>
+          這也正是 prompt 存在的理由——<strong>prompt 的工作，就是在流程裡明確寫上「請先參考 course://reflection-rules」</strong>，讓「翻參考書」這件事不再看 AI 心情。
+        </p>
+      </div>
+
+      <!-- 實測：prompt 掛得上，但這一版 CLI 沒有入口 -->
+      <h2 class="detail-heading">實測：prompt 掛得上，但這一版 CLI 沒有入口</h2>
+
+      <p class="detail-paragraph">
+        <code>/mcp list</code> 的畫面上，<code>draft_reflection</code> 明明白白列在 <code>Prompts:</code> 底下。它確實被 server 提供出來了。
+      </p>
+
+      <p class="detail-paragraph">
+        但在 Gemini CLI v0.55.1 裡，我們找不到呼叫它的方式：
+      </p>
+
+      <ul class="cross-list">
+        <li>輸入 <code>/</code> 之後的自動補全清單，只有 CLI 內建指令（<code>clear</code>、<code>compress</code>、<code>directory</code>、<code>docs</code>、<code>rewind</code>…），沒有 <code>draft_reflection</code></li>
+        <li>輸入 <code>/course-notes</code> 不會被當成指令，會被當成一句普通的話送給 Gemini</li>
+      </ul>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這不是你的程式寫錯了。prompt 已經正確地掛上去，清單上看得到——<br/>
+          只是<strong>這一版 Gemini CLI 還沒有提供呼叫它的入口</strong>。<br/><br/>
+          Prompt 是什麼、為什麼需要它、它和 tool 差在哪裡，你已經懂了。<br/>
+          能不能按下去，是工具的事，不是你的事。
+        </p>
       </div>
 
       <!-- 為什麼建立新檔比修改舊檔安全 -->
@@ -1226,6 +1760,29 @@ if __name__ == "__main__":
         代表目前只允許讀 Markdown 筆記。
       </p>
 
+      <p class="detail-paragraph">實際試一次。輸入：</p>
+
+      <blockquote class="prompt-example">
+        請讀取 week1.txt。
+      </blockquote>
+
+      <p class="detail-paragraph">回覆：</p>
+
+      <pre class="code-block" is:raw><code class="lang-text">✓  read_note (course-notes MCP Server) {"filename":"week1.txt"}
+
+目前只允許讀取 .md 筆記檔。</code></pre>
+
+      <p class="detail-paragraph">
+        注意前面是<strong>綠色的勾</strong>，不是紅色的錯誤。工具<strong>成功執行了</strong>，只是回傳一句拒絕的話。
+      </p>
+
+      <div class="callout-card">
+        <p class="callout-text">
+          這就是「出錯時說人話」的樣子：不是滿螢幕的紅字，是一句看得懂的話。<br/>
+          Gemini 收到之後也轉述給你：「無法讀取 week1.txt，因為該工具目前只允許讀取 .md 格式的筆記檔。」
+        </p>
+      </div>
+
       <h3 class="sub-heading">第三個邊界：不覆蓋既有檔案</h3>
       <pre class="code-block" is:raw><code class="lang-python">if path.exists():
     return f"草稿已存在：{filename}。我沒有覆蓋它，請換一個標題。"</code></pre>
@@ -1250,11 +1807,10 @@ if __name__ == "__main__":
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            先檢查 <code>settings.json</code> 的位置是否正確。如果是專案設定，應該放在：
+            最常見的原因是<strong>啟動的位置不對</strong>。<code>settings.json</code> 裡的 <code>args</code> 寫的是 <code>server.py</code> 這個相對路徑，所以你<strong>必須在 <code>mcp-test</code> 資料夾裡啟動 Gemini CLI</strong>。
           </p>
-          <pre class="code-block code-block--tree" is:raw><code>my-first-mcp-server/.gemini/settings.json</code></pre>
           <p class="detail-paragraph">
-            再檢查 <code>cwd</code> 有沒有改成自己的專案資料夾路徑。<strong>很多時候不是程式錯，而是 Gemini CLI 不知道要去哪個資料夾啟動 server.py。</strong>
+            先 <code>cd "$HOME\mcp-test"</code> 再啟動，狀態列左下角要顯示 <code>~\mcp-test</code>。也確認 <code>.gemini\settings.json</code> 確實在 <code>mcp-test</code> 底下。
           </p>
         </div>
       </details>
@@ -1262,17 +1818,15 @@ if __name__ == "__main__":
       <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">2. 我用 uv 安裝，但 Gemini CLI 找不到 mcp</span>
+          <span class="details-card__title">2. 啟動了，但工具都不見了</span>
           <span class="details-card__hint">點擊查看排查步驟</span>
         </summary>
         <div class="details-card__body">
           <p class="detail-paragraph">
-            請確認 <code>settings.json</code> 使用的是 uv 版本：
+            檢查啟動時的信任框有沒有選 <code>1. Trust folder</code>。
           </p>
-          <pre class="code-block" is:raw><code class="lang-json">"command": "uv",
-"args": ["run", "python", "server.py"]</code></pre>
           <p class="detail-paragraph">
-            這樣 Gemini CLI 才會透過 uv 的專案環境啟動 server。也請確認 <code>cwd</code> 指向正確的專案資料夾，因為 uv 需要在這個資料夾裡找到專案設定。
+            沒有選信任，<code>.gemini</code> 裡的東西<strong>全部不會載入</strong>——MCP Server 不會出現，<code>.env</code> 的金鑰也讀不到。重新啟動一次，這次選信任。
           </p>
         </div>
       </details>
@@ -1314,6 +1868,22 @@ if __name__ == "__main__":
               這<strong>不是錯誤</strong>，而是刻意設計的安全邊界。
             </p>
           </div>
+        </div>
+      </details>
+
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">5. 畫面上的檔名和實際檔名不一樣</span>
+          <span class="details-card__hint">點擊查看排查步驟</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            CLI 畫面上顯示的可能是「我對<em>MCP</em>的理解.md」（MCP 變成斜體），但實際檔名是 <code>我對_MCP_的理解.md</code>。
+          </p>
+          <p class="detail-paragraph">
+            原因是畫面把底線 <code>_</code> 當成 Markdown 的斜體語法渲染掉了。<strong>實際檔名有底線</strong>，用 PowerShell 的 <code>dir drafts</code> 看就是正確的。
+          </p>
         </div>
       </details>
 
