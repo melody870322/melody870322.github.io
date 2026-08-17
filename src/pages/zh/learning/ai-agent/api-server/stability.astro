@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
 <BaseLayout
   title="MCP Tool 穩定化：輸入驗證、錯誤處理與回覆格式設計 — AI Agent 拼圖"
-  description="第一版 MCP Tool 通常只能處理「使用者輸入剛剛好、API 也剛好正常」的情況。這一頁從輸入限制、錯誤處理、回覆格式三個面向，把工具從『可以用』練到『比較可靠』。重點不是讓工具更厲害，而是讓它知道怎麼好好失敗。"
+  description="第一版 MCP Tool 通常只能處理「使用者輸入剛剛好」的情況。這一頁回到自製的課堂筆記 server.py，從輸入限制、錯誤處理、回覆格式三個面向，把工具從『可以用』練到『比較可靠』。重點不是讓工具更厲害，而是讓它知道怎麼好好失敗。"
   lang="zh"
 >
   <section class="section">
@@ -191,52 +191,41 @@ if __name__ == "__main__":
       <header class="detail-header">
         <h1 class="detail-title">不只會成功，也要會好好失敗：讓 MCP Tool 更穩</h1>
         <p class="detail-subtitle">
-          前面我們已經把外部 API 包成 MCP Tool，讓 AI 可以透過工具查詢資料。不過，第一版工具通常只能處理「使用者輸入剛剛好、API 也剛好正常」的情況。<strong>而真實世界不會這麼乖。</strong>
+          前面我們已經把自製的課堂筆記 MCP Server 接上 Gemini CLI，四個工具都真的跑起來了。不過，第一版工具通常只能處理「使用者輸入剛剛好」的情況。<strong>而真實世界不會這麼乖。</strong>
         </p>
-        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.54.4 實測驗證。</p>
+        <p class="version-note">本頁的操作與畫面，以 Gemini CLI v0.55.1 實測驗證。CLI 更新頻繁，你看到的版本號可能比這個更新，畫面細節也可能略有不同。</p>
       </header>
 
-      <p class="detail-paragraph">使用者可能會輸入：</p>
+      <p class="detail-paragraph">使用者（或是替使用者做決定的 AI）可能會傳進來：</p>
 
       <ul class="cross-list">
-        <li>台北市</li>
-        <li>臺北</li>
-        <li>taipei</li>
-        <li>今天台北天氣如何？</li>
-        <li>空白</li>
-        <li>不存在的城市</li>
-      </ul>
-
-      <p class="detail-paragraph">外部 API 也可能會遇到：</p>
-
-      <ul class="cross-list">
-        <li>網路太慢</li>
-        <li>API 暫時壞掉</li>
-        <li>資料格式改變</li>
-        <li>回傳資料缺欄位</li>
+        <li>空字串</li>
+        <li>前後帶空白的檔名</li>
+        <li>不存在的檔名</li>
+        <li>一個不是 UTF-8 編碼的檔案</li>
       </ul>
 
       <p class="detail-paragraph">
-        所以這裡要學的<strong>不是「讓 MCP Tool 變得很厲害」，而是讓它變得比較穩</strong>。所謂比較穩，就是：
+        所以這一頁要學的<strong>不是「讓 MCP Tool 變得很厲害」，而是讓它變得比較穩</strong>。所謂比較穩，就是：
       </p>
 
       <ul class="check-list">
-        <li>使用者輸入怪一點，<strong>它不會直接壞掉</strong></li>
-        <li>外部 API 出問題，<strong>它會說清楚發生什麼事</strong></li>
+        <li>輸入怪一點，<strong>它不會直接壞掉</strong></li>
+        <li>檔案有問題，<strong>它會說清楚發生什麼事</strong></li>
         <li>AI 拿到工具結果後，<strong>比較容易理解和整理</strong></li>
       </ul>
 
       <!-- Section: stability is about failing well -->
       <h2 class="detail-heading">先說重點：穩定的工具，不是永遠成功，而是知道怎麼失敗</h2>
       <p class="detail-paragraph">
-        很多人一開始寫工具，會只測成功情況。例如「請查詢台北目前的天氣」，如果成功，就覺得工具完成了。但<strong>真正要放進 AI 工作流裡的 tool，不能只會處理成功情況</strong>。它還要知道：
+        很多人一開始寫工具，會只測成功情況。例如「請幫我讀 week10.md」，如果讀得出內容，就覺得工具完成了。但<strong>真正要放進 AI 工作流裡的 tool，不能只會處理成功情況</strong>。它還要知道：
       </p>
 
       <ul class="check-list">
         <li>輸入<strong>不完整</strong>時怎麼辦</li>
-        <li>輸入<strong>不支援</strong>時怎麼辦</li>
-        <li>外部 API <strong>失敗</strong>時怎麼辦</li>
-        <li>資料回來但<strong>格式怪怪的</strong>時候怎麼辦</li>
+        <li>輸入<strong>不是預期格式</strong>時怎麼辦</li>
+        <li>檔案<strong>讀不出來</strong>時怎麼辦</li>
+        <li>事情做完了，但<strong>每次回覆長得都不一樣</strong>的時候怎麼辦</li>
       </ul>
 
       <p class="detail-paragraph">
@@ -265,468 +254,168 @@ if __name__ == "__main__":
         </p>
       </div>
 
-      <!-- Section: Why limit input -->
-      <h2 class="detail-heading">為什麼要限制輸入？</h2>
+      <!-- Section: input validation -->
+      <h2 class="detail-heading">輸入限制：safe_note_path 與空字串</h2>
+
+      <h3 class="sub-heading">before：一句沒說謊、但講錯重點的訊息</h3>
       <p class="detail-paragraph">
-        有些人會問：既然 AI 很聰明，為什麼還要限制輸入？原因是：
+        原版 <code>safe_note_path</code>（〈實作步驟〉頁的版本）沒有處理空字串：
       </p>
 
-      <div class="highlight-card">
-        <p class="highlight-text">
-          AI 很會理解文字，<br/>
-          但它<strong>不一定知道我們的工具能處理到哪裡</strong>。
-        </p>
-      </div>
+      <pre class="code-block" is:raw><code class="lang-python">def safe_note_path(filename: str) -> Path:
+    """確認 AI 只能讀 class_notes 裡的 .md 檔案。"""
+    name = Path(filename).name
+
+    if name != filename:
+        raise ValueError("請只輸入檔名，不要輸入資料夾路徑。")
+
+    path = NOTES_DIR / name
+
+    if path.suffix != ".md":
+        raise ValueError("目前只允許讀取 .md 筆記檔。")
+
+    return path</code></pre>
 
       <p class="detail-paragraph">
-        例如我們的天氣工具只支援<strong>台北、台中、高雄、淡水</strong>，但使用者可能問：
+        實測：當傳進來的是<strong>空字串</strong>，它會一路走到副檔名檢查，回覆：
       </p>
 
-      <blockquote class="prompt-example">
-        幫我查一下東京明天會不會下雨。
-      </blockquote>
+      <pre class="code-block" is:raw><code>目前只允許讀取 .md 筆記檔。</code></pre>
 
       <p class="detail-paragraph">
-        如果 tool 沒有限制，它可能會拿著「東京明天會不會下雨」這整句話去查 API。結果可能是：
-      </p>
-
-      <ul class="cross-list">
-        <li>查不到</li>
-        <li>查錯地方</li>
-        <li>API 回傳錯誤</li>
-        <li>AI 自己<strong>猜答案</strong></li>
-      </ul>
-
-      <p class="detail-paragraph">
-        所以<strong>輸入限制不是在降低 AI 能力，而是在幫 AI 畫出清楚的使用範圍</strong>。
+        這句話完全是人話，也沒有說謊（空字串的副檔名確實不是 <code>.md</code>）——<strong>但真正的問題是「沒給檔名」</strong>。它把使用者引去檢查副檔名，方向錯了。
       </p>
 
       <div class="callout-card">
         <p class="callout-text">
-          你可以把 MCP Tool 想成<strong>課堂上的助教</strong>。助教可以幫忙查資料，但老師要先講清楚：你可以查哪些資料、不可以查哪些資料、學生問錯方向時你要怎麼回答。
+          <strong>檢查的順序，決定訊息說不說得對。</strong>先檢查「有沒有給」，再檢查「給得對不對」。
         </p>
       </div>
 
-      <!-- Section: Input validation -->
-      <h2 class="detail-heading">防呆功能</h2>
+      <h3 class="sub-heading">after：兩行，讓訊息說對重點</h3>
 
-      <h3 class="sub-heading">1. 不要接受空白輸入</h3>
-      <p class="detail-paragraph">
-        我們先從最簡單的情況開始。如果學生輸入空白，或 AI 傳進來的 <code>city</code> 是空字串，工具不應該繼續查 API：
-      </p>
+      <pre class="code-block" is:raw><code class="lang-python">def safe_note_path(filename: str) -> Path:
+    """確認 AI 只能讀 class_notes 裡的 .md 檔案。"""
+    filename = filename.strip()
 
-      <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
+    if not filename:
+        raise ValueError("沒有收到檔名。請先用 list_notes 看看有哪些筆記。")
+    name = Path(filename).name
 
-if not city:
-    return "請提供要查詢的城市名稱，例如：台北、台中、高雄、淡水。"</code></pre>
+    if name != filename:
+        raise ValueError("請只輸入檔名，不要輸入資料夾路徑。")
 
-      <p class="detail-paragraph">
-        <code>strip()</code> 的意思是把<strong>前後空白拿掉</strong>。例如 <code>" 台北 "</code> 會變成 <code>"台北"</code>。這是一個很小的動作，但很實用 —— 因為很多錯誤其實不是大問題，只是使用者多打一個空白、少打一個字，工具就開始出錯。
-      </p>
+    path = NOTES_DIR / name
 
-      <h3 class="sub-heading">2. 只接受支援的城市</h3>
-      <p class="detail-paragraph">
-        接著，我們要限制工具<strong>只能查支援的城市</strong>。假設目前支援城市放在這裡：
-      </p>
+    if path.suffix != ".md":
+        raise ValueError("目前只允許讀取 .md 筆記檔。")
 
-      <pre class="code-block" is:raw><code class="lang-python">CITY_LOCATIONS = {
-    "台北": {"latitude": 25.0330, "longitude": 121.5654},
-    "台中": {"latitude": 24.1477, "longitude": 120.6736},
-    "高雄": {"latitude": 22.6273, "longitude": 120.3014},
-    "淡水": {"latitude": 25.1676, "longitude": 121.4458},
-}</code></pre>
-
-      <p class="detail-paragraph">檢查方式可以寫成：</p>
-
-      <pre class="code-block" is:raw><code class="lang-python">if city not in CITY_LOCATIONS:
-    supported_cities = "、".join(CITY_LOCATIONS.keys())
-    return f"目前不支援「{city}」。請改查以下城市：{supported_cities}"</code></pre>
+    return path</code></pre>
 
       <p class="detail-paragraph">
-        這樣一來，如果使用者輸入「東京」，工具不會假裝自己會查，也不會直接壞掉，而是清楚回覆：
+        <code>strip()</code> 把前後空白拿掉；空值檢查放在最前面，訊息直接指出下一步：<strong>先用 <code>list_notes</code></strong>。
       </p>
 
-      <pre class="code-block" is:raw><code>目前不支援「東京」。請改查以下城市：台北、台中、高雄、淡水</code></pre>
+      <h3 class="sub-heading">這句訊息不只是給人看的</h3>
 
-      <div class="highlight-card">
-        <p class="highlight-text">
-          這就是穩定工具的基本態度：<br/>
-          可以做的就做，<strong>不能做的就說清楚，不要亂猜</strong>。
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>實測：錯誤訊息的「下一步」會指揮 agent。</strong>
+        </p>
+        <p class="callout-text">
+          訊息指向工具（「請先用 list_notes」）時，agent 會照做——先呼叫 <code>list_notes</code> 拿到正確檔名，再重試一次，<strong>在你設的圍籬內自我修復</strong>，整個過程不需要人插手。
+        </p>
+        <p class="callout-text">
+          所以錯誤訊息不是裝飾：<strong>下一步寫給誰，agent 就往哪走。</strong>
         </p>
       </div>
 
-      <h3 class="sub-heading">3. 處理常見別名</h3>
+      <!-- Section: error handling -->
+      <h2 class="detail-heading">錯誤處理：read_note 與不是 UTF-8 的檔案</h2>
+
+      <h3 class="sub-heading">先看一個沒接住的例外會發生什麼事</h3>
       <p class="detail-paragraph">
-        可是，使用者不一定每次都剛好輸入「台北」。有人可能會輸入：
+        原版 <code>read_note</code> 直接讀檔：
       </p>
 
-      <ul class="check-list">
-        <li>台北市</li>
-        <li>臺北</li>
-        <li>Taipei</li>
-        <li>taipei</li>
-      </ul>
+      <pre class="code-block" is:raw><code class="lang-python">    return path.read_text(encoding="utf-8")</code></pre>
 
       <p class="detail-paragraph">
-        如果我們希望工具友善一點，可以做一個<strong>別名表</strong>：
+        當檔案不是 UTF-8（例如同學從舊系統帶來、用 ANSI 存的檔），這行會拋出 <code>UnicodeDecodeError</code>。
       </p>
 
-      <pre class="code-block" is:raw><code class="lang-python">CITY_ALIASES = {
-    "台北市": "台北",
-    "臺北": "台北",
-    "臺北市": "台北",
-    "taipei": "台北",
-    "Taipei": "台北",
-    "台中市": "台中",
-    "高雄市": "高雄",
-}</code></pre>
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>實測：MCP 工具拋出的未接例外，CLI 畫面上完全不顯示。</strong>
+        </p>
+        <p class="callout-text">
+          沒有紅字、沒有錯誤訊息——錯誤全文只回給了模型。你看到的第一個徵兆，是 <strong>agent 突然換工具</strong>：它放下你的 server，改用內建的 ReadFile 或 Shell 去讀那個檔案。錯誤被吞掉，人是最後一個知道的。
+        </p>
+      </div>
 
-      <p class="detail-paragraph">然後在查詢前先轉換：</p>
+      <h3 class="sub-heading">after：把例外接住，換成一句指路的話</h3>
 
-      <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
-city = CITY_ALIASES.get(city, city)</code></pre>
+      <pre class="code-block" is:raw><code class="lang-python">    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return f"{filename} 不是 UTF-8 編碼，我讀不出來。請用記事本開啟它，另存新檔時選 UTF-8，再試一次。"</code></pre>
 
-      <p class="detail-paragraph">
-        這行的意思是：<strong>如果 city 在別名表裡，就換成正式名稱；如果不在，就保留原本輸入</strong>。例如 <code>taipei → 台北</code>、<code>高雄市 → 高雄</code>。
-      </p>
+      <h3 class="sub-heading">這次的下一步，是寫給人的</h3>
 
       <div class="callout-card">
         <p class="callout-text">
-          別名可以增加，但<strong>不要無限制亂加</strong>。這裡的原則還是：先小範圍、先可控、先好測。
+          對照第一段：那句訊息指向<strong>工具</strong>，agent 自己就修好了。這句訊息指向<strong>人</strong>（開記事本、另存 UTF-8）——這件事 agent 做不到，它只能把話帶到，<strong>由人做人的那一步</strong>。
         </p>
-      </div>
-
-      <!-- Section: Error handling -->
-      <h2 class="detail-heading">錯誤處理</h2>
-
-      <h3 class="sub-heading">1. 不要讓使用者看到一大串英文錯誤</h3>
-      <p class="detail-paragraph">
-        很多程式出錯時，會噴出一大串英文錯誤訊息。對使用者來說，那通常<strong>不是幫助，而是壓力</strong>。例如 API 連不上時，如果直接顯示底層錯誤，使用者可能只會看到一堆看不懂的字。
-      </p>
-
-      <p class="detail-paragraph">
-        比較好的方式是：<strong>工具內部知道發生什麼錯，但回覆給使用者時，用人看得懂的方式說明</strong>：
-      </p>
-
-      <pre class="code-block" is:raw><code class="lang-python">except httpx.TimeoutException:
-    return "查詢天氣時等太久沒有回應，請稍後再試。"</code></pre>
-
-      <p class="detail-paragraph">
-        這句話不需要使用者知道什麼是 <code>TimeoutException</code>。他只要知道：<strong>現在是外部服務或網路太慢，不一定是自己寫錯</strong>。
-      </p>
-
-      <h3 class="sub-heading">2. API 回傳錯誤狀態</h3>
-      <p class="detail-paragraph">
-        有時候 API 有回應，但不是成功回應。例如：
-      </p>
-
-      <ul class="check-list">
-        <li><code>404</code>：找不到</li>
-        <li><code>500</code>：對方伺服器錯誤</li>
-        <li><code>429</code>：請求太多次</li>
-      </ul>
-
-      <p class="detail-paragraph">我們可以用這行檢查：</p>
-
-      <pre class="code-block" is:raw><code class="lang-python">response.raise_for_status()</code></pre>
-
-      <p class="detail-paragraph">如果 API 回傳錯誤狀態，它會進入這段：</p>
-
-      <pre class="code-block" is:raw><code class="lang-python">except httpx.HTTPStatusError as error:
-    return f"天氣 API 回傳錯誤，狀態碼：{error.response.status_code}"</code></pre>
-
-      <p class="detail-paragraph">
-        這樣至少可以讓使用者知道：<strong>程式有成功連到 API，但是 API 回傳的狀態不是成功</strong>。這和「完全連不上網路」是不一樣的問題。
-      </p>
-
-      <h3 class="sub-heading">3. 完全連不上</h3>
-      <p class="detail-paragraph">
-        如果網路中斷，或 API 網址打錯，可能會進到：
-      </p>
-
-      <pre class="code-block" is:raw><code class="lang-python">except httpx.RequestError:
-    return "無法連線到天氣 API，請確認網路連線是否正常。"</code></pre>
-
-      <p class="detail-paragraph">
-        這句話很簡單，但很有用。它把問題指向<strong>網路連線、API 網址、外部服務</strong>，而不是讓使用者一直懷疑自己的 Gemini 指令是不是下錯。
-      </p>
-
-      <h3 class="sub-heading">4. API 有回傳，但資料缺欄位</h3>
-      <p class="detail-paragraph">
-        還有一種情況很容易被忽略：<strong>API 有成功回傳資料，但資料裡沒有我們想要的欄位</strong>。例如我們想拿 <code>temperature_2m</code>、<code>wind_speed_10m</code>、<code>time</code>，但 API 回來的資料裡少了其中一個。
-      </p>
-
-      <p class="detail-paragraph">這時候不要直接假裝沒事。可以這樣檢查：</p>
-
-      <pre class="code-block" is:raw><code class="lang-python">temperature = current.get("temperature_2m")
-wind_speed = current.get("wind_speed_10m")
-update_time = current.get("time")
-
-if temperature is None or wind_speed is None or update_time is None:
-    return "天氣 API 有回傳資料，但缺少必要欄位，請稍後再試。"</code></pre>
-
-      <div class="callout-card">
         <p class="callout-text">
-          這個檢查很重要。因為<strong>外部 API 不是我們自己控制的</strong>。它今天正常，不代表它永遠不會改。所以 MCP Tool 要有一點「防震能力」。
+          好的錯誤處理不是把所有事都自動化，而是<strong>把「該誰做」說清楚</strong>。
         </p>
       </div>
 
-      <!-- Section: Response format -->
-      <h2 class="detail-heading">回覆格式</h2>
-
-      <h3 class="sub-heading">1. 不要每次都長得不一樣</h3>
-      <p class="detail-paragraph">
-        如果 tool 每次回覆格式都不一樣，<strong>AI 會比較難整理，人也比較難檢查</strong>。例如有時候回：
-      </p>
-
-      <pre class="code-block" is:raw><code>台北 28 度，風速 10。</code></pre>
-
-      <p class="detail-paragraph">有時候回：</p>
-
-      <pre class="code-block" is:raw><code>查詢成功！目前台北氣溫是 28°C，風速約 10 km/h。</code></pre>
-
-      <p class="detail-paragraph">有時候又回：</p>
-
-      <pre class="code-block" is:raw><code>{"temperature": 28, "wind": 10}</code></pre>
-
-      <p class="detail-paragraph">
-        這樣不是不能用，但會比較亂。比較好的做法是：<strong>先固定格式</strong>。例如成功時都回：
-      </p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：成功
-城市：台北
-更新時間：2025-01-01T10:00
-目前氣溫：約 28 °C
-目前風速：約 10 km/h
-提醒：這是外部天氣 API 回傳的資料，實際情況仍可能因地點不同而有差異。</code></pre>
-
-      <p class="detail-paragraph">失敗時都回：</p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：失敗
-原因：目前不支援「東京」。
-建議：請改查台北、台中、高雄、淡水。</code></pre>
-
-      <p class="detail-paragraph">
-        這樣 AI 就比較容易看懂：<strong>成功就整理資料，失敗就告訴使用者原因和下一步</strong>。
-      </p>
-
-      <h3 class="sub-heading">2. 用「狀態、原因、建議」整理失敗訊息</h3>
-      <p class="detail-paragraph">
-        失敗訊息不要只說「錯誤」，這樣太少；也不要直接貼一大串系統錯誤。比較適合使用者的格式是：
-      </p>
-
-      <ul class="role-list">
-        <li class="role-item">
-          <span class="role-item__label">狀態</span>
-          <span class="role-item__desc">失敗</span>
-        </li>
-        <li class="role-item">
-          <span class="role-item__label">原因</span>
-          <span class="role-item__desc">發生什麼事</span>
-        </li>
-        <li class="role-item">
-          <span class="role-item__label">建議</span>
-          <span class="role-item__desc">接下來可以怎麼做</span>
-        </li>
-      </ul>
-
-      <p class="detail-paragraph">例如：</p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：失敗
-原因：目前不支援「東京」。
-建議：請改查以下城市：台北、台中、高雄、淡水。</code></pre>
-
-      <p class="detail-paragraph">或是：</p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：失敗
-原因：天氣 API 等太久沒有回應。
-建議：請稍後再試，或確認網路連線是否正常。</code></pre>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          這種格式對 AI 也很友善。<br/>
-          AI 拿到結果後，<strong>可以更穩定地向使用者解釋，而不是自己猜錯誤原因</strong>。
-        </p>
-      </div>
-
-      <!-- ============ Part 2: 實際測試 ============ -->
-      <div class="part-divider">
-        <span class="part-label">PART 2</span>
-        <span class="part-text">實際測試</span>
-      </div>
-
-      <!-- STEP 1 -->
-      <div class="case-header">
-        <p class="case-label">STEP 1</p>
-        <h2 class="case-title">改良版：把回覆格式整理成小函式</h2>
-      </div>
-
-      <p class="detail-paragraph">
-        為了讓程式更整齊，我們可以先寫兩個小函式：
-      </p>
-
-      <details class="details-card details-card--code">
+      <details class="details-card">
         <summary class="details-card__summary">
           <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">success_response 與 error_response</span>
-          <span class="details-card__hint">點擊展開程式碼</span>
+          <span class="details-card__title">想自己做一個測試檔？</span>
+          <span class="details-card__hint">點擊展開</span>
         </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details"><code class="lang-python">{helpersCode}</code></pre>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            在 <strong>Windows PowerShell 5.1</strong> 裡，<code>Set-Content</code> 不加編碼參數（或指定 <code>-Encoding Default</code>）寫出來的中文檔是 ANSI（CP950），正好可以拿來測這一段。注意：<strong>PowerShell 7 的 Default 是 UTF-8</strong>，做不出這個測試檔。
+          </p>
         </div>
       </details>
 
-      <p class="detail-paragraph">這樣做的好處是：</p>
+      <!-- Section: response format -->
+      <h2 class="detail-heading">回覆格式：create_reflection_draft 的固定三行</h2>
 
-      <ul class="check-list">
-        <li>成功回覆<strong>都長得一樣</strong></li>
-        <li>失敗回覆<strong>都長得一樣</strong></li>
-        <li>主要工具函式<strong>比較好讀</strong></li>
-        <li>以後要改回覆格式<strong>比較方便</strong></li>
-      </ul>
+      <h3 class="sub-heading">before：一句話的回覆</h3>
+
+      <pre class="code-block" is:raw><code class="lang-python">    return f"已建立草稿：{filename}"</code></pre>
+
+      <p class="detail-paragraph">
+        能用，但每個工具各講各的，AI 整理起來要猜，人檢查起來要找。
+      </p>
+
+      <h3 class="sub-heading">after：固定「狀態／檔案／下一步」三行</h3>
+
+      <pre class="code-block" is:raw><code class="lang-python">    return (
+        "狀態：成功\n"
+        f"檔案：drafts/{filename}\n"
+        "下一步：用 notepad 打開檢查內容，確認後再自行修改。"
+    )</code></pre>
 
       <div class="callout-card">
         <p class="callout-text">
-          這不是為了炫技，而是<strong>為了讓程式比較好維護</strong>。
+          固定格式的好處：<strong>成功都長一樣、失敗都長一樣——AI 好整理，人好檢查。</strong>出了問題時，也比較容易知道是哪一步出錯。
         </p>
-      </div>
-
-      <!-- STEP 2 -->
-      <div class="case-header">
-        <p class="case-label">STEP 2</p>
-        <h2 class="case-title">完整改良版：比較穩的天氣 MCP Tool</h2>
-      </div>
-
-      <p class="detail-paragraph">
-        下面是一個比較完整的版本。它做了三件事：
-      </p>
-
-      <ul class="check-list">
-        <li><strong>限制輸入</strong></li>
-        <li><strong>處理錯誤</strong></li>
-        <li><strong>固定回覆格式</strong></li>
-      </ul>
-
-      <details class="details-card details-card--code">
-        <summary class="details-card__summary">
-          <span class="details-card__icon" aria-hidden="true">▸</span>
-          <span class="details-card__title">完整改良版 server.py</span>
-          <span class="details-card__hint">點擊展開程式碼</span>
-        </summary>
-        <div class="details-card__body details-card__body--flush">
-          <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
-        </div>
-      </details>
-
-      <p class="detail-paragraph">
-        這份程式不一定比前一版「功能更多」，但它讓使用者<strong>看得出來</strong>：
-      </p>
-
-      <ul class="check-list">
-        <li>哪裡在<strong>處理輸入</strong></li>
-        <li>哪裡在<strong>呼叫 API</strong></li>
-        <li>哪裡在<strong>處理錯誤</strong></li>
-        <li>哪裡在<strong>整理回覆格式</strong></li>
-      </ul>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          <strong>這比把所有東西塞在同一段程式裡更清楚。</strong>
-        </p>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="case-header">
-        <p class="case-label">STEP 3</p>
-        <h2 class="case-title">在 Gemini CLI 裡測試正常情況</h2>
-      </div>
-
-      <p class="detail-paragraph">啟動 Gemini CLI 後，可以先問：</p>
-
-      <blockquote class="prompt-example">
-        請使用 weather-api 的 hello 工具。
-      </blockquote>
-
-      <p class="detail-paragraph">接著測試：</p>
-
-      <blockquote class="prompt-example">
-        請查詢台北目前的天氣。
-      </blockquote>
-
-      <p class="detail-paragraph">如果成功，應該會看到類似：</p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：成功
-城市：台北
-更新時間：某個時間
-目前氣溫：約某個溫度 °C
-目前風速：約某個風速 km/h
-提醒：這是外部天氣 API 回傳的資料，實際情況仍可能因地點不同而有差異。</code></pre>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          這表示：AI 最後講出來的自然語言，<strong>不是憑空編出來的</strong>。<br/>
-          它是先呼叫 MCP Tool，拿到外部 API 的結果，再整理給使用者。
-        </p>
-      </div>
-
-      <!-- STEP 4 -->
-      <div class="case-header">
-        <p class="case-label">STEP 4</p>
-        <h2 class="case-title">不只測成功，也要測失敗</h2>
-      </div>
-
-      <p class="detail-paragraph">
-        這裡<strong>最重要的練習，就是不要只測成功</strong>。請測試下面幾種情況。
-      </p>
-
-      <h3 class="sub-heading">第一種：輸入不支援的城市</h3>
-      <blockquote class="prompt-example">
-        請查詢東京目前的天氣。
-      </blockquote>
-      <p class="detail-paragraph">
-        應該看到工具<strong>說明目前不支援東京</strong>，並建議可以查哪些城市。
-      </p>
-
-      <h3 class="sub-heading">第二種：輸入別名</h3>
-      <blockquote class="prompt-example">
-        請查詢臺北市目前的天氣。
-      </blockquote>
-      <p class="detail-paragraph">
-        如果別名表有寫好，工具應該會把它<strong>轉成「台北」</strong>後成功查詢。
-      </p>
-
-      <h3 class="sub-heading">第三種：輸入英文</h3>
-      <blockquote class="prompt-example">
-        請查詢 taipei 目前的天氣。
-      </blockquote>
-      <p class="detail-paragraph">
-        如果別名表有支援，<strong>也應該能查詢成功</strong>。
-      </p>
-
-      <h3 class="sub-heading">第四種：輸入空白或不完整內容</h3>
-      <blockquote class="prompt-example">
-        請查詢目前的天氣。
-      </blockquote>
-      <p class="detail-paragraph">
-        這個情況要看 AI 有沒有補出城市。如果 AI 沒有提供城市給工具，工具應該回覆：
-      </p>
-
-      <pre class="code-block" is:raw><code>查詢狀態：失敗
-原因：沒有收到城市名稱。
-建議：請提供要查詢的城市，例如：台北、台中、高雄、淡水。</code></pre>
-
-      <div class="highlight-card">
-        <p class="highlight-text">
-          這些測試會讓使用者理解：<br/>
-          工具的穩定性<strong>不是靠「一次成功」證明的</strong>，<br/>
-          而是靠「各種奇怪情況都能好好回應」<strong>慢慢建立的</strong>。
+        <p class="callout-text">
+          接著可以自己決定：防覆蓋那句「草稿已存在……」要不要也改成三行格式？決定之後，你就是在做「回覆格式設計」了。
         </p>
       </div>
 
       <!-- Section: Key takeaway -->
       <h2 class="detail-heading">這裡最重要的觀念</h2>
       <p class="detail-paragraph">
-        這裡的重點不是讓天氣工具變得多華麗。而是讓使用者知道，<strong>一個能放進 AI 工作流的 MCP Tool，至少要想三件事</strong>：
+        這裡的重點不是讓課堂筆記工具變得多華麗。而是讓使用者知道，<strong>一個能放進 AI 工作流的 MCP Tool，至少要想三件事</strong>：
       </p>
 
       <ul class="role-list">
@@ -744,6 +433,12 @@ if temperature is None or wind_speed is None or update_time is None:
         </li>
       </ul>
 
+      <div class="highlight-card highlight-card--strong">
+        <p class="highlight-text">
+          <strong>錯誤訊息的下一步寫給誰，agent 就往哪走。</strong>
+        </p>
+      </div>
+
       <div class="highlight-card highlight-card--final">
         <p class="highlight-text">
           好的 MCP Tool，<br/>
@@ -754,6 +449,498 @@ if temperature is None or wind_speed is None or update_time is None:
       <p class="detail-paragraph">
         當工具越穩，AI 工作流就越不容易亂掉。
       </p>
+
+      <!-- ============ Appendix: external weather API version ============ -->
+      <details class="details-card">
+        <summary class="details-card__summary">
+          <span class="details-card__icon" aria-hidden="true">▸</span>
+          <span class="details-card__title">外接 API 組參考：把同樣三件事用在外部天氣 API 上</span>
+          <span class="details-card__hint">點擊展開</span>
+        </summary>
+        <div class="details-card__body">
+          <p class="detail-paragraph">
+            下面是同樣三件事（輸入限制、錯誤處理、回覆格式）用在<strong>外部天氣 API</strong> 上的版本，給專題要外接 API 的組參考。此範例以 Gemini CLI v0.54.4 實測驗證。
+          </p>
+
+          <p class="detail-paragraph">使用者可能會輸入：</p>
+
+          <ul class="cross-list">
+            <li>台北市</li>
+            <li>臺北</li>
+            <li>taipei</li>
+            <li>今天台北天氣如何？</li>
+            <li>空白</li>
+            <li>不存在的城市</li>
+          </ul>
+
+          <p class="detail-paragraph">外部 API 也可能會遇到：</p>
+
+          <ul class="cross-list">
+            <li>網路太慢</li>
+            <li>API 暫時壞掉</li>
+            <li>資料格式改變</li>
+            <li>回傳資料缺欄位</li>
+          </ul>
+
+          <!-- Section: Why limit input -->
+          <h3 class="detail-heading">為什麼要限制輸入？</h3>
+          <p class="detail-paragraph">
+            有些人會問：既然 AI 很聰明，為什麼還要限制輸入？原因是：
+          </p>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              AI 很會理解文字，<br/>
+              但它<strong>不一定知道我們的工具能處理到哪裡</strong>。
+            </p>
+          </div>
+
+          <p class="detail-paragraph">
+            例如我們的天氣工具只支援<strong>台北、台中、高雄、淡水</strong>，但使用者可能問：
+          </p>
+
+          <blockquote class="prompt-example">
+            幫我查一下東京明天會不會下雨。
+          </blockquote>
+
+          <p class="detail-paragraph">
+            如果 tool 沒有限制，它可能會拿著「東京明天會不會下雨」這整句話去查 API。結果可能是：
+          </p>
+
+          <ul class="cross-list">
+            <li>查不到</li>
+            <li>查錯地方</li>
+            <li>API 回傳錯誤</li>
+            <li>AI 自己<strong>猜答案</strong></li>
+          </ul>
+
+          <p class="detail-paragraph">
+            所以<strong>輸入限制不是在降低 AI 能力，而是在幫 AI 畫出清楚的使用範圍</strong>。
+          </p>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              你可以把 MCP Tool 想成<strong>課堂上的助教</strong>。助教可以幫忙查資料，但老師要先講清楚：你可以查哪些資料、不可以查哪些資料、學生問錯方向時你要怎麼回答。
+            </p>
+          </div>
+
+          <!-- Section: Input validation -->
+          <h3 class="detail-heading">防呆功能</h3>
+
+          <h4 class="sub-heading">1. 不要接受空白輸入</h4>
+          <p class="detail-paragraph">
+            我們先從最簡單的情況開始。如果學生輸入空白，或 AI 傳進來的 <code>city</code> 是空字串，工具不應該繼續查 API：
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
+
+if not city:
+    return "請提供要查詢的城市名稱，例如：台北、台中、高雄、淡水。"</code></pre>
+
+          <p class="detail-paragraph">
+            <code>strip()</code> 的意思是把<strong>前後空白拿掉</strong>。例如 <code>" 台北 "</code> 會變成 <code>"台北"</code>。這是一個很小的動作，但很實用 —— 因為很多錯誤其實不是大問題，只是使用者多打一個空白、少打一個字，工具就開始出錯。
+          </p>
+
+          <h4 class="sub-heading">2. 只接受支援的城市</h4>
+          <p class="detail-paragraph">
+            接著，我們要限制工具<strong>只能查支援的城市</strong>。假設目前支援城市放在這裡：
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">CITY_LOCATIONS = {
+    "台北": {"latitude": 25.0330, "longitude": 121.5654},
+    "台中": {"latitude": 24.1477, "longitude": 120.6736},
+    "高雄": {"latitude": 22.6273, "longitude": 120.3014},
+    "淡水": {"latitude": 25.1676, "longitude": 121.4458},
+}</code></pre>
+
+          <p class="detail-paragraph">檢查方式可以寫成：</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">if city not in CITY_LOCATIONS:
+    supported_cities = "、".join(CITY_LOCATIONS.keys())
+    return f"目前不支援「{city}」。請改查以下城市：{supported_cities}"</code></pre>
+
+          <p class="detail-paragraph">
+            這樣一來，如果使用者輸入「東京」，工具不會假裝自己會查，也不會直接壞掉，而是清楚回覆：
+          </p>
+
+          <pre class="code-block" is:raw><code>目前不支援「東京」。請改查以下城市：台北、台中、高雄、淡水</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              這就是穩定工具的基本態度：<br/>
+              可以做的就做，<strong>不能做的就說清楚，不要亂猜</strong>。
+            </p>
+          </div>
+
+          <h4 class="sub-heading">3. 處理常見別名</h4>
+          <p class="detail-paragraph">
+            可是，使用者不一定每次都剛好輸入「台北」。有人可能會輸入：
+          </p>
+
+          <ul class="check-list">
+            <li>台北市</li>
+            <li>臺北</li>
+            <li>Taipei</li>
+            <li>taipei</li>
+          </ul>
+
+          <p class="detail-paragraph">
+            如果我們希望工具友善一點，可以做一個<strong>別名表</strong>：
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">CITY_ALIASES = {
+    "台北市": "台北",
+    "臺北": "台北",
+    "臺北市": "台北",
+    "taipei": "台北",
+    "Taipei": "台北",
+    "台中市": "台中",
+    "高雄市": "高雄",
+}</code></pre>
+
+          <p class="detail-paragraph">然後在查詢前先轉換：</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">city = city.strip()
+city = CITY_ALIASES.get(city, city)</code></pre>
+
+          <p class="detail-paragraph">
+            這行的意思是：<strong>如果 city 在別名表裡，就換成正式名稱；如果不在，就保留原本輸入</strong>。例如 <code>taipei → 台北</code>、<code>高雄市 → 高雄</code>。
+          </p>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              別名可以增加，但<strong>不要無限制亂加</strong>。這裡的原則還是：先小範圍、先可控、先好測。
+            </p>
+          </div>
+
+          <!-- Section: Error handling -->
+          <h3 class="detail-heading">錯誤處理</h3>
+
+          <h4 class="sub-heading">1. 不要讓使用者看到一大串英文錯誤</h4>
+          <p class="detail-paragraph">
+            很多程式出錯時，會噴出一大串英文錯誤訊息。對使用者來說，那通常<strong>不是幫助，而是壓力</strong>。例如 API 連不上時，如果直接顯示底層錯誤，使用者可能只會看到一堆看不懂的字。
+          </p>
+
+          <p class="detail-paragraph">
+            比較好的方式是：<strong>工具內部知道發生什麼錯，但回覆給使用者時，用人看得懂的方式說明</strong>：
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">except httpx.TimeoutException:
+    return "查詢天氣時等太久沒有回應，請稍後再試。"</code></pre>
+
+          <p class="detail-paragraph">
+            這句話不需要使用者知道什麼是 <code>TimeoutException</code>。他只要知道：<strong>現在是外部服務或網路太慢，不一定是自己寫錯</strong>。
+          </p>
+
+          <h4 class="sub-heading">2. API 回傳錯誤狀態</h4>
+          <p class="detail-paragraph">
+            有時候 API 有回應，但不是成功回應。例如：
+          </p>
+
+          <ul class="check-list">
+            <li><code>404</code>：找不到</li>
+            <li><code>500</code>：對方伺服器錯誤</li>
+            <li><code>429</code>：請求太多次</li>
+          </ul>
+
+          <p class="detail-paragraph">我們可以用這行檢查：</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">response.raise_for_status()</code></pre>
+
+          <p class="detail-paragraph">如果 API 回傳錯誤狀態，它會進入這段：</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">except httpx.HTTPStatusError as error:
+    return f"天氣 API 回傳錯誤，狀態碼：{error.response.status_code}"</code></pre>
+
+          <p class="detail-paragraph">
+            這樣至少可以讓使用者知道：<strong>程式有成功連到 API，但是 API 回傳的狀態不是成功</strong>。這和「完全連不上網路」是不一樣的問題。
+          </p>
+
+          <h4 class="sub-heading">3. 完全連不上</h4>
+          <p class="detail-paragraph">
+            如果網路中斷，或 API 網址打錯，可能會進到：
+          </p>
+
+          <pre class="code-block" is:raw><code class="lang-python">except httpx.RequestError:
+    return "無法連線到天氣 API，請確認網路連線是否正常。"</code></pre>
+
+          <p class="detail-paragraph">
+            這句話很簡單，但很有用。它把問題指向<strong>網路連線、API 網址、外部服務</strong>，而不是讓使用者一直懷疑自己的 Gemini 指令是不是下錯。
+          </p>
+
+          <h4 class="sub-heading">4. API 有回傳，但資料缺欄位</h4>
+          <p class="detail-paragraph">
+            還有一種情況很容易被忽略：<strong>API 有成功回傳資料，但資料裡沒有我們想要的欄位</strong>。例如我們想拿 <code>temperature_2m</code>、<code>wind_speed_10m</code>、<code>time</code>，但 API 回來的資料裡少了其中一個。
+          </p>
+
+          <p class="detail-paragraph">這時候不要直接假裝沒事。可以這樣檢查：</p>
+
+          <pre class="code-block" is:raw><code class="lang-python">temperature = current.get("temperature_2m")
+wind_speed = current.get("wind_speed_10m")
+update_time = current.get("time")
+
+if temperature is None or wind_speed is None or update_time is None:
+    return "天氣 API 有回傳資料，但缺少必要欄位，請稍後再試。"</code></pre>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              這個檢查很重要。因為<strong>外部 API 不是我們自己控制的</strong>。它今天正常，不代表它永遠不會改。所以 MCP Tool 要有一點「防震能力」。
+            </p>
+          </div>
+
+          <!-- Section: Response format -->
+          <h3 class="detail-heading">回覆格式</h3>
+
+          <h4 class="sub-heading">1. 不要每次都長得不一樣</h4>
+          <p class="detail-paragraph">
+            如果 tool 每次回覆格式都不一樣，<strong>AI 會比較難整理，人也比較難檢查</strong>。例如有時候回：
+          </p>
+
+          <pre class="code-block" is:raw><code>台北 28 度，風速 10。</code></pre>
+
+          <p class="detail-paragraph">有時候回：</p>
+
+          <pre class="code-block" is:raw><code>查詢成功！目前台北氣溫是 28°C，風速約 10 km/h。</code></pre>
+
+          <p class="detail-paragraph">有時候又回：</p>
+
+          <pre class="code-block" is:raw><code>{"temperature": 28, "wind": 10}</code></pre>
+
+          <p class="detail-paragraph">
+            這樣不是不能用，但會比較亂。比較好的做法是：<strong>先固定格式</strong>。例如成功時都回：
+          </p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：成功
+城市：台北
+更新時間：2025-01-01T10:00
+目前氣溫：約 28 °C
+目前風速：約 10 km/h
+提醒：這是外部天氣 API 回傳的資料，實際情況仍可能因地點不同而有差異。</code></pre>
+
+          <p class="detail-paragraph">失敗時都回：</p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：失敗
+原因：目前不支援「東京」。
+建議：請改查台北、台中、高雄、淡水。</code></pre>
+
+          <p class="detail-paragraph">
+            這樣 AI 就比較容易看懂：<strong>成功就整理資料，失敗就告訴使用者原因和下一步</strong>。
+          </p>
+
+          <h4 class="sub-heading">2. 用「狀態、原因、建議」整理失敗訊息</h4>
+          <p class="detail-paragraph">
+            失敗訊息不要只說「錯誤」，這樣太少；也不要直接貼一大串系統錯誤。比較適合使用者的格式是：
+          </p>
+
+          <ul class="role-list">
+            <li class="role-item">
+              <span class="role-item__label">狀態</span>
+              <span class="role-item__desc">失敗</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">原因</span>
+              <span class="role-item__desc">發生什麼事</span>
+            </li>
+            <li class="role-item">
+              <span class="role-item__label">建議</span>
+              <span class="role-item__desc">接下來可以怎麼做</span>
+            </li>
+          </ul>
+
+          <p class="detail-paragraph">例如：</p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：失敗
+原因：目前不支援「東京」。
+建議：請改查以下城市：台北、台中、高雄、淡水。</code></pre>
+
+          <p class="detail-paragraph">或是：</p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：失敗
+原因：天氣 API 等太久沒有回應。
+建議：請稍後再試，或確認網路連線是否正常。</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              這種格式對 AI 也很友善。<br/>
+              AI 拿到結果後，<strong>可以更穩定地向使用者解釋，而不是自己猜錯誤原因</strong>。
+            </p>
+          </div>
+
+          <!-- Part 2: 實際測試 -->
+          <div class="part-divider">
+            <span class="part-label">PART 2</span>
+            <span class="part-text">實際測試</span>
+          </div>
+
+          <!-- STEP 1 -->
+          <div class="case-header">
+            <p class="case-label">STEP 1</p>
+            <h3 class="case-title">改良版：把回覆格式整理成小函式</h3>
+          </div>
+
+          <p class="detail-paragraph">
+            為了讓程式更整齊，我們可以先寫兩個小函式：
+          </p>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">success_response 與 error_response</span>
+              <span class="details-card__hint">點擊展開程式碼</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details"><code class="lang-python">{helpersCode}</code></pre>
+            </div>
+          </details>
+
+          <p class="detail-paragraph">這樣做的好處是：</p>
+
+          <ul class="check-list">
+            <li>成功回覆<strong>都長得一樣</strong></li>
+            <li>失敗回覆<strong>都長得一樣</strong></li>
+            <li>主要工具函式<strong>比較好讀</strong></li>
+            <li>以後要改回覆格式<strong>比較方便</strong></li>
+          </ul>
+
+          <div class="callout-card">
+            <p class="callout-text">
+              這不是為了炫技，而是<strong>為了讓程式比較好維護</strong>。
+            </p>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="case-header">
+            <p class="case-label">STEP 2</p>
+            <h3 class="case-title">完整改良版：比較穩的天氣 MCP Tool</h3>
+          </div>
+
+          <p class="detail-paragraph">
+            下面是一個比較完整的版本。它做了三件事：
+          </p>
+
+          <ul class="check-list">
+            <li><strong>限制輸入</strong></li>
+            <li><strong>處理錯誤</strong></li>
+            <li><strong>固定回覆格式</strong></li>
+          </ul>
+
+          <details class="details-card details-card--code">
+            <summary class="details-card__summary">
+              <span class="details-card__icon" aria-hidden="true">▸</span>
+              <span class="details-card__title">完整改良版 server.py</span>
+              <span class="details-card__hint">點擊展開程式碼</span>
+            </summary>
+            <div class="details-card__body details-card__body--flush">
+              <pre class="code-block code-block--in-details"><code class="lang-python">{fullServerPy}</code></pre>
+            </div>
+          </details>
+
+          <p class="detail-paragraph">
+            這份程式不一定比前一版「功能更多」，但它讓使用者<strong>看得出來</strong>：
+          </p>
+
+          <ul class="check-list">
+            <li>哪裡在<strong>處理輸入</strong></li>
+            <li>哪裡在<strong>呼叫 API</strong></li>
+            <li>哪裡在<strong>處理錯誤</strong></li>
+            <li>哪裡在<strong>整理回覆格式</strong></li>
+          </ul>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              <strong>這比把所有東西塞在同一段程式裡更清楚。</strong>
+            </p>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="case-header">
+            <p class="case-label">STEP 3</p>
+            <h3 class="case-title">在 Gemini CLI 裡測試正常情況</h3>
+          </div>
+
+          <p class="detail-paragraph">啟動 Gemini CLI 後，可以先問：</p>
+
+          <blockquote class="prompt-example">
+            請使用 weather-api 的 hello 工具。
+          </blockquote>
+
+          <p class="detail-paragraph">接著測試：</p>
+
+          <blockquote class="prompt-example">
+            請查詢台北目前的天氣。
+          </blockquote>
+
+          <p class="detail-paragraph">如果成功，應該會看到類似：</p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：成功
+城市：台北
+更新時間：某個時間
+目前氣溫：約某個溫度 °C
+目前風速：約某個風速 km/h
+提醒：這是外部天氣 API 回傳的資料，實際情況仍可能因地點不同而有差異。</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              這表示：AI 最後講出來的自然語言，<strong>不是憑空編出來的</strong>。<br/>
+              它是先呼叫 MCP Tool，拿到外部 API 的結果，再整理給使用者。
+            </p>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="case-header">
+            <p class="case-label">STEP 4</p>
+            <h3 class="case-title">不只測成功，也要測失敗</h3>
+          </div>
+
+          <p class="detail-paragraph">
+            這裡<strong>最重要的練習，就是不要只測成功</strong>。請測試下面幾種情況。
+          </p>
+
+          <h4 class="sub-heading">第一種：輸入不支援的城市</h4>
+          <blockquote class="prompt-example">
+            請查詢東京目前的天氣。
+          </blockquote>
+          <p class="detail-paragraph">
+            應該看到工具<strong>說明目前不支援東京</strong>，並建議可以查哪些城市。
+          </p>
+
+          <h4 class="sub-heading">第二種：輸入別名</h4>
+          <blockquote class="prompt-example">
+            請查詢臺北市目前的天氣。
+          </blockquote>
+          <p class="detail-paragraph">
+            如果別名表有寫好，工具應該會把它<strong>轉成「台北」</strong>後成功查詢。
+          </p>
+
+          <h4 class="sub-heading">第三種：輸入英文</h4>
+          <blockquote class="prompt-example">
+            請查詢 taipei 目前的天氣。
+          </blockquote>
+          <p class="detail-paragraph">
+            如果別名表有支援，<strong>也應該能查詢成功</strong>。
+          </p>
+
+          <h4 class="sub-heading">第四種：輸入空白或不完整內容</h4>
+          <blockquote class="prompt-example">
+            請查詢目前的天氣。
+          </blockquote>
+          <p class="detail-paragraph">
+            這個情況要看 AI 有沒有補出城市。如果 AI 沒有提供城市給工具，工具應該回覆：
+          </p>
+
+          <pre class="code-block" is:raw><code>查詢狀態：失敗
+原因：沒有收到城市名稱。
+建議：請提供要查詢的城市，例如：台北、台中、高雄、淡水。</code></pre>
+
+          <div class="highlight-card">
+            <p class="highlight-text">
+              這些測試會讓使用者理解：<br/>
+              工具的穩定性<strong>不是靠「一次成功」證明的</strong>，<br/>
+              而是靠「各種奇怪情況都能好好回應」<strong>慢慢建立的</strong>。
+            </p>
+          </div>
+        </div>
+      </details>
 
     </div>
   </section>
@@ -962,6 +1149,11 @@ if temperature is None or wind_speed is None or update_time is None:
     background-color: var(--color-bg-secondary);
   }
 
+  .callout-card--warn {
+    border-left-color: #d97706;
+    background-color: rgba(217, 119, 6, 0.06);
+  }
+
   .callout-text {
     font-size: var(--text-sm);
     color: var(--color-text);
@@ -974,12 +1166,23 @@ if temperature is None or wind_speed is None or update_time is None:
     font-weight: 600;
   }
 
+  /* Stacked entries inside one callout */
+  .callout-text + .callout-text {
+    margin-top: var(--space-3);
+  }
+
   .highlight-card {
     margin: var(--space-4) 0 var(--space-6);
     padding: var(--space-3) var(--space-8);
     border: 1px solid var(--color-accent);
     border-radius: var(--border-radius);
     background-color: var(--color-tag-bg);
+  }
+
+  .highlight-card--strong {
+    margin: var(--space-6) 0 var(--space-8);
+    padding: var(--space-5) var(--space-8);
+    border-width: 2px;
   }
 
   .highlight-card--final {

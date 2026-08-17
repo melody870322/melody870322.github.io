@@ -71,7 +71,7 @@ npx @google/gemini-cli -r</code></pre>
           <strong>實測確認：<code>--resume</code> 會還原對話脈絡，不只是還原畫面。</strong>
         </p>
         <p class="callout-text">
-          測法很簡單，你也可以自己驗一次：開一個新 session → 告訴它一件只有這次講過的事（例如一個代號）→ <code>/quit</code> → <code>--resume</code> → 選擇要接哪一筆 → 問它那件事。它答得出來。
+          測法很簡單，你也可以自己驗一次：開一個新 session → 告訴它一件只有這次講過的事（例如一個代號）→ <code>/quit</code> → <code>--resume</code>（會直接接上最近一次）→ 問它那件事。它答得出來。
         </p>
         <p class="callout-text">
           另外一個提醒：在不同資料夾續接時，<strong>絕對路徑的檔案引用可能會失敗，相對路徑比較安全</strong>。
@@ -87,6 +87,39 @@ npx @google/gemini-cli -r</code></pre>
         />
         <figcaption class="figure__caption">實測：離開後用 <code>--resume</code> 續接，它仍記得上一次對話裡給的代號「藍色鉛筆」。</figcaption>
       </figure>
+
+      <div class="callout-card callout-card--warn">
+        <p class="callout-text">
+          <strong>實測：<code>--resume</code> 接得回脈絡，接不回授權。</strong>
+        </p>
+        <p class="callout-text">
+          接回來之後，右下角的模型鎖還在、MCP 連線是綠燈、上次的對話它都記得 —— 但<strong>工具確認框會重新問你一次</strong>。上一輪按過的「Allow for this session」，接回來就失效了。
+        </p>
+        <p class="callout-text">
+          這不是壞掉。把它當成每次開工自帶的一次重新確認：看指令，按 1。
+        </p>
+      </div>
+
+      <figure class="figure">
+        <img
+          class="figure__img"
+          src="/learning/agent/session-resume-confirm-again.png"
+          alt="用 --resume 接回同一個 session 後再叫一次 MCP 工具 list_notes，CLI 重新跳出授權確認框，游標停在 1. Allow once"
+          loading="lazy"
+        />
+        <figcaption class="figure__caption">實測：<code>--resume</code> 接回同一個 session 後再叫同一個工具 —— 確認框重新出現。</figcaption>
+      </figure>
+
+      <p class="detail-paragraph">
+        還有一件事要知道：<strong><code>/clear</code> 過的 session，<code>--resume</code> 接不回內容。</strong>實測在 <code>/clear</code> 之後離開再 <code>--resume</code>，問它先前給過的代號 —— 它答不出來，只能翻專案資料夾裡的檔案找，最後誠實說找不到。
+      </p>
+
+      <div class="highlight-card">
+        <p class="highlight-text">
+          <strong>所以收工的順序是：<code>/stats</code> 看一眼 → <code>/quit</code> 直接走。</strong><br/>
+          要保留續接，就不要在收工前 <code>/clear</code>。<code>/clear</code> 的正確位置是<strong>練習與練習之間</strong> —— 清乾淨重來，需要保留的寫進 <code>GEMINI.md</code>。
+        </p>
+      </div>
 
       <!-- Section 3: /rewind -->
       <h2 class="detail-heading">回到剛剛的樣子：<code>/rewind</code></h2>
